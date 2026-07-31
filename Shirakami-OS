@@ -1,0 +1,123 @@
+```markdown
+# Shirakami OS α2.2 Foundation Revision
+
+**Version:** α2.2  
+**Status:** Foundation Freeze  
+**Role:** Foundation Base Point
+
+---
+
+# Statement
+
+Shirakami OS α2.2 is the current **Foundation Base Point** of the Shirakami Project.
+
+This release does not attempt to represent the entire development history.
+
+Instead, it defines the current architectural baseline from which future development will proceed.
+
+All future changes shall be evaluated as differences from this Foundation.
+
+---
+
+# Objectives
+
+- Consolidate the architectural foundation established through α2.1.
+- Stabilize terminology.
+- Clarify architectural responsibilities.
+- Prepare the project for implementation.
+- Preserve long-term compatibility.
+
+---
+
+# Scope
+
+## Includes
+
+- Core Architecture
+- Core Terminology
+- Runtime Boundary
+- Repository Structure
+- Runtime Interface
+
+## Excludes
+
+- New Theory
+- Research Documents
+- Implementation Details
+- Plugin Development
+- Applications
+- Historical Discussions
+
+---
+
+# Core Concepts
+
+- Landscape
+- Perspective
+- Protocol
+- Runtime
+- Renderer
+- Context Pack
+- Expression Pack
+
+---
+
+# Foundation Principles
+
+- Landscape First
+- Protocol Oriented
+- Runtime Independent
+- Theory / Implementation Separation
+- Replaceable Runtime
+- Non-destructive Evolution
+
+---
+
+# Release Policy
+
+| Version | Purpose |
+|---------|---------|
+| Alpha | Foundation Revision |
+| Beta | Implementation Evolution |
+| Stable | Long-term Compatibility |
+
+---
+
+# Base Point Policy
+
+Shirakami OS α2.2 shall be treated as the Foundation Base Point.
+
+Future proposals shall not modify this Foundation directly.
+
+Changes shall be evaluated as:
+
+- **+** Addition
+- **−** Removal
+- **±** Modification
+
+Only changes requiring a new architectural foundation shall result in a future Alpha major revision.
+
+All implementation evolution shall occur within Beta releases.
+
+---
+
+# Editorial Policy
+
+This Foundation Revision follows a single editorial rule.
+
+> **Add nothing. Remove nothing.**
+
+The document represents the current consensus of the Shirakami Project at the moment of publication.
+
+Its purpose is not perfection.
+
+Its purpose is to establish a stable base point for future evolution.
+
+---
+
+# Copyright
+
+Shirakami Project
+
+Foundation Revision α2.2
+```
