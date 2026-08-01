@@ -1,0 +1,15 @@
+plugin:
+  id: plugin-0001
+  name: GitHub Adapter
+  version: 0.1
+  provider: Shirakami OS
+  type:
+    adapter
+  layer:
+    knowledge-adapter
+  capability:
+    - Repository Discovery
+    - Documentation Reading
+    - RFC Navigation
+  status:
+    prototype
