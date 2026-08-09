@@ -1,0 +1,27 @@
+name: Runtime β0.1 Verification
+
+on:
+  push:
+    paths:
+      - "runtime/**"
+      - ".github/workflows/runtime-beta-0.1.yml"
+  pull_request:
+    paths:
+      - "runtime/**"
+      - ".github/workflows/runtime-beta-0.1.yml"
+
+jobs:
+  test-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run Runtime β0.1 focused test
+        working-directory: runtime
+        run: python -m unittest -v test_prototype.py
