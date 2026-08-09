@@ -54,12 +54,24 @@ Implementation details belong to later development phases.
 
 ---
 
-## Initial RFCs
+## Current RFCs
 
-- RFC-0000 Repository Convention
 - RFC-0001 Plugin Classification
-- RFC-0002 Runtime Lifecycle
-- RFC-0003 Adapter Contract
+- RFC-0002 Plugin Lifecycle
+- RFC-0003 Runtime Lifecycle
+- RFC-0004 Plugin Contract
+- RFC-0005 Contract Layer Overview
+- RFC-0006 Runtime Interface Contract
+
+RFC-0006 is currently marked Draft.
+
+---
+
+## Foundation Relationship
+
+RFCs are architectural discussion and proposal documents. They do not automatically become Foundation merely by existing in this directory.
+
+The current Foundation Base Point is documented separately under `spec/` and the repository root documentation.
 
 ---
 
