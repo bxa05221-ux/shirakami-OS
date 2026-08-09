@@ -7,7 +7,7 @@ behavior. It is an executable boundary test, not the final Runtime architecture.
 """
 
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Mapping
+from typing import Any, Callable, Mapping
 
 
 @dataclass(frozen=True)
@@ -53,7 +53,21 @@ class Runtime:
             input=dict(input_data or {}),
         )
 
-        transition = protocol(context)
+        try:
+            transition = protocol(context)
+        except Exception as exc:
+            return ExecutionResult(
+                status="failed",
+                protocol_id=protocol_id,
+                transition=Transition(
+                    kind="execution.failed",
+                    data={
+                        "error_type": type(exc).__name__,
+                        "message": str(exc),
+                    },
+                ),
+                signals=("execution.failed", "transition.observed"),
+            )
 
         return ExecutionResult(
             status="completed",
@@ -73,6 +87,11 @@ def example_protocol(context: ExecutionContext) -> Transition:
             "changed": True,
         },
     )
+
+
+# Deterministic failing Protocol used only for failure-path verification.
+def failing_protocol(context: ExecutionContext) -> Transition:
+    raise RuntimeError("intentional prototype failure")
 
 
 if __name__ == "__main__":
