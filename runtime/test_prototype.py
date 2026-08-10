@@ -35,3 +35,50 @@ def test_failure_is_observable():
     assert result.transition.data["message"] == "intentional prototype failure"
     assert "execution.failed" in result.signals
     assert "transition.observed" in result.signals
+
+
+def test_invalid_protocol_id_is_observable():
+    runtime = Runtime()
+
+    result = runtime.execute("", example_protocol, {})
+
+    assert result.status == "failed"
+    assert result.transition.kind == "execution.invalid_input"
+    assert result.transition.data["error_type"] == "InvalidProtocolId"
+    assert "execution.invalid" in result.signals
+
+
+def test_invalid_protocol_is_observable():
+    runtime = Runtime()
+
+    result = runtime.execute("invalid.protocol", None, {})
+
+    assert result.status == "failed"
+    assert result.transition.kind == "execution.invalid_input"
+    assert result.transition.data["error_type"] == "InvalidProtocol"
+    assert "execution.invalid" in result.signals
+
+
+def test_invalid_context_input_is_observable():
+    runtime = Runtime()
+
+    result = runtime.execute("invalid.context", example_protocol, ["not", "a", "mapping"])
+
+    assert result.status == "failed"
+    assert result.transition.kind == "execution.invalid_input"
+    assert result.transition.data["error_type"] == "InvalidContextInput"
+    assert "execution.invalid" in result.signals
+
+
+def test_invalid_protocol_result_is_observable():
+    runtime = Runtime()
+
+    def bad_protocol(context):
+        return {"changed": True}
+
+    result = runtime.execute("bad.result", bad_protocol, {})
+
+    assert result.status == "failed"
+    assert result.transition.kind == "execution.invalid_result"
+    assert result.transition.data["error_type"] == "InvalidProtocolResult"
+    assert "execution.invalid" in result.signals
