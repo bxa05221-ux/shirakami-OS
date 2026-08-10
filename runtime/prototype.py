@@ -48,6 +48,20 @@ class Runtime:
         protocol: Protocol,
         input_data: Mapping[str, Any] | None = None,
     ) -> ExecutionResult:
+        validation_error = self._validate_execution_input(
+            protocol_id, protocol, input_data
+        )
+        if validation_error is not None:
+            return ExecutionResult(
+                status="failed",
+                protocol_id=protocol_id if isinstance(protocol_id, str) else "",
+                transition=Transition(
+                    kind="execution.invalid_input",
+                    data=validation_error,
+                ),
+                signals=("execution.invalid", "transition.observed"),
+            )
+
         context = ExecutionContext(
             protocol_id=protocol_id,
             input=dict(input_data or {}),
@@ -69,12 +83,49 @@ class Runtime:
                 signals=("execution.failed", "transition.observed"),
             )
 
+        if not isinstance(transition, Transition):
+            return ExecutionResult(
+                status="failed",
+                protocol_id=protocol_id,
+                transition=Transition(
+                    kind="execution.invalid_result",
+                    data={
+                        "error_type": "InvalidProtocolResult",
+                        "message": "Protocol must return Transition",
+                    },
+                ),
+                signals=("execution.invalid", "transition.observed"),
+            )
+
         return ExecutionResult(
             status="completed",
             protocol_id=protocol_id,
             transition=transition,
             signals=("execution.completed", "transition.observed"),
         )
+
+    @staticmethod
+    def _validate_execution_input(
+        protocol_id: str,
+        protocol: Protocol,
+        input_data: Mapping[str, Any] | None,
+    ) -> dict[str, str] | None:
+        if not isinstance(protocol_id, str) or not protocol_id.strip():
+            return {
+                "error_type": "InvalidProtocolId",
+                "message": "protocol_id must be a non-empty string",
+            }
+        if not callable(protocol):
+            return {
+                "error_type": "InvalidProtocol",
+                "message": "protocol must be callable",
+            }
+        if input_data is not None and not isinstance(input_data, Mapping):
+            return {
+                "error_type": "InvalidContextInput",
+                "message": "input_data must be a mapping or None",
+            }
+        return None
 
 
 # Deterministic Protocol used only for the minimal vertical-slice demonstration.
