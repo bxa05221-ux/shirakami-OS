@@ -1,0 +1,17 @@
+matome:
+  title: Quickstart Observation Protocol
+  version: 0.1
+  status:
+    architecture: example
+  statement: >
+    A minimal protocol demonstrating that a Protocol can be loaded,
+    executed, observed, and represented as a Landscape transition.
+  pipeline:
+    - phase: observe
+      action: capture_input
+    - phase: transition
+      action: mark_observed
+    - phase: evidence
+      action: capture_evidence
+    - phase: landscape
+      action: expose_state
