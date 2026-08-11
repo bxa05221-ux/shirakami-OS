@@ -1,0 +1,7 @@
+{
+  "probe": "runtime-landscape-write",
+  "version": "beta-0.1",
+  "status": "controlled-write",
+  "source": "Shirakami Runtime Landscape Adapter verification",
+  "purpose": "Verify that an external GitHub Landscape can receive a controlled transition without modifying Foundation documents."
+}
