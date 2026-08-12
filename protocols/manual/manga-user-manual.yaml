@@ -1,0 +1,65 @@
+matome:
+  title: Shirakami OS User Manual Manga
+  subtitle:
+    - Manual Rendering Protocol
+    - Manga UI Adapter
+    - Multilingual Documentation
+  version: 0.1
+  status:
+    protocol: experimental
+    renderer: alpha
+    purpose: public-alpha-demo
+  statement: >
+    The same manual structure can be rendered as a human-readable manga
+    in multiple languages without changing the underlying protocol intent.
+  manual:
+    type: manga
+    default_language: ja
+    supported_languages:
+      - ja
+      - en
+    output:
+      format: svg
+      page_width: 1200
+      page_height: 900
+    pages:
+      - id: landscape
+        title:
+          ja: "AIが変わっても、景色を残したい"
+          en: "Keep the landscape, even when AI changes"
+        narration:
+          ja: "白神OSでは、人間のLandscapeを中心に置きます。"
+          en: "Shirakami OS places the human Landscape at the center."
+        dialogue:
+          ja: "このAIとの時間を、次のAIにもつなげたい。"
+          en: "I want this experience to carry over to the next AI."
+      - id: protocol
+        title:
+          ja: "まず、Protocolとして記述する"
+          en: "First, describe it as a Protocol"
+        narration:
+          ja: "的目YAMLは、Runtimeが扱うProtocolの入口です。"
+          en: "Matome YAML is an entry point for Protocols consumed by the Runtime."
+        dialogue:
+          ja: "何を守り、何を観測するかを先に決めよう。"
+          en: "Let's define what to preserve and what to observe first."
+      - id: runtime
+        title:
+          ja: "RuntimeがProtocolを実行する"
+          en: "The Runtime executes the Protocol"
+        narration:
+          ja: "RuntimeはAIそのものではなく、Protocolに従って状態を扱います。"
+          en: "The Runtime is not the AI itself; it handles state according to the Protocol."
+        dialogue:
+          ja: "観測した。では、その変化をEvidenceとして残す。"
+          en: "Observed. Now preserve that transition as Evidence."
+      - id: multilingual
+        title:
+          ja: "同じ構造を、別の言語へ"
+          en: "Render the same structure in another language"
+        narration:
+          ja: "言語を差し替えても、マニュアルの構造は変わりません。"
+          en: "The manual structure remains unchanged when the language changes."
+        dialogue:
+          ja: "日本語でも英語でも、同じProtocolから説明できる。"
+          en: "Japanese or English, the explanation comes from the same Protocol."
