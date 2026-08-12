@@ -30,7 +30,7 @@ def test_successful_transition_becomes_immutable_evidence():
         evidence.status = "rewritten"
 
 
-def test_failure_result_does_not_invent_transition_evidence():
+def test_failure_result_remains_observable_without_transition_evidence():
     def failing_protocol(context):
         raise RuntimeError("boom")
 
@@ -43,6 +43,7 @@ def test_failure_result_does_not_invent_transition_evidence():
     evidence = capture_evidence(result)
 
     assert evidence.status == "failed"
-    assert evidence.transition_kind == "execution.failure"
-    assert evidence.transition_data["changed"] is False
+    assert evidence.transition_kind == "execution.failed"
+    assert evidence.transition_data["error_type"] == "RuntimeError"
+    assert evidence.transition_data["message"] == "boom"
     assert is_transition_evidence(evidence) is False
