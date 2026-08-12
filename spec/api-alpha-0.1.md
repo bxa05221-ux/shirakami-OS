@@ -4,7 +4,7 @@
 
 Experimental Public Alpha API.
 
-This API exposes the existing Protocol IR → Runtime vertical slice for external observation and integration testing.
+The API exposes the current Protocol IR → Runtime vertical slice and the minimum GitHub Adapter boundary for external observation and controlled write/read-back experiments.
 
 ## Endpoints
 
@@ -18,56 +18,40 @@ Returns:
 
 ### `POST /v0.1/execute`
 
-Request:
+Executes the currently supported Protocol transition.
 
-```json
-{
-  "protocol": {
-    "matome": {
-      "title": "Example",
-      "version": "0.1"
-    }
-  },
-  "operation": "echo",
-  "input": {"example": "landscape"}
-}
-```
+### `POST /v0.1/github/read`
 
-Response:
+Reads a repository file through the GitHub Adapter. The API does not directly call GitHub-specific transport code; the Adapter owns that boundary.
 
-```json
-{
-  "protocol": {
-    "title": "Example",
-    "version": "0.1"
-  },
-  "success": true,
-  "event": "execution.completed",
-  "output": {"example": "landscape"},
-  "error": null
-}
-```
+### `POST /v0.1/github/write`
 
-## Scope
+Performs a controlled write using the supplied current blob SHA and immediately reads the resulting file back through the Adapter.
 
-α0.1 intentionally exposes only an `echo` transition. It exists to verify the API boundary, not to define the final Protocol execution language.
+A GitHub token is required by the Adapter for writes (`GITHUB_TOKEN`). The API never accepts the token as request data.
 
-The API does not yet define authentication, persistence, scheduling, multi-user isolation, or production deployment requirements.
-
-## Architecture
+Conceptually:
 
 ```text
 Client
   ↓
-Runtime API α0.1
+Runtime API
   ↓
-Protocol Runtime Bridge
+GitHub Adapter
   ↓
-Runtime
+GitHub Backend
   ↓
-ExecutionResult / Evidence boundary
+Read-back
+  ↓
+Evidence
 ```
 
-## Compatibility Principle
+## Safety Boundary
 
-The API must remain a thin interface over the existing Runtime. API-specific semantics must not silently become Protocol or Runtime Core semantics.
+The controlled-write endpoint requires an existing blob SHA. This provides an optimistic concurrency boundary and prevents an unconditional replacement operation from being treated as a Runtime transition.
+
+The adapter must retain the Backend-specific transport details. Runtime Core remains unaware of GitHub APIs.
+
+## Scope
+
+α0.1 is an integration proof, not a production service specification. Authentication, authorization, rate limiting, persistence, multi-user isolation, deployment, and broader Protocol execution semantics remain outside this version.
