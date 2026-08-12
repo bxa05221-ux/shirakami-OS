@@ -1,0 +1,130 @@
+matome:
+  title: "機械仕掛けのマリアのプロトコル — AIとともに読む Protocol"
+  subtitle:
+    - "β1 Work Landscape Experiment"
+    - "Source-Grounded Reading"
+    - "Observation Before Interpretation"
+  version: "0.1"
+  status:
+    protocol: experimental
+    manuscript: source-grounded
+    scene_map: partial
+    purpose: "作品LandscapeをRuntime上で観測する最小実証"
+
+statement: >
+  本Protocolは、小説本文をAIが勝手に解釈するためのものではない。
+  正本として選択されたEditionを起点に、Chapter、Scene、Observation、Evidenceを分離して保持し、
+  AIとの読書において本文に存在する事実と、読者・AIによる解釈を混同しないための境界を定義する。
+
+source:
+  canonical_candidate:
+    title: "機械仕掛けのマリアのプロトコル（規約）通し版.docx"
+    note: "現時点でFile Library上で確認できる通し版。完成版・改訂版の最終的な正本指定は別途確定する。"
+  alternate_sources:
+    - "機械仕掛けのマリア三部構成9:8.docx"
+    - "# 機械仕掛けのマリア.txt"
+  rule:
+    - "Editionを混在させない。"
+    - "本文の差異は改訂履歴として扱い、勝手に統合しない。"
+    - "正本が確定するまではcanonical_candidateとして扱う。"
+
+landscape_layers:
+  - id: manuscript
+    purpose: "作品本文そのもの"
+    authority: source
+  - id: scene
+    purpose: "本文上確認できる時間・場所・視点・出来事の単位"
+    authority: observed
+  - id: evidence
+    purpose: "Scene境界やObservationを裏付ける本文上の根拠"
+    authority: source
+  - id: reading
+    purpose: "AI・読者が作品から受け取った問い・連想・解釈"
+    authority: interpretation
+  - id: author_context
+    purpose: "執筆時の対話・改稿履歴・作者による説明"
+    authority: contextual
+
+reading_rules:
+  observation:
+    - "まず本文に何があるかを記録する。"
+    - "時間・場所・視点・登場人物・出来事を本文から抽出する。"
+    - "本文にない心理や意図をObservationとして確定しない。"
+  interpretation:
+    - "Observationと解釈を別レイヤーに保持する。"
+    - "解釈は仮説として扱い、Evidenceと区別する。"
+    - "作者の意図を本文だけから確定しない。"
+  dark_question:
+    - "問いを保持する。"
+    - "読者より先に意味を確定しない。"
+    - "問いが本文上の別Scene・別章・別作品と関係する場合はRelation候補として保持する。"
+  revision:
+    - "改訂による差異はEvidenceとして記録する。"
+    - "旧版を現行版に自動的に混ぜない。"
+
+scene_map_contract:
+  current_artifact: "works/maria/scene-map.yaml"
+  current_status: partial
+  required:
+    - "scene_id"
+    - "chapter_order"
+    - "boundary_basis"
+    - "source_evidence"
+  optional:
+    - "time"
+    - "place"
+    - "viewpoint"
+    - "actors"
+    - "event"
+    - "transition_note"
+
+observation_event:
+  input:
+    - "Scene"
+    - "Reader statement"
+    - "AI observation"
+  output:
+    - "observable fact"
+    - "source evidence"
+    - "open question"
+    - "interpretation candidate"
+  invariant:
+    - "Evidence is preserved."
+    - "Interpretation does not overwrite source."
+    - "Uncertainty remains explicit."
+
+ai_reader:
+  role: "読書Landscapeの観測補助"
+  must_not:
+    - "作品の意味を一方的に決定する"
+    - "本文にない事実を補う"
+    - "作者の心理を断定する"
+    - "異なるEditionを混ぜる"
+    - "読者の反応を作品本文の事実として保存する"
+  should:
+    - "本文上の根拠を示す"
+    - "問いを保持する"
+    - "過去のSceneとの関係候補を提示する"
+    - "読者自身の言語化を促す"
+
+experiment:
+  hypothesis: >
+    Source-groundedな作品Landscapeを保持することで、AIは単発の要約・感想生成ではなく、
+    作品を継続的に参照しながら読者との対話を維持できる。
+  success_conditions:
+    - "本文EvidenceとAI解釈を分離できる"
+    - "Sceneを跨いだ関係を追跡できる"
+    - "読者が自分の読みを修正・追加できる"
+    - "別Editionへの変更を追跡できる"
+    - "同じProtocolを別作品へ移植できる"
+
+next:
+  - "Scene Mapの第一部全章を本文Evidence付きで確定する"
+  - "第二部全章を本文Evidence付きで確定する"
+  - "Scene Observationを数件実施する"
+  - "AIとの読書TurnをEvidence付きで記録する"
+  - "不足するRuntime Contractだけを実装課題として抽出する"
+
+critical_rule:
+  - "小説の理論化を先行させない。"
+  - "本文を壊さず、読者とAIの往復運動を観測する。"
