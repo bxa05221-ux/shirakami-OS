@@ -13,8 +13,9 @@ def test_protocol_ir_executes_through_runtime():
 
     assert execution.protocol_title == "Bridge Test"
     assert execution.protocol_version == "0.1"
-    assert execution.result.success is True
-    assert execution.result.output == {"echo": "landscape"}
+    assert execution.result.status == "success"
+    assert execution.result.transition == "completed"
+    assert execution.result.signals == [{"type": "execution.completed"}]
 
 
 def test_protocol_ir_failure_is_preserved_as_runtime_result():
@@ -31,6 +32,6 @@ def test_protocol_ir_failure_is_preserved_as_runtime_result():
     execution = execute_protocol(protocol, fail, input_value="landscape")
 
     assert execution.protocol_title == "Failure Test"
-    assert execution.result.success is False
-    assert execution.result.event == "execution.failed"
-    assert execution.result.error == "expected failure"
+    assert execution.result.status == "failure"
+    assert execution.result.transition == "failed"
+    assert execution.result.signals == [{"type": "execution.failed", "error": "expected failure"}]
