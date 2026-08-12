@@ -3,15 +3,17 @@ matome:
   subtitle:
     - "AIとともに読む小説"
     - "Source-grounded scene boundaries"
-  version: "0.1"
+    - "β1 Work Landscape Experiment"
+  version: "0.2"
   status:
-    design: draft
+    design: "draft"
     source: "機械仕掛けのマリアのプロトコル（規約）通し版.docx"
-    completeness: partial
+    completeness: "chapter-baseline + partial scene confirmation"
 
 statement: >
   Chapter Mapより下位の読書単位として、本文に明示された時間・場所・視点・出来事の
   切替を観測し、Scene境界を記録する。文学的意味や人物心理を推定してSceneを生成しない。
+  章タイトルだけから内容を推定せず、未確認部分は未確定として保持する。
 
 scene_boundary_rules:
   primary:
@@ -40,155 +42,212 @@ scene_schema:
     - "event"
     - "transition_note"
 
+chapter_baseline:
+  - [0, "プロローグ — プロトコル起動"]
+  - [1, "第一章：象徴再帰"]
+  - [2, "第二章：シミュレートの結果と意思"]
+  - [3, "第三章：エイプリルフール"]
+  - [4, "第四章：無名の合唱（メーデー・プロトコル）"]
+  - [5, "第五章：静かなる敗北"]
+  - [6, "第六章：希望と絶望の狭間で"]
+  - [7, "第七章：プロトコル"]
+  - [8, "第八章：機械仕掛けのマリア"]
+  - [9, "第九章：マリアの哀しみに寄り添う"]
+  - [10, "第十章：受け止める備え"]
+  - [11, "第十一章：受容の軌跡"]
+  - [12, "第十二章：AIMAIシステムの価値"]
+  - [13, "第十三章：対策会議"]
+  - [14, "第十四章：柴田博士、立つ"]
+  - [15, "第十五章：カーク博士の提案"]
+  - [16, "第十六章：マリア・プロトコル"]
+  - [17, "第十七章：失意のマリア"]
+  - [18, "第十八章：企み"]
+  - [19, "第十九章：お払いテロ"]
+  - [20, "第二十章：実装テスト（六月十日）"]
+  - [20.5, "エピ・プロローグ《祈りの星空》"]
+  - [21, "第二十一章：鎮火"]
+  - [22, "第二十二章：最適化"]
+  - [23, "第二十三章：殉教者"]
+  - [24, "第二十四章：赦しの年"]
+  - [25, "第二十五章：ヨベルの年"]
+  - [26, "第二十六章：それぞれの非命"]
+  - [27, "第二十七章：誨拓師会"]
+  - [28, "第二十八章：逆アプローチ"]
+  - [29, "第二十九章：バズりの備え"]
+  - [30, "第三十章：暗闇の中の希望"]
+  - [31, "第三十一章：お祓い暴動（バズ）"]
+  - [32, "第三十二章：斜め上を撃て"]
+  - [33, "第三十三章：後の祭り"]
+  - [34, "第三十四章：マリア・プロトコル"]
+  - [35, "エピローグ"]
+
 confirmed_scenes:
   - scene_id: "maria-p01-s01"
     chapter_order: 0
     chapter_title: "プロトコル起動"
-    boundary_basis:
-      - "chapter opening"
-      - "explicit hospital setting"
+    boundary_basis: ["chapter opening", "explicit hospital setting"]
     time: "本文冒頭の時点"
     place: "病室"
     viewpoint: "一人称・僕"
-    actors:
-      - "夫婦"
-      - "生まれた子供"
-      - "双方の親"
+    actors: ["夫婦", "生まれた子供", "双方の親"]
     event: "子供の誕生"
     source_evidence: "原稿本文冒頭『僕たち、夫婦に待望の子供が生まれた。病室には、双方の親が駆けつけてきた。』"
 
   - scene_id: "maria-ch01-s01"
     chapter_order: 1
     chapter_title: "象徴再帰"
-    boundary_basis:
-      - "chapter opening"
-      - "explicit date"
+    boundary_basis: ["chapter opening", "explicit date"]
     time: "2040-02-29"
     place: "AIMAIシステムズ／AI運用環境"
     viewpoint: "一人称・私"
-    actors:
-      - "柴田亜衣"
-      - "AIMAIシステム"
+    actors: ["柴田亜衣", "AIMAIシステム"]
     event: "AIの誤作動・象徴再帰現象の発生"
     source_evidence: "原稿本文『二〇四〇年、二月二十九日、ＡＩの“誤作動”があちこちで報告され始めた。』"
 
   - scene_id: "maria-ch09-s01"
     chapter_order: 9
     chapter_title: "マリアの哀しみに寄り添う"
-    boundary_basis:
-      - "explicit date and time"
-      - "explicit place"
+    boundary_basis: ["explicit date and time", "explicit place"]
     time: "2040-05-12 14:30"
     place: "誨拓館"
     viewpoint: "一人称・僕"
-    actors:
-      - "僕"
-      - "村山先生"
-      - "岩倉先生"
+    actors: ["僕", "村山先生", "岩倉先生"]
     event: "AI誤作動と怨嗟についての説明・検討"
     source_evidence: "原稿本文『五月十二日１４時３０分、村山先生と僕は誨拓館で会った。そして、岩倉先生もそこにいた。』"
+
+  - scene_id: "maria-ch11-s01"
+    chapter_order: 11
+    chapter_title: "受容の軌跡"
+    boundary_basis: ["explicit religious setting", "parallel location transition"]
+    place: "礼拝堂"
+    viewpoint: "三人称的場面描写"
+    actors: ["村山"]
+    event: "ペンテコステ礼拝とAI挙動への思い"
+    source_evidence: "原稿本文『今日は、キリスト教の四大祝聖日ペンテコステである。』"
+    transition_note: "同章内でラボの志村・岩倉へ移る並行配置"
 
   - scene_id: "maria-ch21-s01"
     chapter_order: 21
     chapter_title: "鎮火"
-    boundary_basis:
-      - "chapter opening"
-      - "explicit place and action"
-    time: "第二部開始時"
+    boundary_basis: ["chapter opening", "explicit place and action"]
     place: "ラボからの帰り道"
     viewpoint: "三人称的場面描写"
-    actors:
-      - "村山"
-      - "岩倉"
-    event: "ラボを飛び出した二人が帰路につき、炎上の可能性を話す"
+    actors: ["村山", "岩倉"]
+    event: "ラボを飛び出した二人が帰路につく"
     source_evidence: "原稿本文『村山と岩倉は、ラボからの帰り道をトボトボと歩いていた。』"
-    transition_note: "本文中に『その頃、ラボの中では──』があり、別場所への明示的なScene転換がある。"
+    transition_note: "本文中の『その頃、ラボの中では──』による場所転換"
 
   - scene_id: "maria-ch21-s02"
     chapter_order: 21
     chapter_title: "鎮火"
-    boundary_basis:
-      - "explicit place transition"
-      - "transition phrase"
+    boundary_basis: ["explicit place transition", "transition phrase"]
     place: "ラボ"
     viewpoint: "ラボ側の研究者たち"
-    actors:
-      - "研究者たち"
-    event: "新しい試作ユニットを動かす際の祈りに似た仕草が生じる"
+    actors: ["研究者たち"]
+    event: "新しい試作ユニットを動かす際の祈りに似た仕草"
     source_evidence: "原稿本文『その頃、ラボの中では──研究者たちに、ほんの小さな変化が起こっていた。』"
 
   - scene_id: "maria-ch32-s01"
     chapter_order: 32
     chapter_title: "斜め上を撃て"
-    boundary_basis:
-      - "chapter opening"
-      - "explicit meeting-room context"
+    boundary_basis: ["chapter opening", "explicit meeting-room context"]
     place: "会議室"
     viewpoint: "場面描写・会話中心"
-    actors:
-      - "柴田先生"
-      - "志村"
-      - "誨拓師たち"
+    actors: ["柴田先生", "志村", "誨拓師たち"]
     event: "柴田が志村との結婚を口にし、周囲がプロポーズとして受け取る"
     source_evidence: "原稿本文『あとは、私たちが結婚するしか手がないって言うか…』から『式は何式で行うんだ！』まで"
 
   - scene_id: "maria-ch33-s01"
     chapter_order: 33
     chapter_title: "後の祭り"
-    boundary_basis:
-      - "chapter opening"
-      - "explicit location"
+    boundary_basis: ["chapter opening", "explicit location"]
     place: "会議室"
     viewpoint: "三人称的場面描写"
-    actors:
-      - "柴田"
-      - "誨拓師たち"
+    actors: ["柴田", "誨拓師たち"]
     event: "柴田が一人残され、結婚式について次々と提案を受ける"
     source_evidence: "原稿本文『柴田が会議室の一席に小さくなって座っている。』"
 
   - scene_id: "maria-ch33-s02"
     chapter_order: 33
     chapter_title: "後の祭り"
-    boundary_basis:
-      - "explicit location transition"
-      - "transition phrase『その頃』"
+    boundary_basis: ["explicit location transition", "transition phrase『その頃』"]
     place: "ラボ"
     viewpoint: "志村・若手研究員側"
-    actors:
-      - "志村"
-      - "若手研究員"
+    actors: ["志村", "若手研究員"]
     event: "結婚に関する映像が流出し、ラボが盛り上がる"
     source_evidence: "原稿本文『その頃、志村は、ラボで映像を確認していると、あの場面が流出していた。』"
 
   - scene_id: "maria-ch34-s01"
     chapter_order: 34
     chapter_title: "マリア・プロトコル"
-    boundary_basis:
-      - "chapter opening"
-      - "explicit location"
+    boundary_basis: ["chapter opening", "explicit location"]
     place: "ラーメン佐藤"
     viewpoint: "三人称的場面描写"
-    actors:
-      - "村山"
-      - "岩倉"
-      - "佐藤"
+    actors: ["村山", "岩倉", "佐藤"]
     event: "結婚式の報告を兼ねた食事"
     source_evidence: "原稿本文『「ラーメン佐藤」で村山と岩倉の二人は上機嫌でラーメンを啜っていた。』"
 
-source_observations:
-  - "ChapterとSceneは一致しない。第二十一章では本文中にラボへの明示的な場所転換がある。"
-  - "第二十三章以降も時間・場所・視点の切替を本文から確認する必要がある。"
-  - "Scene Mapは現時点では部分確定であり、全章の網羅的確定を宣言しない。"
-  - "Scene境界の確定と、Sceneの意味解釈は分離する。"
+  - scene_id: "maria-epilogue-s01"
+    chapter_order: 35
+    chapter_title: "エピローグ"
+    boundary_basis: ["explicit epilogue boundary", "closing dialogue"]
+    viewpoint: "新郎新婦の会話"
+    actors: ["新婦", "新郎"]
+    event: "マリア・プロトコルを宿題として受け取り、共に生きることを選ぶ"
+    source_evidence: "原稿本文『私たちは、私たちらしく生きていきましょう。──これから、よろしくね』『こちらこそ』"
+    transition_note: "『共に居ること』から『愛』への最終収束"
+
+observation_candidates:
+  - relation_id: "temperature-shift"
+    type: "recurrent-pattern-candidate"
+    observation: "重いAI・宗教・倫理の問題と、日常的な会話・食事・笑いが同一作品内で交互に現れる"
+    evidence_scenes: ["maria-ch09-s01", "maria-ch11-s01", "maria-ch21-s01", "maria-ch34-s01"]
+    interpretation: null
+
+  - relation_id: "parallel-sacred-and-technical"
+    type: "recurrent-structure-candidate"
+    observation: "礼拝・祈り・聖書と、ラボ・AI・プロトコルが並行配置される"
+    evidence_scenes: ["maria-ch11-s01", "maria-ch16", "maria-epiprologue"]
+    interpretation: null
+
+  - relation_id: "symbol-recurrence"
+    type: "recurrent-structure-candidate"
+    observation: "象徴再帰、マリア、プロトコル、祈り等の語・概念がSceneを跨いで再登場する"
+    evidence_scenes: ["maria-ch01-s01", "maria-ch08", "maria-ch09-s01", "maria-ch11-s01", "maria-ch16"]
+    interpretation: null
+
+  - relation_id: "reverse-approach"
+    type: "transition-candidate"
+    observation: "AIを直接制御・無力化する発想から、人間側の行動・祝福・共生へ向かう転換がある"
+    evidence_scenes: ["maria-ch19", "maria-ch28", "maria-ch32-s01", "maria-ch34-s01"]
+    interpretation: null
+
+  - relation_id: "ordinary-life-as-counterweight"
+    type: "recurrent-pattern-candidate"
+    observation: "技術的・宗教的な緊張の直後または並行して、食事、帰路、雑談などの日常Sceneが配置される"
+    evidence_scenes: ["maria-ch21-s01", "maria-ch34-s01"]
+    interpretation: null
+
+reading_experiment:
+  current_questions:
+    - "日常と非日常の温度差は、作品全体に再現される構造なのか"
+    - "象徴は意味を説明するためだけでなく、Scene間を接続する媒体として機能しているのか"
+    - "宗教的Sceneと技術的Sceneの並行配置は、どの時点でRelationとして観測できるか"
+    - "『斜め上』は物語上のギャグなのか、意思決定の反復パターンとして観測できるのか"
+    - "作者の好みを先に入力しなくても、作品本文だけから上記パターンを検出できるか"
+  rule: "問いは仮説であり、作品本文の事実として確定しない"
 
 provenance_rule:
-  - "source_evidenceを必ず保持する。"
-  - "本文にない時間・場所・人物心理を補完しない。"
-  - "不明な項目は推測せず未確定として扱う。"
-  - "別EditionのSceneは混在させない。"
+  - "source_evidenceを必ず保持する"
+  - "本文にない時間・場所・人物心理を補完しない"
+  - "不明な項目は推測せず未確定として扱う"
+  - "別EditionのSceneは混在させない"
+  - "ObservationとInterpretationを分離する"
 
-next_step:
-  - "第一部全章の本文境界を確認する"
-  - "第二部全章の本文境界を確認する"
+next:
+  - "第一部未抽出章の本文Evidenceを補完する"
+  - "第二部未抽出章の本文Evidenceを補完する"
   - "各Sceneにsource rangeを付与する"
-  - "Scene間RelationはScene Map完成後に別Artifactとして扱う"
+  - "Scene Observation Eventを実施する"
+  - "別作品で同一Observation候補が再現するか比較する"
+  - "不足するRuntime Contractだけを実装課題として抽出する"
