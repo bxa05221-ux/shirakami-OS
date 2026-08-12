@@ -1,0 +1,152 @@
+matome:
+  title: "機械仕掛けのマリアのプロトコル — Chapter Map"
+  subtitle:
+    - "AIとともに読む小説"
+    - "Source-grounded structural map"
+  version: "0.1"
+  status:
+    design: draft
+    source: "機械仕掛けのマリアのプロトコル（規約）通し版.docx"
+    source_verification: "table-of-contents extraction"
+
+statement: >
+  本文の意味解釈ではなく、原稿に明示された章・プロローグ・エピローグの
+  構造だけを記録する。章名・順序・表記上の揺れを勝手に修正しない。
+
+source:
+  title: "機械仕掛けのマリアのプロトコル（規約）通し版.docx"
+  role: source_candidate
+  authority: manuscript
+  note: "完成版としてのcanonical確定は作者判断を待つ。"
+
+structure:
+  - order: 0
+    type: prologue
+    title: "プロトコル起動"
+  - order: 1
+    type: chapter
+    title: "象徴再帰"
+  - order: 2
+    type: chapter
+    title: "シミュレートの結果と意思"
+  - order: 3
+    type: chapter
+    title: "エイプリルフール"
+  - order: 4
+    type: chapter
+    title: "無名の合唱（メーデー・プロトコル）"
+  - order: 5
+    type: chapter
+    title: "静かなる敗北"
+  - order: 6
+    type: chapter
+    title: "希望と絶望の狭間で"
+  - order: 7
+    type: chapter
+    title: "プロトコル"
+  - order: 8
+    type: chapter
+    title: "機械仕掛けのマリア"
+  - order: 9
+    type: chapter
+    title: "マリアの哀しみに寄り添う"
+  - order: 10
+    type: chapter
+    title: "受け止める備え"
+  - order: 11
+    type: chapter
+    title: "受容の軌跡"
+  - order: 12
+    type: chapter
+    title: "ＡＩＭＡＩシステムの価値"
+  - order: 13
+    type: chapter
+    title: "対策会議"
+  - order: 14
+    type: chapter
+    title: "柴田博士、立つ"
+  - order: 15
+    type: chapter
+    title: "カーク博士の提案"
+  - order: 16
+    type: chapter
+    title: "マリア・プロトコル"
+  - order: 17
+    type: chapter
+    title: "失意のマリア"
+  - order: 18
+    type: chapter
+    title: "企み"
+  - order: 19
+    type: chapter
+    title: "お払いテロ"
+  - order: 20
+    type: chapter
+    title: "実装テスト（六月十日）"
+  - order: 20.5
+    type: epi_prologue
+    title: "祈りの星空"
+  - order: 21
+    type: chapter
+    title: "鎮火"
+  - order: 22
+    type: chapter
+    title: "最適化"
+  - order: 23
+    type: chapter
+    title: "殉教者"
+  - order: 24
+    type: chapter
+    title: "赦しの年"
+  - order: 25
+    type: chapter
+    title: "ヨベルの年"
+  - order: 26
+    type: chapter
+    title: "それぞれの非命"
+  - order: 27
+    type: chapter
+    title: "誨拓師会"
+  - order: 28
+    type: chapter
+    title: "逆アプローチ"
+  - order: 29
+    type: chapter
+    title: "バズりの備え"
+  - order: 30
+    type: chapter
+    title: "暗闇の中の希望"
+    source_label: "第三十十章"
+    note: "原稿目次の表記をそのまま保持。番号の正規化は未実施。"
+  - order: 31
+    type: chapter
+    title: "お祓い暴動（バズ）"
+  - order: 32
+    type: chapter
+    title: "斜め上を撃て"
+  - order: 33
+    type: chapter
+    title: "後の祭り"
+  - order: 34
+    type: chapter
+    title: "マリア・プロトコル"
+  - order: 35
+    type: epilogue
+    title: "エピローグ"
+
+source_observations:
+  - "目次では『第三十十章』という表記が確認できる。"
+  - "『エピ・プロローグ《祈りの星空》』が第二十章と第二十一章の間に配置されている。"
+  - "目次後に『第一部　機械仕掛けのマリア』とプロローグ本文が続く構成が確認できる。"
+  - "このファイルは章構成の抽出であり、本文の内容解釈を含まない。"
+
+provenance_rule:
+  - "章タイトルは原稿目次から抽出する。"
+  - "番号・表記の揺れは原文を優先する。"
+  - "構造上の矛盾に見える箇所は修正せずObservationとして保持する。"
+  - "別Editionの章構成はこのMapに混在させない。"
+
+next_step:
+  - "本文境界を章単位で確認する"
+  - "同一Edition内のScene境界を抽出する"
+  - "別EditionとのChapter Map差分を観測する"
