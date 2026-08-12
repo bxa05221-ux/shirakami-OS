@@ -24,10 +24,7 @@ def render_manual(source: str | Path, language: str = "ja") -> str:
         raise ManualRenderError("manual must contain at least one page")
 
     width, height = 1200, 900
-    panels = []
-    for index, page in enumerate(pages, start=1):
-        panels.append(_panel(index, page, width, height))
-
+    panels = [_panel(index, page) for index, page in enumerate(pages, start=1)]
     body = "\n".join(panels)
     return f'''<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height * len(panels)}" viewBox="0 0 {width} {height * len(panels)}">
@@ -51,25 +48,30 @@ def _parse_pages(text: str, language: str) -> list[dict[str, str]]:
             value = _localized_value(rest, field, language)
             if value:
                 page[field] = value
-        if not all(page.get(key) for key in ("id", "title", "narration", "dialogue")):
+        required = ("id", "title", "narration", "dialogue")
+        if not all(page.get(key) for key in required):
             raise ManualRenderError(f"page '{page_id.strip()}' is incomplete")
         pages.append(page)
     return pages
 
 
 def _localized_value(text: str, field: str, language: str) -> str | None:
-    pattern = rf"^\s{{8}}{re.escape(field)}:\s*$([\\s\\S]*?)(?=^\s{{8}}(?:title|narration|dialogue):\s*$|\Z)"
-    match = re.search(pattern, text, re.MULTILINE)
+    pattern = rf"^\s{{8}}{re.escape(field)}:\s*$\n(.*?)(?=^\s{{8}}(?:title|narration|dialogue):\s*$|\Z)"
+    match = re.search(pattern, text, re.MULTILINE | re.DOTALL)
     if not match:
         return None
-    block = match.group(1)
-    locale_match = re.search(rf"^\s{{10}}{re.escape(language)}:\s*[\"']?(.*?)[\"']?\s*$", block, re.MULTILINE)
+    locale_match = re.search(
+        rf"^\s{{10}}{re.escape(language)}:\s*[\"']?(.*?)[\"']?\s*$",
+        match.group(1),
+        re.MULTILINE,
+    )
     if not locale_match:
         return None
     return locale_match.group(1).strip().strip('"\'')
 
 
-def _panel(index: int, page: dict[str, str], width: int, height: int) -> str:
+def _panel(index: int, page: dict[str, str]) -> str:
+    width, height = 1200, 900
     y = (index - 1) * height
     title = _wrap(page["title"], 38)
     narration = _wrap(page["narration"], 46)
