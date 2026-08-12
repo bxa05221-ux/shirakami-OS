@@ -12,6 +12,7 @@ Status: Foundation Freeze
 
 - Foundation → [spec/](spec/)
 - Architecture → [docs/](docs/)
+- **User Manual (manga)** → [docs/user-manual.md](docs/user-manual.md)
 - RFC → [docs/rfc/](docs/rfc/)
 - Examples → [examples/](examples/)
 - Japanese introduction → [README.ja.md](README.ja.md)
