@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="3600" viewBox="0 0 1200 3600">
+  <title>Shirakami OS User Manual Manga (en)</title>
+  <desc>Generated from protocols/manual/manga-user-manual.yaml.</desc>
+  <g transform="translate(0,0)">
+    <rect x="40" y="40" width="1120" height="820" rx="24" fill="white" stroke="black" stroke-width="4"/>
+    <text x="80" y="100" font-size="28px" font-family="sans-serif">PAGE 1 · landscape</text>
+    <text x="100" y="190" font-size="40px" font-weight="bold" font-family="sans-serif">Keep the landscape, even when AI changes</text>
+    <rect x="90" y="310" width="1020" height="210" rx="18" fill="none" stroke="black" stroke-width="3"/>
+    <text x="125" y="370" font-size="28px" font-family="sans-serif">Shirakami OS places the human Landscape at the center.</text>
+    <rect x="250" y="570" width="760" height="170" rx="85" fill="white" stroke="black" stroke-width="3"/>
+    <text x="320" y="640" font-size="30px" font-family="sans-serif">I want this experience to carry over to the next AI.</text>
+  </g>
+  <g transform="translate(0,900)">
+    <rect x="40" y="40" width="1120" height="820" rx="24" fill="white" stroke="black" stroke-width="4"/>
+    <text x="80" y="100" font-size="28px" font-family="sans-serif">PAGE 2 · protocol</text>
+    <text x="100" y="190" font-size="40px" font-weight="bold" font-family="sans-serif">First, describe it as a Protocol</text>
+    <rect x="90" y="310" width="1020" height="210" rx="18" fill="none" stroke="black" stroke-width="3"/>
+    <text x="125" y="370" font-size="28px" font-family="sans-serif">Matome YAML is an entry point for Protocols consumed by the Runtime.</text>
+    <rect x="250" y="570" width="760" height="170" rx="85" fill="white" stroke="black" stroke-width="3"/>
+    <text x="320" y="640" font-size="30px" font-family="sans-serif">Let's define what to preserve and what to observe first.</text>
+  </g>
+  <g transform="translate(0,1800)">
+    <rect x="40" y="40" width="1120" height="820" rx="24" fill="white" stroke="black" stroke-width="4"/>
+    <text x="80" y="100" font-size="28px" font-family="sans-serif">PAGE 3 · runtime</text>
+    <text x="100" y="190" font-size="40px" font-weight="bold" font-family="sans-serif">The Runtime executes the Protocol</text>
+    <rect x="90" y="310" width="1020" height="210" rx="18" fill="none" stroke="black" stroke-width="3"/>
+    <text x="125" y="370" font-size="28px" font-family="sans-serif">The Runtime is not the AI itself; it handles state according to the Protocol.</text>
+    <rect x="250" y="570" width="760" height="170" rx="85" fill="white" stroke="black" stroke-width="3"/>
+    <text x="320" y="640" font-size="30px" font-family="sans-serif">Observed. Now preserve that transition as Evidence.</text>
+  </g>
+  <g transform="translate(0,2700)">
+    <rect x="40" y="40" width="1120" height="820" rx="24" fill="white" stroke="black" stroke-width="4"/>
+    <text x="80" y="100" font-size="28px" font-family="sans-serif">PAGE 4 · multilingual</text>
+    <text x="100" y="190" font-size="40px" font-weight="bold" font-family="sans-serif">Render the same structure in another language</text>
+    <rect x="90" y="310" width="1020" height="210" rx="18" fill="none" stroke="black" stroke-width="3"/>
+    <text x="125" y="370" font-size="28px" font-family="sans-serif">The manual structure remains unchanged when the language changes.</text>
+    <rect x="250" y="570" width="760" height="170" rx="85" fill="white" stroke="black" stroke-width="3"/>
+    <text x="320" y="640" font-size="30px" font-family="sans-serif">Japanese or English, the explanation comes from the same Protocol.</text>
+  </g>
+</svg>
