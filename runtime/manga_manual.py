@@ -95,9 +95,26 @@ def _panel(index: int, page: dict[str, str]) -> str:
 
 
 def _wrap(value: str, width: int) -> list[str]:
+    """Wrap Latin text at whitespace; preserve character wrapping for CJK."""
     if len(value) <= width:
         return [value]
-    return [value[index:index + width] for index in range(0, len(value), width)]
+    if re.search(r"[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]", value):
+        return [value[index:index + width] for index in range(0, len(value), width)]
+
+    words = value.split()
+    lines: list[str] = []
+    current = ""
+    for word in words:
+        candidate = word if not current else f"{current} {word}"
+        if len(candidate) <= width:
+            current = candidate
+        else:
+            if current:
+                lines.append(current)
+            current = word
+    if current:
+        lines.append(current)
+    return lines
 
 
 def main() -> None:
