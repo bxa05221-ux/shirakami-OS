@@ -1,5 +1,8 @@
 # shirakami-OS
+
 Shirakami OS — Foundation Base Point
+
+[English](README.md) | [日本語](README.ja.md)
 
 ----
 Version: α2.2  
@@ -11,8 +14,10 @@ Status: Foundation Freeze
 - Architecture → [docs/](docs/)
 - RFC → [docs/rfc/](docs/rfc/)
 - Examples → [examples/](examples/)
+- Japanese introduction → [README.ja.md](README.ja.md)
 
 ## Overview
+
 Shirakami OS is an open specification project for preserving and utilizing Human Landscapes across generations of AI technologies.  
 This repository contains the current Foundation Base Point used as the architectural baseline for future research, implementation, and development.
 
@@ -41,8 +46,6 @@ Out of scope:
 - Protocols describe Landscapes.
 - Runtime executes Protocols.
 - LLMs are replaceable. Landscape remains.
-
-----
 
 ## Repository structure
 - spec/ — Foundation specifications
