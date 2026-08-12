@@ -140,6 +140,23 @@ Quickstartでは、Protocol YAMLを読み込み、Protocol IRを生成し、Runt
 
 ---
 
+## ユーザーズマニュアル（漫画版）
+
+Public Alphaでは、**的目YAML → 漫画Renderer → SVG**という最小の文書生成経路を試しています。
+
+- [漫画マニュアルの入口](docs/manual/)
+- [日本語版SVG](docs/manual/manga-user-manual.ja.svg)
+- [English版SVG](docs/manual/manga-user-manual.en.svg)
+- [生成元の的目YAML](protocols/manual/manga-user-manual.yaml)
+- [Rendering Contract α0.1](spec/manual-rendering.md)
+- [漫画Renderer](runtime/manga_manual.py)
+
+日本語と英語で言語を差し替えても、ページIDや説明構造は共通です。
+
+これは現時点では、**漫画生成AIそのものを作るものではなく、Protocolで定義した説明構造を人間向けUIへRenderする実験的なAdapter**です。
+
+---
+
 ## Repositoryの構成
 
 白神OS単体だけでは、白神プロジェクト全体を説明しません。
