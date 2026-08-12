@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Runnable Shirakami OS β0.1 Quickstart.
 
-This example uses the existing β0.1 Runtime vertical slice directly:
-Protocol -> Execution -> Transition -> Evidence -> Landscape State.
+Matome YAML -> Protocol IR -> Runtime -> Evidence -> Landscape State.
 No GitHub credentials or external packages are required.
 """
 
@@ -16,7 +15,25 @@ if str(RUNTIME_DIR) not in sys.path:
 
 from evidence import capture_evidence
 from landscape import LandscapeState
-from prototype import Runtime, example_protocol
+from protocol_loader import load_matome
+from prototype import Runtime, Transition
+
+
+def protocol_from_ir(protocol_ir):
+    def execute(context):
+        return Transition(
+            kind="matome.observation",
+            data={
+                "protocol_id": context.protocol_id,
+                "protocol_title": protocol_ir.title,
+                "protocol_version": protocol_ir.version,
+                "pipeline_phases": [item["phase"] for item in protocol_ir.pipeline],
+                "input": dict(context.input),
+                "changed": True,
+            },
+        )
+
+    return execute
 
 
 def main() -> int:
@@ -28,12 +45,18 @@ def main() -> int:
         print("ERROR: quickstart files are missing")
         return 1
 
-    print("Protocol loaded")
+    try:
+        protocol = load_matome(protocol_path)
+    except Exception as exc:
+        print(f"ERROR: Protocol load failed: {exc}")
+        return 1
+
+    print(f"Protocol loaded: {protocol.title} v{protocol.version}")
     input_data = {"message": "Hello Shirakami"}
 
     result = Runtime().execute(
-        "quickstart.observation",
-        example_protocol,
+        protocol.protocol_id,
+        protocol_from_ir(protocol),
         input_data,
     )
     print("Observation captured")
