@@ -1,14 +1,9 @@
-"""Minimal bridge from Protocol IR to the existing Runtime vertical slice.
-
-This module intentionally keeps the bridge small. It adapts the currently
-supported Protocol IR into the callable transition interface already used by
-Runtime, without introducing a new runtime architecture.
-"""
+"""Minimal bridge from Protocol IR to the existing Runtime vertical slice."""
 
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any, Callable, Mapping
 
-from runtime.runtime import Runtime, ExecutionResult
+from runtime.prototype import ExecutionResult, Runtime, Transition
 
 
 @dataclass(frozen=True)
@@ -20,21 +15,29 @@ class ProtocolExecution:
 
 def execute_protocol(
     protocol_ir: dict[str, Any],
-    transition: Callable[[Any], Any],
+    transition: Callable[[Mapping[str, Any]], Transition],
     *,
     input_value: Any = None,
 ) -> ProtocolExecution:
-    """Execute a loaded Protocol IR through the existing Runtime.
+    """Execute a loaded Protocol IR through the existing Runtime boundary.
 
-    The bridge deliberately does not invent protocol semantics. The supplied
-    callable remains the concrete transition supported by the Runtime.
+    The bridge adapts the current β0.1 Runtime signature without introducing
+    new protocol semantics.
     """
     matome = protocol_ir.get("matome", protocol_ir)
-    title = matome.get("title", "")
+    if not isinstance(matome, dict):
+        raise ValueError("protocol IR must contain an object-like matome")
+
+    title = str(matome.get("title", ""))
     version = str(matome.get("version", ""))
+    protocol_id = title or "anonymous.protocol"
+
+    def runtime_protocol(context):
+        return transition(context.input)
 
     runtime = Runtime()
-    result = runtime.execute(transition, input_value)
+    normalized_input = input_value if isinstance(input_value, Mapping) else {}
+    result = runtime.execute(protocol_id, runtime_protocol, normalized_input)
     return ProtocolExecution(
         protocol_title=title,
         protocol_version=version,
