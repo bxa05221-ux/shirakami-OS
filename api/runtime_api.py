@@ -1,33 +1,21 @@
 """Minimal HTTP-facing API for the Shirakami Runtime alpha 0.1.
 
-The API exposes the existing Protocol -> Runtime vertical slice without
-introducing authentication, persistence, scheduling, or a new runtime core.
+The API exposes the existing Protocol -> Runtime vertical slice and a thin
+GitHub Adapter boundary for controlled observation/write-back experiments.
 """
 
 from typing import Any
 
+from plugins.adapters.github.github_adapter import GitHubAdapter
 from runtime.protocol_runtime_bridge import execute_protocol
 
 
 def execute(payload: dict[str, Any]) -> dict[str, Any]:
-    """Execute one supported Protocol IR transition.
-
-    Request shape:
-        {
-            "protocol": {"matome": {"title": ..., "version": ...}},
-            "input": ...
-        }
-
-    The transition is deliberately limited to an echo operation in alpha
-    0.1. This makes the API boundary testable without inventing new protocol
-    semantics.
-    """
+    """Execute one supported Protocol IR transition."""
     protocol = payload.get("protocol")
     if not isinstance(protocol, dict):
         raise ValueError("protocol must be an object")
-
-    operation = payload.get("operation", "echo")
-    if operation != "echo":
+    if payload.get("operation", "echo") != "echo":
         raise ValueError("unsupported operation")
 
     execution = execute_protocol(
@@ -35,17 +23,41 @@ def execute(payload: dict[str, Any]) -> dict[str, Any]:
         lambda value: value,
         input_value=payload.get("input"),
     )
-
     result = execution.result
     return {
-        "protocol": {
-            "title": execution.protocol_title,
-            "version": execution.protocol_version,
-        },
+        "protocol": {"title": execution.protocol_title, "version": execution.protocol_version},
         "success": result.success,
         "event": result.event,
         "output": result.output,
         "error": result.error,
+    }
+
+
+def github_read(payload: dict[str, Any], adapter: GitHubAdapter | None = None) -> dict[str, Any]:
+    """Observe a GitHub file through the Adapter boundary."""
+    repository, path = payload.get("repository"), payload.get("path")
+    if not isinstance(repository, str) or not isinstance(path, str):
+        raise ValueError("repository and path are required")
+    file = (adapter or GitHubAdapter()).read_file(repository, path, payload.get("ref", "main"))
+    return {"repository": file.repository, "path": file.path, "sha": file.sha,
+            "content": file.content, "event": "backend.observed"}
+
+
+def github_controlled_write(payload: dict[str, Any], adapter: GitHubAdapter | None = None) -> dict[str, Any]:
+    """Perform a controlled write followed immediately by Adapter read-back."""
+    required = ("repository", "path", "content", "message", "sha")
+    if any(not isinstance(payload.get(key), str) for key in required):
+        raise ValueError("repository, path, content, message and sha are required")
+    github = adapter or GitHubAdapter()
+    result = github.write_file(
+        payload["repository"], payload["path"], payload["content"],
+        payload["message"], payload["sha"], payload.get("branch", "main"),
+    )
+    return {
+        "repository": result.repository, "path": result.path,
+        "sha": result.sha, "content": result.content,
+        "event": "backend.write.readback",
+        "evidence": {"operation": "controlled_write", "read_back": True},
     }
 
 
@@ -64,6 +76,20 @@ def create_app():
         try:
             return execute(payload)
         except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.post("/v0.1/github/read")
+    def github_read_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
+        try:
+            return github_read(payload)
+        except (ValueError, RuntimeError) as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.post("/v0.1/github/write")
+    def github_write_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
+        try:
+            return github_controlled_write(payload)
+        except (PermissionError, ValueError, RuntimeError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     return app
