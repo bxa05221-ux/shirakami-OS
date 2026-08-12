@@ -26,4 +26,10 @@ jobs:
 
       - name: Run Runtime β0.1 focused tests
         working-directory: runtime
-        run: python -m unittest -v test_prototype.py test_manga_manual.py
+        run: python -m unittest -v test_manga_manual.MangaManualRendererTests
+
+      - name: Smoke-render Japanese manual
+        run: python runtime/manga_manual.py protocols/manual/manga-user-manual.yaml --lang ja --output /tmp/manga-user-manual.ja.svg
+
+      - name: Smoke-render English manual
+        run: python runtime/manga_manual.py protocols/manual/manga-user-manual.yaml --lang en --output /tmp/manga-user-manual.en.svg
