@@ -1,13 +1,10 @@
-"""Minimal HTTP-facing API for the Shirakami Runtime alpha 0.1.
-
-The API exposes the existing Protocol -> Runtime vertical slice and a thin
-GitHub Adapter boundary for controlled observation/write-back experiments.
-"""
+"""Minimal HTTP-facing API for the Shirakami Runtime alpha 0.1."""
 
 from typing import Any
 
 from plugins.adapters.github.github_adapter import GitHubAdapter
 from runtime.protocol_runtime_bridge import execute_protocol
+from runtime.prototype import Transition
 
 
 def execute(payload: dict[str, Any]) -> dict[str, Any]:
@@ -18,18 +15,21 @@ def execute(payload: dict[str, Any]) -> dict[str, Any]:
     if payload.get("operation", "echo") != "echo":
         raise ValueError("unsupported operation")
 
+    def echo_transition(value: Any) -> Transition:
+        return Transition(kind="api.echo", data={"output": value})
+
     execution = execute_protocol(
         protocol,
-        lambda value: value,
+        echo_transition,
         input_value=payload.get("input"),
     )
     result = execution.result
     return {
         "protocol": {"title": execution.protocol_title, "version": execution.protocol_version},
-        "success": result.success,
-        "event": result.event,
-        "output": result.output,
-        "error": result.error,
+        "success": result.status == "completed",
+        "event": result.transition.kind,
+        "output": result.transition.data.get("output"),
+        "error": None if result.status == "completed" else result.transition.data,
     }
 
 
