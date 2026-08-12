@@ -1,3 +1,4 @@
+import unittest
 from pathlib import Path
 
 from manga_manual import render_manual
@@ -7,15 +8,19 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "protocols" / "manual" / "manga-user-manual.yaml"
 
 
-def test_japanese_manual_contains_all_pages():
-    svg = render_manual(SOURCE, "ja")
-    assert svg.count("<g transform=") == 4
-    assert "AIが変わっても、景色を残したい" in svg
-    assert "同じ構造を、別の言語へ" in svg
+class MangaManualRendererTests(unittest.TestCase):
+    def test_japanese_manual_contains_all_pages(self):
+        svg = render_manual(SOURCE, "ja")
+        self.assertEqual(svg.count("<g transform="), 4)
+        self.assertIn("AIが変わっても、景色を残したい", svg)
+        self.assertIn("同じ構造を、別の言語へ", svg)
+
+    def test_english_manual_uses_same_page_structure(self):
+        svg = render_manual(SOURCE, "en")
+        self.assertEqual(svg.count("<g transform="), 4)
+        self.assertIn("Keep the landscape, even when AI changes", svg)
+        self.assertIn("Render the same structure in another language", svg)
 
 
-def test_english_manual_uses_same_page_structure():
-    svg = render_manual(SOURCE, "en")
-    assert svg.count("<g transform=") == 4
-    assert "Keep the landscape, even when AI changes" in svg
-    assert "Render the same structure in another language" in svg
+if __name__ == "__main__":
+    unittest.main()
