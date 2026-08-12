@@ -4,10 +4,12 @@ on:
   push:
     paths:
       - "runtime/**"
+      - "protocols/manual/**"
       - ".github/workflows/runtime-beta-0.1.yml"
   pull_request:
     paths:
       - "runtime/**"
+      - "protocols/manual/**"
       - ".github/workflows/runtime-beta-0.1.yml"
 
 jobs:
@@ -22,6 +24,6 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Run Runtime β0.1 focused test
+      - name: Run Runtime β0.1 focused tests
         working-directory: runtime
-        run: python -m unittest -v test_prototype.py
+        run: python -m unittest -v test_prototype.py test_manga_manual.py
