@@ -1,0 +1,97 @@
+matome:
+  title: Shirakami Literary Landscape Manifest
+  subtitle:
+    - Work Collection
+    - Temporal Continuity
+    - Source-of-Truth Preservation
+  version: 0.1
+  status:
+    architecture: draft
+    implementation: planned
+    source_verification: pending
+
+statement: >
+  複数の小説作品を独立した文書として保持しながら、
+  作品間に存在する時系列、人物、出来事、場所、世界観上の関係を
+  Landscapeとして観測可能にするためのManifestである。
+
+principles:
+  - 原稿本文をSource of Truthとする
+  - AIの記憶による補完を正史として扱わない
+  - 原文由来のObservationとAIによるHypothesisを分離する
+  - 作者が指定したCanonical RelationとAI推論によるRelationを分離する
+  - 原稿そのものと派生Landscapeを混同しない
+  - 新しい理論を追加せず、既存のShirakami OS契約に従う
+
+collection:
+  series:
+    name: 教誨シリーズ
+    works:
+      - id: kyoukai
+        title: 教誨
+      - id: shukuto
+        title: 祝祷
+      - id: manabi
+        title: 学び
+      - id: kaitaku
+        title: 誨拓
+      - id: kaikon
+        title: 誨魂
+
+  standalone:
+    - id: maria_protocol
+      title: 機械仕掛けのマリアのプロトコル
+    - id: virtual_graduation_trip
+      title: ニートのバーチャル卒業旅行
+    - id: poor_ubiquitous
+      title: 貧乏人のユビキタス
+    - id: shirakami_high_school_brass_band
+      title: 白神高校ブラスバンド部
+
+relations:
+  temporal:
+    status: to_be_observed
+    note: 作品間の時系列関係は原稿と作者指定を基準に確定する
+  character:
+    status: to_be_observed
+    note: 人物の同一性・継承・関係性は原稿根拠を記録する
+  event:
+    status: to_be_observed
+  location:
+    status: to_be_observed
+  world:
+    status: to_be_observed
+
+provenance:
+  source_authority: manuscript
+  derived_layers:
+    - observation
+    - evidence
+    - landscape
+    - protocol
+  verification_states:
+    - unverified
+    - observed
+    - author_confirmed
+    - contradicted
+
+pipeline:
+  - source_registration
+  - manuscript_segmentation
+  - observation
+  - evidence_recording
+  - landscape_construction
+  - relation_mapping
+  - protocol_generation
+  - runtime_validation
+
+constraints:
+  - Do not infer canon from model memory alone
+  - Do not rewrite source manuscripts during extraction
+  - Do not silently resolve contradictions
+  - Preserve unresolved relations as unresolved
+  - Treat language variants as representations of the same work landscape when explicitly linked
+
+next_step:
+  name: source_manifest_expansion
+  purpose: 原稿ファイル、版、章構成、言語、公開範囲を作品ごとに登録する
