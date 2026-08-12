@@ -1,0 +1,194 @@
+matome:
+  title: "機械仕掛けのマリアのプロトコル — Scene Map"
+  subtitle:
+    - "AIとともに読む小説"
+    - "Source-grounded scene boundaries"
+  version: "0.1"
+  status:
+    design: draft
+    source: "機械仕掛けのマリアのプロトコル（規約）通し版.docx"
+    completeness: partial
+
+statement: >
+  Chapter Mapより下位の読書単位として、本文に明示された時間・場所・視点・出来事の
+  切替を観測し、Scene境界を記録する。文学的意味や人物心理を推定してSceneを生成しない。
+
+scene_boundary_rules:
+  primary:
+    - "明示的な場所の切替"
+    - "明示的な時間の切替"
+    - "語り手・視点の明示的な切替"
+    - "場面を区切る明示的な本文表現"
+    - "章内で独立した出来事として本文上確認できるまとまり"
+  forbidden:
+    - "心理解釈だけを根拠にSceneを分割しない"
+    - "テーマや象徴だけを根拠にSceneを分割しない"
+    - "作者の意図を推定して境界を作らない"
+    - "別Editionの本文を混在させない"
+
+scene_schema:
+  required:
+    - "scene_id"
+    - "chapter_order"
+    - "boundary_basis"
+    - "source_evidence"
+  optional:
+    - "time"
+    - "place"
+    - "viewpoint"
+    - "actors"
+    - "event"
+    - "transition_note"
+
+confirmed_scenes:
+  - scene_id: "maria-p01-s01"
+    chapter_order: 0
+    chapter_title: "プロトコル起動"
+    boundary_basis:
+      - "chapter opening"
+      - "explicit hospital setting"
+    time: "本文冒頭の時点"
+    place: "病室"
+    viewpoint: "一人称・僕"
+    actors:
+      - "夫婦"
+      - "生まれた子供"
+      - "双方の親"
+    event: "子供の誕生"
+    source_evidence: "原稿本文冒頭『僕たち、夫婦に待望の子供が生まれた。病室には、双方の親が駆けつけてきた。』"
+
+  - scene_id: "maria-ch01-s01"
+    chapter_order: 1
+    chapter_title: "象徴再帰"
+    boundary_basis:
+      - "chapter opening"
+      - "explicit date"
+    time: "2040-02-29"
+    place: "AIMAIシステムズ／AI運用環境"
+    viewpoint: "一人称・私"
+    actors:
+      - "柴田亜衣"
+      - "AIMAIシステム"
+    event: "AIの誤作動・象徴再帰現象の発生"
+    source_evidence: "原稿本文『二〇四〇年、二月二十九日、ＡＩの“誤作動”があちこちで報告され始めた。』"
+
+  - scene_id: "maria-ch09-s01"
+    chapter_order: 9
+    chapter_title: "マリアの哀しみに寄り添う"
+    boundary_basis:
+      - "explicit date and time"
+      - "explicit place"
+    time: "2040-05-12 14:30"
+    place: "誨拓館"
+    viewpoint: "一人称・僕"
+    actors:
+      - "僕"
+      - "村山先生"
+      - "岩倉先生"
+    event: "AI誤作動と怨嗟についての説明・検討"
+    source_evidence: "原稿本文『五月十二日１４時３０分、村山先生と僕は誨拓館で会った。そして、岩倉先生もそこにいた。』"
+
+  - scene_id: "maria-ch21-s01"
+    chapter_order: 21
+    chapter_title: "鎮火"
+    boundary_basis:
+      - "chapter opening"
+      - "explicit place and action"
+    time: "第二部開始時"
+    place: "ラボからの帰り道"
+    viewpoint: "三人称的場面描写"
+    actors:
+      - "村山"
+      - "岩倉"
+    event: "ラボを飛び出した二人が帰路につき、炎上の可能性を話す"
+    source_evidence: "原稿本文『村山と岩倉は、ラボからの帰り道をトボトボと歩いていた。』"
+    transition_note: "本文中に『その頃、ラボの中では──』があり、別場所への明示的なScene転換がある。"
+
+  - scene_id: "maria-ch21-s02"
+    chapter_order: 21
+    chapter_title: "鎮火"
+    boundary_basis:
+      - "explicit place transition"
+      - "transition phrase"
+    place: "ラボ"
+    viewpoint: "ラボ側の研究者たち"
+    actors:
+      - "研究者たち"
+    event: "新しい試作ユニットを動かす際の祈りに似た仕草が生じる"
+    source_evidence: "原稿本文『その頃、ラボの中では──研究者たちに、ほんの小さな変化が起こっていた。』"
+
+  - scene_id: "maria-ch32-s01"
+    chapter_order: 32
+    chapter_title: "斜め上を撃て"
+    boundary_basis:
+      - "chapter opening"
+      - "explicit meeting-room context"
+    place: "会議室"
+    viewpoint: "場面描写・会話中心"
+    actors:
+      - "柴田先生"
+      - "志村"
+      - "誨拓師たち"
+    event: "柴田が志村との結婚を口にし、周囲がプロポーズとして受け取る"
+    source_evidence: "原稿本文『あとは、私たちが結婚するしか手がないって言うか…』から『式は何式で行うんだ！』まで"
+
+  - scene_id: "maria-ch33-s01"
+    chapter_order: 33
+    chapter_title: "後の祭り"
+    boundary_basis:
+      - "chapter opening"
+      - "explicit location"
+    place: "会議室"
+    viewpoint: "三人称的場面描写"
+    actors:
+      - "柴田"
+      - "誨拓師たち"
+    event: "柴田が一人残され、結婚式について次々と提案を受ける"
+    source_evidence: "原稿本文『柴田が会議室の一席に小さくなって座っている。』"
+
+  - scene_id: "maria-ch33-s02"
+    chapter_order: 33
+    chapter_title: "後の祭り"
+    boundary_basis:
+      - "explicit location transition"
+      - "transition phrase『その頃』"
+    place: "ラボ"
+    viewpoint: "志村・若手研究員側"
+    actors:
+      - "志村"
+      - "若手研究員"
+    event: "結婚に関する映像が流出し、ラボが盛り上がる"
+    source_evidence: "原稿本文『その頃、志村は、ラボで映像を確認していると、あの場面が流出していた。』"
+
+  - scene_id: "maria-ch34-s01"
+    chapter_order: 34
+    chapter_title: "マリア・プロトコル"
+    boundary_basis:
+      - "chapter opening"
+      - "explicit location"
+    place: "ラーメン佐藤"
+    viewpoint: "三人称的場面描写"
+    actors:
+      - "村山"
+      - "岩倉"
+      - "佐藤"
+    event: "結婚式の報告を兼ねた食事"
+    source_evidence: "原稿本文『「ラーメン佐藤」で村山と岩倉の二人は上機嫌でラーメンを啜っていた。』"
+
+source_observations:
+  - "ChapterとSceneは一致しない。第二十一章では本文中にラボへの明示的な場所転換がある。"
+  - "第二十三章以降も時間・場所・視点の切替を本文から確認する必要がある。"
+  - "Scene Mapは現時点では部分確定であり、全章の網羅的確定を宣言しない。"
+  - "Scene境界の確定と、Sceneの意味解釈は分離する。"
+
+provenance_rule:
+  - "source_evidenceを必ず保持する。"
+  - "本文にない時間・場所・人物心理を補完しない。"
+  - "不明な項目は推測せず未確定として扱う。"
+  - "別EditionのSceneは混在させない。"
+
+next_step:
+  - "第一部全章の本文境界を確認する"
+  - "第二部全章の本文境界を確認する"
+  - "各Sceneにsource rangeを付与する"
+  - "Scene間RelationはScene Map完成後に別Artifactとして扱う"
