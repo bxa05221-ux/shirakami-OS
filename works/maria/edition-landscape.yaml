@@ -1,0 +1,92 @@
+matome:
+  title: "機械仕掛けのマリアのプロトコル — Edition Landscape"
+  subtitle:
+    - "AIとともに読む小説"
+    - "Edition-aware Creative Landscape"
+  version: "0.1"
+  status:
+    design: draft
+    source_verification: ongoing
+
+statement: >
+  作品は単一の本文ではなく、執筆・改訂・完成・再改訂を含む
+  時間的Landscapeとして保持する。
+  正本を一つに固定するのではなく、作品の同一性と各Editionの
+  canonical statusを分離する。
+
+source_of_truth:
+  rule: manuscript
+  ai_memory_is_source: false
+  ai_inference_is_canon: false
+
+work:
+  title: "機械仕掛けのマリアのプロトコル"
+  series: "教誨シリーズ"
+
+editions:
+  - id: maria-draft-9-8
+    label: "三部構成9:8"
+    role: historical_draft
+    status: source_candidate
+    note: "241ページの原稿。初稿・構成履歴として保持する。"
+
+  - id: maria-completed
+    label: "完成版"
+    role: canonical_text_candidate
+    status: pending_author_confirmation
+    note: "完成品として扱う本文候補。作者確認後にcanonical_textへ確定する。"
+
+  - id: maria-current
+    label: "現在改訂版"
+    role: working_text
+    status: pending_source_mapping
+    note: "将来の改訂を受け入れる作業用Edition。"
+
+relations:
+  edition_relation:
+    type: revision_chain
+    rule: "Edition間の差分をEvidenceとして保持し、旧Editionを削除しない。"
+
+verification:
+  canonical_identity:
+    meaning: "作品そのものの同一性"
+    authority: author
+
+  canonical_text:
+    meaning: "現在の本文として採用するEdition"
+    authority: author
+
+  historical_source:
+    meaning: "過去の本文・草稿・構成案"
+    authority: source
+
+  hypothesis:
+    meaning: "AIが推測した関係・解釈"
+    authority: none
+
+ai_reading:
+  principle: "AIは本文を正本として参照し、本文にない内容をcanonとして補完しない。"
+  outputs:
+    - observation
+    - evidence
+    - interpretation
+    - unresolved
+  prohibition:
+    - "AIによる勝手な改稿"
+    - "AI記憶による本文補完"
+    - "推測された作品間関係のcanonical化"
+
+revision_protocol:
+  on_new_edition:
+    - register_new_source
+    - preserve_previous_edition
+    - compare_versions
+    - observe_landscape_impact
+    - mark_unresolved_relations
+    - require_author_confirmation_for_canon
+
+next_step:
+  - "完成版のSource IDを作者が指定する"
+  - "各Editionの章構成を抽出する"
+  - "Edition間差分の観測形式を定義する"
+  - "AIとともに読むための読書Protocolへ接続する"
