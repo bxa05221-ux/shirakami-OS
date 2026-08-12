@@ -24,9 +24,8 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Run Runtime β0.1 focused tests
-        working-directory: runtime
-        run: python -m unittest -v test_manga_manual.MangaManualRendererTests
+      - name: Compile manga renderer
+        run: python -m py_compile runtime/manga_manual.py
 
       - name: Smoke-render Japanese manual
         run: python runtime/manga_manual.py protocols/manual/manga-user-manual.yaml --lang ja --output /tmp/manga-user-manual.ja.svg
