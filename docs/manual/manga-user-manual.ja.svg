@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="3600" viewBox="0 0 1200 3600">
+  <title>Shirakami OS User Manual Manga (ja)</title>
+  <desc>Generated from protocols/manual/manga-user-manual.yaml.</desc>
+  <g transform="translate(0,0)">
+    <rect x="40" y="40" width="1120" height="820" rx="24" fill="white" stroke="black" stroke-width="4"/>
+    <text x="80" y="100" font-size="28px" font-family="sans-serif">PAGE 1 · landscape</text>
+    <text x="100" y="190" font-size="40px" font-weight="bold" font-family="sans-serif">AIが変わっても、景色を残したい</text>
+    <rect x="90" y="310" width="1020" height="210" rx="18" fill="none" stroke="black" stroke-width="3"/>
+    <text x="125" y="370" font-size="28px" font-family="sans-serif">白神OSでは、人間のLandscapeを中心に置きます。</text>
+    <rect x="250" y="570" width="760" height="170" rx="85" fill="white" stroke="black" stroke-width="3"/>
+    <text x="320" y="640" font-size="30px" font-family="sans-serif">このAIとの時間を、次のAIにもつなげたい。</text>
+  </g>
+  <g transform="translate(0,900)">
+    <rect x="40" y="40" width="1120" height="820" rx="24" fill="white" stroke="black" stroke-width="4"/>
+    <text x="80" y="100" font-size="28px" font-family="sans-serif">PAGE 2 · protocol</text>
+    <text x="100" y="190" font-size="40px" font-weight="bold" font-family="sans-serif">まず、Protocolとして記述する</text>
+    <rect x="90" y="310" width="1020" height="210" rx="18" fill="none" stroke="black" stroke-width="3"/>
+    <text x="125" y="370" font-size="28px" font-family="sans-serif">的目YAMLは、Runtimeが扱うProtocolの入口です。</text>
+    <rect x="250" y="570" width="760" height="170" rx="85" fill="white" stroke="black" stroke-width="3"/>
+    <text x="320" y="640" font-size="30px" font-family="sans-serif">何を守り、何を観測するかを先に決めよう。</text>
+  </g>
+  <g transform="translate(0,1800)">
+    <rect x="40" y="40" width="1120" height="820" rx="24" fill="white" stroke="black" stroke-width="4"/>
+    <text x="80" y="100" font-size="28px" font-family="sans-serif">PAGE 3 · runtime</text>
+    <text x="100" y="190" font-size="40px" font-weight="bold" font-family="sans-serif">RuntimeがProtocolを実行する</text>
+    <rect x="90" y="310" width="1020" height="210" rx="18" fill="none" stroke="black" stroke-width="3"/>
+    <text x="125" y="370" font-size="28px" font-family="sans-serif">RuntimeはAIそのものではなく、Protocolに従って状態を扱います。</text>
+    <rect x="250" y="570" width="760" height="170" rx="85" fill="white" stroke="black" stroke-width="3"/>
+    <text x="320" y="640" font-size="30px" font-family="sans-serif">観測した。では、その変化をEvidenceとして残す。</text>
+  </g>
+  <g transform="translate(0,2700)">
+    <rect x="40" y="40" width="1120" height="820" rx="24" fill="white" stroke="black" stroke-width="4"/>
+    <text x="80" y="100" font-size="28px" font-family="sans-serif">PAGE 4 · multilingual</text>
+    <text x="100" y="190" font-size="40px" font-weight="bold" font-family="sans-serif">同じ構造を、別の言語へ</text>
+    <rect x="90" y="310" width="1020" height="210" rx="18" fill="none" stroke="black" stroke-width="3"/>
+    <text x="125" y="370" font-size="28px" font-family="sans-serif">言語を差し替えても、マニュアルの構造は変わりません。</text>
+    <rect x="250" y="570" width="760" height="170" rx="85" fill="white" stroke="black" stroke-width="3"/>
+    <text x="320" y="640" font-size="30px" font-family="sans-serif">日本語でも英語でも、同じProtocolから説明できる。</text>
+  </g>
+</svg>
