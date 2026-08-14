@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Runnable Shirakami OS β0.1 Quickstart.
 
-Matome YAML -> Protocol IR -> Runtime -> Evidence -> Landscape State.
+Matome YAML -> Protocol IR -> generic Protocol bridge -> Runtime -> Evidence -> Landscape State.
 No GitHub credentials or external packages are required.
 """
 
@@ -15,25 +15,9 @@ if str(RUNTIME_DIR) not in sys.path:
 
 from evidence import capture_evidence
 from landscape import LandscapeState
+from protocol_bridge import protocol_from_ir
 from protocol_loader import load_matome
-from prototype import Runtime, Transition
-
-
-def protocol_from_ir(protocol_ir):
-    def execute(context):
-        return Transition(
-            kind="matome.observation",
-            data={
-                "protocol_id": context.protocol_id,
-                "protocol_title": protocol_ir.title,
-                "protocol_version": protocol_ir.version,
-                "pipeline_phases": [item["phase"] for item in protocol_ir.pipeline],
-                "input": dict(context.input),
-                "changed": True,
-            },
-        )
-
-    return execute
+from prototype import Runtime
 
 
 def main() -> int:
