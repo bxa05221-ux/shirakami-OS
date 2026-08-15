@@ -1,0 +1,106 @@
+matome:
+  title: 第三者評価員支援プロトコル
+  subtitle:
+    - Third-Party Evaluation Support Protocol
+    - Nonlinear Meeting
+    - Evaluator Context Synchronization
+    - Resilience Observation
+    - Context Difference Representation
+  version: 0.1
+  status:
+    protocol: prototype
+    field_verification: not_started
+  statement: >
+    第三者評価の評価期間において、評価員それぞれがその時点で持つ認識を保持し、
+    同時に会議へ参加できない状況でも、AIを介して相互に把握できる環境を構築する。
+    本プロトコルは評価判断をAIへ委譲せず、評価員個人のLandscapeを保持したまま、
+    評価員間の非同期的な協調を支援する。
+  principles:
+    - evaluation_judgment_belongs_to_human
+    - evaluator_context_is_individual
+    - recognition_difference_is_preserved
+    - confidentiality_is_architectural_boundary
+    - ai_supports_coordination_not_decision
+    - context_must_survive_session_changes
+    - context_must_survive_ai_changes
+  context_representation:
+    matome_yaml:
+      role:
+        - context_representation
+        - context_transport
+        - difference_representation
+      verification_hypothesis: >
+        的目yamlは巨大なContextそのものを保存するのではなく、Landscapeにおける
+        現在状態と変化を抽出し、次のRuntimeへ渡すための差分表現として機能する
+        可能性がある。これは本プロトタイプで検証する。
+  nonlinear_meeting:
+    name: スレゼンター
+    definition: >
+      複数の評価員が同一時間に会議へ参加できない場合でも、それぞれがその時点で
+      持つ認識を代表表現として持ち寄り、AIを介して相互に把握できるようにする
+      非同期・ノンリニアな会議構造。
+    rules:
+      - simultaneous_meeting_is_optional
+      - recognition_difference_is_preserved
+      - viewed_does_not_mean_accepted
+      - ai_must_not_create_final_evaluation
+  observation:
+    properties:
+      - timestamp
+      - evaluator
+      - context
+      - observation
+      - source
+      - related_evaluation_item
+  recognition:
+    rule: >
+      評価員それぞれの認識を独立した状態として保持し、過去の認識を上書きしない。
+  evidence:
+    rule: >
+      Evidenceは絶対的真実ではなく、Observationに基づく認識・確信・仮説を追跡可能な
+      状態として保持する。既存記録を上書きせず、変更は新しいObservationとして記録する。
+  resilience:
+    observation_targets:
+      - supporting_resources
+      - dependencies
+      - alternative_paths
+      - recovery_paths
+      - learning_from_failure
+      - adaptation
+  confidentiality:
+    layers:
+      - original_material
+      - evaluator_only
+      - evaluation_team
+      - representative_context
+      - ai_accessible_context
+    lifecycle:
+      - retain
+      - destroy
+      - anonymize
+      - handover
+  adapters:
+    initial:
+      calendar: evaluator_schedule
+      document_storage: protected_material
+      github: protocol_and_development_landscape
+  prototype:
+    objective: >
+      三名程度の評価員が数日間それぞれ別々に評価活動を行い、同時に会議を開催しなくても、
+      各自の現在認識を共有し、認識差を把握し、必要な論点だけを最終合議へ持ち込めることを検証する。
+    minimum_features:
+      - evaluation_landscape
+      - evaluator_landscape
+      - observation
+      - matome_yaml_generation
+      - nonlinear_meeting
+      - recognition_difference
+      - evidence
+      - resilience_observation
+      - re_observation
+      - permission_boundary
+  non_goals:
+    - ai_evaluation_judgment
+    - evaluator_replacement
+    - unrestricted_ai_access_to_original_material
+    - automatic_consensus
