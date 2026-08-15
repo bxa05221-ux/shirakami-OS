@@ -1,0 +1,55 @@
+version: 0.1
+
+observation:
+  lifecycle:
+    - recorded
+    - interpreted
+    - presented
+    - questioned
+    - re_observed
+
+recognition:
+  lifecycle:
+    - current
+    - superseded
+  rule: historical_recognition_is_not_overwritten
+
+matome_snapshot:
+  lifecycle:
+    - generated
+    - presented
+    - superseded
+  rule: snapshot_is_immutable
+
+evidence:
+  lifecycle:
+    - candidate
+    - supported
+    - questioned
+    - revised
+    - crystallized
+    - superseded
+  rule: evidence_lineage_is_preserved
+
+presenter:
+  lifecycle:
+    - representative_ready
+    - presented
+    - viewed
+    - questioned
+    - responded
+    - updated
+
+resilience:
+  lifecycle:
+    - observed
+    - re_observed
+    - changed
+    - learned
+
+closure:
+  actions:
+    - retain
+    - anonymize
+    - destroy
+    - handover
