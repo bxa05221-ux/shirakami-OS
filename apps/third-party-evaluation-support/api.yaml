@@ -1,0 +1,66 @@
+version: 0.1
+
+endpoints:
+  - method: POST
+    path: /evaluations
+    purpose: create_evaluation
+  - method: GET
+    path: /evaluations/{id}
+    purpose: get_evaluation
+  - method: POST
+    path: /evaluations/{id}/observations
+    purpose: record_observation
+  - method: POST
+    path: /evaluations/{id}/recognitions
+    purpose: record_recognition
+  - method: POST
+    path: /evaluations/{id}/matome/snapshot
+    purpose: create_matome_snapshot
+  - method: GET
+    path: /evaluations/{id}/matome/current
+    purpose: get_current_matome
+  - method: GET
+    path: /evaluations/{id}/presenter
+    purpose: get_presenter
+  - method: POST
+    path: /evaluations/{id}/presenter/questions
+    purpose: ask_question
+  - method: POST
+    path: /evaluations/{id}/presenter/responses
+    purpose: respond_to_question
+  - method: POST
+    path: /evaluations/{id}/evidence
+    purpose: record_evidence
+  - method: GET
+    path: /evaluations/{id}/evidence
+    purpose: list_evidence
+  - method: POST
+    path: /evaluations/{id}/resilience
+    purpose: record_resilience_observation
+  - method: GET
+    path: /evaluations/{id}/trail
+    purpose: get_audit_trail
+
+boundaries:
+  ai:
+    role: adapter
+    may:
+      - compare
+      - relate
+      - summarize
+      - ask_clarifying_question
+      - suggest_re_observation
+    may_not:
+      - make_final_evaluation
+      - silently_merge_recognitions
+      - fabricate_evidence
+      - bypass_permission
+
+  runtime:
+    owns:
+      - protocol_execution
+      - state_transition
+      - evidence_recording
+      - permission_check
+    does_not_own:
+      - domain_evaluation_judgment
