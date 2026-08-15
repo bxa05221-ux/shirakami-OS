@@ -1,0 +1,110 @@
+version: 0.1
+
+entities:
+  Evaluation:
+    fields:
+      - id
+      - period
+      - evaluators
+      - evaluation_items
+      - landscape_state
+
+  Evaluator:
+    fields:
+      - id
+      - role
+      - permissions
+
+  EvaluatorLandscape:
+    fields:
+      - evaluator_id
+      - observations
+      - recognitions
+      - matome_snapshots
+
+  Observation:
+    fields:
+      - id
+      - evaluator_id
+      - timestamp
+      - evaluation_item
+      - observation
+      - source
+
+  Recognition:
+    fields:
+      - id
+      - evaluator_id
+      - timestamp
+      - statement
+      - based_on_observations
+      - supersedes
+
+  MatomeSnapshot:
+    fields:
+      - id
+      - evaluator_id
+      - previous_snapshot_id
+      - current_state
+      - changes
+      - representative_context
+      - generated_at
+
+  PresenterEntry:
+    fields:
+      - evaluator_id
+      - snapshot_id
+      - recognition
+      - updated_at
+
+  Question:
+    fields:
+      - id
+      - from_evaluator
+      - to_evaluator
+      - context
+      - response
+      - status
+
+  Evidence:
+    fields:
+      - id
+      - source_observations
+      - statement
+      - status
+      - lineage
+      - created_at
+
+  ResilienceObservation:
+    fields:
+      - id
+      - resource
+      - dependency
+      - alternative_path
+      - recovery_path
+      - learning
+      - timestamp
+
+  Permission:
+    fields:
+      - subject
+      - resource
+      - action
+      - scope
+
+  Trail:
+    fields:
+      - id
+      - actor
+      - action
+      - target
+      - timestamp
+      - result
+
+invariants:
+  - evaluator_recognition_is_individual
+  - historical_recognition_is_not_overwritten
+  - presenter_entry_is_traceable_to_snapshot
+  - evidence_is_traceable_to_observation
+  - permission_is_checked_before_access
+  - ai_cannot_make_final_evaluation
