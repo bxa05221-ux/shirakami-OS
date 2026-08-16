@@ -1,0 +1,43 @@
+matome:
+  title: R0010 Projection Boundary Test
+  subtitle:
+    - Evidence to Projection to Landscape
+    - Observation and Interpretation Boundary
+    - Landscape State Projection
+  version: 0.1
+  status:
+    design: verification
+    implementation: minimal
+
+statement: >
+  Evidence must remain an immutable observation record. Landscape state must
+  not consume Evidence directly; a separate Projection boundary derives the
+  state update. Projection history must preserve which Evidence-derived
+  projection produced each observed state change.
+
+question: >
+  Can Evidence be projected into Landscape State through an independent,
+  replaceable boundary without mutating the source Evidence?
+
+scenario:
+  - create Evidence_1 from an observable transition
+  - derive Projection_1 from Evidence_1
+  - apply Projection_1 to Landscape State
+  - re-observe the resulting state
+  - create distinct Evidence_2
+  - derive Projection_2 from Evidence_2
+  - preserve Projection_1 and Evidence_1 unchanged
+
+constraints:
+  - Evidence remains immutable
+  - Projection does not mutate Evidence
+  - Projection does not require domain semantics
+  - Landscape State applies Projection, not Evidence
+  - Projection history is preserved
+
+success_criteria:
+  - Evidence_1 remains unchanged after projection
+  - Landscape State changes only when Projection is applied
+  - Projection_1 remains available after Projection_2
+  - Evidence_1 and Evidence_2 remain distinct observations
+  - no new Foundation theory is introduced
