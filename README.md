@@ -8,6 +8,18 @@ Shirakami OS — Foundation Base Point
 Version: α2.2  
 Status: Foundation Freeze
 
+## Reviewer Entry Point
+
+For external architecture review, start here:
+
+- **[Reviewer Entry Point](docs/architecture/REVIEWER_ENTRY_POINT.md)** — evidence-backed reading order and Kernel boundary review questions.
+
+The recommended path is:
+
+**Foundation → Protocol Contract → Architecture → Runtime → Evidence / Observations → Tests → Replay**
+
+Please classify the architecture from repository evidence rather than from the project name or prior assumptions.
+
 ## Getting Started
 
 - Foundation → [spec/](spec/)
@@ -39,8 +51,6 @@ Out of scope:
 - Implementation Details
 - Plugins
 - Applications
-
-----
 
 ## Principles
 - Landscape First.
