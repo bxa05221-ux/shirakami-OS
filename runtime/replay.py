@@ -1,13 +1,13 @@
 """Deterministic replay boundary for Runtime β0.1.
 
 Replay observes existing execution artifacts. It does not introduce protocol
-semantics or mutate Evidence/Landscape state.
+semantics or mutate Evidence records.
 """
 
 from dataclasses import dataclass
 import hashlib
 import json
-from typing import Any, Mapping
+from typing import Any, Iterable, Mapping
 
 from evidence import EvidenceRecord
 from landscape import LandscapeState
@@ -25,6 +25,7 @@ def execution_fingerprint(result: ExecutionResult) -> str:
         "transition_kind": result.transition.kind,
         "transition_data": dict(result.transition.data),
         "signals": list(result.signals),
+        "steps": result.steps,
     }
     return hashlib.sha256(_canonical(payload)).hexdigest()
 
@@ -42,6 +43,14 @@ def evidence_fingerprint(evidence: EvidenceRecord) -> str:
 
 def landscape_fingerprint(state: Mapping[str, Any]) -> str:
     return hashlib.sha256(_canonical(dict(state))).hexdigest()
+
+
+def replay_landscape(evidence_records: Iterable[EvidenceRecord]) -> Mapping[str, Any]:
+    """Reconstruct a Landscape view by replaying preserved Evidence in order."""
+    state = LandscapeState.empty()
+    for evidence in evidence_records:
+        state.apply_evidence(evidence)
+    return state.snapshot()
 
 
 @dataclass(frozen=True)
