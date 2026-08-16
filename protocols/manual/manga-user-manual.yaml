@@ -12,6 +12,11 @@ matome:
   statement: >
     The same manual structure can be rendered as a human-readable manga
     in multiple languages without changing the underlying protocol intent.
+  pipeline:
+    - phase: observe
+      action: capture_manual_structure
+    - phase: evidence
+      action: capture_transition
   manual:
     type: manga
     default_language: ja
