@@ -1,6 +1,6 @@
 """Complete β0.1 vertical slice from Matome Protocol to Landscape state.
 
-Matome YAML -> ProtocolIR -> Runtime -> ExecutionResult -> Evidence -> Landscape.
+Matome YAML -> ProtocolIR -> Runtime -> ExecutionResult -> Evidence -> Projection -> Landscape.
 This module only composes existing boundaries; it does not introduce protocol
 semantics.
 """
@@ -11,6 +11,7 @@ from typing import Any, Mapping
 
 from evidence import EvidenceRecord, capture_evidence
 from landscape import LandscapeState
+from projection import project_evidence
 from protocol_bridge import protocol_from_ir
 from protocol_loader import ProtocolIR, load_matome
 from prototype import ExecutionResult, Runtime
@@ -40,13 +41,11 @@ def execute_matome(path: str | Path, input_value: Mapping[str, Any] | None = Non
         normalized_input,
     )
     evidence = capture_evidence(execution)
-
-    landscape = LandscapeState.empty()
-    landscape.apply_evidence(evidence)
+    landscape = project_evidence(evidence)
 
     return VerticalSliceResult(
         protocol=protocol,
         execution=execution,
         evidence=evidence,
-        landscape=landscape.snapshot(),
+        landscape=landscape,
     )
