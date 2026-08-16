@@ -1,26 +1,33 @@
 from evidence import capture_evidence
-from landscape import LandscapeState
 from prototype import Runtime, example_protocol
 from projection import project_evidence
-from replay import capture_replay, replay_matches
+from replay import capture_replay, replay_landscape, replay_matches
 
 
-def run_once():
-    result = Runtime().execute("example.protocol", example_protocol, {"message": "hello landscape"})
+def run_once(message="hello landscape"):
+    result = Runtime().execute("example.protocol", example_protocol, {"message": message})
     evidence = capture_evidence(result)
     landscape = project_evidence(evidence)
-    return capture_replay(result, evidence, landscape)
+    return result, evidence, landscape
 
 
 def test_execution_evidence_landscape_replay_is_deterministic():
-    first = run_once()
-    second = run_once()
-    assert replay_matches(first, second)
+    first_result, first_evidence, first_landscape = run_once()
+    second_result, second_evidence, second_landscape = run_once()
+    assert replay_matches(
+        capture_replay(first_result, first_evidence, first_landscape),
+        capture_replay(second_result, second_evidence, second_landscape),
+    )
+
+
+def test_replay_reconstructs_the_same_landscape():
+    _, evidence, projected = run_once()
+    assert replay_landscape([evidence]) == projected
 
 
 def test_replay_fingerprints_are_distinct_for_different_inputs():
-    a = Runtime().execute("example.protocol", example_protocol, {"message": "a"})
-    b = Runtime().execute("example.protocol", example_protocol, {"message": "b"})
-    assert capture_replay(a, capture_evidence(a), project_evidence(capture_evidence(a))).execution_fingerprint != capture_replay(
-        b, capture_evidence(b), project_evidence(capture_evidence(b))
+    a_result, a_evidence, a_landscape = run_once("a")
+    b_result, b_evidence, b_landscape = run_once("b")
+    assert capture_replay(a_result, a_evidence, a_landscape).execution_fingerprint != capture_replay(
+        b_result, b_evidence, b_landscape
     ).execution_fingerprint
