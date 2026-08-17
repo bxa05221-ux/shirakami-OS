@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from runtime.evidence import capture_evidence
-from runtime.landscape import LandscapeState
-from runtime.protocol_loader import load_matome
-from runtime.protocol_runtime_bridge import execute_protocol
-from runtime.prototype import Transition
+from evidence import capture_evidence
+from landscape import LandscapeState
+from protocol_loader import load_matome
+from protocol_runtime_bridge import execute_protocol
+from prototype import Transition
 
 
 def test_symbolic_recurrence_fixture_loads_and_preserves_pipeline():
