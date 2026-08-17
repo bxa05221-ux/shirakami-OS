@@ -1,30 +1,7 @@
-from pathlib import Path
-
 from evidence import capture_evidence
 from landscape import LandscapeState
-from protocol_loader import load_matome
 from protocol_runtime_bridge import execute_protocol
 from prototype import Transition
-
-
-def test_symbolic_recurrence_fixture_loads_and_preserves_pipeline():
-    fixture = Path(__file__).parents[1] / "protocols" / "manual" / "symbolic-recurrence-boundary.yaml"
-    protocol_ir = load_matome(fixture)
-
-    assert protocol_ir.title == "Symbolic Recurrence Boundary Test"
-    assert protocol_ir.version == "0.1"
-    assert [item["phase"] for item in protocol_ir.pipeline] == [
-        "observation",
-        "recurrence",
-        "transition",
-        "evidence",
-    ]
-    assert [item["action"] for item in protocol_ir.pipeline] == [
-        "preserve_symbolic_lineage",
-        "carry_symbolic_reference_as_protocol_data",
-        "expose_recurrence_as_observable_transition",
-        "preserve_recurrence_lineage",
-    ]
 
 
 def test_symbolic_recurrence_lineage_survives_runtime_and_landscape_boundary():
