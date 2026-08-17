@@ -1,0 +1,17 @@
+matome:
+  title: Symbolic Recurrence Boundary Test
+  version: 0.1
+  statement: >
+    過去に形成された人物・記憶・言葉・経験・象徴が、
+    現在のLandscapeと関係することで、
+    現在の認知・発言・行動の中に再び立ち上がる
+    象徴再帰のRuntime境界を観測する。
+  pipeline:
+    - phase: observation
+      action: preserve_symbolic_lineage
+    - phase: recurrence
+      action: carry_symbolic_reference_as_protocol_data
+    - phase: transition
+      action: expose_recurrence_as_observable_transition
+    - phase: evidence
+      action: preserve_recurrence_lineage
