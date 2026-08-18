@@ -1,12 +1,27 @@
 # shirakami-OS
 
-Shirakami OS — Foundation Base Point
+> **Shirakami OS is not another AI model.**
+> It is a runtime for preserving, observing, and transferring human context across AI systems.
 
 [English](README.md) | [日本語](README.ja.md)
 
 ----
 Version: α2.2  
 Status: Foundation Freeze
+
+## A Different Question
+
+AI models change.
+AI providers change.
+Interfaces change.
+
+But human context should not have to disappear with them.
+
+Shirakami explores a different question:
+
+> **What if the valuable asset is not the AI model, but the human landscape the AI learns to inherit?**
+
+**Landscape First.** The runtime is a service to Landscape, not the other way around.
 
 ## Reviewer Entry Point
 
@@ -19,6 +34,24 @@ The recommended path is:
 **Foundation → Protocol Contract → Architecture → Runtime → Evidence / Observations → Tests → Replay**
 
 Please classify the architecture from repository evidence rather than from the project name or prior assumptions.
+
+## Architecture
+
+```text
+Landscape
+    ↓
+Evidence
+    ↓
+Protocol
+    ↓
+Runtime
+    ↓
+Adapter
+    ↓
+AI
+```
+
+Shirakami OS treats protocols, evidence, observable state, and human context as explicit architectural objects so that the surrounding AI model can change without forcing the human's accumulated context to disappear.
 
 ## Getting Started
 
@@ -57,6 +90,16 @@ Out of scope:
 - Protocols describe Landscapes.
 - Runtime executes Protocols.
 - LLMs are replaceable. Landscape remains.
+
+## Why This Matters
+
+We are not trying to build a better model inside the model race.
+
+We are exploring the layer around the model:
+
+> **How can a human keep their Landscape when the AI changes?**
+
+This is an experimental open-source project. We welcome comparison, criticism, experiments, and alternative approaches.
 
 ## Repository structure
 - spec/ — Foundation specifications
