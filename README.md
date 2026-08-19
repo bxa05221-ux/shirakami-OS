@@ -53,6 +53,15 @@ AI
 
 Shirakami OS treats protocols, evidence, observable state, and human context as explicit architectural objects so that the surrounding AI model can change without forcing the human's accumulated context to disappear.
 
+## Service Artifacts
+
+Shirakami OS also produces concrete protocols and services that make the architecture observable in practice.
+
+- **[Thread RPG v1.2.1](products/thread-rpg-v1.2.1/)** — UI-for-AI dialogue protocol / multi-voice conversation
+- **[Service Artifact Index](products/)** — current runnable/reference artifacts
+
+The Foundation describes the architecture. The service artifacts show what that architecture can produce.
+
 ## Getting Started
 
 - Foundation → [spec/](spec/)
@@ -107,6 +116,7 @@ This is an experimental open-source project. We welcome comparison, criticism, e
 - examples/ — Minimal examples for runtime boundary
 - protocols/ — Protocol source artifacts
 - runtime/ — Runtime implementation
+- products/ — Service artifacts and reference implementations
 
 ## User Manual (Manga)
 
