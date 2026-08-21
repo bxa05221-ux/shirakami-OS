@@ -1,0 +1,41 @@
+landscape:
+  id: example-japanese-context-001
+  type: social_context
+  locale: ja-JP
+  title: 管理者への反発に見える会話
+
+contexts:
+  - id: context-a
+    type: statement
+    text: >
+      この運営のやり方には反対だ。
+
+  - id: context-b
+    type: statement
+    text: >
+      この場所そのものがなくなってほしいわけじゃない。
+
+  - id: context-c
+    type: prior_statement
+    text: >
+      もっと良くなれば、ここは続けられると思う。
+
+relations:
+  - source: context-a
+    target: context-c
+    type: contextual_continuity
+    status: candidate
+    basis: >
+      現在の反発と過去の発言に継続的な問題関心が観測される。
+
+  - source: context-b
+    target: context-c
+    type: shared_context
+    status: candidate
+    basis: >
+      両方の発言に場所を維持したいという文脈が含まれる可能性がある。
+
+evidence:
+  - type: observation
+    note: >
+      relations は本人の真意を確定するものではなく、追加観測のための接続候補である。
