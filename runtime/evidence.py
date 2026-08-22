@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Any, Mapping
 
-from prototype import ExecutionResult, Transition
+from .prototype import ExecutionResult, Transition
 
 
 @dataclass(frozen=True)
