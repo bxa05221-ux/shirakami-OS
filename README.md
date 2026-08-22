@@ -53,6 +53,34 @@ AI
 
 Shirakami OS treats protocols, evidence, observable state, and human context as explicit architectural objects so that the surrounding AI model can change without forcing the human's accumulated context to disappear.
 
+## Minimal Executable OS
+
+The repository now exposes one concrete vertical slice as the executable entry point:
+
+```text
+boot Landscape
+      ↓
+   Protocol
+      ↓
+    Runtime
+      ↓
+ Observable Transition
+      ↓
+    Evidence
+      ↓
+ Landscape State
+      ↓
+ Inspectable Result
+```
+
+Run:
+
+```bash
+python shirakami_os.py
+```
+
+The entry point is intentionally small. It does not claim to be the final architecture; it makes the minimum OS boundary directly executable and inspectable. The implementation is covered by `tests/test_shirakami_os.py`.
+
 ## Service Artifacts
 
 Shirakami OS also produces concrete protocols and services that make the architecture observable in practice.
