@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Any, Mapping
 
-from evidence import EvidenceRecord, is_transition_evidence
+from .evidence import EvidenceRecord, is_transition_evidence
 
 
 @dataclass
