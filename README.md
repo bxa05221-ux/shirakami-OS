@@ -23,15 +23,26 @@ Shirakami explores a different question:
 
 **Landscape First.** The runtime is a service to Landscape, not the other way around.
 
+## Repository Landscape
+
+Shirakami is intentionally separated into four roles:
+
+- **shirakami-model** — cognitive model, principles, and conceptual foundation
+- **shirakami-research** — observations, experiments, hypotheses, and exploratory artifacts
+- **shirakami-specification** — stable specifications, schemas, and normative protocol contracts
+- **shirakami-OS** — Runtime, reference implementation, adapters, plugins, and executable artifacts
+
+This repository is the implementation/runtime layer. It must not become the canonical home for stable specifications merely because an implementation happens to live here.
+
 ## Reviewer Entry Point
 
 For external architecture review, start here:
 
 - **[Reviewer Entry Point](docs/architecture/REVIEWER_ENTRY_POINT.md)** — evidence-backed reading order and Kernel boundary review questions.
 
-The recommended path is:
+Recommended reading order:
 
-**Foundation → Protocol Contract → Architecture → Runtime → Evidence / Observations → Tests → Replay**
+**Landscape → Evidence → Specification / Protocol → Runtime → Adapter → Execution → Observation**
 
 Please classify the architecture from repository evidence rather than from the project name or prior assumptions.
 
@@ -42,20 +53,20 @@ Landscape
     ↓
 Evidence
     ↓
-Protocol
+Protocol / Specification
     ↓
 Runtime
     ↓
 Adapter
     ↓
-AI
+External System / AI
 ```
 
 Shirakami OS treats protocols, evidence, observable state, and human context as explicit architectural objects so that the surrounding AI model can change without forcing the human's accumulated context to disappear.
 
 ## Minimal Executable OS
 
-The repository now exposes one concrete vertical slice as the executable entry point:
+The repository exposes one concrete vertical slice as the executable entry point:
 
 ```text
 boot Landscape
@@ -92,35 +103,31 @@ The Foundation describes the architecture. The service artifacts show what that 
 
 ## Getting Started
 
-- Foundation → [spec/](spec/)
+- Foundation / implementation boundary → [spec/](spec/)
 - Architecture → [docs/](docs/)
 - **User Manual (manga)** → [docs/manual/](docs/manual/)
-- RFC → [docs/rfc/](docs/rfc/)
+- Historical / active RFCs → [docs/rfc/](docs/rfc/)
 - Examples → [examples/](examples/)
 - Japanese introduction → [README.ja.md](README.ja.md)
+- Normative specifications → **[shirakami-specification](https://github.com/bxa05221-ux/shirakami-specification)**
 
 ## Overview
 
-Shirakami OS is an open specification project for preserving and utilizing Human Landscapes across generations of AI technologies.  
-This repository contains the current Foundation Base Point used as the architectural baseline for future research, implementation, and development.
+Shirakami OS is an open specification project for preserving and utilizing Human Landscapes across generations of AI technologies. This repository contains the current Foundation Base Point and reference implementation used for implementation, testing, and development.
 
 ## Scope
 Included:
-- Foundation Architecture
-- Core Concepts
-- Terminology
-- Runtime Boundary
-- Repository Structure
-- Runtime Interface
-
-----
+- Runtime implementation
+- Reference architecture implementation
+- Adapters and plugins
+- Executable examples
+- Evidence and observation mechanisms
 
 Out of scope:
 - Research Notes
 - Historical Discussions
-- Implementation Details
-- Plugins
-- Applications
+- Stable normative specifications owned by `shirakami-specification`
+- Private user Landscape
 
 ## Principles
 - Landscape First.
@@ -139,12 +146,13 @@ We are exploring the layer around the model:
 This is an experimental open-source project. We welcome comparison, criticism, experiments, and alternative approaches.
 
 ## Repository structure
-- spec/ — Foundation specifications
-- docs/ — Concept documents and reference notes
-- examples/ — Minimal examples for runtime boundary
-- protocols/ — Protocol source artifacts
+- spec/ — implementation-side Foundation and transition specifications
+- docs/ — architecture and reference notes
+- examples/ — minimal examples for runtime boundary
+- protocols/ — protocol source artifacts used by implementations
 - runtime/ — Runtime implementation
-- products/ — Service artifacts and reference implementations
+- plugins/ — plugin and adapter implementations
+- products/ — service artifacts and reference implementations
 
 ## User Manual (Manga)
 
