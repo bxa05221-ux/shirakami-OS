@@ -2,20 +2,44 @@
 
 ## Purpose
 
-This document is the shortest evidence-backed route for an external reviewer or AI system to inspect the repository without relying on prior knowledge of Shirakami OS.
+This is the shortest evidence-backed route for an external reviewer or AI system to inspect Shirakami OS without relying on prior knowledge.
 
-The review order is intentional: establish the Foundation first, then inspect the Runtime boundary, then inspect implementation and verification evidence.
+The repository is one implementation layer within a larger Shirakami Landscape. Stable normative specifications are maintained in `shirakami-specification`; this repository contains Runtime, adapters, plugins, tests, and executable artifacts.
+
+## Repository Roles
+
+```text
+shirakami-model
+    ↓ conceptual foundation
+shirakami-research
+    ↓ observation / experiment
+shirakami-specification
+    ↓ normative contract
+shirakami-OS
+    ↓ runtime / implementation
+Evidence / Observation
+    ↺ research
+```
 
 ## Recommended Reading Order
 
-1. **Foundation** — [`spec/README.md`](../../spec/README.md)
-2. **Protocol contract** — [`spec/protocol.md`](../../spec/protocol.md)
-3. **Adapter contract** — [`spec/adapter-contract.md`](../../spec/adapter-contract.md)
+1. **Repository README** — implementation-layer scope and architecture
+2. **Normative Specification** — [shirakami-specification](https://github.com/bxa05221-ux/shirakami-specification)
+3. **Foundation / implementation boundary** — [`spec/README.md`](../../spec/README.md)
 4. **Architecture baseline** — [`docs/Shirakami_OS_Alpha2.2.md`](../Shirakami_OS_Alpha2.2.md)
-5. **RFCs** — [`docs/rfc/`](../rfc/)
+5. **Active / historical RFCs** — [`docs/rfc/`](../rfc/)
 6. **Runtime implementation** — [`runtime/`](../../runtime/)
-7. **Evidence / observation records** — [`docs/observations/`](../observations/)
-8. **Examples / Protocol source artifacts** — [`examples/`](../../examples/) and [`protocols/`](../../protocols/)
+7. **Adapters / plugins** — [`plugins/`](../../plugins/)
+8. **Evidence / observation records** — [`docs/observations/`](../observations/)
+9. **Examples / protocol source artifacts** — [`examples/`](../../examples/) and [`protocols/`](../../protocols/)
+
+## Specification Boundary
+
+The canonical home for stable normative contracts is `shirakami-specification`.
+
+The `docs/rfc/` directory in this repository is now an RFC history and active-design area. RFC-0001 through RFC-0005 have promoted specifications; RFC-0006 remains Draft.
+
+Do not treat implementation-side documents as normative merely because they are present in this repository.
 
 ## Kernel Boundary
 
@@ -87,7 +111,7 @@ An external review should answer these questions from repository evidence rather
 - Can Landscape State be reconstructed from preserved Evidence?
 - Which migration guarantees are implemented, and which remain hypotheses?
 
-### Comparison with Existing Systems
+## Comparison with Existing Systems
 
 Do not begin by asking whether Shirakami resembles Event Sourcing, Workflow Engines, Policy Engines, or Agent Frameworks.
 
@@ -101,7 +125,7 @@ The answer must be derived from the actual Protocol, Evidence, Projection, Lands
 
 External AI observations are **observations**, not authoritative facts.
 
-Repository code, tests, immutable Evidence, and accepted Foundation/RFC documents are the primary evidence sources.
+Repository code, tests, immutable Evidence, and accepted specifications are the primary evidence sources.
 
 When external reviews disagree:
 
@@ -120,9 +144,10 @@ Do not silently reconcile contradictory external interpretations.
 ## Current Review Status
 
 - Repository entry point: established
-- Foundation navigation: established
-- Protocol contract navigation: established
+- Repository role boundary: established
+- Normative specification navigation: established
 - Runtime implementation navigation: established
+- Adapter / plugin navigation: established
 - Observation / Evidence navigation: established
 - Event Sourcing / Workflow divergence: pending external review
 - Landscape layer placement: pending verification
@@ -131,6 +156,6 @@ Do not silently reconcile contradictory external interpretations.
 
 ## Review Rule
 
-The reviewer should not infer the project's intended meaning from the name `Shirakami OS`.
+Do not infer the project's intended meaning from the name `Shirakami OS`.
 
-Read the Foundation, follow the implementation path, inspect the tests and observations, and only then classify the architecture.
+Read the normative specification, follow the implementation path, inspect the tests and observations, and only then classify the architecture.
