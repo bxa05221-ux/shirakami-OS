@@ -1,0 +1,356 @@
+openapi: 3.0.3
+info:
+  title: Shirakami Model v3.2 Matome API
+  version: 3.2.0-draft
+  description: >
+    Experimental API contract for the Shirakami Model v3.2 asynchronous
+    observation/conference cycle. This document is a draft product artifact,
+    not a normative Foundation specification.
+  x-status: experimental
+  x-principles:
+    - Landscape First
+    - Protocol First
+    - Human Context First
+    - unresolved_kept
+servers:
+  - url: http://localhost:8000
+    description: Example local server; no server implementation is implied.
+paths:
+  /landscape/boot:
+    post:
+      operationId: bootLandscape
+      summary: Boot Landscape
+      description: Initialize an observation cycle without changing Reality.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Landscape'
+      responses:
+        '200':
+          description: Booted Landscape
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LandscapeState'
+  /threads/spawn:
+    post:
+      operationId: spawnThreads
+      summary: Spawn independent observation threads
+      description: >
+        Create independent observation units. Thread perspectives are
+        contextual and are not defined as fixed personalities.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpawnThreadsRequest'
+      responses:
+        '200':
+          description: Spawned threads
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Threads'
+  /observations/run:
+    post:
+      operationId: runObservation
+      summary: Run independent observations
+      description: Threads observe without using other threads' conclusions as premises.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObservationRequest'
+      responses:
+        '200':
+          description: Observation results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObservationResults'
+  /matome/compress:
+    post:
+      operationId: compressToMatomeYaml
+      summary: Compress observations to Matome YAML
+      description: Separate facts from interpretations while preserving unresolved items.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObservationResults'
+      responses:
+        '200':
+          description: Compressed Matome artifact
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatomeYaml'
+  /presenter/conference:
+    post:
+      operationId: presenterConference
+      summary: Run Presenter Conference
+      description: Observe differences and contradictions without erasing them.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatomeConferenceRequest'
+      responses:
+        '200':
+          description: Conference result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConferenceResult'
+  /threads/optimize-return:
+    post:
+      operationId: optimizeAndReturn
+      summary: Optimize and return individualized Matome artifacts
+      description: Return different next-step resources to each thread according to observed needs.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConferenceResult'
+      responses:
+        '200':
+          description: Individualized returns
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndividualizedReturns'
+  /observations/reobserve:
+    post:
+      operationId: reobserve
+      summary: Re-observe with returned context
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReobserveRequest'
+      responses:
+        '200':
+          description: Next observation state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LandscapeState'
+  /resources/distribute:
+    post:
+      operationId: distributeResources
+      summary: Distribute resources by observed need
+      description: Resources are not allocated by output quantity alone.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceDistributionRequest'
+      responses:
+        '200':
+          description: Resource distribution result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceDistributionResult'
+components:
+  schemas:
+    Landscape:
+      type: object
+      required: [id, reality, state]
+      properties:
+        id:
+          type: string
+        reality:
+          description: Reality is observed, not modified by boot.
+        state:
+          type: object
+          additionalProperties: true
+    LandscapeState:
+      type: object
+      required: [landscape_id, state, unresolved]
+      properties:
+        landscape_id:
+          type: string
+        state:
+          type: object
+          additionalProperties: true
+        unresolved:
+          type: array
+          items:
+            type: string
+    SpawnThreadsRequest:
+      type: object
+      required: [landscape_id, count]
+      properties:
+        landscape_id:
+          type: string
+        count:
+          type: integer
+          minimum: 1
+        observation_contexts:
+          type: array
+          items:
+            type: string
+    Threads:
+      type: object
+      required: [threads]
+      properties:
+        threads:
+          type: array
+          items:
+            $ref: '#/components/schemas/Thread'
+    Thread:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+        context:
+          type: string
+    ObservationRequest:
+      type: object
+      required: [landscape_id, thread_ids]
+      properties:
+        landscape_id:
+          type: string
+        thread_ids:
+          type: array
+          items:
+            type: string
+    ObservationResults:
+      type: object
+      required: [results]
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            required: [thread_id, facts, interpretations, unresolved]
+            properties:
+              thread_id:
+                type: string
+              facts:
+                type: array
+                items:
+                  type: string
+              interpretations:
+                type: array
+                items:
+                  type: string
+              unresolved:
+                type: array
+                items:
+                  type: string
+    MatomeYaml:
+      type: object
+      required: [facts, interpretations, unresolved]
+      properties:
+        facts:
+          type: array
+          items:
+            type: string
+        interpretations:
+          type: array
+          items:
+            type: string
+        unresolved:
+          type: array
+          items:
+            type: string
+    MatomeConferenceRequest:
+      type: object
+      required: [matome_artifacts]
+      properties:
+        matome_artifacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatomeYaml'
+    ConferenceResult:
+      type: object
+      required: [differences, contradictions, unresolved]
+      properties:
+        differences:
+          type: array
+          items:
+            type: string
+        contradictions:
+          type: array
+          items:
+            type: string
+        unresolved:
+          type: array
+          items:
+            type: string
+    IndividualizedReturns:
+      type: object
+      required: [returns]
+      properties:
+        returns:
+          type: array
+          items:
+            type: object
+            required: [thread_id, next_task, required_resources]
+            properties:
+              thread_id:
+                type: string
+              next_task:
+                type: string
+              required_resources:
+                type: array
+                items:
+                  type: string
+              matome:
+                $ref: '#/components/schemas/MatomeYaml'
+    ReobserveRequest:
+      type: object
+      required: [landscape_id, individualized_returns]
+      properties:
+        landscape_id:
+          type: string
+        individualized_returns:
+          $ref: '#/components/schemas/IndividualizedReturns'
+    ResourceDistributionRequest:
+      type: object
+      required: [threads, available_resources]
+      properties:
+        threads:
+          type: array
+          items:
+            type: object
+            required: [thread_id, need]
+            properties:
+              thread_id:
+                type: string
+              need:
+                type: array
+                items:
+                  type: string
+        available_resources:
+          type: array
+          items:
+            type: string
+    ResourceDistributionResult:
+      type: object
+      required: [allocations]
+      properties:
+        allocations:
+          type: array
+          items:
+            type: object
+            required: [thread_id, resources]
+            properties:
+              thread_id:
+                type: string
+              resources:
+                type: array
+                items:
+                  type: string
