@@ -92,15 +92,17 @@ python shirakami_os.py
 
 The entry point is intentionally small. It does not claim to be the final architecture; it makes the minimum OS boundary directly executable and inspectable. The implementation is covered by `tests/test_shirakami_os.py`.
 
-## Service Artifacts
+## Public Service Artifact
 
-Shirakami OS also produces concrete protocols and services that make the architecture observable in practice.
+The current public service artifact is **[Thread RPG v1.2.1](products/thread-rpg-v1.2.1/)** — a UI-for-AI dialogue protocol / multi-voice conversation system.
 
-- **[Thread RPG v1.2.1](products/thread-rpg-v1.2.1/)** — UI-for-AI dialogue protocol / multi-voice conversation
-- **[Matome API v3.2](products/matome-api/)** — Shirakami Model v3.2 asynchronous observation/conference API contract (experimental)
-- **[Service Artifact Index](products/)** — current runnable/reference artifacts
+Thread RPG is the public entry point for experiencing Shirakami concepts in a concrete form. It demonstrates how Protocol-driven interaction can produce a human-observable Landscape and serve as a basis for further observation.
 
-The Foundation describes the architecture. The service artifacts show what that architecture can produce.
+Other experimental artifacts, including Matome API v3.2 and related Evidence work, remain development/research artifacts and are not presented here as public service products.
+
+→ **[Service Artifact Index](products/)**
+
+The Foundation describes the architecture. The public service artifact shows what that architecture can produce; research artifacts remain available in their appropriate development boundaries.
 
 ## Getting Started
 
@@ -153,7 +155,7 @@ This is an experimental open-source project. We welcome comparison, criticism, e
 - protocols/ — protocol source artifacts used by implementations
 - runtime/ — Runtime implementation
 - plugins/ — plugin and adapter implementations
-- products/ — service artifacts and reference implementations
+- products/ — public service artifact and reference implementations
 
 ## User Manual (Manga)
 
