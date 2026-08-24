@@ -1,0 +1,87 @@
+landscape:
+  metadata:
+    title: "Shirakami OS 開発Landscape 公開例"
+    type: "example_landscape"
+    language: "ja"
+    purpose: >
+      Shirakami OSが扱うLandscapeを具体化するため、
+      実際の開発で確認された公開可能な状態を最小限に表現する。
+    status: "public_example"
+
+  project:
+    name: "Shirakami OS"
+    repositories:
+      model: "shirakami-model"
+      research: "shirakami-research"
+      specification: "shirakami-specification"
+      os: "shirakami-OS"
+
+  current_state:
+    architecture:
+      principle: "Landscape First"
+      flow:
+        - "Landscape"
+        - "Evidence"
+        - "Protocol"
+        - "Runtime"
+        - "Adapter"
+        - "External System / AI"
+
+    runtime:
+      status: "minimal_vertical_slice"
+      observable_flow:
+        - "boot Landscape"
+        - "execute Protocol"
+        - "generate Observable Transition"
+        - "record Evidence"
+        - "return Landscape State"
+        - "produce Inspectable Result"
+
+    workspace:
+      status: "boundary_under_verification"
+      principle:
+        - "OS Runtime and user Landscape are not the same thing"
+        - "User Landscapes must remain isolated across Workspace boundaries"
+
+  observations:
+    - id: "obs-001"
+      statement: >
+        Shirakami OSはAIモデルそのものではなく、
+        Landscapeを中心にProtocolを実行するRuntimeとして整理されている。
+
+    - id: "obs-002"
+      statement: >
+        GitHubは単なる開発場所ではなく、
+        Adapterを通じて観測対象となり得る外部Landscapeでもある。
+
+    - id: "obs-003"
+      statement: >
+        RuntimeとUser Landscapeの境界を明示することで、
+        複数ユーザーのLandscapeを共有Runtimeから分離できる設計基準が得られた。
+
+  evidence:
+    available:
+      - "最小Runtime実行経路"
+      - "Workspace Landscape isolation test"
+      - "GitHub Landscape Adapter implementation"
+      - "公開用Shirakami OS Overview"
+
+  unresolved:
+    - "Workspaceを実装上の第一級オブジェクトとして確定する"
+    - "複数Landscapeの永続化境界を確定する"
+    - "Evidence lifecycleをさらに検証する"
+    - "AdapterとRuntimeの契約を安定仕様へ移行する"
+
+  next_observation:
+    questions:
+      - "Landscapeはどの最小Schemaで保持すべきか"
+      - "Workspace境界はRuntime API上でどのように表現されるか"
+      - "Evidenceから次のLandscape Stateへ何を引き継ぐべきか"
+      - "どの部分をSpecificationとして固定できるか"
+
+  core_loop:
+    - "Observe"
+    - "Record"
+    - "Execute"
+    - "Return"
+    - "Observe again"
