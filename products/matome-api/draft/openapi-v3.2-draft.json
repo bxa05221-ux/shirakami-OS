@@ -1,0 +1,21 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Shirakami Model v3.2 Matome API",
+    "version": "3.2.0-draft",
+    "description": "Experimental API contract for the Shirakami Model v3.2 asynchronous observation/conference cycle. This document is a draft product artifact, not a normative Foundation specification.",
+    "x-status": "experimental",
+    "x-principles": ["Landscape First", "Protocol First", "Human Context First", "unresolved_kept"]
+  },
+  "servers": [{"url": "http://localhost:8000", "description": "Example local server; no server implementation is implied."}],
+  "paths": {
+    "/landscape/boot": {"post": {"operationId": "bootLandscape", "summary": "Boot Landscape", "responses": {"200": {"description": "Booted Landscape"}}}},
+    "/threads/spawn": {"post": {"operationId": "spawnThreads", "summary": "Spawn independent observation threads", "responses": {"200": {"description": "Spawned threads"}}}},
+    "/observations/run": {"post": {"operationId": "runObservation", "summary": "Run independent observations", "responses": {"200": {"description": "Observation results"}}}},
+    "/matome/compress": {"post": {"operationId": "compressToMatomeYaml", "summary": "Compress observations to Matome YAML", "responses": {"200": {"description": "Compressed Matome artifact"}}}},
+    "/presenter/conference": {"post": {"operationId": "presenterConference", "summary": "Run Presenter Conference", "responses": {"200": {"description": "Conference result"}}}},
+    "/threads/optimize-return": {"post": {"operationId": "optimizeAndReturn", "summary": "Optimize and return individualized Matome artifacts", "responses": {"200": {"description": "Individualized returns"}}}},
+    "/observations/reobserve": {"post": {"operationId": "reobserve", "summary": "Re-observe with returned context", "responses": {"200": {"description": "Next observation state"}}}},
+    "/resources/distribute": {"post": {"operationId": "distributeResources", "summary": "Distribute resources by observed need", "responses": {"200": {"description": "Resource distribution result"}}}}
+  }
+}
