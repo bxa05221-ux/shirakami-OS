@@ -1,0 +1,163 @@
+openapi: 3.0.3
+info:
+  title: Shirakami Model v3.2 Matome API
+  version: 0.1.0-draft
+  description: >-
+    Experimental API contract for exposing the Shirakami Model v3.2
+    Observe -> Compress -> Conference -> Optimize -> Return cycle.
+    This is a contract draft, not a statement that a network server already exists.
+servers:
+  - url: https://example.invalid
+    description: Placeholder only; no public server is claimed.
+tags:
+  - name: landscape
+  - name: observation
+  - name: conference
+paths:
+  /v1/landscapes/boot:
+    post:
+      tags: [landscape]
+      summary: Boot a Landscape
+      operationId: bootLandscape
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Landscape'
+      responses:
+        '200':
+          description: Initial Landscape snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LandscapeResult'
+
+  /v1/observations:
+    post:
+      tags: [observation]
+      summary: Run an independent observation
+      operationId: runObservation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObservationRequest'
+      responses:
+        '200':
+          description: Observation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObservationResult'
+
+  /v1/conferences:
+    post:
+      tags: [conference]
+      summary: Conference compressed observations
+      operationId: presenterConference
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConferenceRequest'
+      responses:
+        '200':
+          description: Conference result with individualized returns
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConferenceResult'
+
+components:
+  schemas:
+    Landscape:
+      type: object
+      additionalProperties: true
+      description: Observable user/project state. Reality is not modified by boot.
+
+    LandscapeResult:
+      type: object
+      required: [landscape]
+      properties:
+        landscape:
+          $ref: '#/components/schemas/Landscape'
+
+    ObservationRequest:
+      type: object
+      required: [landscape, protocol_id, thread_id]
+      properties:
+        landscape:
+          $ref: '#/components/schemas/Landscape'
+        protocol_id:
+          type: string
+        thread_id:
+          type: string
+        input:
+          type: object
+          additionalProperties: true
+        prior_thread_results:
+          type: array
+          description: Must be empty for an independent observation unless the protocol explicitly permits prior results.
+          items:
+            type: object
+            additionalProperties: true
+
+    ObservationResult:
+      type: object
+      required: [thread_id, observation, uncertainty, unresolved]
+      properties:
+        thread_id:
+          type: string
+        observation:
+          type: object
+          additionalProperties: true
+        uncertainty:
+          type: array
+          items:
+            type: string
+        unresolved:
+          type: array
+          items:
+            type: string
+
+    ConferenceRequest:
+      type: object
+      required: [landscape, observations]
+      properties:
+        landscape:
+          $ref: '#/components/schemas/Landscape'
+        observations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObservationResult'
+
+    ConferenceResult:
+      type: object
+      required: [differences, contradictions, individualized_returns]
+      properties:
+        differences:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        contradictions:
+          type: array
+          description: Contradictions are preserved rather than silently erased.
+          items:
+            type: object
+            additionalProperties: true
+        individualized_returns:
+          type: array
+          description: Each thread receives a return adapted to its next observation.
+          items:
+            type: object
+            required: [thread_id, matome_yaml]
+            properties:
+              thread_id:
+                type: string
+              matome_yaml:
+                type: object
+                additionalProperties: true
