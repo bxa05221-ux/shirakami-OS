@@ -1,0 +1,46 @@
+matome_yaml:
+  metadata:
+    title: "Shirakami Model v3.2 individualized return"
+    type: "draft_evidence_artifact"
+    status: "experimental"
+    principle: "全員に同じ答えを返さない"
+
+  threads:
+    - id: "thread-A"
+      next_task: "Landscape bootから独立観測への境界を確認する"
+      required_resources:
+        - "initial landscape"
+        - "observation context"
+      matome:
+        facts:
+          - "Landscape boot is the first transition"
+        interpretations:
+          - "The boundary should preserve the initial state"
+        unresolved:
+          - "How much state should be copied into a thread?"
+
+    - id: "thread-B"
+      next_task: "事実と解釈の分離状態を比較する"
+      required_resources:
+        - "thread observation results"
+        - "comparison context"
+      matome:
+        facts:
+          - "Matome YAML contains separate facts and interpretations"
+        interpretations:
+          - "Separation enables cross-thread comparison"
+        unresolved:
+          - "How should conflicting interpretations be retained?"
+
+    - id: "thread-C"
+      next_task: "個別最適化後の再観測を実行する"
+      required_resources:
+        - "individualized return"
+        - "previous evidence"
+      matome:
+        facts:
+          - "Returned next_task and required_resources differ by thread"
+        interpretations:
+          - "Resource allocation can follow observed need rather than output volume"
+        unresolved:
+          - "What evidence is sufficient to change resource allocation?"
