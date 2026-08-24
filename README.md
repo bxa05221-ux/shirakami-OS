@@ -97,6 +97,7 @@ The entry point is intentionally small. It does not claim to be the final archit
 Shirakami OS also produces concrete protocols and services that make the architecture observable in practice.
 
 - **[Thread RPG v1.2.1](products/thread-rpg-v1.2.1/)** — UI-for-AI dialogue protocol / multi-voice conversation
+- **[Matome API v3.2](products/matome-api/)** — Shirakami Model v3.2 asynchronous observation/conference API contract (experimental)
 - **[Service Artifact Index](products/)** — current runnable/reference artifacts
 
 The Foundation describes the architecture. The service artifacts show what that architecture can produce.
