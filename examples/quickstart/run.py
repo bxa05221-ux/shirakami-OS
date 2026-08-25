@@ -6,6 +6,11 @@ No GitHub credentials or external packages are required.
 """
 
 from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from runtime.evidence import capture_evidence
 from runtime.landscape import LandscapeState
