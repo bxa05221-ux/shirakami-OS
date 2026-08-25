@@ -1,0 +1,190 @@
+openapi: 3.1.0
+info:
+  title: Shirakami OS API
+  version: 0.1.0-alpha
+  description: |
+    Minimal external API boundary for Shirakami OS.
+
+    This specification exposes the current executable boundary without
+    promoting model output directly into Landscape state.
+
+    Core flow:
+      Landscape -> Protocol -> Runtime -> Transition -> Evidence -> Landscape
+
+    Model providers are implementation details behind adapters and are not
+    part of the public API contract.
+servers:
+  - url: https://api.example.invalid/v1
+    description: Placeholder server; deployment endpoint is not defined yet.
+paths:
+  /execute:
+    post:
+      operationId: executeProtocol
+      summary: Execute a protocol against a supplied context
+      description: |
+        Runs a protocol through the Runtime. The Runtime validates the
+        protocol/context boundary and returns an execution result.
+        Model output, when used by an adapter, is treated as an observation
+        or proposal and is not itself a committed Landscape state transition.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteRequest'
+      responses:
+        '200':
+          description: Execution result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecuteResponse'
+        '400':
+          description: Invalid request or protocol/context structure
+        '409':
+          description: Transition conflict or state precondition failure
+
+  /observe:
+    post:
+      operationId: recordObservation
+      summary: Record an observation without committing a state transition
+      description: |
+        Records an observation/proposal boundary event. This endpoint does
+        not assert that the observation is domain truth and does not by
+        itself mutate Landscape state.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObservationRequest'
+      responses:
+        '202':
+          description: Observation accepted for recording
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObservationResponse'
+        '400':
+          description: Invalid observation payload
+
+  /evidence/{evidence_id}:
+    get:
+      operationId: getEvidence
+      summary: Retrieve immutable evidence for an observable transition
+      parameters:
+        - name: evidence_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Evidence record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evidence'
+        '404':
+          description: Evidence not found
+
+components:
+  schemas:
+    ExecuteRequest:
+      type: object
+      required:
+        - protocol
+        - context
+      properties:
+        protocol:
+          type: object
+          description: Protocol definition or resolved Protocol IR reference.
+        context:
+          type: object
+          description: Context projection supplied to the Runtime.
+        request_id:
+          type: string
+        actor:
+          type: string
+
+    ExecuteResponse:
+      type: object
+      required:
+        - status
+        - result
+      properties:
+        status:
+          type: string
+          enum: [executed, rejected]
+        result:
+          type: object
+        transition:
+          $ref: '#/components/schemas/Transition'
+        evidence:
+          $ref: '#/components/schemas/EvidenceRef'
+
+    ObservationRequest:
+      type: object
+      required:
+        - source
+        - payload
+      properties:
+        source:
+          type: string
+        payload:
+          type: object
+        protocol_id:
+          type: string
+        request_id:
+          type: string
+
+    ObservationResponse:
+      type: object
+      required:
+        - observation_id
+        - status
+      properties:
+        observation_id:
+          type: string
+        status:
+          type: string
+          enum: [accepted]
+
+    Transition:
+      type: object
+      properties:
+        transition_id:
+          type: string
+        type:
+          type: string
+        from_state:
+          type: object
+        to_state:
+          type: object
+
+    EvidenceRef:
+      type: object
+      properties:
+        evidence_id:
+          type: string
+
+    Evidence:
+      type: object
+      required:
+        - evidence_id
+        - immutable
+      properties:
+        evidence_id:
+          type: string
+        immutable:
+          type: boolean
+          const: true
+        transition_id:
+          type: string
+        observation_id:
+          type: string
+        recorded_at:
+          type: string
+          format: date-time
+        payload:
+          type: object
