@@ -5,6 +5,7 @@ on:
     branches: ["feat/v41-runtime-migration", "main"]
   pull_request:
     branches: ["main"]
+  workflow_dispatch:
 
 jobs:
   test-api:
