@@ -36,6 +36,14 @@ Out of scope:
 - docs/ — Concept documents and reference notes
 - examples/ — Minimal examples for runtime boundary
 
+## Related Work
+
+Shirakami OS is developed within a broader landscape of research on memory, context management, stateful agents, cognitive architectures, and AI runtimes.
+
+We intentionally link to adjacent projects and treat them as comparative research references rather than competitors. The comparison focuses on the boundary between model capability, memory architecture, runtime architecture, and human-owned Landscape.
+
+See [Related Work / Comparative Landscape](docs/architecture/RELATED_WORK.md).
+
 ## Contributing
 Please open issues for proposed changes to the Foundation. For patches or documentation fixes, create a branch named `fix/...` or `feat/...` and submit a PR against `main`.
 
