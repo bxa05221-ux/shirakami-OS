@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "runtime/**"
+      - "tests/**"
       - "protocols/manual/**"
       - ".github/workflows/runtime-beta-0.1.yml"
   pull_request:
     paths:
       - "runtime/**"
+      - "tests/**"
       - "protocols/manual/**"
       - ".github/workflows/runtime-beta-0.1.yml"
 
@@ -27,8 +29,8 @@ jobs:
       - name: Install test dependency
         run: python -m pip install pytest
 
-      - name: Run Runtime unit tests
-        run: python -m pytest runtime -q
+      - name: Run Runtime and boundary tests
+        run: python -m pytest runtime tests -q
 
       - name: Compile manga renderer
         run: python -m py_compile runtime/manga_manual.py
