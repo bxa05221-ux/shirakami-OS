@@ -24,12 +24,13 @@ def execute(payload: dict[str, Any]) -> dict[str, Any]:
         input_value=payload.get("input"),
     )
     result = execution.result
+    completed = result.status == "completed"
     return {
         "protocol": {"title": execution.protocol_title, "version": execution.protocol_version},
-        "success": result.status == "completed",
-        "event": result.transition.kind,
+        "success": completed,
+        "event": "execution.completed" if completed else "execution.failed",
         "output": result.transition.data.get("output"),
-        "error": None if result.status == "completed" else result.transition.data,
+        "error": None if completed else result.transition.data,
     }
 
 
