@@ -191,11 +191,11 @@ This is an experimental UI/documentation adapter, not a general manga-generation
 
 ---
 
-## Common Misconceptions
+## To prevent misunderstanding
 
 Shirakami OS is sometimes mistaken for an AI model, an LLM project, or a vendor-specific AI application.
 
-It is not intended to:
+Shirakami OS is **not intended to**:
 
 - replace ChatGPT or another specific AI
 - develop a new LLM itself
