@@ -2,7 +2,6 @@ name: Shirakami Quickstart CI
 
 on:
   push:
-    branches: ["main", "feat/**", "phase2/**"]
   pull_request:
     branches: ["main"]
 
