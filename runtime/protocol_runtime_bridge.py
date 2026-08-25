@@ -3,7 +3,10 @@
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping
 
-from runtime.prototype import ExecutionResult, Runtime, Transition
+try:
+    from .prototype import ExecutionResult, Runtime, Transition
+except ImportError:  # pragma: no cover - compatibility for direct module execution
+    from prototype import ExecutionResult, Runtime, Transition
 
 
 @dataclass(frozen=True)

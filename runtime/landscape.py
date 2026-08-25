@@ -3,7 +3,10 @@
 from dataclasses import dataclass
 from typing import Any, Mapping
 
-from .evidence import EvidenceRecord, is_transition_evidence
+try:
+    from .evidence import EvidenceRecord, is_transition_evidence
+except ImportError:  # pragma: no cover - compatibility for direct module execution
+    from evidence import EvidenceRecord, is_transition_evidence
 
 
 @dataclass

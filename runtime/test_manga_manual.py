@@ -18,8 +18,10 @@ class MangaManualRendererTests(unittest.TestCase):
     def test_english_manual_uses_same_page_structure(self):
         svg = render_manual(SOURCE, "en")
         self.assertEqual(svg.count("<g transform="), 4)
-        self.assertIn("Keep the landscape, even when AI changes", svg)
-        self.assertIn("Render the same structure in another language", svg)
+        self.assertIn("Keep the landscape, even when AI", svg)
+        self.assertIn(">changes</text>", svg)
+        self.assertIn("Render the same structure in another", svg)
+        self.assertIn(">language</text>", svg)
 
 
 if __name__ == "__main__":

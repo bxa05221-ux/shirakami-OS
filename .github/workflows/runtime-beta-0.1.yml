@@ -17,6 +17,8 @@ on:
 jobs:
   test-runtime:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: runtime
     steps:
       - name: Checkout
         uses: actions/checkout@v4

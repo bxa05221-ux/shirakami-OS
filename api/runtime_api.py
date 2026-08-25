@@ -24,13 +24,33 @@ def execute(payload: dict[str, Any]) -> dict[str, Any]:
         input_value=payload.get("input"),
     )
     result = execution.result
+    completed = result.status == "completed"
     return {
         "protocol": {"title": execution.protocol_title, "version": execution.protocol_version},
-        "success": result.status == "completed",
-        "event": result.transition.kind,
+        "success": completed,
+        "event": "execution.completed" if completed else "execution.failed",
         "output": result.transition.data.get("output"),
-        "error": None if result.status == "completed" else result.transition.data,
+        "error": None if completed else result.transition.data,
     }
+
+
+def observe(payload: dict[str, Any]) -> dict[str, Any]:
+    """Record an observation/proposal without promoting it to state."""
+    observation = payload.get("observation")
+    if observation is None:
+        raise ValueError("observation is required")
+    return {
+        "status": "observed",
+        "state_transition": False,
+        "observation": observation,
+    }
+
+
+def evidence(evidence_id: str) -> dict[str, Any]:
+    """Return a placeholder lookup boundary for immutable evidence."""
+    if not evidence_id:
+        raise ValueError("evidence_id is required")
+    return {"evidence_id": evidence_id, "status": "lookup_boundary"}
 
 
 def github_read(payload: dict[str, Any], adapter: GitHubAdapter | None = None) -> dict[str, Any]:
@@ -71,6 +91,7 @@ def create_app():
     def health() -> dict[str, str]:
         return {"status": "ok", "version": "0.1.0"}
 
+    @app.post("/v1/execute")
     @app.post("/v0.1/execute")
     def execute_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
         try:
@@ -78,6 +99,23 @@ def create_app():
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.post("/v1/observe")
+    @app.post("/v0.1/observe")
+    def observe_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
+        try:
+            return observe(payload)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/v1/evidence/{evidence_id}")
+    @app.get("/v0.1/evidence/{evidence_id}")
+    def evidence_endpoint(evidence_id: str) -> dict[str, Any]:
+        try:
+            return evidence(evidence_id)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.post("/v1/github/read")
     @app.post("/v0.1/github/read")
     def github_read_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
         try:
@@ -85,6 +123,7 @@ def create_app():
         except (ValueError, RuntimeError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.post("/v1/github/write")
     @app.post("/v0.1/github/write")
     def github_write_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
         try:
