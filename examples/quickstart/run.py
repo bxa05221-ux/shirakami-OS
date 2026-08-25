@@ -6,18 +6,12 @@ No GitHub credentials or external packages are required.
 """
 
 from pathlib import Path
-import sys
 
-ROOT = Path(__file__).resolve().parents[2]
-RUNTIME_DIR = ROOT / "runtime"
-if str(RUNTIME_DIR) not in sys.path:
-    sys.path.insert(0, str(RUNTIME_DIR))
-
-from evidence import capture_evidence
-from landscape import LandscapeState
-from protocol_bridge import protocol_from_ir
-from protocol_loader import load_matome
-from prototype import Runtime
+from runtime.evidence import capture_evidence
+from runtime.landscape import LandscapeState
+from runtime.protocol_bridge import protocol_from_ir
+from runtime.protocol_loader import load_matome
+from runtime.prototype import Runtime
 
 
 def main() -> int:
@@ -63,4 +57,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())
