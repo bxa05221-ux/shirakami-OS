@@ -191,6 +191,21 @@ This is an experimental UI/documentation adapter, not a general manga-generation
 
 ---
 
+## Common Misconceptions
+
+Shirakami OS is sometimes mistaken for an AI model, an LLM project, or a vendor-specific AI application.
+
+It is not intended to:
+
+- replace ChatGPT or another specific AI
+- develop a new LLM itself
+- lock the runtime to a particular AI vendor
+- serve merely as a repository for research notes
+
+The focus is the **Runtime layer that allows human Landscape and Protocol to remain usable even when the underlying AI changes.**
+
+---
+
 ## Contributing
 
 Please open issues for proposed changes to the Foundation. For patches or documentation fixes, create a branch named `fix/...` or `feat/...` and submit a PR against `main`.
