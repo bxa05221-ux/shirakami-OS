@@ -4,10 +4,8 @@ The bridge interprets only the generic Protocol IR shape. It does not branch on
 or implement domain-specific actions; those remain data carried by the IR.
 """
 
-from typing import Any
-
-from protocol_loader import ProtocolIR
-from prototype import ExecutionContext, Transition
+from .protocol_loader import ProtocolIR
+from .prototype import ExecutionContext, Transition
 
 
 def protocol_from_ir(protocol_ir: ProtocolIR):
