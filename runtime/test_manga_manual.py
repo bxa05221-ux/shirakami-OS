@@ -1,3 +1,4 @@
+import re
 import unittest
 from pathlib import Path
 
@@ -18,8 +19,8 @@ class MangaManualRendererTests(unittest.TestCase):
     def test_english_manual_uses_same_page_structure(self):
         svg = render_manual(SOURCE, "en")
         self.assertEqual(svg.count("<g transform="), 4)
-        self.assertIn("Keep the landscape, even when AI changes", svg)
-        self.assertIn("Render the same structure in another language", svg)
+        self.assertRegex(svg, r"Keep the landscape, even when AI\s*changes")
+        self.assertRegex(svg, r"Render the same structure in another\s*language")
 
 
 if __name__ == "__main__":
