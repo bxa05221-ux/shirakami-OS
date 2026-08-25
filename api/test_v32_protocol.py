@@ -45,7 +45,7 @@ def test_v32_execute_preserves_protocol_identity_and_input():
 
     assert response.status_code == 200
     result = response.json()
-    assert result["protocol"]["title"] == "白神模型 v3.2"
+    assert result["protocol"]["title"] == "白神モデル v3.2"
     assert result["protocol"]["version"] == "3.2"
     assert result["success"] is True
     assert result["event"] == "execution.completed"
