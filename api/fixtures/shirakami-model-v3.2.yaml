@@ -1,0 +1,54 @@
+matome_yaml:
+  metadata:
+    title: "白神モデル v3.2"
+    type: "的目YAML"
+    purpose: "知識空間・スレッド共同体・非同期会議を一つの循環として記録する"
+    status: "conceptual_architecture"
+  subject:
+    name: "白神モデル"
+    central_concept:
+      - "Landscape First"
+      - "Protocol First"
+      - "Human Context First"
+      - "Knowledge as Landscape"
+  architecture:
+    landscape:
+      role: "すべての観測の基盤"
+      principle:
+        - "Realityは変更しない"
+        - "現在の状態を保存する"
+        - "未解決を未解決のまま保持する"
+    thread:
+      role: "独立した観測単位"
+      properties:
+        - "独自の視点を持つ"
+        - "独自の結果を生成する"
+        - "他スレッドと競争・共有できる"
+        - "固定人格ではない"
+    matome_yaml:
+      role:
+        - "状態圧縮"
+        - "観測結果の受け渡し"
+        - "スレッド間通信"
+        - "AIと人間の中間表現"
+      principle:
+        - "事実と解釈を分離する"
+        - "状態変化を保存する"
+        - "次の観測を可能にする"
+    presenter:
+      name: "スレゼンター"
+      role:
+        - "スレッド群の統括"
+        - "各スレッドの成果を読む"
+        - "スレッド同士を対話させる"
+        - "各スレッドに最適化した的目YAMLを返す"
+  core_loop:
+    - "人間がLandscapeを持ち込む"
+    - "AIが観測する"
+    - "スレッドが分岐する"
+    - "的目YAMLが成果を圧縮する"
+    - "スレゼンターが会議する"
+    - "個別最適化されたYAMLを返す"
+    - "スレッドが再び動く"
+    - "Landscapeが変化する"
+    - "その変化を再び観測する"
