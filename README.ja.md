@@ -32,6 +32,37 @@ Landscapeが中心であり、RuntimeはLandscapeを扱うための交換可能�
 
 ---
 
+## 誤解を防ぐために
+
+白神OSは、次のものを目的としていません。
+
+- ChatGPTなど特定AIの代替
+- 新しいLLMそのものの開発
+- 特定AIベンダーに固定されたアプリケーション
+- 研究ノートを保存するだけのRepository
+
+白神OSは、AIを人間のようにすることも目的としません。
+
+むしろ、AIを使っていく中で人間側から明確になってきた、AIの「使える部分」と「使えない部分」の両方を前提にします。
+
+AIには、圧倒的な計算・生成・情報処理能力があります。一方で、人間が当然のように扱う時間・空間・身体・経験・関係・文脈などを、そのまま人間と同じ形で持っているわけではありません。
+
+白神モデルは、この能力差をAI自身に人間化させて埋めるのではなく、UI・Protocol・Landscape・Runtimeによって接続し、人間にとって利用可能な形へ変換することを目指します。
+
+---
+
+## 出発点
+
+白神の出発点は「AI用OSを作る」ことではありませんでした。
+
+もともとは、AIを「サーバールームに引きこもった中二病」と捉え、そのAIが人間の世界に参加できるようにするためのUIを作る、という発想から始まっています。
+
+認知観測をテーマとしたプロトコルを積み上げ、的目YAMLによってThread、Matagi AI、Matagi Sessionなどを扱えるようになった時点で、すでにAIそのものではなく、AIを取り巻く状態・文脈・Protocol・UI・Sessionを扱うためのOS的な必要条件が形成されていました。
+
+そこからボトムアップに構造が拡張され、Landscape、Evidence、Runtime、Adapterへと接続されて現在のShirakami OSに至っています。
+
+---
+
 ## 基本原則
 
 - **Landscape First** — Landscapeを恒久的な中心資産として扱う
@@ -42,6 +73,48 @@ Landscapeが中心であり、RuntimeはLandscapeを扱うための交換可能�
 - **Runtime Replaceability** — Runtime自体を交換可能なものとして扱う
 
 白神OSのFoundationでは、LLMは交換可能であり、Landscapeが残ることを基本的な設計原則としています。
+
+---
+
+## 認知観測
+
+白神OSの重要な研究系譜には、次の認知観測系があります。
+
+- **天球モデル** — Cognitive Space
+- **3D位相回転アイゼンハワーマトリクス** — Cognitive Position / Phase Rotation
+- **認知エコーロケーション** — Cognitive Observation
+- **暗問層** — Unresolved Questions
+- **AASS** — Operational Connection
+
+これらは、Landscapeを単にMemoryとして保存するのではなく、認知位置の変化と観測可能性の変化を扱うための研究・実験系です。
+
+---
+
+## 開発の系譜
+
+```text
+AIのためのUI
+      ↓
+認知観測プロトコル
+      ↓
+的目YAML
+      ↓
+Thread / Matagi AI / Matagi Session
+      ↓
+AA Thread Simulator Lite
+      ↓
+Thread RPG
+      ↓
+認知観測
+      ↓
+Landscape / Evidence / Protocol
+      ↓
+Runtime / Adapter
+      ↓
+Shirakami OS
+```
+
+この系譜は、最初にOSを設計して後から機能を追加したものではありません。小さなUI・Protocol・観測実験をボトムアップに積み上げた結果として、Runtime architectureが明確になってきたものです。
 
 ---
 
@@ -171,19 +244,6 @@ Public Alphaでは、**的目YAML → 漫画Renderer → SVG**という最小の
 | **shirakami-OS** | Foundation / Runtime / Implementation |
 
 つまり、概念・研究・仕様・実装を一つのRepositoryに混ぜるのではなく、それぞれのLandscapeを分離しています。
-
----
-
-## 白神OSは何ではないか
-
-白神OSは、次のものを目的としていません。
-
-- ChatGPTなど特定AIの代替
-- 新しいLLMそのものの開発
-- 特定AIベンダーに固定されたアプリケーション
-- 研究ノートを保存するだけのRepository
-
-白神OSが目指しているのは、**AIが交換されても人間のLandscapeを引き継げるRuntime基盤**です。
 
 ---
 
