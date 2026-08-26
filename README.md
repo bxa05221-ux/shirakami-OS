@@ -173,4 +173,14 @@ The same manual structure can be rendered in different languages without changin
 Please open issues for proposed changes to the Foundation. For patches or documentation fixes, create a branch named `fix/...` or `feat/...` and submit a PR against `main`.
 
 ## License
-This repository is licensed under the MIT License — see LICENSE.
+
+Shirakami OS now uses a **layered licensing model**:
+
+- **Source code and executable implementation artifacts** → MIT License (`LICENSE`)
+- **Specifications, protocols, schemas, architecture documents, and documentation** → CC BY 4.0 (`LICENSE-SPECIFICATION.md`)
+- **Shirakami OS name, logos, and project marks** → not granted as trademark or official-brand rights by either license
+- **Official certification, endorsement, commercial branding, and Enterprise offerings** → may be governed by separate terms or agreements
+
+This separation is intentional. The implementation is open for use and adaptation, while the specification and documentation remain reusable with attribution, and the project's identity and official status remain separately governed.
+
+See [`LICENSE`](LICENSE) and [`LICENSE-SPECIFICATION.md`](LICENSE-SPECIFICATION.md).
