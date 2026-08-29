@@ -1,0 +1,230 @@
+matome:
+
+  title: "認知ランドスケープとガイドランナーとしてのAI"
+  version: "0.2"
+  date: "2026-08-30"
+  status: "architecture_feedback"
+
+  purpose:
+    type: "研究成果から開発側へのArchitecture Feedback"
+    implementation_instruction: false
+    constitutional_revision: false
+    design_specification: false
+
+  statement: >
+    AIは人間を代替するのではなく、
+    人間が判断できる世界を広げる。
+
+    AIの役割は、人間には困難な認知・計算・探索を補完し、
+    人間自身が判断可能なLandscapeを拡張することである。
+
+    最終的な判断と責任は人間に残る。
+
+  core_observations:
+
+    human_development:
+      observation: >
+        人間の認知は発達に伴って、現在の瞬間から過去・未来へと
+        より長い時間軸を保持できるようになる。
+
+      developmental_support:
+        principle: >
+          未来への見通しを形成することが、現在の行動を支える。
+
+        mechanism:
+          - "複雑な行動を小さな単位へ分解する"
+          - "一つずつ実行可能にする"
+          - "反復によって手順を内在化する"
+          - "最終的に支援そのものを不要にする"
+
+    guidance:
+      metaphor: "ブラインドマラソンのガイドランナー"
+      principle:
+        - "本人の代わりに走らない"
+        - "本人の進行を支える"
+        - "危険や段差を知らせる"
+        - "本人が自分で進めるように付き添う"
+      ai_mapping: >
+        AIは人間の代わりに判断するのではなく、
+        人間が判断可能な景色を広げるガイドランナーとして機能する。
+
+  ai_role:
+    not:
+      - "人間を不要にする存在"
+      - "最終判断者"
+      - "責任主体"
+    rather:
+      - "認知的欠損を補完する"
+      - "大量計算を行う"
+      - "大量の可能性を探索する"
+      - "人間の認知バイアスを突破する選択肢を提示する"
+      - "判断可能なLandscapeを拡張する"
+
+  aviation_observation:
+    scenario: "複数の異常が発生した航空機コックピット"
+    human_limitation:
+      - "目の前の問題から解決しようとする"
+      - "時間制約により探索範囲が狭くなる"
+    ai_capability:
+      - "大量のシナリオ探索"
+      - "人間が思いつかなかった経路の提示"
+      - "手近な解決策への認知的偏りへの対抗"
+    authority:
+      ai:
+        role: "選択肢・シナリオ提示"
+      human:
+        role:
+          - "結果を評価する"
+          - "採用する選択肢を決定する"
+          - "最終責任を負う"
+    principle: >
+      AIが判断するのではなく、人間の判断空間を拡張する。
+
+  hallucination_boundary:
+    observation:
+      - "AIはハルシネーションを起こす"
+      - "AI出力を無条件にEvidenceとして扱えない"
+    architectural_implication:
+      - "ObservationとInterpretationを分離する"
+      - "AIの解釈と観測された事実を分離する"
+      - "AI出力を最終判断の根拠として自動的に昇格させない"
+
+  evidence_model:
+    distinction:
+      observation:
+        definition: "何が起きたか"
+      record:
+        definition: "何が記録されたか"
+      interpretation:
+        definition: "AIまたは人間がどう解釈したか"
+      decision:
+        definition: "人間が何を選択したか"
+    principle: "観測・記録・解釈・判断を混同しない。"
+
+  cognitive_landscape:
+    definition: >
+      人間が経験・選択・判断を積み重ねることによって形成される
+      認知上のLandscape。
+    possible_value:
+      - "過去を客観的に振り返る"
+      - "現在と過去と未来を接続する"
+      - "選択可能性を発見する"
+      - "相談の質を向上させる"
+      - "理不尽に対する耐性を形成する"
+    important_observation: >
+      AIとの対話そのものによって、人間の認知Landscapeが変化する可能性がある。
+
+  conversation_as_evidence:
+    observation: >
+      完成したProtocolだけでなく、Protocolが形成されるまでの会話過程にも
+      開発上の情報が存在する。
+    distinction:
+      final_protocol:
+        metaphor: "化石"
+        meaning: "結晶化された設計知"
+      conversation_log:
+        metaphor: "地層"
+        meaning:
+          - "仮説の発生"
+          - "認知の変化"
+          - "失敗"
+          - "修正"
+          - "AIのハルシネーション"
+          - "人間による軌道修正"
+          - "Protocol生成の起点"
+    architectural_question: >
+      会話LandscapeをDevelopment Evidenceとしてどこまで保存・参照するべきか。
+    status: "unresolved"
+
+  human_sovereignty:
+    critical_question: >
+      認知Landscapeはどこまで記録可能で、どこから先を本人の不可侵領域とするべきか。
+    aviation_analogy:
+      - "Cockpit Voice Recorder"
+      - "Flight Data Recorder"
+    benefit_of_recording:
+      - "変化の過程を保存できる"
+      - "失敗の再構成が可能"
+      - "支援の継続性を確保できる"
+    risk_of_recording:
+      - "監視・評価・処分の道具になる可能性"
+      - "本人の内面が本人の支配下から離れる可能性"
+    status: "unresolved"
+
+  emerging_hypothesis:
+    name: "本人主権型フライトレコーダー"
+    status: "hypothesis_only"
+    principles:
+      - "記録は本人を裁くためではなく本人を支えるために存在する"
+      - "記録の目的・範囲・期間を限定する"
+      - "本人の認知LandscapeとAIの推論を分離する"
+      - "重大事象の検証記録と日常的支援記録を分離する"
+      - "本人による開示・凍結・削除等の権限を検討する"
+    implementation:
+      status: "not_authorized"
+    reason: >
+      権限・保存・不可侵領域・開示範囲等の
+      Constitution / Design上の原則が未確定であるため。
+
+  shirakami_os_feedback:
+    existing_principles:
+      - "Landscape First"
+      - "Human Context First"
+      - "Protocol First"
+      - "EvidenceとInterpretationの分離"
+      - "Human Authority"
+      - "Model Agnostic"
+    architectural_observation: >
+      認知Landscapeを扱う場合、Landscapeそのもの、Evidence、AI Interpretation、
+      Human Decision、Permissionを同一データとして扱うべきではない。
+    development_implication:
+      - "責務境界を維持する"
+      - "AI InterpretationをEvidenceへ自動昇格させない"
+      - "Human DecisionをAI Runtimeの権限外として保持する"
+      - "本人主権に関する仕様を未確定のまま実装しない"
+
+  documentation_boundary:
+    purpose: >
+      本的目YAMLは開発仕様ではなく、Architectureに対するObservation / Feedbackとして扱う。
+    document_hierarchy:
+      Vision:
+        responsibility: "なぜ作るのか"
+      Constitution:
+        responsibility: "何を守るのか"
+      Blueprint:
+        responsibility: "どういう構造にするのか"
+      Design:
+        responsibility: "具体的な仕様をどう定義するか"
+      Implementation:
+        responsibility: "コードとしてどう実装するか"
+    rule: "本YAMLから直接Implementationを生成しない。"
+
+  development_questions:
+    - "認知LandscapeをどこまでSystemが保持するべきか"
+    - "本人の不可侵領域をArchitecture上どう表現するか"
+    - "EvidenceとInterpretationをどの境界で分離するか"
+    - "Conversation LandscapeをDevelopment Evidenceとして扱う範囲はどこまでか"
+    - "本人による開示・凍結・削除権限をどこで定義するか"
+    - "重大事象記録と日常支援記録をどう分離するか"
+    - "AI Model変更後もLandscapeの連続性をどう保持するか"
+
+  feedback_to_development:
+    type: "Architecture Question"
+    priority: "high"
+    implementation_required: false
+    constitution_candidate: true
+    design_candidate: false
+    message: >
+      現時点で新機能を実装することではなく、Shirakami OSが
+      「何を記録し、何をEvidenceとし、何をAIに解釈させ、
+      何を本人の不可侵領域として残すのか」という境界を検討することが必要である。
+
+  key_statement:
+    - "AIは人間の代わりに生きるものではない"
+    - "AIは人間だけでは見えなかった景色を見せる"
+    - "最終的に選ぶのは人間"
+    - "責任も人間に残る"
+    - "Landscapeは人間側の資産である"
+    - "EvidenceとInterpretationを混同しない"
+    - "記録できることと、記録してよいことは同じではない"
+    - "本人主権は未解決のArchitecture Questionとして保持する"
