@@ -1,0 +1,26 @@
+name: OPPAI Runtime
+
+on:
+  push:
+    paths:
+      - 'runtime/**'
+      - 'tests/**'
+      - 'docs/specs/OPPAI_Schema_v0.1.md'
+      - '.github/workflows/oppai-runtime.yml'
+  pull_request:
+    paths:
+      - 'runtime/**'
+      - 'tests/**'
+      - 'docs/specs/OPPAI_Schema_v0.1.md'
+      - '.github/workflows/oppai-runtime.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Run OPPAI tests
+        run: python -m pytest -q tests/test_oppai_schema.py tests/test_oppai_runtime_flow.py
