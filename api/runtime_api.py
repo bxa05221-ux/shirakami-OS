@@ -3,6 +3,7 @@
 from typing import Any
 
 from plugins.adapters.github.github_adapter import GitHubAdapter
+from runtime.oppai_schema import normalize as normalize_oppai, to_dict as oppai_to_dict
 from runtime.protocol_runtime_bridge import execute_protocol
 from runtime.prototype import Transition
 
@@ -31,6 +32,15 @@ def execute(payload: dict[str, Any]) -> dict[str, Any]:
         "output": result.transition.data.get("output"),
         "error": None if result.status == "completed" else result.transition.data,
     }
+
+
+def oppai_normalize(payload: dict[str, Any]) -> dict[str, Any]:
+    """Run the dependency-light OPPAI preprocessing boundary."""
+    text = payload.get("text")
+    if not isinstance(text, str):
+        raise ValueError("text is required")
+    observation = normalize_oppai(text, payload.get("context"))
+    return {"schema": "OPPAI", "version": "0.1", "event": "oppai.observed", **oppai_to_dict(observation)}
 
 
 def github_read(payload: dict[str, Any], adapter: GitHubAdapter | None = None) -> dict[str, Any]:
@@ -75,6 +85,13 @@ def create_app():
     def execute_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
         try:
             return execute(payload)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.post("/v0.1/oppai/normalize")
+    def oppai_normalize_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
+        try:
+            return oppai_normalize(payload)
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
