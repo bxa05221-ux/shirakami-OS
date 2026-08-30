@@ -60,8 +60,8 @@ def _unresolved(segments: tuple[str, ...]) -> tuple[str, ...]:
 def normalize(text: str, context: Mapping[str, Any] | None = None) -> OppaiObservation:
     """Normalize natural human input without forcing premature semantic closure.
 
-    ``context`` is intentionally carried only as metadata at this stage. The
-    first implementation does not infer hidden intent from it.
+    ``context`` is accepted for forward compatibility but is not interpreted in
+    this minimal slice. The first implementation does not infer hidden intent.
     """
     if not isinstance(text, str) or not text.strip():
         raise ValueError("text must be a non-empty string")
@@ -72,14 +72,9 @@ def normalize(text: str, context: Mapping[str, Any] | None = None) -> OppaiObser
     signals = _signals(segments)
     unresolved = _unresolved(segments)
 
-    # Keep the user's latest explicit correction in the canonical candidate.
-    # This is deliberately conservative: OPPAI should not invent a conclusion.
-    candidate_segments = segments
-    if corrections:
-        last_correction_index = max(i for i, segment in enumerate(segments) if _is_correction(segment))
-        candidate_segments = segments[last_correction_index:]
-
-    canonical = "\n".join(candidate_segments)
+    # Preserve the complete conversational sequence. Corrections are evidence
+    # about interpretation state, not instructions to erase earlier context.
+    canonical = "\n".join(segments)
     confidence = "provisional" if corrections or unresolved else "observed"
 
     return OppaiObservation(
