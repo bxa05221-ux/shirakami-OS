@@ -1,10 +1,12 @@
-"""Minimal reference server for the OPPAI-Shirakami API contract.
+"""Minimal OPPAI-Shirakami runtime reference.
 
-No vendor SDK is required. The model adapter is intentionally a callable so
-that any LLM/provider can be connected without changing the public boundary.
+The public boundary accepts natural language. OPPAI captures the raw input
+and context before the provider-specific model adapter is invoked.
 """
 
 from typing import Any, Callable
+
+from src.shirakami.oppai import listen
 
 
 class ShirakamiRuntime:
@@ -18,12 +20,16 @@ class ShirakamiRuntime:
         session_id: str | None = None,
     ) -> dict[str, Any]:
         if not isinstance(input_text, str) or not input_text.strip():
-            return {"response": None, "session_id": session_id, "context_delta": {}, "status": "invalid_request"}
+            return {
+                "response": None,
+                "session_id": session_id,
+                "context_delta": {},
+                "status": "invalid_request",
+            }
 
-        ctx = context or {}
-        # Minimal OPPAI boundary: preserve the user's natural input and context
-        # rather than requiring provider-specific prompt syntax.
-        response = self.model_adapter(input_text, ctx)
+        envelope = listen(input_text, context)
+        response = self.model_adapter(envelope.raw_input, envelope.context)
+
         return {
             "response": response,
             "session_id": session_id,
