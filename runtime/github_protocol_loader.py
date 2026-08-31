@@ -7,10 +7,8 @@ the protocol loader owns interpretation.
 
 from __future__ import annotations
 
-from typing import Any
-
 from .github_client import GitHubContentsClient
-from .protocol_loader import load_matome
+from .protocol_loader import ProtocolIR, parse_matome
 
 
 class GitHubProtocolLoader:
@@ -19,7 +17,7 @@ class GitHubProtocolLoader:
     def __init__(self, client: GitHubContentsClient) -> None:
         self.client = client
 
-    def load(self, path: str) -> Any:
+    def load(self, path: str) -> ProtocolIR:
         """Fetch ``path`` from GitHub and parse it with the existing loader."""
         payload = self.client.get(path)
         if isinstance(payload, dict) and "content" in payload:
@@ -28,4 +26,4 @@ class GitHubProtocolLoader:
             content = payload
         else:
             raise TypeError("GitHub protocol payload must contain text content")
-        return load_matome(content)
+        return parse_matome(content)
