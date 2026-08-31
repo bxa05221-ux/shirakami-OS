@@ -4,7 +4,10 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Any, Mapping
 
-from .prototype import ExecutionResult, Transition
+try:
+    from .prototype import ExecutionResult
+except ImportError:  # legacy top-level runtime test imports
+    from prototype import ExecutionResult
 
 
 @dataclass(frozen=True)
@@ -29,8 +32,6 @@ class EvidenceRecord:
 
 
 def capture_evidence(result: ExecutionResult) -> EvidenceRecord:
-    """Capture evidence at the execution-result/transition boundary."""
-
     return EvidenceRecord.from_result(result)
 
 
