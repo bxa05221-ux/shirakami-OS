@@ -73,7 +73,9 @@ def _localized_value(text: str, field: str, language: str) -> str | None:
 def _panel(index: int, page: dict[str, str]) -> str:
     width, height = 1200, 900
     y = (index - 1) * height
-    title = _wrap(page["title"], 38)
+    # Keep normal English titles on one SVG text node when they fit the panel.
+    # This preserves exact source phrases for downstream consumers/tests.
+    title = _wrap(page["title"], 52)
     narration = _wrap(page["narration"], 46)
     dialogue = _wrap(page["dialogue"], 38)
     full_title = html.escape(page["title"])
