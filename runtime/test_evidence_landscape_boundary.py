@@ -1,6 +1,7 @@
 from runtime.landscape import LandscapeState
 from runtime.evidence import capture_evidence
-from runtime.prototype import Transition, execute_protocol
+from runtime.protocol_runtime_bridge import execute_protocol
+from runtime.prototype import Transition
 
 
 def test_evidence_can_cross_into_landscape_without_runtime_owning_meaning():
