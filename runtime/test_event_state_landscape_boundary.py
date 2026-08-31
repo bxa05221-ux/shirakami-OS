@@ -1,6 +1,7 @@
 from evidence import capture_evidence
 from landscape import LandscapeState
-from prototype import Transition, execute_protocol
+from protocol_runtime_bridge import execute_protocol
+from prototype import Transition
 
 
 def test_observable_transition_survives_event_state_evidence_landscape_boundary():
