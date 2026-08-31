@@ -25,46 +25,79 @@ def _scalar(value: str) -> str:
     return value.strip().strip('"\'')
 
 
-def parse_protocol(text: str) -> CurrentProtocol:
-    lines = text.splitlines()
-    fields: dict[str, str] = {}
-    sections: dict[str, dict[str, Any]] = {}
+def _parse_nested(lines: list[str], start: int, base_indent: int) -> dict[str, Any]:
+    """Parse the small mapping/list subset used by current protocol sections."""
+    result: dict[str, Any] = {}
+    stack: list[tuple[int, dict[str, Any]]] = [(base_indent, result)]
 
-    protocol_seen = False
-    current_top: str | None = None
-    purpose_lines: list[str] = []
-    collecting_purpose = False
-
-    for raw in lines:
+    for raw in lines[start:]:
         if not raw.strip():
             continue
+        indent = len(raw) - len(raw.lstrip())
+        if indent <= base_indent:
+            break
+        stripped = raw.strip()
 
+        while stack and indent <= stack[-1][0]:
+            stack.pop()
+        if not stack:
+            break
+        parent = stack[-1][1]
+
+        if stripped.startswith("-"):
+            parent.setdefault("items", []).append(_scalar(stripped[1:]))
+            continue
+
+        if ":" not in stripped:
+            continue
+        key, value = stripped.split(":", 1)
+        key = key.strip()
+        value = value.strip()
+        if value in {"", ">"}:
+            child: dict[str, Any] = {}
+            parent[key] = child
+            stack.append((indent, child))
+        else:
+            parent[key] = _scalar(value)
+
+    return result
+
+
+def parse_protocol(text: str) -> CurrentProtocol:
+    lines = text.splitlines()
+    if not any(line.strip() == "protocol:" for line in lines):
+        raise ProtocolLoadError("root key must be 'protocol'")
+
+    fields: dict[str, str] = {}
+    sections: dict[str, dict[str, Any]] = {}
+    purpose_lines: list[str] = []
+    collecting_purpose = False
+    protocol_seen = False
+
+    top_sections = {"principles", "participants", "learning_cycle", "evidence"}
+
+    for index, raw in enumerate(lines):
+        if not raw.strip():
+            continue
         indent = len(raw) - len(raw.lstrip())
         stripped = raw.strip()
 
-        # A top-level key closes any active block.
-        if indent == 0 and stripped.endswith(":"):
+        if indent == 0 and stripped == "protocol:":
+            protocol_seen = True
+            continue
+
+        if protocol_seen and indent == 0 and stripped.endswith(":"):
             if collecting_purpose:
                 sections.setdefault("purpose", {})["text"] = " ".join(purpose_lines).strip()
                 collecting_purpose = False
                 purpose_lines = []
-            current_top = stripped[:-1]
-            if current_top == "protocol":
-                protocol_seen = True
-            else:
-                sections.setdefault(current_top, {})
+            key = stripped[:-1]
+            if key in top_sections:
+                sections[key] = _parse_nested(lines, index, 0)
+            protocol_seen = False
             continue
 
-        if not protocol_seen:
-            continue
-
-        # Fields directly under protocol.
-        if current_top == "protocol" and indent == 2 and ":" in stripped:
-            if collecting_purpose:
-                sections.setdefault("purpose", {})["text"] = " ".join(purpose_lines).strip()
-                collecting_purpose = False
-                purpose_lines = []
-
+        if protocol_seen and indent == 2 and ":" in stripped:
             key, value = stripped.split(":", 1)
             key = key.strip()
             value = value.strip()
@@ -75,22 +108,12 @@ def parse_protocol(text: str) -> CurrentProtocol:
             continue
 
         if collecting_purpose:
-            # purpose is a YAML folded block indented beneath protocol.purpose.
             if indent >= 4:
                 purpose_lines.append(stripped)
-                continue
-            sections.setdefault("purpose", {})["text"] = " ".join(purpose_lines).strip()
-            collecting_purpose = False
-            purpose_lines = []
-
-        if current_top in {"principles", "participants", "learning_cycle", "evidence"}:
-            section = sections.setdefault(current_top, {})
-            if indent == 2 and stripped.startswith("-"):
-                section.setdefault("items", []).append(_scalar(stripped[1:]))
-            elif indent == 2 and ":" in stripped:
-                key, value = stripped.split(":", 1)
-                if value.strip() not in {"", ">"}:
-                    section[key.strip()] = _scalar(value)
+            else:
+                sections.setdefault("purpose", {})["text"] = " ".join(purpose_lines).strip()
+                collecting_purpose = False
+                purpose_lines = []
 
     if collecting_purpose:
         sections.setdefault("purpose", {})["text"] = " ".join(purpose_lines).strip()
