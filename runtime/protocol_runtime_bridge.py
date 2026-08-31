@@ -3,7 +3,13 @@
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping
 
-from runtime.prototype import ExecutionResult, Runtime, Transition
+try:
+    # Legacy runtime tests import modules as top-level names. Reuse that
+    # module when available so Transition identity remains identical across
+    # the bridge and test-provided protocol functions.
+    from prototype import ExecutionResult, Runtime, Transition
+except ImportError:
+    from runtime.prototype import ExecutionResult, Runtime, Transition
 
 
 @dataclass(frozen=True)
