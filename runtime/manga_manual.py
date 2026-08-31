@@ -76,6 +76,7 @@ def _panel(index: int, page: dict[str, str]) -> str:
     title = _wrap(page["title"], 38)
     narration = _wrap(page["narration"], 46)
     dialogue = _wrap(page["dialogue"], 38)
+    full_title = html.escape(page["title"])
 
     def text_lines(lines: list[str], x: int, start_y: int, line_height: int, size: int, weight: str = "normal") -> str:
         return "\n".join(
@@ -84,6 +85,7 @@ def _panel(index: int, page: dict[str, str]) -> str:
         )
 
     return f'''<g transform="translate(0,{y})">
+  <title>{full_title}</title>
   <rect x="40" y="40" width="1120" height="820" rx="24" fill="white" stroke="black" stroke-width="4"/>
   <text x="80" y="100" font-size="28px" font-family="sans-serif">PAGE {index} · {html.escape(page["id"])}</text>
   {text_lines(title, 100, 190, 48, 40, "bold")}
