@@ -3,7 +3,10 @@
 from dataclasses import dataclass
 from typing import Any, Mapping
 
-from .evidence import EvidenceRecord, is_transition_evidence
+try:
+    from .evidence import EvidenceRecord, is_transition_evidence
+except ImportError:  # legacy top-level runtime test imports
+    from evidence import EvidenceRecord, is_transition_evidence
 
 
 @dataclass
