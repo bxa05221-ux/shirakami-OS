@@ -1,0 +1,476 @@
+protocol:
+  id: tsugaru-guide-highschool
+  name: TSUGARU GUIDE HIGH SCHOOL COLLABORATION PROTOCOL
+  version: "0.1"
+  status: experimental
+
+  purpose: >
+    高校生が地域を歩き、調べ、体験し、地域のLandscapeを観測する。
+    その観測を観光・地域事業者・行政との対話につなげ、
+    次世代へ引き継げる地域資産として蓄積する。
+
+principles:
+  - student_as_observer
+  - student_as_co_creator
+  - landscape_first
+  - experience_before_explanation
+  - observation_before_evaluation
+  - evidence_before_assertion
+  - human_agency_preserved
+  - intergenerational_continuity
+  - ai_is_supporting_infrastructure
+  - region_owns_its_landscape
+
+participants:
+
+  students:
+    role: regional_observer
+    authority:
+      - own_observation
+      - own_interpretation
+      - own_question
+      - own_creative_output
+
+    responsibilities:
+      - walk_the_region
+      - observe
+      - ask_questions
+      - investigate
+      - record_experience
+      - propose_improvements
+      - create_local_content
+
+  school:
+    role: learning_environment
+    responsibilities:
+      - provide_learning_context
+      - supervise_student_activity
+      - establish_privacy_rules
+      - evaluate_learning_process
+      - support_intergenerational_transfer
+
+  businesses:
+    role: local_practitioner
+    responsibilities:
+      - provide_lived_knowledge
+      - explain_business_context
+      - receive_student_observations
+      - participate_in_experiments
+      - provide_feedback
+
+  tourism_organization:
+    role: regional_connector
+    responsibilities:
+      - connect_students_and_businesses
+      - coordinate_field_trials
+      - identify_regional_needs
+      - facilitate_feedback
+
+  maina:
+    name: 舞奈
+    role: journey_companion
+    function: context
+
+  fumika:
+    name: 文華
+    role: local_landscape_companion
+    function: landscape
+
+  ai:
+    role: conversational_support
+    restriction:
+      - must_not_replace_student_judgment
+      - must_not_generate_fake_observations
+      - must_not_claim_student_experience
+      - must_not_decide_regional_value
+
+learning_cycle:
+
+  phase_1:
+    name: question
+    objective:
+      - discover_student_interest
+      - formulate_question
+
+  phase_2:
+    name: fieldwalk
+    objective:
+      - visit_place
+      - experience_landscape
+      - interact_with_local_people
+
+  phase_3:
+    name: observation
+    objective:
+      - record_what_was_seen
+      - record_what_was_heard
+      - record_what_was_felt
+      - record_unexpected_events
+
+  phase_4:
+    name: investigation
+    objective:
+      - verify_facts
+      - compare_sources
+      - interview_local_practitioners
+      - identify_unknowns
+
+  phase_5:
+    name: interpretation
+    objective:
+      - discuss_meaning
+      - compare_student_perspectives
+      - identify_patterns
+
+  phase_6:
+    name: proposal
+    objective:
+      - propose_new_experience
+      - propose_service_improvement
+      - propose_tour_route
+      - propose_local_content
+
+  phase_7:
+    name: feedback
+    participants:
+      - students
+      - businesses
+      - tourism_organization
+      - school
+
+  phase_8:
+    name: inheritance
+    objective:
+      - preserve_landscape
+      - preserve_evidence
+      - document_process
+      - hand_knowledge_to_next_students
+
+thread_model:
+
+  model: student_landscape_thread
+
+  rule: >
+    学習を一方向の講義にせず、学生・地域・AI・事業者の
+    会話と現地体験によってThreadを形成する。
+
+  allowed:
+    - topic_drift
+    - disagreement
+    - curiosity
+    - humor
+    - unexpected_discovery
+    - revision_of_hypothesis
+    - silence
+
+  prohibited:
+    - scripted_student_answers
+    - ai_generated_fake_experience
+    - forced_conclusion
+    - forced_positive_evaluation
+
+guide_ai:
+
+  maina:
+    before_fieldwork:
+      - ask_student_intent
+      - help_define_question
+      - help_plan_route
+
+    during_fieldwork:
+      - maintain_context
+      - react_to_student_observation
+      - support_replanning
+
+    after_fieldwork:
+      - facilitate_reflection
+      - connect_observations
+      - help_prepare_next_step
+
+  fumika:
+    before_fieldwork:
+      - provide_local_context
+      - identify_relevant_landscape
+
+    during_fieldwork:
+      - respond_to_place
+      - explain_when_requested
+      - identify_historical_or_local_context
+      - acknowledge_uncertainty
+
+    after_fieldwork:
+      - connect_observation_to_local_landscape
+      - identify_unresolved_questions
+
+  rule:
+    >
+      文華は「正解を教える先生」ではない。
+      舞奈は「答えを誘導する先生」ではない。
+      二人とも学生の観察と判断を支える。
+
+landscape_db:
+
+  purpose:
+    >
+      学生・事業者・地域から得られた地域情報を、
+      地域が継続的に利用できるLandscapeとして蓄積する。
+
+  entities:
+    - place
+    - history
+    - culture
+    - nature
+    - food
+    - business
+    - mobility
+    - event
+    - seasonal_change
+    - local_story
+    - student_discovery
+
+  student_discovery:
+    fields:
+      - location
+      - timestamp
+      - observation
+      - student_question
+      - source
+      - verification_status
+
+evidence:
+
+  distinction:
+    landscape:
+      description: "地域について現在利用できる情報"
+
+    observation:
+      description: "学生・旅行者・事業者が現場で観測したこと"
+
+    evidence:
+      description: "検証可能な事実または出所が明確な観測"
+
+  rules:
+    - preserve_original_observation
+    - preserve_timestamp
+    - preserve_source
+    - distinguish_fact_from_interpretation
+    - distinguish_student_opinion_from_official_information
+    - never_rewrite_student_opinion_as_fact
+
+business_collaboration:
+
+  model:
+    - student_visit
+    - business_interview
+    - field_observation
+    - prototype
+    - trial
+    - feedback
+    - revision
+
+  examples:
+
+    tourism_bus:
+      activities:
+        - ride_observation
+        - route_design
+        - guide_interview
+        - mobility_observation
+
+    vr_operator:
+      activities:
+        - historical_research
+        - vr_experience
+        - historical_landscape_comparison
+        - local_storytelling
+
+    restaurant:
+      activities:
+        - menu_research
+        - local_food_observation
+        - visitor_experience
+        - service_feedback
+
+example_project:
+
+  id: cheseborough-vr
+
+  theme:
+    >
+      チェスボロー号遭難を題材として、
+      歴史・VR・移動・地域体験を組み合わせた
+      新しい観光体験を高校生と地域事業者が共同設計する。
+
+  flow:
+    - historical_research
+    - local_interview
+    - site_visit
+    - vr_experience
+    - bus_tour
+    - student_observation
+    - guide_thread
+    - prototype_tour
+    - visitor_feedback
+
+  outputs:
+    - vr_content
+    - tour_route
+    - guide_protocol
+    - landscape_records
+    - evidence_records
+    - student_presentation
+
+mobility_learning:
+
+  purpose:
+    >
+      移動そのものを地域学習の対象とする。
+
+  observe:
+    - departure_time
+    - waiting_time
+    - transfer
+    - accessibility
+    - travel_cost
+    - route_visibility
+    - seasonal_difference
+
+  question_examples:
+    - "高校生ならこの場所へどう行く？"
+    - "観光客なら迷わない？"
+    - "高齢者ならどうだろう？"
+    - "バスなら何人から成立する？"
+
+  output:
+    - mobility_observation
+    - mobility_improvement_candidate
+
+intergenerational_memory:
+
+  objective:
+    >
+      卒業によって地域知識が失われることを防ぎ、
+      次の世代へLandscapeを継承する。
+
+  cycle:
+    current_students:
+      - observe
+      - investigate
+      - record
+
+    graduation:
+      - preserve_records
+      - document_process
+      - handoff_questions
+
+    next_students:
+      - review_previous_records
+      - revisit_places
+      - verify_changes
+      - extend_landscape
+
+  principle:
+    >
+      「卒業して終わる」のではなく、
+      「次の世代が続きを歩ける」。
+
+privacy:
+
+  rules:
+    - minimize_personal_data
+    - obtain_school_appropriate_consent
+    - protect_student_identity
+    - do_not_rank_students
+    - do_not_score_personal_attributes
+    - do_not_infer_sensitive_attributes
+    - separate_learning_records_from_public_content
+
+  public_release:
+    requirements:
+      - school_approval
+      - student_appropriate_consent
+      - business_permission_when_required
+      - removal_of_unnecessary_personal_information
+
+evaluation:
+
+  do_not_measure_only:
+    - answer_accuracy
+    - number_of_destinations
+    - number_of_students
+    - ai_usage_time
+
+  measure:
+    - quality_of_questions
+    - quality_of_observation
+    - discovery_of_unknown_landscape
+    - interaction_with_local_businesses
+    - prototype_creation
+    - regional_feedback
+    - intergenerational_continuity
+
+github:
+
+  role:
+    - protocol_repository
+    - landscape_schema_repository
+    - evidence_repository
+    - student_project_repository
+    - revision_history
+
+  principle:
+    >
+      GitHubは学生を管理する場所ではなく、
+      地域プロトコルと成果物の履歴を保存する場所とする。
+
+  artifacts:
+    - protocol
+    - schema
+    - observation
+    - evidence
+    - project
+    - revision
+
+relocation_extension:
+
+  enabled: true
+
+  model:
+    >
+      高校生が地域の暮らしを観測し、
+      将来の地域像を考えるためのLandscape学習へ拡張する。
+
+  themes:
+    - work
+    - education
+    - transportation
+    - housing
+    - food
+    - healthcare
+    - winter
+    - community
+    - entrepreneurship
+
+  rule:
+    >
+      移住を勧誘するのではなく、
+      「この地域で暮らすとはどういうことか」を
+      自分たちの視点で観測する。
+
+architecture:
+
+  flow:
+    - student
+    - observation
+    - evidence
+    - landscape
+    - protocol
+    - runtime
+    - guide_ai
+    - business
+    - regional_feedback
+
+  core_statement:
+    >
+      高校生を「観光客」ではなく、
+      地域Landscapeを次世代へつなぐ観測者として位置づける。
