@@ -11,34 +11,42 @@ class FakeGitHubContentsClient:
         return self.payload
 
 
-def test_github_protocol_loader_delegates_yaml_to_existing_loader():
-    yaml_text = """
+VALID_YAML = """
 matome:
   title: TSUGARU GUIDE HIGH SCHOOL
   version: "0.1"
+  statement: >
+    Students observe the regional landscape and connect their observations to the community.
 pipeline:
-  - question
-  - fieldwalk
-  - observation
+  - phase: question
+    action: formulate_question
+  - phase: fieldwalk
+    action: observe_landscape
+  - phase: observation
+    action: record_observation
 """
-    client = FakeGitHubContentsClient({"content": yaml_text})
+
+
+def test_github_protocol_loader_delegates_yaml_to_existing_loader():
+    client = FakeGitHubContentsClient({"content": VALID_YAML})
 
     protocol = GitHubProtocolLoader(client).load(
         "protocols/tsugaru-guide-highschool.yaml"
     )
 
     assert client.requested_path == "protocols/tsugaru-guide-highschool.yaml"
-    assert protocol is not None
+    assert protocol.title == "TSUGARU GUIDE HIGH SCHOOL"
+    assert protocol.version == "0.1"
+    assert protocol.pipeline[0] == {
+        "phase": "question",
+        "action": "formulate_question",
+    }
 
 
 def test_github_protocol_loader_accepts_raw_text_payload():
-    yaml_text = """
-matome:
-  title: TSUGARU GUIDE HIGH SCHOOL
-  version: "0.1"
-"""
     protocol = GitHubProtocolLoader(
-        FakeGitHubContentsClient(yaml_text)
+        FakeGitHubContentsClient(VALID_YAML)
     ).load("protocols/tsugaru-guide-highschool.yaml")
 
-    assert protocol is not None
+    assert protocol.title == "TSUGARU GUIDE HIGH SCHOOL"
+    assert len(protocol.pipeline) == 3
