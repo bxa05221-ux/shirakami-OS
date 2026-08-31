@@ -1,6 +1,6 @@
 """Minimal replaceable Landscape State boundary for Runtime β0.1."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Mapping
 
 try:
@@ -14,6 +14,7 @@ class LandscapeState:
     """Small in-memory representation of current observable Landscape state."""
 
     _state: dict[str, Any]
+    evidence: list[EvidenceRecord] = field(default_factory=list)
 
     @classmethod
     def empty(cls) -> "LandscapeState":
@@ -27,4 +28,5 @@ class LandscapeState:
         if not is_transition_evidence(evidence):
             return
 
+        self.evidence.append(evidence)
         self._state.update(dict(evidence.transition_data))
