@@ -29,7 +29,8 @@ def execute_protocol(
     """Execute a loaded Protocol IR through the existing Runtime boundary.
 
     The bridge adapts the current β0.1 Runtime signature without introducing
-    new protocol semantics.
+    new protocol semantics. It also normalizes a structurally compatible
+    Transition returned by a caller loaded under another module identity.
     """
     matome = protocol_ir.get("matome", protocol_ir)
     if not isinstance(matome, dict):
@@ -40,7 +41,17 @@ def execute_protocol(
     protocol_id = title or "anonymous.protocol"
 
     def runtime_protocol(context):
-        return transition(context.input)
+        candidate = transition(context.input)
+        if isinstance(candidate, Transition):
+            return candidate
+
+        # Keep the bridge semantic-neutral: only adapt the observable
+        # Transition shape so Runtime can enforce its own type boundary.
+        kind = getattr(candidate, "kind", None)
+        data = getattr(candidate, "data", None)
+        if isinstance(kind, str) and isinstance(data, Mapping):
+            return Transition(kind=kind, data=dict(data))
+        return candidate
 
     runtime = Runtime()
     normalized_input = input_value if isinstance(input_value, Mapping) else {}
