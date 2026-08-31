@@ -1,0 +1,2 @@
+CI probe: verify OPPAI workflow trigger and pytest environment.
+This file intentionally touches a non-runtime path and is used only to trigger the workflow if its trigger configuration includes CI probe paths.
