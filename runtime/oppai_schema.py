@@ -72,9 +72,9 @@ def normalize(text: str, context: Mapping[str, Any] | None = None) -> OppaiObser
     signals = _signals(segments)
     unresolved = _unresolved(segments)
 
-    # Preserve the complete conversational sequence. Corrections are evidence
-    # about interpretation state, not instructions to erase earlier context.
-    canonical = "\n".join(segments)
+    # Canonicalization preserves the complete user-authored sequence. Parsing
+    # into segments is observational only; it must not rewrite the prompt.
+    canonical = raw
     confidence = "provisional" if corrections or unresolved else "observed"
 
     return OppaiObservation(
