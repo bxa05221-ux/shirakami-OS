@@ -8,7 +8,7 @@ def test_current_tsugaru_guide_protocol_loads_as_current_protocol():
 
     protocol = parse_protocol(text)
 
-    assert protocol.protocol_id == "tsugaru-guide-highschool"
+    assert protocol.protocol_id == "cheseborough-vr"
     assert protocol.version == "0.1"
     assert protocol.status == "experimental"
     assert protocol.purpose
