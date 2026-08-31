@@ -30,7 +30,7 @@ def _parse_nested(lines: list[str], start: int, base_indent: int) -> dict[str, A
     result: dict[str, Any] = {}
     stack: list[tuple[int, dict[str, Any]]] = [(base_indent, result)]
 
-    for raw in lines[start:]:
+    for raw in lines[start + 1 :]:
         if not raw.strip():
             continue
         indent = len(raw) - len(raw.lstrip())
