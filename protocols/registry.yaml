@@ -1,0 +1,9 @@
+protocol_registry:
+  - id: tsugaru-guide-highschool
+    state: active
+    artifact: protocols/tsugaru-guide-highschool.yaml
+
+  - id: cheseborough-vr
+    state: archived
+    artifact: protocols/tsugaru-guide-highschool.yaml
+    note: "Historical example_project identifier; VR企画は頓挫"
