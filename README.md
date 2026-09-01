@@ -23,28 +23,16 @@ Shirakami explores a different question:
 
 **Landscape First.** The runtime is a service to Landscape, not the other way around.
 
-## Repository Landscape
-
-Shirakami is intentionally separated into four roles:
-
-- **shirakami-model** — cognitive model, principles, and conceptual foundation
-- **shirakami-research** — observations, experiments, hypotheses, and exploratory artifacts
-- **shirakami-specification** — stable specifications, schemas, and normative protocol contracts
-- **shirakami-OS** — Runtime, reference implementation, adapters, plugins, and executable artifacts
-
-This repository is the implementation/runtime layer. It must not become the canonical home for stable specifications merely because an implementation happens to live here.
-
 ## Reviewer Entry Point
 
-For external architecture review, start here:
+For external review, start here:
 
-- **[Reviewer Entry Point](docs/architecture/REVIEWER_ENTRY_POINT.md)** — evidence-backed reading order and Kernel boundary review questions.
+- **[Reviewer Entry Point](docs/architecture/REVIEWER_ENTRY_POINT.md)** — evidence-backed reading order and architecture boundaries.
+- **[MVP Quickstart](docs/architecture/MVP_QUICKSTART.md)** — the shortest route to running and testing the implementation.
 
 Recommended reading order:
 
 **Landscape → Evidence → Specification / Protocol → Runtime → Adapter → Execution → Observation**
-
-Please classify the architecture from repository evidence rather than from the project name or prior assumptions.
 
 ## Architecture
 
@@ -106,6 +94,7 @@ The Foundation describes the architecture. The public service artifact shows wha
 
 ## Getting Started
 
+- **MVP Quickstart → [docs/architecture/MVP_QUICKSTART.md](docs/architecture/MVP_QUICKSTART.md)**
 - Foundation / implementation boundary → [spec/](spec/)
 - Architecture → [docs/](docs/)
 - **User Manual (manga)** → [docs/manual/](docs/manual/)
