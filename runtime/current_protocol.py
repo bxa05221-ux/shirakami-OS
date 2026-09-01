@@ -1,11 +1,6 @@
-"""Current-protocol selection boundary.
-
-The existing Matome loader remains unchanged. Registry state is applied only
-when a caller explicitly asks for a current protocol.
-"""
+"""Current-protocol selection boundary."""
 
 from pathlib import Path
-from typing import Any
 
 from .protocol_loader import ProtocolIR, parse_matome
 from .protocol_registry import ProtocolRegistry, ProtocolRegistryError
@@ -21,7 +16,11 @@ def load_current_protocol(
     protocol_id: str,
 ) -> ProtocolIR:
     """Load a protocol only after lifecycle eligibility is confirmed."""
-    entry = registry.select_current(protocol_id)
+    try:
+        entry = registry.select_current(protocol_id)
+    except ProtocolRegistryError as exc:
+        raise CurrentProtocolError(str(exc)) from exc
+
     text = Path(path).read_text(encoding="utf-8")
     protocol = parse_matome(text)
     if protocol.protocol_id != entry.protocol_id:
