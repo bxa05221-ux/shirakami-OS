@@ -32,6 +32,19 @@ Landscapeが中心であり、RuntimeはLandscapeを扱うための交換可能�
 
 ---
 
+## 外部レビューの入口
+
+初めて見る場合は、まず以下から入ってください。
+
+- **[Reviewer Entry Point](docs/architecture/REVIEWER_ENTRY_POINT.md)** — ArchitectureとEvidenceを確認するための読み順
+- **[MVP Quickstart](docs/architecture/MVP_QUICKSTART.md)** — 最短で実装を実行・検証する入口
+
+最短ルート：
+
+**Landscape → Evidence → Protocol → Runtime → Adapter → Execution → Observation**
+
+---
+
 ## 誤解を防ぐために
 
 白神OSは、次のものを目的としていません。
@@ -210,6 +223,8 @@ python examples/quickstart/run.py
 ```
 
 Quickstartでは、Protocol YAMLを読み込み、Protocol IRを生成し、Runtimeを実行してEvidenceとLandscape Stateを確認します。
+
+→ **[MVP Quickstart](docs/architecture/MVP_QUICKSTART.md)**
 
 ---
 
