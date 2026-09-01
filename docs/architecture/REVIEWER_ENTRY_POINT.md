@@ -33,6 +33,36 @@ Evidence / Observation
 8. **Evidence / observation records** — [`docs/observations/`](../observations/)
 9. **Examples / protocol source artifacts** — [`examples/`](../../examples/) and [`protocols/`](../../protocols/)
 
+## MVP Execution Path
+
+For a quick implementation check, follow this concrete path:
+
+```text
+Protocol Source
+      ↓
+Protocol Loader
+      ↓
+Current Selection
+      ↓
+MTM Compatibility
+      ↓
+Runtime Execution
+      ↓
+Inspectable Result
+```
+
+The minimum executable entry point is `runtime/execute.py`. It deliberately stops at a prepared Runtime result; AI-provider invocation is outside the current MVP boundary.
+
+The corresponding execution test is `tests/test_execute.py`.
+
+Run the verification suite with:
+
+```bash
+python -m pytest runtime tests -q
+```
+
+The MVP boundary is considered healthy when this suite is green.
+
 ## Specification Boundary
 
 The canonical home for stable normative contracts is `shirakami-specification`.
@@ -105,13 +135,7 @@ An external review should answer these questions from repository evidence rather
 - Is Landscape State the state/context used by subsequent Protocol evaluation?
 - Is Landscape a runtime state model rather than merely an audit-log read model?
 
-### Replay / Migration
-
-- What level of determinism is actually guaranteed?
-- Can Landscape State be reconstructed from preserved Evidence?
-- Which migration guarantees are implemented, and which remain hypotheses?
-
-## Comparison with Existing Systems
+### Comparison with Existing Systems
 
 Do not begin by asking whether Shirakami resembles Event Sourcing, Workflow Engines, Policy Engines, or Agent Frameworks.
 
@@ -149,6 +173,7 @@ Do not silently reconcile contradictory external interpretations.
 - Runtime implementation navigation: established
 - Adapter / plugin navigation: established
 - Observation / Evidence navigation: established
+- MVP execution path: established
 - Event Sourcing / Workflow divergence: pending external review
 - Landscape layer placement: pending verification
 - Rich Protocol Semantics boundary: deferred
