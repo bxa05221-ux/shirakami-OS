@@ -94,7 +94,6 @@ def parse_protocol(text: str) -> CurrentProtocol:
             key = stripped[:-1]
             if key in top_sections:
                 sections[key] = _parse_nested(lines, index, 0)
-            protocol_seen = False
             continue
 
         if protocol_seen and indent == 2 and ":" in stripped:
