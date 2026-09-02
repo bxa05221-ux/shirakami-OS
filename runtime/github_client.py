@@ -41,6 +41,17 @@ class GitHubContentsClient:
             detail = exc.read().decode("utf-8", errors="replace")
             raise GitHubTransportError(f"GitHub API request failed: {exc.code} {detail}") from exc
 
+    def get(self, path: str) -> Mapping[str, Any]:
+        """Retrieve one repository content entry without interpreting its semantics."""
+        url = f"{self.api_base}/repos/{self.owner}/{self.repo}/contents/{path}?ref={self.branch}"
+        payload = self._request("GET", url)
+        if payload.get("encoding") == "base64" and "content" in payload:
+            decoded = base64.b64decode(payload["content"].replace("\n", "")).decode("utf-8")
+            return {**payload, "content": decoded}
+        if "content" not in payload:
+            raise GitHubTransportError("GitHub content response does not contain content")
+        return payload
+
     def read_landscape(self) -> Mapping[str, Any]:
         url = f"{self.api_base}/repos/{self.owner}/{self.repo}/contents/{self.landscape_path}?ref={self.branch}"
         payload = self._request("GET", url)
