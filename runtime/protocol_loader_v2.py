@@ -92,6 +92,7 @@ def parse_protocol(text: str) -> CurrentProtocol:
                 collecting_purpose = False
                 purpose_lines = []
             key = stripped[:-1]
+            protocol_seen = False
             if key in top_sections:
                 sections[key] = _parse_nested(lines, index, 0)
             continue
