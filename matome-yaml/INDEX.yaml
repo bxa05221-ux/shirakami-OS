@@ -1,5 +1,5 @@
 title: Shirakami OS 的目YAML集 Index
-version: 0.3
+version: 0.4
 
 purpose: >
   これまで蓄積された「的目YAML」を、原資料・設計判断・Protocol・検証・応用知見として
@@ -25,6 +25,14 @@ categories:
   observations:
     meaning: 個別の観測・セッション・状態記録
     path: matome-yaml/observations/
+
+canonical_archives_added:
+  - id: childcare_resilience
+    path: matome-yaml/applications/childcare_resilience_canonical.yaml
+    category: applications
+    status: canonical_archive
+    role: 保育レジリエンスの循環構造・AI境界・検証候補を統合した発見記述
+    protocol_candidate: true
 
 legacy_inventory:
   - id: legacy_m0001
@@ -152,14 +160,15 @@ inventory_status:
   known_library_yaml_files: 9
   unique_legacy_matome_sources: 5
   duplicate_sources_identified: 2
-  canonical_archive_added_in_this_pass: 3
+  canonical_archive_added_in_this_pass: 4
   source_only_pending_review: 1
   recent_derived_artifacts: 3
   protocol_mapping_file: matome-yaml/PROTOCOL_MAPPING.yaml
-  conversation_derived_candidates: 8
+  conversation_derived_candidates_remaining: 7
 
 next_inventory_target:
-  - 保育レジリエンス、発達支援、結婚支援、要保護児童対策、第三者評価、ガイドAI等の会話由来候補をcanonical YAML化する
+  - 発達支援、結婚支援、要保護児童対策、第三者評価、ガイドAI等の会話由来候補をcanonical YAML化する
+  - 保育レジリエンスをProtocol boundary → schema → validation → runtime test → evidenceへ昇格検証する
   - protocol-registryとの対応付けを継続する
   - Protocol化済み／未実装／Historicalの判定を進める
   - canonical archiveとsource archiveのリンクを整理する
