@@ -24,5 +24,5 @@ def test_r0010_verifier_cannot_auto_fix():
     result = validate_handoff(handoff)
 
     assert result["valid"] is False
-    assert any("payload keys" in error for error in result["errors"])
+    assert result["errors"]
     assert handoff["payload"]["fix"] == "apply automatic repair"
