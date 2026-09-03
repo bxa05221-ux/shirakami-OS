@@ -1,5 +1,5 @@
 title: Shirakami OS 的目YAML集 Index
-version: 0.2
+version: 0.3
 
 purpose: >
   これまで蓄積された「的目YAML」を、原資料・設計判断・Protocol・検証・応用知見として
@@ -103,6 +103,11 @@ recent_derived_artifacts:
     status: canonical
     role: Prompt→Protocol→Runtime→Landscape First→Verification→Evidence→Replay→AI Scientistの到達経路
 
+mapping:
+  path: matome-yaml/PROTOCOL_MAPPING.yaml
+  status: working_inventory
+  purpose: 的目YAMLと既存Protocol Registry、新規Protocol候補、Historicalを対応付ける
+
 related_protocol_families:
   core:
     - conversation_turn
@@ -150,10 +155,12 @@ inventory_status:
   canonical_archive_added_in_this_pass: 3
   source_only_pending_review: 1
   recent_derived_artifacts: 3
+  protocol_mapping_file: matome-yaml/PROTOCOL_MAPPING.yaml
+  conversation_derived_candidates: 8
 
 next_inventory_target:
-  - 的目yaml集以外の会話ログから未収録YAML名を照合する
-  - protocol-registryとの対応付けを行う
+  - 保育レジリエンス、発達支援、結婚支援、要保護児童対策、第三者評価、ガイドAI等の会話由来候補をcanonical YAML化する
+  - protocol-registryとの対応付けを継続する
   - Protocol化済み／未実装／Historicalの判定を進める
   - canonical archiveとsource archiveのリンクを整理する
   - Evidence/Replayへの接続を追加する
