@@ -1,0 +1,50 @@
+matome:
+  title: Shirakami Nursery Resilience Protocol
+  subtitle:
+    - 保育レジリエンス・プロトコル
+    - Observation to Continuity
+    - Human Judgment Boundary
+  version: 0.1
+  status:
+    protocol: candidate
+    runtime: unverified
+    purpose: field-verification
+  statement: >
+    Preserve a child's observable landscape and continuity of support by
+    separating observation from interpretation, recording transitions as
+    evidence, and keeping human caregivers as the final decision makers.
+  pipeline:
+    - phase: observe
+      action: capture_observed_fact
+    - phase: dialogue
+      action: capture_context_and_child_voice
+    - phase: record
+      action: preserve_observation_without_rewrite
+    - phase: share
+      action: project_permitted_shared_landscape
+    - phase: support
+      action: propose_nonbinding_support_options
+    - phase: growth
+      action: capture_observable_change
+    - phase: reobserve
+      action: compare_new_observation_with_prior_evidence
+    - phase: evidence
+      action: preserve_transition_and_provenance
+  boundary:
+    observation_is_not_interpretation: true
+    ai_is_not_decision_maker: true
+    human_authority_required: true
+    historical_records_are_immutable: true
+  roles:
+    child: subject_and_voice
+    caregiver: primary_practice_decision_maker
+    guardian: shared_authority
+    ai: observation_and_recording_assistant
+  evidence:
+    required_for_transition: true
+    immutable: true
+    provenance_required: true
+  verification:
+    one_change_one_verification: true
+    replay_required: true
+    field_verification_required: true
