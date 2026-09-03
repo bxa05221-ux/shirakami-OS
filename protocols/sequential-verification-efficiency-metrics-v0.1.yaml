@@ -1,0 +1,55 @@
+title: 逐次検証型開発効率測定フォーマット
+subtitle:
+  - Sequential Verification Development Efficiency Metrics
+version: 0.1
+
+purpose: >
+  逐次検証型マルチエージェント・プロトコルの実運用における
+  手戻りと変更範囲を観測するための最小記録フォーマット。
+  プロトコルの理論やRuntimeの意味論を変更しない。
+
+measurement:
+  change_count:
+    definition: "実装上の独立した変更数"
+  verification_count:
+    definition: "変更後に実施した検証回数"
+  rework_count:
+    definition: "検証失敗を受けて同一課題へ追加変更した回数"
+  scope_expansion_count:
+    definition: "当初の変更対象外へ変更範囲が拡大した回数"
+  elapsed_time:
+    definition: "観測開始から確定までの経過時間"
+    role: reference_only
+
+primary_signal:
+  - rework_count
+  - scope_expansion_count
+
+secondary_signal:
+  - verification_count
+  - change_count
+
+record:
+  task_id: ""
+  protocol: sequential-verification-multi-agent-v0.1
+  start: ""
+  end: ""
+  change_count: 0
+  verification_count: 0
+  rework_count: 0
+  scope_expansion_count: 0
+  elapsed_time: ""
+  result: ""
+  evidence: []
+
+constraints:
+  - no_model_speed_claim
+  - no_api_latency_claim
+  - no_theory_extension
+  - evidence_preservation
+  - human_final_judgment
+
+interpretation:
+  rule: >
+    効率改善は経過時間単独では判定しない。
+    手戻りと変更範囲の縮小を主要観測対象とする。
