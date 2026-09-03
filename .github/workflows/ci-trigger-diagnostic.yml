@@ -1,0 +1,24 @@
+name: CI Trigger Diagnostic
+
+on:
+  push:
+    paths:
+      - "tests/**"
+      - "runtime/**"
+      - ".github/workflows/ci-trigger-diagnostic.yml"
+  pull_request:
+    paths:
+      - "tests/**"
+      - "runtime/**"
+      - ".github/workflows/ci-trigger-diagnostic.yml"
+
+jobs:
+  test-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install pytest
+      - run: python -m pytest runtime tests -q
