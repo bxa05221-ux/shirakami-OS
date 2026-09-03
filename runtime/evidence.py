@@ -19,6 +19,7 @@ class EvidenceRecord:
     transition_kind: str
     transition_data: Mapping[str, Any]
     signals: tuple[str, ...]
+    confidence: str = "observed"
 
     @classmethod
     def from_result(cls, result: ExecutionResult) -> "EvidenceRecord":

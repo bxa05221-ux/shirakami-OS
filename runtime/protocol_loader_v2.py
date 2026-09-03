@@ -86,14 +86,15 @@ def parse_protocol(text: str) -> CurrentProtocol:
             protocol_seen = True
             continue
 
-        if protocol_seen and indent == 0 and stripped.endswith(":"):
+        if indent == 0 and stripped.endswith(":"):
             if collecting_purpose:
                 sections.setdefault("purpose", {})["text"] = " ".join(purpose_lines).strip()
                 collecting_purpose = False
                 purpose_lines = []
             key = stripped[:-1]
             if key in top_sections:
-                sections[key] = _parse_nested(lines, index, 0)
+                sections[key] = _parse_nested(lines, index, -1)
+            protocol_seen = False
             continue
 
         if protocol_seen and indent == 2 and ":" in stripped:
