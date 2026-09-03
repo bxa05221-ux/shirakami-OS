@@ -1,0 +1,140 @@
+title: 白神OS 開発経緯 的目YAML
+subtitle:
+  - Shirakami OS Development History
+  - Landscape Driven Evolution
+version: 0.1
+
+purpose: >
+  白神OSがどのような観測と実装上の発見を経て現在の構造に到達したかを記録する。
+  完成仕様ではなく、設計判断が生まれた経緯そのものをLandscapeとして保存する。
+
+core_observation:
+  statement: >
+    白神OSは、最初から完成したAIアーキテクチャを設計したものではない。
+    現実の問題を扱い、プロトコル化し、実装し、検証する過程で構造が発見されてきた。
+  important_property: >
+    到達経路そのものが白神OSの設計根拠であり、再現可能な知見である。
+
+evolution:
+  - step: 1
+    name: Prompt_to_Protocol
+    observation: 人間の複雑な要求をAIが扱える言語構造へ変換する必要が見えた。
+    discovery: Protocolという境界が必要になった。
+
+  - step: 2
+    name: Protocol_to_Runtime
+    observation: Protocolを記述するだけでは実行・状態遷移・検証ができない。
+    discovery: Protocolを実行するRuntimeが必要になった。
+
+  - step: 3
+    name: Landscape_First
+    observation: AIやRuntimeより先に、何を観測し何を保持するかが重要だった。
+    discovery: Landscapeを中心に置く構造へ転換した。
+
+  - step: 4
+    name: Model_Independence
+    observation: 特定LLMに依存するとContextと資産がモデル変更に巻き込まれる。
+    discovery: LLMは交換可能なAdapter/Backendとして扱う方向になった。
+
+  - step: 5
+    name: Verification_Necessity
+    observation: AIの出力だけでは、変更が正しかったか判断できない。
+    discovery: Verificationを独立した責務として配置した。
+
+  - step: 6
+    name: One_Change_One_Verification
+    observation: 複数変更をまとめて評価すると原因と結果の対応が曖昧になる。
+    discovery: 一つの変更を一つの検証単位として扱う方式が生まれた。
+
+  - step: 7
+    name: Sequential_Verification_Multi_Agent
+    observation: Agentを増やすこと自体ではなく、役割と観測責任の分離が重要だった。
+    discovery: 観測結果を次のAgentへ順次引き渡す検証型マルチエージェント構造へ進んだ。
+
+  - step: 8
+    name: Evidence
+    observation: 検証結果を後から書き換えられると、検証可能性が失われる。
+    discovery: Evidenceを記録・保存し、RuntimeはRewriteしない原則を置いた。
+
+  - step: 9
+    name: Replay
+    observation: 現在の状態だけでは、なぜそこへ到達したか追跡できない。
+    discovery: Change → Evidence → Change → Evidence の履歴をReplay可能にする必要が生まれた。
+
+  - step: 10
+    name: Distributed_Operation
+    observation: 全Contextを中央サーバーへ集約すると運用負荷と依存性が増える。
+    discovery: User側Landscape、Registry、Runtime、Adaptersを分離する分散運用構造へ進んだ。
+
+  - step: 11
+    name: AI_Scientist_Connection
+    observation: 仮説 → 実験 → 観測 → 検証 → Evidence → 次の仮説という循環が研究Agentの動作と一致した。
+    discovery: AI Scientist型システムを白神OSの実証対象として扱えることが見えた。
+
+ai_scientist_connection:
+  relation: >
+    白神OSはAI Scientistそのものではなく、AI Scientist型の探索を
+    Landscape・Protocol・Verification・Evidence・Replayによって観測可能にする基盤として位置づける。
+  target_loop:
+    - landscape_snapshot
+    - hypothesis
+    - experiment_design
+    - one_change
+    - execution
+    - observation
+    - verification
+    - evidence
+    - landscape_transition
+    - next_hypothesis
+
+amateur_origin:
+  observation: >
+    AI工学を専門としない実務者の問題設定から、この構造が段階的に発見された。
+  implication: >
+    現場知識を持つ人間が、AI専門知識だけに依存せずAIシステムの構造設計へ参加できる可能性を示す。
+
+black_box_prevention:
+  principles:
+    - Landscapeを起点とする
+    - Protocolの境界を明示する
+    - 変更を小さくする
+    - 各変更を検証する
+    - Evidenceを保存する
+    - Replay可能にする
+    - Runtimeの責務を限定する
+    - LLMを交換可能にする
+
+current_state:
+  achieved:
+    - Protocol as Codeの設計
+    - Shirakami Runtimeの基本構想
+    - Landscape First原則
+    - Evidence Contract
+    - One Change One Verification
+    - Sequential Verification Multi-Agent Protocol
+    - 分散運用アーキテクチャ
+    - AI Scientist Verification Protocol v0.1
+  not_yet_complete:
+    - Research Agentの実運用
+    - Verifier Agentの実運用
+    - 実験Evidenceの永続化
+    - Replay UI/CLI
+    - AI Scientistループの実証
+
+next_action:
+  priority: >
+    追加の理論化ではなく、既存のShirakami OS RuntimeへAI Scientist Verification Protocolを接続し、
+    小さな実験を一つ実行してEvidenceとReplayまで確認する。
+
+meta_observation:
+  statement: >
+    AI Scientistを最初から目標にしたのではない。
+    現実の問題を一つずつ扱った結果として、AI Scientist型の探索環境に到達した。
+  significance: >
+    この到達経路自体が、白神OSが「AIを賢くする仕組み」ではなく、
+    人間のLandscapeを起点にAIの探索・変更・検証・記録を接続する環境であることを示している。
+
+final_axiom: >
+  白神OSはAIそのものを中心に置かない。
+  Human Landscapeを起点に、Protocolで境界を定め、AIに探索させ、変更を検証し、
+  Evidenceを保存し、その結果を次のLandscapeへ接続する。
