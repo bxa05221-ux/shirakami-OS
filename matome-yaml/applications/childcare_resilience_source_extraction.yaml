@@ -1,0 +1,121 @@
+title: 保育レジリエンスProtocol原型抽出表
+subtitle: SNS式保育 × 都市問題
+version: 0.1
+status: source_derived
+
+purpose: >
+  既存の「SNS式保育」および「都市問題.pdf」に記録された実践・観察・支援の構造を、
+  後続の保育レジリエンスProtocol設計に利用できる単位へ抽出する。
+  本文書は新しい理論を追加するものではなく、原資料に現れる構造の対応表である。
+
+source_boundary:
+  - sns_hoiku_tekimoku.yml
+  - 都市問題.pdf
+  - childcare_resilience_canonical.yaml
+
+extraction:
+  - id: PR-001
+    element: environment_first
+    sns_source: "子どもに必要以上の介入を感じさせず、自由と好奇心、喜怒哀楽を自覚できるよう支援する"
+    urban_problem_source: "環境がまずあり、その環境に応じた一人ひとりの主体性を見守った中で個人へ対応する"
+    protocol_implication: "介入より先にLandscape/環境を観察対象とする"
+
+  - id: PR-002
+    element: child_agency
+    sns_source: "子どもの反応・つぶやき・行動から次の展開を発見する"
+    urban_problem_source: "環境を通した子どもの主体的な活動から学習させる"
+    protocol_implication: "子どもを指示対象ではなく観察可能な主体として扱う"
+
+  - id: PR-003
+    element: observation_before_interpretation
+    sns_source: "保育士のつぶやきや子どもの姿を切っ掛けとして観察を続ける"
+    urban_problem_source: "計画・観察点・実際の結果を書き込む"
+    protocol_implication: "observed_fact と interpretation を分離する"
+
+  - id: PR-004
+    element: hypothesis_and_observation
+    sns_source: "大人の予想から外れる子どもの反応を新しい発見として扱う"
+    urban_problem_source: "計画段階の連想・予測を観察点と結果によって検証する"
+    protocol_implication: "計画は確定命令ではなく観察可能な仮説として保持する"
+
+  - id: PR-005
+    element: minimum_intervention
+    sns_source: "必要以上に介入せず、さりげなく支援する"
+    urban_problem_source: "傍観者の立ち位置を取り、適宜、必要最低限の介入を行う"
+    protocol_implication: "介入をTransitionとして記録し、介入しなかったことも観察可能にする"
+
+  - id: PR-006
+    element: individual_context
+    sns_source: "一人ひとりの姿や関心を手掛かりに展開する"
+    urban_problem_source: "集団への適合だけでなく、A君固有の事情や家庭環境を考慮する"
+    protocol_implication: "個人Landscapeと周辺Contextを切り離さず保持する"
+
+  - id: PR-007
+    element: caregiver_cognitive_shift
+    sns_source: "『それって大事なこと？』等の問いから保育者自身の見方を変える"
+    urban_problem_source: "観察の中で子どもの求めを拾い上げることを保育士の専門性とする"
+    protocol_implication: "観察結果だけでなく、観察者の認知変化を記録候補にする"
+
+  - id: PR-008
+    element: continuity
+    sns_source: "一つの発見を次の活動・共有・観察へつなげる"
+    urban_problem_source: "前月の支援計画をもとに毎月さらにA君への理解を深める"
+    protocol_implication: "単発の回答ではなく、履歴を保持した再観察を必須化する"
+
+  - id: PR-009
+    element: shared_landscape
+    sns_source: "保育者間・子ども同士で発見や価値を共有する"
+    urban_problem_source: "家庭・医療・行政等との連続性を含めて保育を捉える"
+    protocol_implication: "共有範囲と権限を明示したShared Landscapeを設ける"
+
+  - id: PR-010
+    element: structural_context
+    sns_source: "子どもの行動だけを単独で評価しない"
+    urban_problem_source: "クラスやカリキュラム等の環境要因による問題を構造的問題として扱う"
+    protocol_implication: "child_state と environment_state を別々の観測対象として保持する"
+
+  - id: PR-011
+    element: evidence_cycle
+    sns_source: "実践の変化を次の観察につなげる"
+    urban_problem_source: "計画・観察・結果をマトリクス化する"
+    protocol_implication: "各TransitionにEvidenceを紐付け、再現可能な履歴を残す"
+
+  - id: PR-012
+    element: support_network
+    sns_source: "保育者間の共有と子どもの関係性を通じて展開する"
+    urban_problem_source: "保育・家庭・医療・行政等の連携を重視する"
+    protocol_implication: "単独のAI判断ではなく、人間を中心とした支援ネットワークとして設計する"
+
+common_structure:
+  observed_by_both_sources:
+    - environment precedes direct intervention
+    - child agency is observable
+    - observation changes subsequent support
+    - individual context matters
+    - intervention should be limited
+    - continuity matters
+    - practice generates further observation
+
+not_yet_supported_by_sources:
+  - specific JSON/YAML schema fields
+  - exact permission roles
+  - exact escalation thresholds
+  - runtime implementation details
+  - automated diagnosis or classification rules
+  - measurable resilience score
+
+promotion_candidates:
+  - observation_event
+  - hypothesis_event
+  - intervention_event
+  - child_response_event
+  - caregiver_cognitive_shift_event
+  - evidence_record
+  - reobservation_transition
+  - shared_landscape_update
+
+principle:
+  source_truth_first: true
+  no_silent_theory_addition: true
+  preserve_original_terminology: true
+  protocolization_requires_verification: true
