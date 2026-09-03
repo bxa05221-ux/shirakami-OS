@@ -1,0 +1,19 @@
+title: "的目産業 - SNS式保育支援プロトコル ver 1.1"
+source_archive: "/的目yaml集/sns hoiku tekimoku.yml"
+related_source_archive: "/育実幼稚園の保育レジリエンスモデルを作成する/sns hoiku tekimoku.yml"
+classification: application
+status: protocol_derived_source
+summary:
+  - "SNS式保育メソッド等の著作群を白神スレッドRPGの外骨格モデルでプロトコル化"
+  - "ideology_layer / five_pillars / crisis_layer の三層構造"
+  - "相談 / 計画 / 保護者 / 研修 の四モード"
+  - "保育哲学とAI設計思想に共通する、命令しない・環境を作る・主体性を待つ構造の発見"
+major_discovery: >
+  SNS式保育でAIを育てたら白神モデルが生まれた、という自己観測を記録する。
+  保育における環境設計とAIにおけるProtocol設計が同型であることを示す。
+next_phase:
+  - "理念層・危機管理層の発展"
+  - "白神モデルへの統合"
+  - "実装・検証"
+archival_rule: >
+  現在の保育Protocolそのものではなく、保育実践から白神OSの設計原理が抽出された過程を示す資料として保存する。
