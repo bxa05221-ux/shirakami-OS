@@ -1,0 +1,119 @@
+title: 逐次検証型マルチエージェント・プロトコル
+subtitle:
+  - Sequential Verification Multi-Agent Protocol
+  - One Change One Verification Protocol
+version: 0.1
+
+statement: >
+  複数のAgentを同時に動かすことを目的としない。
+  役割を分離し、各Agentの観測結果を次のAgentへ引き渡し、
+  一変更・一検証・一確定の循環によって実装の暴走を防止する。
+
+principle:
+  - role_separation
+  - observation_before_change
+  - one_change_at_a_time
+  - verification_before_confirmation
+  - human_final_judgment
+  - evidence_preservation
+
+agents:
+  observer:
+    role: 現状観測
+    output:
+      - facts
+      - current_state
+      - detected_gap
+    prohibited:
+      - implementation
+      - theory_extension
+
+  auditor:
+    role: 境界監査
+    output:
+      - confirmed_boundary
+      - risk
+      - minimal_change_candidate
+    prohibited:
+      - implementation
+      - theory_extension
+
+  implementer:
+    role: 最小変更
+    input:
+      - confirmed_boundary
+      - minimal_change_candidate
+    output:
+      - change
+      - commit
+    prohibited:
+      - unrelated_change
+
+  verifier:
+    role: 検証
+    input:
+      - change
+    output:
+      - pass
+      - fail
+      - evidence
+    prohibited:
+      - automatic_fix
+
+  confirmer:
+    role: 状態確定
+    input:
+      - verification_result
+      - evidence
+    output:
+      - confirmed
+      - next_action
+
+human_boundary:
+  final_judgment: true
+  automatic_merge: false
+  automatic_theory_change: false
+
+state_machine:
+  - OBSERVE
+  - AUDIT
+  - CHANGE
+  - VERIFY
+  - CONFIRM
+
+transition_rule:
+  OBSERVE_to_AUDIT:
+    condition: observation_complete
+  AUDIT_to_CHANGE:
+    condition: minimal_change_defined
+  CHANGE_to_VERIFY:
+    condition: single_change_committed
+  VERIFY_to_CONFIRM:
+    condition: verification_complete
+  CONFIRM_to_OBSERVE:
+    condition: next_change_required
+
+failure_rule:
+  verification_failed:
+    action: return_to_AUDIT
+  ambiguous_result:
+    action: preserve_uncertainty
+  unrelated_change_detected:
+    action: reject_change
+
+critical_rule:
+  - Agentは自分の担当境界を越えない
+  - 検証Agentは自分で修正しない
+  - 実装Agentは理論を変更しない
+  - 監査Agentは実装しない
+  - 人間の確定判断を自動化しない
+  - Evidenceを改変しない
+
+sacred_equation: >
+  Multi-Agent ≠ Concurrent Agents
+  Multi-Agent = Separated Roles + Controlled Transitions + Evidence
+
+symbolic_phrase:
+  - 「一人で賢くするのではなく、役割を分けて暴走を防ぐ。」
+  - 「一変更、一検証、一確定。」
+  - 「次のAgentは、前のAgentの結論ではなくEvidenceを受け取る。」
