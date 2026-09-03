@@ -1,14 +1,18 @@
 from runtime.evidence import EvidenceRecord
+from runtime.prototype import ExecutionResult, Transition
 
 
 def test_r0010_evidence_record_preserves_captured_data():
-    evidence = EvidenceRecord(
-        protocol_id="r0010",
+    result = ExecutionResult(
         status="failed",
-        transition_kind="VERIFY",
-        transition_data={"changed": False, "result": "failed"},
+        protocol_id="r0010",
+        transition=Transition(
+            kind="VERIFY",
+            data={"changed": False, "result": "failed"},
+        ),
         signals=("verification_failed",),
     )
+    evidence = EvidenceRecord.from_result(result)
 
     original_data = dict(evidence.transition_data)
 
