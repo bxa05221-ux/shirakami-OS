@@ -1,5 +1,5 @@
 title: Shirakami OS 的目YAML → Protocol Mapping
-version: 0.1
+version: 0.2
 status: working_inventory
 
 purpose: >
@@ -44,6 +44,13 @@ mappings:
     registry_id: guide_runtime
     note: 保育実践から抽出された「命令せず環境を設計する」構造。現場実装候補。
 
+  - id: childcare_resilience_canonical
+    source: matome-yaml/applications/childcare_resilience_canonical.yaml
+    status: candidate
+    protocol_relation: childcare_resilience / nursery_resilience / evidence_cycle
+    registry_id: null
+    note: 保育レジリエンスの観察→対話→記録→共有→支援→成長→再観察をcanonical archiveとして整理。Runtime実行仕様への昇格前にschema・permission・evidence・field verificationが必要。
+
   - id: distributed_operation
     source: shirakami_distributed_operation_architecture.yaml
     status: candidate
@@ -66,13 +73,6 @@ mappings:
     note: セッション移行・Context継承系。内容精査後に昇格判定。
 
 conversation_derived_candidates:
-  - id: childcare_resilience
-    title: 白神OS 保育レジリエンス・プロトコル
-    status: conversation_derived
-    likely_layer: applications
-    likely_registry_id: null
-    next_action: extract canonical YAML from conversation history
-
   - id: developmental_support
     title: 発達支援専用モデル / 発達支援観察Protocol
     status: conversation_derived
@@ -156,7 +156,7 @@ promotion_rule:
   protocolized: Registry entry → loader/runtime integration → verification evidence
 
 next_batch:
-  - childcare_resilienceのcanonical YAML化
+  - 保育レジリエンスをprotocols/resilience/nursery-resilience.yamlへ昇格可能か検証
   - conversation_derived_candidatesの原会話との照合
   - Registryに未登録のProtocol候補をIssue化
   - Evidence/Replayへの接続フィールドを追加
