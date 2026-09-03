@@ -9,6 +9,7 @@ from typing import Any
 
 from .evidence import EvidenceRecord, is_transition_evidence
 from .navigation import NavigationState
+from .navigation_delta import NavigationBeacon, NavigationDelta
 
 
 _NAVIGATION_FIELDS = frozenset({
@@ -25,8 +26,11 @@ class NavigationObserver:
 
     def __init__(self, state: NavigationState | None = None) -> None:
         self.state = state or NavigationState()
+        self.last_beacon: NavigationBeacon | None = None
+        self.last_delta: NavigationDelta | None = None
 
     def observe(self, evidence: EvidenceRecord) -> NavigationState:
+        before = self.state.snapshot()
         data: dict[str, Any] = dict(evidence.transition_data)
         observed = {
             key: data[key]
@@ -43,4 +47,15 @@ class NavigationObserver:
             evidence_cursor=(evidence.protocol_id, evidence.transition_kind),
             landscape_changed=is_transition_evidence(evidence),
         )
+
+        self.last_beacon = NavigationBeacon(
+            position=observed.get("position"),
+            direction=observed.get("direction"),
+            attitude=observed.get("attitude"),
+            horizon=observed.get("horizon"),
+            uncertainty=tuple(observed.get("uncertainty") or ()),
+            evidence_cursor=(evidence.protocol_id, evidence.transition_kind),
+            landscape_changed=is_transition_evidence(evidence),
+        )
+        self.last_delta = NavigationDelta.between(before, self.state.snapshot())
         return self.state
