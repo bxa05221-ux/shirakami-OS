@@ -1,0 +1,27 @@
+title: "的目のこれから - QRコード規格化と業界標準化の設計"
+source_archive: "/的目yaml集/matome session matome no kore kara.yml"
+duplicate_source: "/育実幼稚園の保育レジリエンスモデルを作成する/matome モジュール化.yml"
+classification: genesis_and_architecture
+status: historical_source_archive
+session_focus: "的目YAMLから媒体非依存の意味体・視覚表現・規格化へ"
+major_discoveries:
+  - media_independence
+  - reality_concept_bridge
+  - systemic_visualization
+  - bootstrap_installer
+  - artwork_qrcode
+  - monoculture_resistance
+transformation_chain:
+  - text_yaml
+  - visualization
+  - manga
+  - system_diagram
+  - artwork
+  - qr_code
+architectural_insight: >
+  的目YAMLを特定の表示形式ではなく、媒体を越えて意味を運ぶ構造として捉える発想を記録する。
+strategic_status:
+  standardization: "historical_concept"
+  distribution: "historical_concept"
+archival_rule: >
+  現在の配布仕様を規定するものではなく、的目YAMLの媒体非依存性と規格化構想の発生記録として保持する。
