@@ -44,7 +44,8 @@ def main() -> None:
         print(f"  current: {result.landscape['stage']}")
         previous = stage
 
-    print("destination:", os.navigation.snapshot()["horizon"])
+    print("navigation:", dict(os.navigation.snapshot()))
+    print("destination_selected_by_os: False")
 
 
 if __name__ == "__main__":
