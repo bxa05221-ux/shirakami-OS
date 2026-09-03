@@ -1,0 +1,34 @@
+protocol_id: M0001
+version: "α2.2-dialogue"
+name: Dialogue Accumulation and Inductive Protocol Generation Protocol
+domain_meaning:
+  purpose: >
+    To declare how a Shirakami Protocol is born not from a priori design,
+    but from the sedimentary accumulation of dialogue.
+  philosophy: >
+    Protocols are not authored. They are deposited, like sediment in the Shirakami
+    forest, like water carving a groove, like discipline repeated until it becomes nature.
+    Data is fluid. Dialogue is rain. Evidence is soil. Protocol is the riverbed that remains.
+applicability_conditions:
+  - context.type == "sustained_dialogue"
+  - participants.human >= 1
+  - participants.ai >= 1
+  - topic.domain == "shirakami_os_architecture"
+  - dialogue.intent evolves from inquiry to sedimentation
+verification_requirements:
+  structural:
+    - each turn must leave a trace in the Trail
+    - transitions between topics must be observable
+    - metaphors must converge toward formalizable structure
+  sedimentary:
+    - initial questions must differ from final understanding
+    - at least one layer must reverse a prior assumption
+    - at least one layer must introduce a new ontological category
+  inductive:
+    - a Protocol IR must be extractable from the dialogue body
+    - the extracted Protocol must not have existed before the dialogue
+    - the extracted Protocol must reference its own origin as accumulated
+source_note: >
+  Canonical archive copy of the historical artifact originally stored in
+  /的目yaml集/M0001_Dialogue_Accumulation_Protocol.yaml.
+  The full original remains preserved in the source archive/library.
