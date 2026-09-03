@@ -1,0 +1,258 @@
+title: 白神OS 保育レジリエンス・カノニカル記述
+subtitle:
+  - Shirakami Nursery Resilience
+  - こだもレジリエンス / こだまシステム
+version: 0.1
+status: canonical_archive
+
+purpose: >
+  保育現場で蓄積された観察・対話・記録・共有・支援・成長の循環を、
+  白神OSのLandscape First原則に接続するためのカノニカルな発見記述。
+  本ファイルは直ちにRuntime実行仕様とせず、保育実践から抽出された
+  構造とProtocol化候補を保存する。
+
+position:
+  category: applications
+  role: field_derived_design_knowledge
+  executable: false
+  protocol_candidate: true
+  likely_protocol_path: protocols/resilience/nursery-resilience.yaml
+
+core_principle:
+  statement: >
+    子どもを変えることを第一目的にせず、子どもの姿を観察し、
+    対話し、環境と関係を整え、変化を記録し、必要な人と共有し、
+    小さな成長を積み重ね、その結果を再び観察して次の支援につなげる。
+  axioms:
+    - landscape_first
+    - child_worldview_first
+    - environment_before_correction
+    - observation_before_interpretation
+    - dialogue_before_assumption
+    - continuity_required
+    - ai_is_not_decision_maker
+    - human_authority_is_preserved
+
+resilience_cycle:
+  description: >
+    保育を一回限りの対応ではなく、観察可能な循環として扱う。
+  steps:
+    - id: observe
+      name: 観察
+      action: 子どもの姿を丁寧に見る
+      output: observable_signals
+    - id: dialogue
+      name: 対話
+      action: 子ども・保護者・保育者で語り合う
+      output: shared_meaning
+    - id: record
+      name: 記録
+      action: 気づきや出来事を正確に記録する
+      output: evidence_record
+    - id: share
+      name: 共有
+      action: 関係者で必要な情報を共有する
+      output: shared_landscape
+    - id: support
+      name: 支援
+      action: 必要な支援と環境調整を協働で行う
+      output: intervention_change
+    - id: growth
+      name: 成長
+      action: 小さな成功体験と変化を積み重ねる
+      output: growth_signal
+    - id: reobserve
+      name: 再観察
+      action: 変化を見つめ、次の支援へつなぐ
+      output: next_observation
+  transition: reobserve -> observe
+
+support_network:
+  center: child
+  participants:
+    - caregiver
+    - guardian
+    - community
+    - education
+    - medical_welfare
+    - ai_kodama
+  relation: bidirectional_support
+  principle: >
+    特定の主体だけに判断・責任・支援を集中させず、必要な関係者が
+    それぞれの専門性と権限を保ちながらLandscapeを共有する。
+
+observation_model:
+  principle: >
+    観察された事実と、その事実から導いた解釈を分離する。
+  record_layers:
+    - observed_fact
+    - child_expression
+    - environmental_context
+    - relationship_context
+    - caregiver_hypothesis
+    - support_action
+    - observed_change
+  example:
+    observed_fact: "朝、いつもより泣いて保護者から離れにくい"
+    contextual_signals:
+      - sleep_change
+      - repeated_morning_crying
+      - family_change
+      - preferred_play
+    interpretation_rule: >
+      複数の小さなサインを接続して背景仮説を形成するが、仮説を事実として扱わない。
+
+planning_model:
+  legacy_relation: "Plan → Do → Check → Action"
+  shirakami_reframing: >
+    計画時に期待した子どもの反応を固定的な正解とせず、実際の観察結果を
+    次の意味づけと環境調整へ返す。
+  cycle:
+    - plan
+    - observe
+    - interpret
+    - support
+    - observe_again
+  key_rule: >
+    「計画どおりだったか」だけで評価せず、予測との差異から新しい観察対象と
+    次の問いを生成する。
+
+ai_role:
+  name: AI（こだまシステム）
+  allowed:
+    - record_support
+    - pattern_visibility
+    - timeline_summary
+    - observation_point_suggestion
+    - information_connection
+    - reflection_question_generation
+  prohibited:
+    - final_diagnosis
+    - unilateral_child_classification
+    - autonomous_high_stakes_decision
+    - replacing_caregiver_judgment
+    - replacing_guardian_consent
+    - hiding_uncertainty
+  principle: >
+    AIは保育を決定する主体ではなく、観察・記録・分析・提案を通じて
+    人間の保育実践と関係者間の認知を支える。
+
+landscape:
+  child:
+    required: true
+    ownership: human_context
+  records:
+    - observations
+    - conversations
+    - support_actions
+    - growth_history
+    - environmental_changes
+  context:
+    - family
+    - classroom
+    - community
+    - education
+    - medical_welfare
+  mutable_state:
+    - current_observation
+    - current_support
+    - current_environment
+    - next_question
+
+memory_and_continuity:
+  principle: >
+    単発の相談ではなく、時間経過による変化を追跡できることを重視する。
+  required_links:
+    - observation_timeline
+    - support_timeline
+    - environmental_changes
+    - prior_landscape
+    - next_landscape
+  evidence_policy:
+    record: true
+    preserve: true
+    rewrite_past_observation: false
+
+privacy_and_authority:
+  principles:
+    - minimum_context
+    - least_privilege
+    - explicit_permission
+    - purpose_limited_sharing
+    - evidence_preservation
+    - human_authority
+  rule: >
+    子ども・家庭に関する情報は必要最小限の範囲で扱い、共有範囲と権限を
+    Protocol/Runtime側で明示する。AIの出力だけを根拠として重要な判断を確定しない。
+
+protocolization_boundary:
+  ready_to_extract:
+    - observation_cycle
+    - support_cycle
+    - evidence_recording
+    - shared_landscape
+    - continuity
+    - ai_assistance_boundary
+  requires_verification:
+    - observation_schema
+    - permission_schema
+    - evidence_schema
+    - escalation_rules
+    - runtime_transitions
+    - replay_requirements
+  not_yet_defined:
+    - concrete_api
+    - authentication
+    - storage_backend
+    - deployment_topology
+
+verification_candidates:
+  - id: V-NUR-001
+    question: >
+      観察事実と解釈を分離した記録によって、後から別の保育者が
+      同じLandscapeを再構成できるか。
+  - id: V-NUR-002
+    question: >
+      一つの支援変更に対して、その変更前後の観察とEvidenceを追跡できるか。
+  - id: V-NUR-003
+    question: >
+      AI提案を採用しなくても、人間が判断経路と根拠を保持できるか。
+  - id: V-NUR-004
+    question: >
+      複数月の記録から小さな変化を再観察し、次の支援へ接続できるか。
+  - id: V-NUR-005
+    question: >
+      共有権限を超えて子ども・家庭情報が伝播しないことを検証できるか。
+
+source_lineage:
+  primary_field_sources:
+    - "白神保育レジリエンスの循環モデル.png"
+    - "こだまレジリエンスのしくみ.png"
+    - "都市問題.pdf"
+  related_matome:
+    - matome-yaml/applications/sns_hoiku_tekimoku.yml
+  related_concepts:
+    - Shirakami Childcare Education Protocol
+    - Nursery Resilience API
+    - こだまシステム
+    - 白神モデル
+  extraction_note: >
+    本記述は、既存の保育実践・保育マトリクス・こだまレジリエンス図・
+    的目YAMLを横断して、共通する循環構造だけをcanonical archiveとして抽出したもの。
+
+promotion_rule:
+  next_stage: protocol_candidate
+  required_before_runtime:
+    - schema_definition
+    - validation_rules
+    - permission_contract
+    - evidence_contract
+    - runtime_test
+    - field_verification
+
+non_goals:
+  - AIによる保育士の置換
+  - 子どもの自動診断
+  - 単一指標による成長評価
+  - 現場の暗黙知の一括自動化
+  - 過去記録の書き換え
