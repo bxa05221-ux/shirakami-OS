@@ -6,12 +6,16 @@ on:
       - "runtime/**"
       - "tests/**"
       - "protocols/manual/**"
+      - "docs/**"
+      - "CHECKLIST.md"
       - ".github/workflows/runtime-beta-0.1.yml"
   pull_request:
     paths:
       - "runtime/**"
       - "tests/**"
       - "protocols/manual/**"
+      - "docs/**"
+      - "CHECKLIST.md"
       - ".github/workflows/runtime-beta-0.1.yml"
 
 jobs:
