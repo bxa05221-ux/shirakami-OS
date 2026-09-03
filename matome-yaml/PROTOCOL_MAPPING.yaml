@@ -1,0 +1,162 @@
+title: Shirakami OS 的目YAML → Protocol Mapping
+version: 0.1
+status: working_inventory
+
+purpose: >
+  的目YAML・会話から発生した設計知を、Protocol Registryの既存項目、
+  新規Protocol候補、Historicalとして対応付ける。的目YAMLそのものを
+  Protocolへ自動変換するのではなく、意味の境界を保ったまま昇格経路を記録する。
+
+status_definitions:
+  protocolized: 実行仕様として既存ProtocolまたはRegistry項目に対応済み
+  candidate: Protocol化可能性が高いが、現時点では正式Registry未登録
+  historical: 到達経路・発見記録として保存し、直接のRuntime仕様にはしない
+  source_only: 原資料として保持し、内容精査待ち
+  duplicate: 同一系統の重複資料
+  conversation_derived: 会話から確認されたが、正式YAMLアーカイブ未収録
+
+mappings:
+  - id: M0001
+    source: matome-yaml/genesis/M0001_Dialogue_Accumulation_Protocol.yaml
+    status: historical
+    protocol_relation: dialogue_accumulation_as_genesis
+    registry_id: null
+    note: 対話の蓄積からProtocolが帰納的に生まれる過程そのものを記録。
+
+  - id: kore_kara_qrcode
+    source: matome-yaml/genesis/matome_no_kore_kara_qrcode_standardization.yml
+    status: historical
+    protocol_relation: media_independent_matome_transport
+    registry_id: null
+    note: 的目YAMLの媒体非依存性・視覚化・QR規格化の発生記録。
+
+  - id: shirakami_integration_session
+    source: matome-yaml/applications/matome_shirakami_os_integration_session.yml
+    status: historical
+    protocol_relation: multi_session_context_inheritance
+    registry_id: null
+    note: 複数AI・複数セッション・物語生成から白神OS統合へ至る発展記録。
+
+  - id: sns_hoiku
+    source: matome-yaml/applications/sns_hoiku_tekimoku.yml
+    status: candidate
+    protocol_relation: childcare_resilience / guide_runtime
+    registry_id: guide_runtime
+    note: 保育実践から抽出された「命令せず環境を設計する」構造。現場実装候補。
+
+  - id: distributed_operation
+    source: shirakami_distributed_operation_architecture.yaml
+    status: candidate
+    protocol_relation: distributed_landscape_runtime
+    registry_id: null
+    note: User Landscape / Registry / Runtime / Adapterの分散運用設計。
+
+  - id: ai_scientist_verification
+    source: shirakami_ai_scientist_verification_protocol_v0.1.yaml
+    status: candidate
+    protocol_relation: sequential_verification / one_change_one_verification / evidence / replay
+    registry_id: null
+    note: AI Scientist型探索を白神OSの検証ループへ接続する候補。
+
+  - id: final_chat_migration
+    source: final chat migration matome.yml
+    status: source_only
+    protocol_relation: context_migration
+    registry_id: null
+    note: セッション移行・Context継承系。内容精査後に昇格判定。
+
+conversation_derived_candidates:
+  - id: childcare_resilience
+    title: 白神OS 保育レジリエンス・プロトコル
+    status: conversation_derived
+    likely_layer: applications
+    likely_registry_id: null
+    next_action: extract canonical YAML from conversation history
+
+  - id: developmental_support
+    title: 発達支援専用モデル / 発達支援観察Protocol
+    status: conversation_derived
+    likely_layer: cognition
+    likely_registry_id: cognitive_echo_location
+    next_action: separate observation protocol from model implementation
+
+  - id: marriage_support
+    title: 結婚支援AIプロトコル
+    status: conversation_derived
+    likely_layer: applications
+    likely_registry_id: null
+    next_action: extract protocol boundary and permissions before implementation
+
+  - id: protected_child_support
+    title: 要保護児童対策プロトコル
+    status: conversation_derived
+    likely_layer: applications
+    likely_registry_id: null
+    next_action: define human authority, evidence, escalation and privacy boundaries
+
+  - id: third_party_evaluation
+    title: 第三者評価支援システム・プロトコル
+    status: conversation_derived
+    likely_layer: applications
+    likely_registry_id: null
+    next_action: extract observation/evidence workflow
+
+  - id: guide_ai
+    title: ガイドAIプロトコル
+    status: conversation_derived
+    likely_layer: applications
+    likely_registry_id: guide_runtime
+    next_action: connect existing guide runtime to local knowledge landscape
+
+  - id: shirakami_radio
+    title: Shirakami Radio Protocol
+    status: protocolized
+    likely_layer: media
+    registry_id: shirakami_radio
+    next_action: keep Registry mapping synchronized with canonical protocol version
+
+  - id: thread_rpg
+    title: Thread RPG Protocol
+    status: protocolized
+    likely_layer: workflow
+    registry_id: thread_rpg
+    next_action: connect summary YAML / replay evidence
+
+  - id: manga_runtime
+    title: Manga Runtime / Renderer Protocol
+    status: protocolized
+    likely_layer: media
+    registry_id: manga_runtime
+    next_action: connect manga pipeline evidence
+
+  - id: perspective
+    title: Perspective Protocol
+    status: protocolized
+    likely_layer: cognition
+    registry_id: perspective
+    next_action: verification evidence before runtime promotion
+
+  - id: anmon_layer
+    title: 暗問層
+    status: protocolized
+    likely_layer: cognition
+    registry_id: anmon_layer
+    next_action: preserve five-turn observation boundary
+
+registry_alignment:
+  registry_source: spec/protocol-registry.yaml
+  registry_branch: protocol-registry/alpha-0.1
+  principle: >
+    Registryは既存Protocolを索引化する。的目YAMLのHistoricalな発見記録や
+    未検証候補を、Registry登録だけでRuntime Contractへ昇格させない。
+
+promotion_rule:
+  historical: genesis/archiveに保存
+  candidate: Protocol boundary → schema → validation → runtime test → evidence
+  protocolized: Registry entry → loader/runtime integration → verification evidence
+
+next_batch:
+  - childcare_resilienceのcanonical YAML化
+  - conversation_derived_candidatesの原会話との照合
+  - Registryに未登録のProtocol候補をIssue化
+  - Evidence/Replayへの接続フィールドを追加
