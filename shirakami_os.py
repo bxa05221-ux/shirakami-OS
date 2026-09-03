@@ -13,6 +13,7 @@ from runtime.navigation import NavigationState
 from runtime.navigation_history import DirectionTrend, NavigationHistory
 from runtime.navigation_observer import NavigationObserver
 from runtime.navigation_scenario import NavigationScenario
+from runtime.observation import ObservationRequest, ObservationView, reobserve
 from runtime.prototype import ExecutionContext, Runtime, Transition
 
 
@@ -71,6 +72,12 @@ class ShirakamiOS:
             navigation=self.navigation.snapshot(),
             direction_trend=self.navigation_history.direction_trend(),
         )
+
+    def reobserve(self, request: ObservationRequest) -> ObservationView:
+        """Inspect the current Landscape through an explicit lens without mutating it."""
+        if not self.booted:
+            self.boot()
+        return reobserve(self.landscape.snapshot(), request)
 
     def simulate_navigation(self, steps: int = 3) -> NavigationScenario:
         """Project the latest observed navigation state without steering or prediction."""
