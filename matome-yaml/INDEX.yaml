@@ -1,0 +1,127 @@
+title: Shirakami OS 的目YAML集 Index
+version: 0.1
+
+purpose: >
+  これまで蓄積された「的目YAML」を、原資料・設計判断・Protocol・検証・応用知見として
+  分類し、Shirakami OS リポジトリ上の正式なアーカイブへ接続するための索引。
+
+principle: >
+  原資料を捨てず、現在の仕様と到達経緯を分離する。
+  的目YAMLは発見の記録、Protocolは実行仕様、Evidenceは検証結果として扱う。
+
+categories:
+  genesis:
+    meaning: 白神OSの発生・発見・設計転換の履歴
+    path: matome-yaml/genesis/
+  architecture:
+    meaning: Landscape、Runtime、Registry、分散運用などの構造上の発見
+    path: matome-yaml/architecture/
+  verification:
+    meaning: One Change One Verification、Evidence、Replay、AI Scientist検証
+    path: matome-yaml/verification/
+  applications:
+    meaning: 実際の用途・現場から抽出された知見
+    path: matome-yaml/applications/
+  observations:
+    meaning: 個別の観測・セッション・状態記録
+    path: matome-yaml/observations/
+
+known_legacy_artifacts:
+  - id: legacy_m0001
+    source_name: M0001_Dialogue_Accumulation_Protocol.yaml
+    source_location: /的目yaml集/M0001_Dialogue_Accumulation_Protocol.yaml
+    category: genesis
+    status: canonical_candidate
+    note: >
+      対話の蓄積からProtocolが帰納的に生成される過程を記録する重要資料。
+      的目YAMLが単なる設定ではなく、発見の履歴を保持できることを示す。
+
+  - id: legacy_shirakami_integration
+    source_name: matome shirakami os integration session.yml
+    source_location: /育実幼稚園の保育レジリエンスモデルを作成する/
+    category: applications
+    status: source_archive
+    note: >
+      的目YAMLを共通言語としてAIベンダー・セッション・Contextを越えて接続する発想を含む。
+
+  - id: legacy_moduleization
+    source_name: matome モジュール化.yml
+    source_location: /育実幼稚園の保育レジリエンスモデルを作成する/
+    category: applications
+    status: source_archive
+    note: モジュール化・再利用の観点から整理する原資料。
+
+  - id: legacy_sns_hoiku
+    source_name: sns hoiku tekimoku.yml
+    source_location: /育実幼稚園の保育レジリエンスモデルを作成する/
+    category: applications
+    status: source_archive
+    note: 保育領域での的目利用例。
+
+recent_derived_artifacts:
+  - id: derived_distributed_operation
+    source_name: shirakami_distributed_operation_architecture.yaml
+    category: architecture
+    status: canonical_candidate
+    relation: User Landscape / Registry / Runtime / Adapter の分散運用
+
+  - id: derived_ai_scientist_verification
+    source_name: shirakami_ai_scientist_verification_protocol_v0.1.yaml
+    category: verification
+    status: protocol_candidate
+    relation: AI Scientist型探索をLandscape・Verification・Evidence・Replayで観測可能にする
+
+existing_canonical:
+  - path: matome-yaml/genesis/shirakami_development_history.yaml
+    category: genesis
+    status: canonical
+    role: >
+      Prompt→Protocol→Runtime→Landscape First→Verification→Evidence→Replay→AI Scientistという
+      白神OSの到達経路を記録する。
+
+related_protocol_families:
+  core:
+    - conversation_turn
+    - guide_runtime
+  cognition:
+    - creative_dialogue
+    - perspective
+    - dark_question
+    - cognitive_echo_location
+  workflow:
+    - thread_rpg
+    - pilgrimage
+  media:
+    - shirakami_radio
+    - manga_runtime
+    - manga_manual
+  metadata:
+    - kaorukaze_metadata
+
+migration_policy:
+  phase_1:
+    action: inventory
+    result: このIndexで既知の的目YAMLを分類する
+  phase_2:
+    action: preserve_source
+    result: 原資料をHistorical/Sourceとして保持する
+  phase_3:
+    action: extract_discovery
+    result: 白神OSの設計根拠となる部分をgenesis/architecture/verificationへ整理する
+  phase_4:
+    action: promote_protocol
+    result: 実行仕様として成熟したものだけprotocols/へ昇格する
+  phase_5:
+    action: link_evidence
+    result: 実装・検証結果をEvidence/Replayへ接続する
+
+important_rule: >
+  「古い的目YAML」を削除して現在の仕様だけを残すことはしない。
+  到達経路そのものがShirakami OSのLandscapeであり、設計根拠である。
+
+next_inventory_target:
+  - 的目yaml集に残る全YAMLの一覧化
+  - 各YAMLの重複・派生関係の確認
+  - Protocol化済み／未実装／Historicalの判定
+  - GitHub上の正式パスとの対応付け
+  - 必要なものだけ原文をcanonical archiveへ移行
