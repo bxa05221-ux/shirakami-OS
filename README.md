@@ -9,6 +9,21 @@
 Version: α2.2  
 Status: Foundation Freeze
 
+## What Shirakami Is
+
+Shirakami OS is an open-source **Personal AI Runtime / development architecture** for preserving and working with human context independently of a particular LLM or AI provider.
+
+It makes these boundaries explicit:
+
+- **Landscape** — observable human/AI/project/context environment
+- **Protocol** — declares meaning and execution structure
+- **Runtime** — executes Protocols without owning domain truth
+- **Evidence** — preserves observable transitions
+- **Projection / Replay** — reconstruct and inspect Landscape state
+- **Adapter** — separates the Runtime from external AI and backend systems
+
+For readers coming from **AI memory, human context preservation, personal AI infrastructure, protocol-driven AI, evidence-driven AI, AI agents, or model-independent AI runtimes**, this repository is the implementation-oriented entry point.
+
 ## A Different Question
 
 AI models change.
@@ -90,8 +105,6 @@ Other experimental artifacts, including Matome API v3.2 and related Evidence wor
 
 → **[Service Artifact Index](products/)**
 
-The Foundation describes the architecture. The public service artifact shows what that architecture can produce; research artifacts remain available in their appropriate development boundaries.
-
 ## Getting Started
 
 - **MVP Quickstart → [docs/architecture/MVP_QUICKSTART.md](docs/architecture/MVP_QUICKSTART.md)**
@@ -103,11 +116,8 @@ The Foundation describes the architecture. The public service artifact shows wha
 - Japanese introduction → [README.ja.md](README.ja.md)
 - Normative specifications → **[shirakami-specification](https://github.com/bxa05221-ux/shirakami-specification)**
 
-## Overview
-
-Shirakami OS is an open specification project for preserving and utilizing Human Landscapes across generations of AI technologies. This repository contains the current Foundation Base Point and reference implementation used for implementation, testing, and development.
-
 ## Scope
+
 Included:
 - Runtime implementation
 - Reference architecture implementation
