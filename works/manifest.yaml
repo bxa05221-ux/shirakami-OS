@@ -1,0 +1,140 @@
+matome:
+  title: Shirakami Creative Works Landscape
+  subtitle:
+    - Works as Landscape
+    - Source of Truth
+    - Revision-aware Manuscript Management
+    - Multi-work Continuity
+  version: 0.1
+  status:
+    architecture: experimental
+    implementation: preparation
+    source_verification: pending
+
+statement: >
+  Literary works are treated as source-grounded Landscapes rather than as
+  memory to be reconstructed by AI. Manuscripts remain the source of truth.
+  Observations, Evidence, canonical relations, hypotheses, and unresolved
+  questions are kept distinct. Revisions are preserved as transitions in the
+  work's Landscape rather than silently replacing prior states.
+
+principles:
+  - manuscript_is_source_of_truth
+  - preserve_revision_history
+  - distinguish_observation_from_interpretation
+  - distinguish_canonical_relation_from_hypothesis
+  - never_silently_rewrite_source
+  - author_controls_canon
+  - protocol_does_not_replace_the_work
+
+works:
+  - id: kyokai
+    title_ja: 教誨
+    group: kyokai_series
+    status: source_pending
+  - id: shukuto
+    title_ja: 祝祷
+    group: kyokai_series
+    status: source_pending
+  - id: manabi
+    title_ja: 学び
+    group: kyokai_series
+    status: source_pending
+  - id: kaotaku
+    title_ja: 誨拓
+    group: kyokai_series
+    status: source_pending
+  - id: kaikon
+    title_ja: 誨魂
+    group: kyokai_series
+    status: source_pending
+  - id: maria_protocol
+    title_ja: 機械仕掛けのマリアのプロトコル
+    group: standalone
+    status: source_available
+    source_note: File Library contains manuscript versions; exact canonical revision is to be selected from source files.
+  - id: virtual_graduation_trip
+    title_ja: ニートのバーチャル卒業旅行
+    group: standalone
+    status: source_pending
+  - id: ubiquitous_for_poor
+    title_ja: 貧乏人のユビキタス
+    group: standalone
+    status: source_pending
+  - id: shirakami_high_school_brass_band
+    title_ja: 白神高校ブラスバンド部
+    group: standalone
+    status: source_pending
+
+relations:
+  temporal:
+    status: author_verification_required
+  character:
+    status: author_verification_required
+  event:
+    status: author_verification_required
+  location:
+    status: author_verification_required
+  thematic:
+    status: author_verification_required
+
+revision_model:
+  source_versions:
+    - manuscript-v1
+    - manuscript-v2
+    - manuscript-vN
+  transition:
+    - source_observation
+    - change_detection
+    - impact_observation
+    - author_confirmation
+    - landscape_update
+  rule: >
+    A later manuscript version does not erase earlier evidence. The Runtime
+    records the transition and preserves provenance.
+
+observation_model:
+  observation: >
+    What can be directly grounded in the manuscript or an explicitly supplied
+    author statement.
+  evidence: >
+    Immutable record of an observed transition or verified source relation.
+  canonical: >
+    A relation explicitly confirmed by the author or authoritative work source.
+  hypothesis: >
+    An AI-derived interpretation or possible relation not yet confirmed.
+  unresolved: >
+    A question or relation that must remain open until verified.
+
+protocol_pipeline:
+  - source_manifest
+  - chapter_map
+  - landscape_manifest
+  - observation
+  - evidence
+  - protocol_extraction
+  - revision_tracking
+  - language_projection
+  - media_transformation
+  - runtime_execution
+
+language:
+  policy: >
+    Japanese and English representations may be maintained for metadata and
+    Protocol-facing material while the manuscript remains independently
+    authoritative. Translation must not silently alter canon.
+  supported:
+    - ja
+    - en
+
+initial_target:
+  work_id: maria_protocol
+  first_phase:
+    - source_manifest
+    - chapter_map
+    - landscape_manifest
+  explicit_non_goals:
+    - rewriting_the_manuscript
+    - inferring_canon_without_author_confirmation
+    - collapsing_revision_history
+    - treating_ai_memory_as_source
