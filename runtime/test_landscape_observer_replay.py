@@ -64,4 +64,4 @@ def test_landscape_observer_replay_preserves_evidence_boundary():
         "changed": True,
     }
     assert evidence_1.transition_data["visited"] is True
-    assert evidence_1.transition_data["noticed"] if "noticed" in evidence_1.transition_data else True
+    assert "noticed" not in evidence_1.transition_data
