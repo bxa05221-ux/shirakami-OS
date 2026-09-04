@@ -12,6 +12,7 @@ Status: β0.1 boundary complete; Rich Protocol Semantics deferred.
 - Deterministic execution fingerprint
 - Deterministic Evidence fingerprint
 - Landscape replay from preserved Evidence
+- Landscape replay is order-dependent when later Evidence overwrites the same projected keys
 - Minimum execution budget boundary (`max_steps >= 1`)
 - Invalid budget is returned as an observable failed transition
 
