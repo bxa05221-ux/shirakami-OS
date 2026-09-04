@@ -26,3 +26,4 @@ def test_failed_transition_does_not_propagate_to_landscape_formal():
 
     assert state.snapshot() == before
     assert state.evidence == [success]
+    assert failed not in state.evidence
