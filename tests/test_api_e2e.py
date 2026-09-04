@@ -1,8 +1,7 @@
-"""External-facing E2E contract test for the alpha API.
+"""External-facing E2E contract tests for the alpha API.
 
-This test uses FastAPI's TestClient when the optional HTTP dependency is
-installed. It verifies the HTTP boundary without performing a real GitHub
-write.
+These tests use FastAPI's TestClient when the optional HTTP dependency is
+installed. They verify HTTP boundaries without performing a real GitHub write.
 """
 
 import pytest
@@ -37,3 +36,25 @@ def test_http_execute_e2e():
     assert body["success"] is True
     assert body["event"] == "execution.completed"
     assert body["output"] == {"landscape": "external-test"}
+
+
+def test_http_oppai_normalize_e2e():
+    from fastapi.testclient import TestClient
+
+    client = TestClient(create_app())
+    response = client.post(
+        "/v0.1/oppai/normalize",
+        json={"text": "いや、そこは違う。どうして？"},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["schema"] == "OPPAI"
+    assert body["version"] == "0.1"
+    assert body["event"] == "oppai.observed"
+    assert body["raw_input"] == "いや、そこは違う。どうして？"
+    assert body["canonical_prompt"] == body["raw_input"]
+    assert body["corrections"] == ["いや、そこは違う。"]
+    assert body["unresolved"] == ["どうして？"]
+    assert body["interaction_signals"] == []
+    assert body["confidence"] == "provisional"
