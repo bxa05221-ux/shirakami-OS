@@ -45,3 +45,24 @@ def test_landscape_observer_preserves_multi_stage_evidence_history():
     assert evidence_1.transition_data["phase"] == "first"
     assert evidence_2.transition_data["phase"] == "second"
     assert evidence_3.transition_data["phase"] == "third"
+
+
+def test_earlier_evidence_remains_unchanged_after_later_projection():
+    runtime = Runtime()
+
+    evidence_1 = _evidence(runtime, "observer.landscape.first", "viewpoint", phase="first")
+    evidence_2 = _evidence(runtime, "observer.landscape.second", "harbor", phase="second")
+    evidence_3 = _evidence(runtime, "observer.landscape.third", "station", phase="third")
+
+    evidence_1_snapshot = dict(evidence_1.transition_data)
+    evidence_2_snapshot = dict(evidence_2.transition_data)
+
+    projected = LandscapeState.empty()
+    project_evidence(evidence_1, projected)
+    project_evidence(evidence_2, projected)
+    project_evidence(evidence_3, projected)
+
+    assert dict(evidence_1.transition_data) == evidence_1_snapshot
+    assert dict(evidence_2.transition_data) == evidence_2_snapshot
+    assert projected.evidence[0] == evidence_1
+    assert projected.evidence[1] == evidence_2
