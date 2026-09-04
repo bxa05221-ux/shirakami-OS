@@ -1,4 +1,5 @@
 from evidence import capture_evidence
+from landscape import LandscapeState
 from prototype import Runtime, Transition
 
 
@@ -10,7 +11,7 @@ def tabitomo_protocol(context):
             "character_response": "千鶴なら、こちらの道も面白いと思うよ。",
             "options_presented": ["quiet_route", "scenic_route"],
             "traveler_choice": choice,
-            "changed": True,
+            "changed": False,
         },
     )
 
@@ -83,3 +84,38 @@ def test_tabitomo_choice_is_not_itself_an_observed_outcome():
     assert outcome_evidence.transition_kind == "tabitomo.outcome.observed"
     assert outcome_evidence.transition_data["traveler_choice"] == "scenic_route"
     assert outcome_evidence.transition_data["observed_outcome"] == "arrived_at_viewpoint"
+
+
+def test_tabitomo_choice_does_not_mutate_landscape():
+    runtime = Runtime()
+    result = runtime.execute(
+        "tabitomo.human_choice",
+        tabitomo_protocol,
+        {"traveler_choice": "scenic_route"},
+    )
+    evidence = capture_evidence(result)
+    landscape = LandscapeState.empty()
+
+    landscape.apply_evidence(evidence)
+
+    assert landscape.snapshot() == {}
+    assert landscape.evidence == []
+
+
+def test_tabitomo_observed_outcome_can_update_landscape():
+    runtime = Runtime()
+    result = runtime.execute(
+        "tabitomo.outcome",
+        tabitomo_outcome_protocol,
+        {
+            "traveler_choice": "scenic_route",
+            "observed_outcome": "arrived_at_viewpoint",
+        },
+    )
+    evidence = capture_evidence(result)
+    landscape = LandscapeState.empty()
+
+    landscape.apply_evidence(evidence)
+
+    assert landscape.snapshot()["observed_outcome"] == "arrived_at_viewpoint"
+    assert len(landscape.evidence) == 1
