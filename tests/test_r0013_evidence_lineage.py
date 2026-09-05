@@ -41,7 +41,7 @@ def test_multiple_transitions_preserve_ordered_evidence_lineage():
     assert all("continuity" not in item.transition_data for item in evidence)
 
 
-def test_multiple_evidence_records_project_without_continuity_claim():
+def test_multiple_evidence_records_project_in_order_without_continuity_claim():
     transitions = [
         _result("r0013.lineage.v1", "transition-r0013-001", "landscape-r0013-001", "landscape-r0013-002"),
         _result("r0013.lineage.v2", "transition-r0013-002", "landscape-r0013-002", "landscape-r0013-003"),
@@ -54,7 +54,13 @@ def test_multiple_evidence_records_project_without_continuity_claim():
         state.apply_evidence(evidence)
 
     snapshot = state.snapshot()
-    assert snapshot["transition-r0013-001"]["protocol_id"] == "r0013.lineage.v1"
-    assert snapshot["transition-r0013-002"]["protocol_id"] == "r0013.lineage.v2"
-    assert snapshot["transition-r0013-003"]["protocol_id"] == "r0013.lineage.v3"
+    assert snapshot["protocol_id"] == "r0013.lineage.v3"
+    assert snapshot["transition_id"] == "transition-r0013-003"
+    assert snapshot["source_landscape_state"] == "landscape-r0013-003"
+    assert snapshot["resulting_landscape_state"] == "landscape-r0013-004"
+    assert [item.transition_data["transition_id"] for item in state.evidence] == [
+        "transition-r0013-001",
+        "transition-r0013-002",
+        "transition-r0013-003",
+    ]
     assert "continuity" not in snapshot
