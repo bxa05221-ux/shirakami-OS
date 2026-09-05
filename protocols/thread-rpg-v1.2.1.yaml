@@ -1,0 +1,30 @@
+protocol:
+  id: thread_rpg
+  title: Thread RPG Protocol
+  version: 1.2.1
+  layer: application
+  status: protocolized
+  purpose: >
+    AIとの対話を複数の視点・発言者によるスレッドとして表現する。
+  capabilities:
+    - multi-voice dialogue
+    - perspective separation
+    - conversational state
+    - thread-based interaction
+    - human-readable AI behavior
+  runtime_role: >
+    Shirakami Runtime上で扱う具体的なサービス／プロトコル成果物。
+  boundary:
+    defines_kernel: false
+    defines_foundation: false
+    character_agnostic: true
+    experimental_extensions_separate: true
+  execution_contract:
+    adapter_boundary: true
+    protocol_semantics_owned_by_protocol: true
+    runtime_must_not_embed_character_or_domain_semantics: true
+  source:
+    reference: products/thread-rpg-v1.2.1/README.md
+  note: >
+    本artifactは既存のThread RPG v1.2.1公開成果物に記載された範囲だけを
+    canonical Protocol artifactとして転記したもの。新規のProtocol semanticsは追加しない。
