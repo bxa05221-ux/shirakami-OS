@@ -27,7 +27,7 @@ def test_multiple_transitions_preserve_ordered_evidence_lineage():
         _result("r0013.lineage.v3", "transition-r0013-003", "landscape-r0013-003", "landscape-r0013-004"),
     ]
 
-    evidence = [capture_evidence(result, protocol_id=result.protocol_id) for result in transitions]
+    evidence = [capture_evidence(result) for result in transitions]
 
     assert [item.transition_data["transition_id"] for item in evidence] == [
         "transition-r0013-001",
@@ -51,7 +51,7 @@ def test_multiple_evidence_records_project_in_order_without_continuity_claim():
 
     state = LandscapeState.empty()
     for result in transitions:
-        evidence = capture_evidence(result, protocol_id=result.protocol_id)
+        evidence = capture_evidence(result)
         state.apply_evidence(evidence)
 
     assert [item.transition_data["transition_id"] for item in state.evidence] == [
