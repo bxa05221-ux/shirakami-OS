@@ -1,0 +1,71 @@
+from runtime.execute import execute_current_protocol
+from runtime.protocol_registry import ProtocolRegistry
+
+
+def test_r0011_execution_keeps_protocol_and_landscape_lineage_as_input_data(tmp_path):
+    protocol_path = tmp_path / "protocol.yaml"
+    protocol_path.write_text(
+        """matome:\n"
+        "  title: R0011 continuity v1\n"
+        "  version: 0.1\n"
+        "  statement: Preserve lineage without asserting continuity.\n"
+        "  pipeline:\n"
+        "    - phase: observe\n"
+        "      action: record\n"
+        """,
+        encoding="utf-8",
+    )
+
+    registry = ProtocolRegistry()
+    registry.register("r0011.protocol.v1", str(protocol_path))
+
+    result = execute_current_protocol(
+        str(protocol_path),
+        registry,
+        "r0011.protocol.v1",
+        input_data={
+            "landscape_state_id": "landscape-r0011-001",
+            "transition_id": "transition-v1-001",
+            "evidence_id": "evidence-v1-001",
+        },
+    )
+
+    assert result["protocol_id"] == "r0011.protocol.v1"
+    assert result["version"] == "0.1"
+    assert result["input"]["landscape_state_id"] == "landscape-r0011-001"
+    assert result["input"]["transition_id"] == "transition-v1-001"
+    assert result["input"]["evidence_id"] == "evidence-v1-001"
+    assert result["status"] == "prepared"
+
+
+def test_r0011_current_execution_boundary_does_not_claim_continuity(tmp_path):
+    protocol_path = tmp_path / "protocol.yaml"
+    protocol_path.write_text(
+        """matome:\n"
+        "  title: R0011 continuity v2\n"
+        "  version: 0.2\n"
+        "  statement: A new protocol must not imply continuity by itself.\n"
+        "  pipeline:\n"
+        "    - phase: transition\n"
+        "      action: prepare\n"
+        """,
+        encoding="utf-8",
+    )
+
+    registry = ProtocolRegistry()
+    registry.register("r0011.protocol.v2", str(protocol_path))
+
+    result = execute_current_protocol(
+        str(protocol_path),
+        registry,
+        "r0011.protocol.v2",
+        input_data={
+            "input_landscape_state": "landscape-r0011-001",
+            "resulting_landscape_state": "landscape-r0011-002",
+            "continuity_claim": "unverified",
+        },
+    )
+
+    assert result["protocol_id"] == "r0011.protocol.v2"
+    assert result["input"]["continuity_claim"] == "unverified"
+    assert "continuity" not in result
