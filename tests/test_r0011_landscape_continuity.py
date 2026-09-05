@@ -8,7 +8,8 @@ def test_r0011_execution_keeps_protocol_and_landscape_lineage_as_input_data(tmp_
         """matome:
   title: R0011 continuity v1
   version: 0.1
-  statement: Preserve lineage without asserting continuity.
+  statement: >
+    Preserve lineage without asserting continuity.
   pipeline:
     - phase: observe
       action: record
@@ -44,7 +45,8 @@ def test_r0011_current_execution_boundary_does_not_claim_continuity(tmp_path):
         """matome:
   title: R0011 continuity v2
   version: 0.2
-  statement: A new protocol must not imply continuity by itself.
+  statement: >
+    A new protocol must not imply continuity by itself.
   pipeline:
     - phase: transition
       action: prepare
