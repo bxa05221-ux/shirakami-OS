@@ -16,9 +16,10 @@ def test_r0012_execute_matome_reaches_evidence_and_landscape():
         },
     )
 
-    assert result.protocol.protocol_id == "anmon-layer-reverse"
+    assert result.protocol.protocol_id == "matome.protocol"
+    assert result.protocol.title == "暗問層逆算プロトコル"
     assert result.execution.status == "completed"
-    assert result.evidence.protocol_id == "anmon-layer-reverse"
+    assert result.evidence.protocol_id == "matome.protocol"
     assert result.evidence.transition_kind == "matome.protocol.transition"
     assert result.evidence.transition_data["input"]["source_landscape_state"] == "landscape-r0012-001"
     assert result.landscape["input"]["source_landscape_state"] == "landscape-r0012-001"
@@ -31,7 +32,7 @@ def test_r0012_vertical_slice_keeps_lineage_as_observable_data():
     )
 
     transition_data = result.evidence.transition_data
-    assert transition_data["protocol_id"] == "anmon-layer-reverse"
+    assert transition_data["protocol_id"] == "matome.protocol"
     assert transition_data["changed"] is True
     assert "continuity" not in result.landscape
     assert "continuity_claim" not in result.landscape
