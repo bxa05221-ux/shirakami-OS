@@ -1,9 +1,140 @@
 protocol_registry:
-  - id: tsugaru-guide-highschool
-    state: active
-    artifact: protocols/tsugaru-guide-highschool.yaml
+  version: 0.2
+  purpose: >
+    既存ProtocolとProtocol候補を一つの索引にまとめる。
+    Registryへの登録だけではRuntime Contractへ昇格させない。
 
-  - id: cheseborough-vr
-    state: archived
-    artifact: protocols/tsugaru-guide-highschool.yaml
-    note: "Historical example_project identifier; VR企画は頓挫"
+  entries:
+    - id: tsugaru-guide-highschool
+      title: 津軽ガイドAI・高校連携試行Protocol
+      state: active
+      source: protocols/tsugaru-guide-highschool.yaml
+      layer: application
+
+    - id: nursery-resilience
+      title: 保育レジリエンスProtocol
+      state: candidate
+      source: protocols/resilience/nursery-resilience.yaml
+      layer: application
+      promotion: verification_required
+
+    - id: sequential-verification-multi-agent
+      title: 逐次検証型マルチエージェントProtocol
+      state: protocolized
+      source: protocols/sequential-verification-multi-agent-v0.1.yaml
+      layer: verification
+
+    - id: sequential-verification-efficiency-metrics
+      title: 逐次検証効率Metrics Protocol
+      state: protocolized
+      source: protocols/sequential-verification-efficiency-metrics-v0.1.yaml
+      layer: verification
+
+    - id: thread_rpg
+      title: Thread RPG Protocol
+      state: protocolized
+      source: null
+      layer: workflow
+      note: >
+        既存の的目YAML／会話由来のProtocol。canonical artifact pathは
+        PROTOCOL_MAPPING.yamlで管理し、未確認のファイルパスをRegistryへ推測登録しない。
+
+    - id: shirakami_radio
+      title: Shirakami Radio Protocol
+      state: protocolized
+      source: null
+      layer: media
+      note: canonical protocol version synchronization pending
+
+    - id: manga_runtime
+      title: Manga Runtime / Renderer Protocol
+      state: protocolized
+      source: null
+      layer: media
+      note: manga pipeline evidence connection pending
+
+    - id: perspective
+      title: Perspective Protocol
+      state: protocolized
+      source: null
+      layer: cognition
+      note: verification evidence required before runtime promotion
+
+    - id: anmon_layer
+      title: 暗問層
+      state: protocolized
+      source: null
+      layer: cognition
+      note: five-turn observation boundary preserved
+
+    - id: guide_ai
+      title: ガイドAIProtocol
+      state: candidate
+      source: null
+      layer: application
+      note: local knowledge Landscape connection pending
+
+    - id: third_party_evaluation
+      title: 第三者評価支援Protocol
+      state: candidate
+      source: null
+      layer: application
+      note: observation/evidence workflow extraction pending
+
+    - id: developmental_support
+      title: 発達支援観察Protocol
+      state: candidate
+      source: null
+      layer: cognition
+      note: observation protocol and model implementation remain separate
+
+    - id: marriage_support
+      title: 結婚支援AIProtocol
+      state: candidate
+      source: null
+      layer: application
+      note: protocol boundary and permissions require verification
+
+    - id: protected_child_support
+      title: 要保護児童対策Protocol
+      state: candidate
+      source: null
+      layer: application
+      note: human authority, evidence, escalation and privacy boundaries require verification
+
+    - id: 3d_pruim
+      title: 3D Phase Rotational Urgency-Importance Matrix
+      state: foundational_protocol
+      source: null
+      layer: cognition
+      note: runtime plugin / IR promotion remains future work
+
+    - id: anmon_layer_reverse
+      title: 暗問層逆算Protocol
+      state: foundational_protocol
+      source: null
+      layer: cognition
+      note: Protocol Plugin / observation support; theory is not extended here
+
+    - id: cheseborough-vr
+      title: Historical Cheseborough VR example
+      state: archived
+      source: protocols/tsugaru-guide-highschool.yaml
+      layer: historical
+      note: historical identifier retained for compatibility; VR企画は頓挫
+
+  promotion_rule:
+    candidate: >
+      Protocol boundary → schema → validation → runtime test → evidence
+    protocolized: >
+      Registry entry → loader/runtime integration → verification evidence
+    foundational_protocol: >
+      Preserve as protocol artifact; do not promote to Runtime semantics without accepted specification/research handoff
+    archived: >
+      Historical record only; not a Runtime execution target
+
+  boundary:
+    registry_is_index: true
+    registry_is_runtime_contract: false
+    theory_must_not_be_extended_here: true
+    one_change_one_verification: true
