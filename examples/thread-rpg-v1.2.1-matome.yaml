@@ -1,0 +1,16 @@
+matome:
+  title: "Thread RPG Protocol"
+  version: "1.2.1"
+  statement: >
+    AIとの対話を複数の視点・発言者によるスレッドとして表現する。
+  pipeline:
+    - phase: "multi_voice_dialogue"
+      action: "represent_dialogue_as_thread"
+    - phase: "perspective_separation"
+      action: "preserve_distinct_viewpoints"
+    - phase: "conversational_state"
+      action: "carry_thread_context"
+    - phase: "thread_based_interaction"
+      action: "continue_thread_interaction"
+    - phase: "human_readable_ai_behavior"
+      action: "render_behavior_for_human_observation"
