@@ -5,14 +5,14 @@ from runtime.protocol_registry import ProtocolRegistry
 def test_r0011_execution_keeps_protocol_and_landscape_lineage_as_input_data(tmp_path):
     protocol_path = tmp_path / "protocol.yaml"
     protocol_path.write_text(
-        """matome:\n"
-        "  title: R0011 continuity v1\n"
-        "  version: 0.1\n"
-        "  statement: Preserve lineage without asserting continuity.\n"
-        "  pipeline:\n"
-        "    - phase: observe\n"
-        "      action: record\n"
-        """,
+        """matome:
+  title: R0011 continuity v1
+  version: 0.1
+  statement: Preserve lineage without asserting continuity.
+  pipeline:
+    - phase: observe
+      action: record
+""",
         encoding="utf-8",
     )
 
@@ -41,14 +41,14 @@ def test_r0011_execution_keeps_protocol_and_landscape_lineage_as_input_data(tmp_
 def test_r0011_current_execution_boundary_does_not_claim_continuity(tmp_path):
     protocol_path = tmp_path / "protocol.yaml"
     protocol_path.write_text(
-        """matome:\n"
-        "  title: R0011 continuity v2\n"
-        "  version: 0.2\n"
-        "  statement: A new protocol must not imply continuity by itself.\n"
-        "  pipeline:\n"
-        "    - phase: transition\n"
-        "      action: prepare\n"
-        """,
+        """matome:
+  title: R0011 continuity v2
+  version: 0.2
+  statement: A new protocol must not imply continuity by itself.
+  pipeline:
+    - phase: transition
+      action: prepare
+""",
         encoding="utf-8",
     )
 
