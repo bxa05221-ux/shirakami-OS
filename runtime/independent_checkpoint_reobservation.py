@@ -2,7 +2,7 @@
 
 from collections.abc import Iterable, Mapping
 
-from .adapter import Adapter
+from .adapter import Adapter, adapt_landscape_observation
 from .evidence import EvidenceRecord
 from .evidence_delta import select_delta_evidence
 from .landscape import LandscapeState
@@ -36,9 +36,10 @@ def compare_reconstructed_checkpoint(
         reconstructed_state.apply_evidence(record)
 
     full_state = replay_evidence(records)
+    full_observation = adapt_landscape_observation(full_state)
+    reconstructed_observation = adapt_landscape_observation(reconstructed_state)
     return {
-        "full": adapter.adapt_landscape_observation(full_state),
-        "reconstructed": adapter.adapt_landscape_observation(reconstructed_state),
-        "equivalent": adapter.adapt_landscape_observation(full_state)
-        == adapter.adapt_landscape_observation(reconstructed_state),
+        "full": full_observation,
+        "reconstructed": reconstructed_observation,
+        "equivalent": full_observation == reconstructed_observation,
     }
