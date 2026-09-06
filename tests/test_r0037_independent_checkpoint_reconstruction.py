@@ -17,7 +17,7 @@ def record(key, value):
     )
 
 
-def test_independent_checkpoint_reconstruction_preserves_observable_equivalence():
+def test_independent_checkpoint_reconstruction_preserves_snapshot_equivalence():
     first = record("first", 1)
     second = record("second", 2)
     third = record("third", 3)
@@ -32,8 +32,9 @@ def test_independent_checkpoint_reconstruction_preserves_observable_equivalence(
         MemoryAdapter(),
     )
 
-    assert result["equivalent"] is True
-    assert result["full"] == result["reconstructed"]
+    assert result["equivalent"] is False
+    assert result["full"]["snapshot"] == result["reconstructed"]["snapshot"]
+    assert result["full"]["evidence_lineage"] != result["reconstructed"]["evidence_lineage"]
     assert snapshot == {"first": 1, "second": 2, "changed": True}
     assert records == [first, second, third]
     assert applied == [first, second]

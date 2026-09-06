@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Verify full replay and checkpoint-plus-delta re-observation equivalence when the checkpoint and applied Evidence are supplied as independently reconstructed inputs.
+Observe whether independently reconstructed checkpoint inputs preserve the current observable Landscape snapshot while keeping Evidence lineage explicit.
 
 ## Boundary
 
@@ -10,9 +10,9 @@ Independent checkpoint reconstruction → delta selection → re-observation
 
 ## Observation
 
-The experiment reconstructs the observable checkpoint as a new mapping and the applied Evidence as a new ordered container before selecting delta Evidence. The resulting Landscape is compared with full ordered Evidence replay through the same Adapter observation boundary.
+The independently reconstructed checkpoint produces the same observable snapshot as full ordered Evidence replay after the unapplied delta is applied. The Adapter observation also exposes a different Evidence lineage: the checkpoint carries observable state, but the reconstructed local state contains only the newly applied delta.
 
-Equivalence is limited to the observable representation produced by the Adapter.
+Therefore R0037 does not establish full Adapter-observation equivalence. It establishes snapshot equivalence and makes the missing lineage explicit rather than silently treating state reconstruction as history reconstruction.
 
 ## Non-goals
 
@@ -29,4 +29,4 @@ Equivalence is limited to the observable representation produced by the Adapter.
 
 ## Next observation
 
-Observe whether the same boundary remains stable when reconstructed inputs are produced from serialized representations, while keeping reconstruction distinct from continuity or identity evidence.
+Observe whether serialized reconstruction preserves the same distinction between observable snapshot state and locally reconstructed Evidence lineage.

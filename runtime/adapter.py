@@ -30,6 +30,10 @@ class MemoryAdapter:
             raise KeyError(reference)
         return dict(self._records[reference])
 
+    def adapt_landscape_observation(self, state: LandscapeState) -> Mapping[str, Any]:
+        """Compatibility method delegating to the existing observation boundary."""
+        return adapt_landscape_observation(state)
+
 
 def adapt_landscape_observation(state: LandscapeState) -> Mapping[str, Any]:
     """Expose observable Landscape state without semantic interpretation."""
