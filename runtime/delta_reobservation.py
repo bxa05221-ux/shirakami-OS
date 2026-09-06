@@ -3,8 +3,9 @@
 from collections.abc import Iterable, Mapping
 
 from .adapter import Adapter
-from .checkpoint_delta_execution import execute_from_checkpoint
 from .evidence import EvidenceRecord
+from .evidence_delta import select_delta_evidence
+from .landscape import LandscapeState
 
 
 def execute_and_reobserve(
@@ -14,7 +15,9 @@ def execute_and_reobserve(
     adapter: Adapter,
 ):
     """Execute unapplied Evidence from a checkpoint, then re-observe the result."""
-    state = execute_from_checkpoint(snapshot, evidence, applied)
+    state = LandscapeState.from_snapshot(snapshot)
+    for record in select_delta_evidence(evidence, applied):
+        state.apply_evidence(record)
     return {
         "snapshot": state.snapshot(),
         "observation": adapter.adapt_landscape_observation(state),
