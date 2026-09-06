@@ -1,1 +1,0 @@
-R0027 implementation is covered by the primary observation document.
