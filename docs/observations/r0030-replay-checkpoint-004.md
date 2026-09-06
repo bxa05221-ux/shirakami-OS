@@ -1,0 +1,1 @@
+R0030 checkpoint replay scope: observable bootstrap plus ordered Evidence tail; no provenance or identity claim.

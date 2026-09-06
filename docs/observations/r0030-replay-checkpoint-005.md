@@ -1,0 +1,1 @@
+R0030 implementation note: the checkpoint API reuses LandscapeState.from_snapshot() and LandscapeState.apply_evidence(), keeping bootstrap state separate from replayed local Evidence.
