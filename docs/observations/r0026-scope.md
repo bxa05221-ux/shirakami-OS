@@ -1,0 +1,1 @@
+R0026 scope: verify the minimal execution loop only. No GitHub write, no semantic interpretation, no Evidence schema changes, no continuity claims.
