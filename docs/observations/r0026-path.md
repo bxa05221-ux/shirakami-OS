@@ -1,0 +1,1 @@
+R0026 path: imported Landscape snapshot -> Runtime -> observable Transition -> immutable Evidence -> updated LandscapeState.
