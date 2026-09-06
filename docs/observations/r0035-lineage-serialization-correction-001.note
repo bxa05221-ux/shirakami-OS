@@ -1,0 +1,1 @@
+Representation-only correction: Adapter lineage is serialized before observation. No runtime semantics change.
