@@ -2,7 +2,7 @@
 
 from collections.abc import Iterable, Mapping
 
-from .adapter import Adapter
+from .adapter import Adapter, adapt_landscape_observation
 from .evidence import EvidenceRecord
 from .evidence_delta import select_delta_evidence
 from .landscape import LandscapeState
@@ -20,5 +20,5 @@ def execute_and_reobserve(
         state.apply_evidence(record)
     return {
         "snapshot": state.snapshot(),
-        "observation": adapter.adapt_landscape_observation(state),
+        "observation": adapt_landscape_observation(state),
     }
