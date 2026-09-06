@@ -1,8 +1,25 @@
 import pytest
 
-from runtime.protocol_api import build_default_protocol_request, build_protocol_request
+from runtime.protocol_api import (
+    build_default_protocol_request,
+    build_protocol_request,
+    register_temporary_matome,
+)
 from runtime.protocol_registry import ProtocolRegistry, ProtocolRegistryError
 from runtime.route_map import RouteMap, RouteMapError
+
+
+MATOME_YAML = """matome:
+  title: session guide
+  version: 0.1
+  statement: >
+    Use the stabilized interaction flow as a temporary reusable Protocol.
+  pipeline:
+    - phase: observation
+      action: capture
+    - phase: response
+      action: render
+"""
 
 
 def test_protocol_request_uses_registered_matome_as_parameter():
@@ -95,6 +112,27 @@ def test_default_protocol_cannot_be_replaced_as_temporary():
 
     with pytest.raises(ProtocolRegistryError):
         registry.replace_temporary("default", {"version": "2.0"})
+
+
+def test_stabilized_matome_yaml_becomes_temporary_protocol():
+    registry = ProtocolRegistry()
+    registry.register_default("default", {"version": "1.0"})
+
+    entry = register_temporary_matome(registry, MATOME_YAML)
+
+    assert entry.lifecycle == "temporary"
+    assert entry.protocol_id == "session.guide"
+    assert entry.artifact.version == "0.1"
+    assert registry.get("session.guide").artifact.title == "session guide"
+
+
+def test_invalid_matome_yaml_is_not_registered():
+    registry = ProtocolRegistry()
+
+    with pytest.raises(ValueError):
+        register_temporary_matome(registry, "matome:\n  title: broken\n")
+
+    assert registry.list_current_candidates() == []
 
 
 def test_route_map_exposes_next_protocols_without_interpreting_them():
