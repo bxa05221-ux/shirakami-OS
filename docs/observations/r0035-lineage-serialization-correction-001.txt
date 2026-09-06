@@ -1,0 +1,1 @@
+R0035 correction: the Adapter observation boundary exposes Evidence lineage as serialized mappings, not EvidenceRecord objects. The test is aligned to that existing representation; Runtime and Adapter behavior are unchanged.
