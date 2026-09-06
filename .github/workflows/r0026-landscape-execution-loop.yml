@@ -1,0 +1,22 @@
+name: R0026 Landscape Execution Loop
+
+on:
+  pull_request:
+    paths:
+      - 'runtime/**'
+      - 'tests/**'
+      - '.github/workflows/r0026-landscape-execution-loop.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pytest tests/test_r0026_landscape_execution_loop.py -q
