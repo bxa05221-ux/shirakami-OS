@@ -1,0 +1,20 @@
+name: R0035 Lineage Serialization Correction
+
+on:
+  pull_request:
+    paths:
+      - "tests/test_r0035_delta_reobservation.py"
+      - "docs/observations/r0035-lineage-serialization-correction-001.md"
+      - ".github/workflows/r0035-lineage-serialization-correction.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install pytest
+      - run: python -m pytest tests/test_r0035_delta_reobservation.py -q
