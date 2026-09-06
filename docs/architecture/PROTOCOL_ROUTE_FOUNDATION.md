@@ -33,12 +33,38 @@ Default Protocol, it remains available as the permanent base behavior, and it
 cannot be removed or replaced through the temporary lifecycle.
 
 A Temporary Protocol is an ordinary Protocol artifact with a shorter lifecycle.
-A user may create it from Matome YAML, invoke it, replace its artifact when the
-working Protocol changes, and remove it when it is no longer needed.
+A user may first work through an interaction flow without explicitly designing
+a Protocol. Once the flow has stabilized, the user may express that flow as
+Matome YAML and register the resulting artifact as a Temporary Protocol. It can
+then be invoked, replaced when the working flow changes, and removed when it is
+no longer needed.
 
 This is a lifecycle distinction, not a semantic hierarchy: both are resolved
 into the same generic `ProtocolRequest` and are executed through the same
 injected executor boundary.
+
+## Stabilized flow to Temporary Protocol
+
+The authoring boundary is deliberately explicit but lightweight:
+
+```text
+ordinary interaction
+        ↓
+working flow stabilizes
+        ↓
+Matome YAML is created
+        ↓
+parse / validate
+        ↓
+Temporary Protocol registration
+        ↓
+reuse / replace / remove
+```
+
+The Runtime does not infer when a flow has stabilized and does not generate the
+Matome YAML. The user-authored Matome YAML is the artifact that crosses the
+Protocol boundary. This preserves the distinction between observed interaction
+history and an explicitly authored reusable Protocol.
 
 ## Design
 
@@ -85,6 +111,7 @@ the authority for Observable Transition and Evidence.
 
 - `runtime/protocol_registry.py` stores Protocol artifacts and their lifecycle.
 - `runtime/protocol_api.py` resolves either the mandatory Default Protocol or a registered Protocol into a parameterized request and dispatches it through an injected executor.
+- `runtime/protocol_api.py` also converts validated Matome YAML into a registered Temporary Protocol artifact.
 - `runtime/route_map.py` stores current location, explicit Protocol edges, and observed dispatches.
 
 The generic API does not know how execution is performed. An executor can be
