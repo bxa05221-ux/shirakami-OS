@@ -1,0 +1,1 @@
+R0027 scope: expose before-state, Runtime Evidence, after-state, and adapter-level observation. No semantic interpretation, continuity, identity, truth, credentials, or writes.
