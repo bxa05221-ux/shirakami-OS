@@ -26,6 +26,8 @@ class RouteMap:
                 raise RouteMapError("route source must be a non-empty string")
             if not isinstance(targets, (list, tuple)):
                 raise RouteMapError(f"route targets must be a sequence: {source}")
+            if any(not isinstance(target, str) or not target for target in targets):
+                raise RouteMapError(f"route target must be a non-empty string: {source}")
             normalized[source] = tuple(targets)
 
         return cls(current=current, transitions=normalized)
