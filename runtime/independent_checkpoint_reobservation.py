@@ -1,4 +1,8 @@
-"""Independent checkpoint reconstruction and re-observation boundary."""
+"""Independent checkpoint reconstruction and re-observation boundary.
+
+Uses the existing module-level Landscape observation boundary without changing
+Adapter or Kernel semantics.
+"""
 
 from collections.abc import Iterable, Mapping
 
