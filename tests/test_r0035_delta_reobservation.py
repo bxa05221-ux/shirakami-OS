@@ -1,6 +1,7 @@
-from runtime.adapter import MemoryAdapter
+from runtime.adapter import MemoryAdapter, adapt_landscape_observation
 from runtime.delta_reobservation import execute_and_reobserve
 from runtime.evidence import capture_evidence
+from runtime.landscape import LandscapeState
 from runtime.prototype import ExecutionResult, Transition
 
 
@@ -35,4 +36,8 @@ def test_execute_and_reobserve_reports_after_state():
         "changed": True,
     }
     assert result["observation"]["snapshot"] == result["snapshot"]
-    assert result["observation"]["evidence_lineage"] == [third]
+
+    expected_state = LandscapeState.from_snapshot({"seed": "checkpoint"})
+    expected_state.apply_evidence(third)
+    expected_observation = adapt_landscape_observation(expected_state)
+    assert result["observation"] == expected_observation
