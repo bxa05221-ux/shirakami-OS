@@ -1,0 +1,30 @@
+name: R0024 Live GitHub Read
+
+on:
+  pull_request:
+    paths:
+      - "runtime/**"
+      - "tests/**"
+      - "docs/observations/**"
+      - ".github/workflows/r0024-live-github-read.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-github-read:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run Shirakami live GitHub read
+        env:
+          SHIRAKAMI_LIVE_GITHUB_TEST: "1"
+          SHIRAKAMI_GITHUB_TOKEN: ${{ github.token }}
+          SHIRAKAMI_GITHUB_OWNER: bxa05221-ux
+          SHIRAKAMI_GITHUB_REPO: shirakami-OS
+          SHIRAKAMI_GITHUB_BRANCH: main
+        run: python -m runtime.operational_github_read
