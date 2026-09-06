@@ -7,6 +7,7 @@ parameterized invocation surface without creating one endpoint per Protocol.
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping
 
+from .protocol_loader import ProtocolLoadError, parse_matome
 from .protocol_registry import ProtocolRegistry, ProtocolRegistryError
 from .route_map import RouteMap
 
@@ -71,6 +72,27 @@ def build_default_protocol_request(
     if entry.state == "archived":
         raise ProtocolAPIError("default protocol cannot be archived")
     return _request_from_entry(entry, input_data=input_data, version=version)
+
+
+def register_temporary_matome(
+    registry: ProtocolRegistry,
+    matome_yaml: str,
+) -> Any:
+    """Turn a stabilized Matome YAML flow into a temporary Protocol artifact.
+
+    Authoring remains human-facing: once a working interaction flow has
+    stabilized, the user may serialize that flow as Matome YAML and register it
+    for temporary reuse. This function only parses and registers the artifact;
+    it does not infer, generate, or interpret Protocol meaning.
+    """
+    try:
+        artifact = parse_matome(matome_yaml)
+    except ProtocolLoadError as exc:
+        raise ProtocolAPIError(str(exc)) from exc
+    return registry.register_temporary(
+        artifact.protocol_id,
+        artifact,
+    )
 
 
 def invoke_protocol(
