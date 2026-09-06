@@ -1,0 +1,1 @@
+R0030 checkpoint replay verification is intentionally limited to observable state reconstruction.
