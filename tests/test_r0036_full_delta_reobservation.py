@@ -17,7 +17,7 @@ def record(key, value):
     )
 
 
-def test_full_and_delta_reobservation_are_equivalent():
+def test_full_and_delta_reobservation_separate_snapshot_and_lineage():
     first = record("first", 1)
     second = record("second", 2)
     third = record("third", 3)
@@ -31,7 +31,9 @@ def test_full_and_delta_reobservation_are_equivalent():
         MemoryAdapter(),
     )
 
-    assert result["equivalent"] is True
-    assert result["full"] == result["delta"]
+    assert result["snapshot_equivalent"] is True
+    assert result["lineage_equivalent"] is False
+    assert result["full"]["snapshot"] == result["delta"]["snapshot"]
+    assert result["full"]["evidence_lineage"] != result["delta"]["evidence_lineage"]
     assert records == [first, second, third]
     assert applied == [first, second]
