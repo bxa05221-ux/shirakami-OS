@@ -2,7 +2,7 @@ from runtime.landscape import LandscapeState
 from runtime.landscape_import import import_observation
 
 
-def test_import_observation_preserves_snapshot_without_semantics():
+def test_import_observation_preserves_snapshot_without_transition_evidence():
     observation = {
         "snapshot": {"repository": "bxa05221-ux/shirakami-OS", "branch": "main"},
         "evidence_lineage": [],
@@ -12,6 +12,19 @@ def test_import_observation_preserves_snapshot_without_semantics():
 
     assert isinstance(state, LandscapeState)
     assert state.snapshot() == observation["snapshot"]
+    assert state.evidence == []
+
+
+def test_import_observation_does_not_import_external_lineage_as_local_evidence():
+    observation = {
+        "snapshot": {"repository": "bxa05221-ux/shirakami-OS", "branch": "main"},
+        "evidence_lineage": [
+            {"protocol_id": "external", "transition_kind": "external.transition"}
+        ],
+    }
+
+    state = import_observation(observation)
+
     assert state.evidence == []
 
 
