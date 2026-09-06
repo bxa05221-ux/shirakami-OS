@@ -1,0 +1,1 @@
+Observed boundary: LandscapeState snapshot versus preserved Evidence lineage.
