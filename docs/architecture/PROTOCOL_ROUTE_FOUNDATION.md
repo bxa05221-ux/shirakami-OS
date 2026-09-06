@@ -9,6 +9,63 @@ Matome YAML remains the canonical human-authored representation of a Protocol.
 The Runtime specification already defines Protocol as an executable description
 and identifies Matome YAML as its canonical authoring form.
 
+## Protocol lifecycles
+
+Shirakami OS has two Protocol lifecycles. They use the same Protocol machinery;
+the difference is lifetime and ownership.
+
+```text
+Protocol
+│
+├── Default Protocol
+│     └── permanent OS foundation
+│
+└── Temporary Protocol
+      └── user-authored Matome YAML
+            ├── register
+            ├── invoke
+            ├── replace
+            └── remove
+```
+
+The Default Protocol is mandatory at the OS operational boundary. There is one
+Default Protocol, it remains available as the permanent base behavior, and it
+cannot be removed or replaced through the temporary lifecycle.
+
+A Temporary Protocol is an ordinary Protocol artifact with a shorter lifecycle.
+A user may first work through an interaction flow without explicitly designing
+a Protocol. Once the flow has stabilized, the user may express that flow as
+Matome YAML and register the resulting artifact as a Temporary Protocol. It can
+then be invoked, replaced when the working flow changes, and removed when it is
+no longer needed.
+
+This is a lifecycle distinction, not a semantic hierarchy: both are resolved
+into the same generic `ProtocolRequest` and are executed through the same
+injected executor boundary.
+
+## Stabilized flow to Temporary Protocol
+
+The authoring boundary is deliberately explicit but lightweight:
+
+```text
+ordinary interaction
+        ↓
+working flow stabilizes
+        ↓
+Matome YAML is created
+        ↓
+parse / validate
+        ↓
+Temporary Protocol registration
+        ↓
+reuse / replace / remove
+```
+
+The Runtime does not infer when a flow has stabilized and does not generate the
+Matome YAML. The user-authored Matome YAML is the artifact that crosses the
+Protocol boundary. This preserves the distinction between observed interaction
+history and an explicitly authored reusable Protocol.
+
 ## Design
 
 A Protocol is treated as a registered artifact that can be selected through a
@@ -52,8 +109,9 @@ the authority for Observable Transition and Evidence.
 
 ## Current implementation
 
-- `runtime/protocol_registry.py` stores Protocol artifacts and lifecycle state.
-- `runtime/protocol_api.py` resolves a registered Protocol into a parameterized request and dispatches it through an injected executor.
+- `runtime/protocol_registry.py` stores Protocol artifacts and their lifecycle.
+- `runtime/protocol_api.py` resolves either the mandatory Default Protocol or a registered Protocol into a parameterized request and dispatches it through an injected executor.
+- `runtime/protocol_api.py` also converts validated Matome YAML into a registered Temporary Protocol artifact.
 - `runtime/route_map.py` stores current location, explicit Protocol edges, and observed dispatches.
 
 The generic API does not know how execution is performed. An executor can be
@@ -69,13 +127,15 @@ result without rewriting the transition data.
 Therefore the architectural direction is:
 
 ```text
-ProtocolRequest
-    ↓
+Default / Temporary Protocol
+            ↓
+      ProtocolRequest
+            ↓
 Runtime / injected executor
-    ↓
-ExecutionResult
-    ├──→ Evidence → Landscape
-    └──→ route observation boundary
+            ↓
+      ExecutionResult
+        ├──→ Evidence → Landscape
+        └──→ route observation boundary
 ```
 
 The Route Map must not duplicate Evidence or reinterpret transition data. A

@@ -7,6 +7,7 @@ parameterized invocation surface without creating one endpoint per Protocol.
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping
 
+from .protocol_loader import ProtocolLoadError, parse_matome
 from .protocol_registry import ProtocolRegistry, ProtocolRegistryError
 from .route_map import RouteMap
 
@@ -24,18 +25,11 @@ class ProtocolRequest:
     input: Mapping[str, Any]
 
 
-def build_protocol_request(
-    registry: ProtocolRegistry,
-    protocol_id: str,
+def _request_from_entry(
+    entry: Any,
     input_data: Mapping[str, Any] | None = None,
     version: str | None = None,
 ) -> ProtocolRequest:
-    """Resolve an eligible Protocol and expose it as a Runtime parameter set."""
-    try:
-        entry = registry.select_current(protocol_id)
-    except ProtocolRegistryError as exc:
-        raise ProtocolAPIError(str(exc)) from exc
-
     artifact = entry.artifact
     artifact_version = getattr(artifact, "version", None)
     if isinstance(artifact, Mapping):
@@ -48,6 +42,56 @@ def build_protocol_request(
         protocol_id=entry.protocol_id,
         version=resolved_version,
         input=dict(input_data or {}),
+    )
+
+
+def build_protocol_request(
+    registry: ProtocolRegistry,
+    protocol_id: str,
+    input_data: Mapping[str, Any] | None = None,
+    version: str | None = None,
+) -> ProtocolRequest:
+    """Resolve an eligible Protocol and expose it as a Runtime parameter set."""
+    try:
+        entry = registry.select_current(protocol_id)
+    except ProtocolRegistryError as exc:
+        raise ProtocolAPIError(str(exc)) from exc
+    return _request_from_entry(entry, input_data=input_data, version=version)
+
+
+def build_default_protocol_request(
+    registry: ProtocolRegistry,
+    input_data: Mapping[str, Any] | None = None,
+    version: str | None = None,
+) -> ProtocolRequest:
+    """Resolve the mandatory OS default Protocol."""
+    try:
+        entry = registry.require_default()
+    except ProtocolRegistryError as exc:
+        raise ProtocolAPIError(str(exc)) from exc
+    if entry.state == "archived":
+        raise ProtocolAPIError("default protocol cannot be archived")
+    return _request_from_entry(entry, input_data=input_data, version=version)
+
+
+def register_temporary_matome(
+    registry: ProtocolRegistry,
+    matome_yaml: str,
+) -> Any:
+    """Turn a stabilized Matome YAML flow into a temporary Protocol artifact.
+
+    Authoring remains human-facing: once a working interaction flow has
+    stabilized, the user may serialize that flow as Matome YAML and register it
+    for temporary reuse. This function only parses and registers the artifact;
+    it does not infer, generate, or interpret Protocol meaning.
+    """
+    try:
+        artifact = parse_matome(matome_yaml)
+    except ProtocolLoadError as exc:
+        raise ProtocolAPIError(str(exc)) from exc
+    return registry.register_temporary(
+        artifact.protocol_id,
+        artifact,
     )
 
 
