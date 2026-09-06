@@ -20,6 +20,11 @@ class LandscapeState:
     def empty(cls) -> "LandscapeState":
         return cls(_state={})
 
+    @classmethod
+    def from_snapshot(cls, snapshot: Mapping[str, Any]) -> "LandscapeState":
+        """Bootstrap current observable state without claiming transition evidence."""
+        return cls(_state=dict(snapshot))
+
     def snapshot(self) -> Mapping[str, Any]:
         return dict(self._state)
 
