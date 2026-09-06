@@ -1,0 +1,20 @@
+name: R0032 Delta Evidence
+
+on:
+  pull_request:
+    paths:
+      - "runtime/evidence_delta.py"
+      - "tests/test_r0032_delta_evidence.py"
+      - ".github/workflows/r0032-delta-evidence.yml"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install pytest
+      - run: python -m pytest tests/test_r0032_delta_evidence.py -q
