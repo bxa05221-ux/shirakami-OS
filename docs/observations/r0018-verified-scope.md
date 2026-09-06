@@ -1,0 +1,1 @@
+R0018 uses only existing LandscapeState and Evidence behavior.
