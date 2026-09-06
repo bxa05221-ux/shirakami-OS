@@ -1,1 +1,0 @@
-R0027 final boundary: before-state, Runtime Evidence, after-state, and adapter-level observation are exposed together without semantic interpretation.
