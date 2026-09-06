@@ -23,6 +23,7 @@ def read_live_repository_landscape(
     client = GitHubContentsClient(
         owner=owner,
         repo=repo,
+        landscape_path="",
         token_provider=token_provider,
         branch=branch,
     )
