@@ -1,0 +1,1 @@
+R0026 execution loop verification: bootstrap an existing Landscape snapshot, execute one Protocol through Runtime, capture Transition as Evidence, and apply Evidence to the same LandscapeState. Bootstrap is initialization only; subsequent changes use the existing Evidence boundary.
