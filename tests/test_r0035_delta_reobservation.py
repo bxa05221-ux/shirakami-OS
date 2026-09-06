@@ -35,4 +35,13 @@ def test_execute_and_reobserve_reports_after_state():
         "changed": True,
     }
     assert result["observation"]["snapshot"] == result["snapshot"]
-    assert result["observation"]["evidence_lineage"] == [third]
+    assert result["observation"]["evidence_lineage"] == (
+        {
+            "protocol_id": third.protocol_id,
+            "status": third.status,
+            "transition_kind": third.transition_kind,
+            "transition_data": dict(third.transition_data),
+            "signals": tuple(third.signals),
+            "confidence": third.confidence,
+        },
+    )
