@@ -1,0 +1,38 @@
+name: R0025 Landscape Import
+
+on:
+  pull_request:
+    paths:
+      - 'runtime/**'
+      - 'tests/**'
+      - '.github/workflows/r0025-landscape-import.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      SHIRAKAMI_LIVE_GITHUB_TEST: "1"
+      SHIRAKAMI_GITHUB_TOKEN: ${{ github.token }}
+      SHIRAKAMI_GITHUB_OWNER: bxa05221-ux
+      SHIRAKAMI_GITHUB_REPO: shirakami-OS
+      SHIRAKAMI_GITHUB_BRANCH: main
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pytest tests/test_r0025_landscape_import.py -q
+      - run: python -m runtime.operational_github_read > /tmp/landscape-observation.json
+      - run: python - <<'PY'
+          import json
+          from runtime.landscape_import import import_observation
+
+          with open('/tmp/landscape-observation.json', encoding='utf-8') as f:
+              observation = json.load(f)
+          state = import_observation(observation)
+          print(json.dumps(state.snapshot(), ensure_ascii=False, indent=2))
+        PY
