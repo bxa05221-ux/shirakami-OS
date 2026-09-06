@@ -1,1 +1,0 @@
-R0027 observation record is maintained in the repository documentation. The execution boundary exposes before-state, Evidence, after-state, and adapter-level observation without semantic interpretation.
