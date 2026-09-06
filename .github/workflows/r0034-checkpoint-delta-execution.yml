@@ -1,0 +1,22 @@
+name: R0034 Checkpoint Delta Execution
+
+on:
+  pull_request:
+    paths:
+      - "runtime/checkpoint_delta_execution.py"
+      - "runtime/evidence_delta.py"
+      - "runtime/evidence_checkpoint.py"
+      - "tests/test_r0034_checkpoint_delta_execution.py"
+      - ".github/workflows/r0034-checkpoint-delta-execution.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install pytest
+      - run: python -m pytest tests/test_r0034_checkpoint_delta_execution.py -q
