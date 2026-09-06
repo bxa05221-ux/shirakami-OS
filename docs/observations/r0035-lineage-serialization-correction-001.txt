@@ -1,3 +1,0 @@
-R0035 correction note
-
-The prior R0035 assertion compared serialized Adapter evidence-lineage mappings with EvidenceRecord objects. The correction aligns the test with the already-established observation representation. No Runtime or Adapter behavior is changed.
