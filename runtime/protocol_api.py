@@ -1,11 +1,11 @@
 """Generic Protocol invocation API boundary.
 
 A Protocol remains the source artifact. This module exposes a small
-parameterized invocation request without creating one endpoint per Protocol.
+parameterized invocation surface without creating one endpoint per Protocol.
 """
 
 from dataclasses import dataclass
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 from .protocol_registry import ProtocolRegistry, ProtocolRegistryError
 
@@ -48,3 +48,18 @@ def build_protocol_request(
         version=resolved_version,
         input=dict(input_data or {}),
     )
+
+
+def invoke_protocol(
+    request: ProtocolRequest,
+    executor: Callable[[ProtocolRequest], Any],
+) -> Any:
+    """Invoke a resolved Protocol through an injected execution boundary.
+
+    The API owns request resolution and transport-neutral dispatch only. The
+    executor owns execution semantics and may be backed by any Runtime adapter
+    or external application.
+    """
+    if not callable(executor):
+        raise ProtocolAPIError("executor is required")
+    return executor(request)
