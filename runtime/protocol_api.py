@@ -24,18 +24,11 @@ class ProtocolRequest:
     input: Mapping[str, Any]
 
 
-def build_protocol_request(
-    registry: ProtocolRegistry,
-    protocol_id: str,
+def _request_from_entry(
+    entry: Any,
     input_data: Mapping[str, Any] | None = None,
     version: str | None = None,
 ) -> ProtocolRequest:
-    """Resolve an eligible Protocol and expose it as a Runtime parameter set."""
-    try:
-        entry = registry.select_current(protocol_id)
-    except ProtocolRegistryError as exc:
-        raise ProtocolAPIError(str(exc)) from exc
-
     artifact = entry.artifact
     artifact_version = getattr(artifact, "version", None)
     if isinstance(artifact, Mapping):
@@ -49,6 +42,35 @@ def build_protocol_request(
         version=resolved_version,
         input=dict(input_data or {}),
     )
+
+
+def build_protocol_request(
+    registry: ProtocolRegistry,
+    protocol_id: str,
+    input_data: Mapping[str, Any] | None = None,
+    version: str | None = None,
+) -> ProtocolRequest:
+    """Resolve an eligible Protocol and expose it as a Runtime parameter set."""
+    try:
+        entry = registry.select_current(protocol_id)
+    except ProtocolRegistryError as exc:
+        raise ProtocolAPIError(str(exc)) from exc
+    return _request_from_entry(entry, input_data=input_data, version=version)
+
+
+def build_default_protocol_request(
+    registry: ProtocolRegistry,
+    input_data: Mapping[str, Any] | None = None,
+    version: str | None = None,
+) -> ProtocolRequest:
+    """Resolve the mandatory OS default Protocol."""
+    try:
+        entry = registry.require_default()
+    except ProtocolRegistryError as exc:
+        raise ProtocolAPIError(str(exc)) from exc
+    if entry.state == "archived":
+        raise ProtocolAPIError("default protocol cannot be archived")
+    return _request_from_entry(entry, input_data=input_data, version=version)
 
 
 def invoke_protocol(
