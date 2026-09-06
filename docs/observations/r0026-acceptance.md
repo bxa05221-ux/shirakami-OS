@@ -1,0 +1,1 @@
+Acceptance: bootstrap LandscapeState, execute one Protocol, capture Evidence, apply Evidence, observe updated state.
