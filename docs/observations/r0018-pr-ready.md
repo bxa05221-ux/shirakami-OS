@@ -1,0 +1,1 @@
+R0018 PR-ready observation: no Runtime, ProtocolIR, or Evidence schema changes.
