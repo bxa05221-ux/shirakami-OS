@@ -1,0 +1,1 @@
+R0026: external Landscape bootstrap -> Runtime execution -> Transition -> Evidence -> LandscapeState. The bootstrap does not create transition evidence; subsequent changes use the existing Evidence application path.
