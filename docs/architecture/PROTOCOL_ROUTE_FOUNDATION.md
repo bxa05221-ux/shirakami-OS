@@ -22,7 +22,9 @@ Protocol Registry
     ↓
 Protocol Request
     ↓
-Runtime
+Generic invocation surface
+    ↓
+Injected executor / Runtime adapter
 ```
 
 The Route Map is a separate observable routing structure:
@@ -39,11 +41,15 @@ It does not interpret their domain meaning.
 ## Current implementation
 
 - `runtime/protocol_registry.py` stores Protocol artifacts and lifecycle state.
-- `runtime/protocol_api.py` exposes a generic parameterized Protocol request.
+- `runtime/protocol_api.py` resolves a registered Protocol into a parameterized request and dispatches it through an injected executor.
 - `runtime/route_map.py` stores current location and explicit Protocol edges.
 
-The Route Map deliberately starts with only three operations: inspect the
-current location, list reachable Protocols, and move along an explicit edge.
+The Route Map deliberately starts with only three navigation operations: inspect
+the current location, list reachable Protocols, and move along an explicit edge.
+
+The generic API deliberately does not know how execution is performed. An
+executor can be supplied by the Runtime or by an external application. This
+keeps the Protocol surface independent of any particular LLM, backend, or UI.
 
 ## Non-goals
 
@@ -57,7 +63,7 @@ current location, list reachable Protocols, and move along an explicit edge.
 
 ## Next concrete use
 
-The next practical step is to register real existing Matome Protocol artifacts
-and expose a single generic invocation surface to a small external application,
-such as a chatbot. The Route Map can then be populated from actual Protocol
-relationships rather than from hypothetical architecture.
+Register real existing Matome Protocol artifacts and expose the generic
+invocation surface to a small external application, such as a chatbot. The
+Route Map can then be populated from actual Protocol relationships rather than
+from hypothetical architecture.
