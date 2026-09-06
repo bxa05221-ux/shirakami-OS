@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Mapping
 
 from .protocol_registry import ProtocolRegistry, ProtocolRegistryError
+from .route_map import RouteMap
 
 
 class ProtocolAPIError(ProtocolRegistryError):
@@ -63,3 +64,17 @@ def invoke_protocol(
     if not callable(executor):
         raise ProtocolAPIError("executor is required")
     return executor(request)
+
+
+def invoke_and_record_route(
+    request: ProtocolRequest,
+    executor: Callable[[ProtocolRequest], Any],
+    route_map: RouteMap,
+) -> tuple[Any, RouteMap]:
+    """Dispatch a Protocol request and record the observed destination.
+
+    The executor remains responsible for execution semantics. Route recording
+    only preserves the fact that the requested Protocol was traversed.
+    """
+    result = invoke_protocol(request, executor)
+    return result, route_map.record_transition(request.protocol_id)
