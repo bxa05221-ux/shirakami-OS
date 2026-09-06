@@ -19,6 +19,8 @@ Historical Evidence → Protocol version reference → deterministic replay
 
 The dedicated test uses two Evidence records with historical versions `0.1` and `0.2`, while the current registry reports `0.3`. The resulting lineage preserves `0.1` and `0.2` as historical references and reports `0.3` separately as current state.
 
+The current Runtime bridge explicitly carries the validated Protocol IR version into transition data as `protocol_version`; R0038 reads that existing transition field rather than introducing a new Evidence schema field.
+
 ## Non-goals
 
 - Protocol artifact hashing
