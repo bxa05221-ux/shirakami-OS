@@ -1,0 +1,1 @@
+R0018 check: snapshot observation remains separate from Evidence lineage; no continuity claim is produced.
