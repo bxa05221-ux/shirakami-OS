@@ -1,6 +1,0 @@
-id: r0035-lineage-serialization-correction-001
-status: observed
-boundary: adapter-evidence-lineage-representation
-change: test-only-representation-alignment
-runtime_semantics_changed: false
-research_theory_changed: false
