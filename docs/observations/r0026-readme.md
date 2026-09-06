@@ -1,0 +1,1 @@
+R0026 verifies the minimal Landscape execution loop without adding domain semantics.
