@@ -1,0 +1,1 @@
+R0030 checkpoint-plus-tail Evidence replay observation. CI verified the checkpoint reconstruction boundary. No semantic, provenance, continuity, identity, inheritance, truth, backend, credential, or GitHub write changes.
