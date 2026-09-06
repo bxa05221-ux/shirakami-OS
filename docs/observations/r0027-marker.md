@@ -1,1 +1,0 @@
-See r0027-observable-execution-result-001.md.
