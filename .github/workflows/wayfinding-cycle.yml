@@ -1,0 +1,24 @@
+name: Wayfinding Cycle
+
+on:
+  pull_request:
+    paths:
+      - 'runtime/wayfinding_cycle.py'
+      - 'runtime/way.py'
+      - 'runtime/landscape.py'
+      - 'tests/test_wayfinding_cycle.py'
+      - 'docs/observations/wayfinding-cycle-001.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pytest tests/test_wayfinding_cycle.py -q
