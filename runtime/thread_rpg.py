@@ -33,6 +33,7 @@ class ThreadState:
     """Observable Thread state; no inferred psychological state is stored."""
 
     session_id: str
+    landscape_ref: str
     status: str = "ready"
     turns: list[Turn] = field(default_factory=list)
     active_topics: list[str] = field(default_factory=list)
@@ -44,6 +45,7 @@ class ThreadState:
     def snapshot(self) -> Mapping[str, Any]:
         return MappingProxyType({
             "session_id": self.session_id,
+            "landscape_ref": self.landscape_ref,
             "status": self.status,
             "turns": [turn.__dict__.copy() for turn in self.turns],
             "active_topics": list(self.active_topics),
@@ -124,7 +126,7 @@ class ThreadRuntime:
         if not isinstance(landscape_ref, str) or not landscape_ref.strip():
             raise ValueError("landscape_ref is required")
         session_id = str(uuid4())
-        state = ThreadState(session_id=session_id)
+        state = ThreadState(session_id=session_id, landscape_ref=landscape_ref)
         self._sessions[session_id] = state
         return state
 
@@ -189,6 +191,7 @@ class ThreadRenderer:
     def render(state: ThreadState) -> Mapping[str, Any]:
         return {
             "session_id": state.session_id,
+            "landscape_ref": state.landscape_ref,
             "status": state.status,
             "turns": [
                 {
