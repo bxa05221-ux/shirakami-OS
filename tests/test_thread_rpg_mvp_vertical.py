@@ -4,6 +4,7 @@ from runtime.thread_rpg import (
     AnonymousOpinion,
     ThreadRenderer,
     ThreadRuntime,
+    TurnRenderingPolicy,
 )
 
 
@@ -55,3 +56,14 @@ def test_thread_rpg_anonymous_group_projects_declared_weights_into_seven():
               for opinion_id in ("a", "b", "c")}
     assert sum(counts.values()) == 7
     assert all(count > 0 for count in counts.values())
+
+
+def test_thread_rpg_turn_rendering_policy_defaults_to_three_and_max_five():
+    runtime = ThreadRuntime()
+
+    assert runtime.turn_rendering_policy == TurnRenderingPolicy(
+        ideal_sentences=3,
+        maximum_sentences=5,
+    )
+    assert runtime.turn_rendering_policy.maximum_sentences == 5
+    assert runtime.turn_rendering_policy.ideal_sentences == 3
