@@ -1,0 +1,25 @@
+name: AATS Thread Wayfinding
+
+on:
+  pull_request:
+    paths:
+      - "runtime/aat_thread_wayfinding.py"
+      - "runtime/aats.py"
+      - "runtime/way.py"
+      - "runtime/landscape.py"
+      - "tests/test_aat_thread_wayfinding.py"
+      - ".github/workflows/aat-thread-wayfinding.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pytest tests/test_aat_thread_wayfinding.py -q
