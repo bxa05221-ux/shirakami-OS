@@ -14,6 +14,9 @@ from uuid import uuid4
 from .evidence import EvidenceRecord
 
 
+ANONYMOUS_GROUP_SIZE = 7
+
+
 @dataclass(frozen=True)
 class Turn:
     """One observable exchange in a Thread."""
@@ -66,17 +69,15 @@ class AnonymousOpinion:
 
 def allocate_anonymous_counts(
     opinions: Sequence[AnonymousOpinion],
-    total_count: int = 7,
     preserve_minority: bool = True,
 ) -> dict[str, int]:
-    """Project declared recommendation weights into anonymous-group size."""
-    if total_count < 0:
-        raise ValueError("total_count must be non-negative")
+    """Project declared recommendation weights into the fixed seven-person group."""
     if not opinions:
         return {}
     if any(op.recommendation_weight < 0 for op in opinions):
         raise ValueError("recommendation_weight must be non-negative")
 
+    total_count = ANONYMOUS_GROUP_SIZE
     total_weight = sum(op.recommendation_weight for op in opinions)
     if total_weight <= 0:
         return {op.opinion_id: 0 for op in opinions}
@@ -208,11 +209,10 @@ class ThreadRenderer:
     @staticmethod
     def render_anonymous_group(
         opinions: Sequence[AnonymousOpinion],
-        total_count: int = 7,
         preserve_minority: bool = True,
     ) -> list[Mapping[str, Any]]:
-        """Render weighted opinions as anonymous participants."""
-        counts = allocate_anonymous_counts(opinions, total_count, preserve_minority)
+        """Render weighted opinions as the fixed seven anonymous participants."""
+        counts = allocate_anonymous_counts(opinions, preserve_minority)
         rendered: list[Mapping[str, Any]] = []
         for opinion in opinions:
             for index in range(counts[opinion.opinion_id]):
