@@ -8,7 +8,7 @@ callable boundary.
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from types import MappingProxyType
-from typing import Any, Callable, Mapping
+from typing import Any, Callable, Mapping, Sequence
 from uuid import uuid4
 
 from .evidence import EvidenceRecord
@@ -53,6 +53,59 @@ class ThreadState:
 
 
 ResponseAdapter = Callable[[str, ThreadState], str]
+
+
+@dataclass(frozen=True)
+class AnonymousOpinion:
+    """An AI-provided candidate opinion and its declared recommendation weight."""
+
+    opinion_id: str
+    text: str
+    recommendation_weight: float
+
+
+def allocate_anonymous_counts(
+    opinions: Sequence[AnonymousOpinion],
+    total_count: int = 7,
+    preserve_minority: bool = True,
+) -> dict[str, int]:
+    """Project declared recommendation weights into anonymous-group size."""
+    if total_count < 0:
+        raise ValueError("total_count must be non-negative")
+    if not opinions:
+        return {}
+    if any(op.recommendation_weight < 0 for op in opinions):
+        raise ValueError("recommendation_weight must be non-negative")
+
+    total_weight = sum(op.recommendation_weight for op in opinions)
+    if total_weight <= 0:
+        return {op.opinion_id: 0 for op in opinions}
+
+    raw = [op.recommendation_weight / total_weight * total_count for op in opinions]
+    counts = [int(value) for value in raw]
+
+    if preserve_minority and total_count >= len(opinions):
+        for index, op in enumerate(opinions):
+            if op.recommendation_weight > 0 and counts[index] == 0:
+                counts[index] = 1
+
+    remaining = total_count - sum(counts)
+    fractions = [raw[i] - int(raw[i]) for i in range(len(opinions))]
+
+    if remaining > 0:
+        order = sorted(range(len(opinions)), key=lambda i: (-fractions[i], i))
+        for index in order[:remaining]:
+            counts[index] += 1
+    elif remaining < 0:
+        order = sorted(range(len(opinions)), key=lambda i: (fractions[i], -counts[i], i))
+        for index in order:
+            if remaining == 0:
+                break
+            if counts[index] > 0:
+                counts[index] -= 1
+                remaining += 1
+
+    return {op.opinion_id: count for op, count in zip(opinions, counts)}
 
 
 class ThreadRuntime:
@@ -151,3 +204,21 @@ class ThreadRenderer:
             },
             "unresolved_questions": list(state.unresolved_questions),
         }
+
+    @staticmethod
+    def render_anonymous_group(
+        opinions: Sequence[AnonymousOpinion],
+        total_count: int = 7,
+        preserve_minority: bool = True,
+    ) -> list[Mapping[str, Any]]:
+        """Render weighted opinions as anonymous participants."""
+        counts = allocate_anonymous_counts(opinions, total_count, preserve_minority)
+        rendered: list[Mapping[str, Any]] = []
+        for opinion in opinions:
+            for index in range(counts[opinion.opinion_id]):
+                rendered.append({
+                    "participant": f"名無し-{opinion.opinion_id}-{index + 1}",
+                    "opinion_id": opinion.opinion_id,
+                    "text": opinion.text,
+                })
+        return rendered
