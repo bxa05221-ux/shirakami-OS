@@ -11,6 +11,10 @@ The implementation boundary completed in this slice is:
 
 `AATS → Thread → Renzan → Kasen → Landscape → Small Step → Evidence → Re-observation`
 
+## API boundary
+
+The completed cycle is exposed through `POST /v1/wayfinding` as a framework-independent HTTP transport boundary.
+
 ## What was completed
 
 - AATS is represented as the root Thread-simulation boundary.
@@ -18,10 +22,11 @@ The implementation boundary completed in this slice is:
 - Renzan collects scattered Thread viewpoints without assigning fixed semantic roles.
 - Kasen composes viewpoints into a natural human-readable narrative.
 - The current Landscape is observed before the step.
-- A Small Step is selected outside Kernel semantics and applied as an observable Transition.
+- A Small Step is supplied at the transport boundary and applied as an observable Transition.
 - The Transition is converted into ExecutionResult and captured as immutable Evidence.
 - Evidence is applied through the existing LandscapeState boundary.
 - The resulting Landscape is observed again.
+- The resulting observable cycle is returned as JSON through the HTTP boundary.
 
 ## Explicit non-claims
 
