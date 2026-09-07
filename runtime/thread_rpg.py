@@ -15,6 +15,16 @@ from .evidence import EvidenceRecord
 
 
 ANONYMOUS_GROUP_SIZE = 7
+TURN_SENTENCE_IDEAL = 3
+TURN_SENTENCE_MAXIMUM = 5
+
+
+@dataclass(frozen=True)
+class TurnRenderingPolicy:
+    """Generation-side budget for keeping one Thread reply readable."""
+
+    ideal_sentences: int = TURN_SENTENCE_IDEAL
+    maximum_sentences: int = TURN_SENTENCE_MAXIMUM
 
 
 @dataclass(frozen=True)
@@ -114,9 +124,14 @@ def allocate_anonymous_counts(
 class ThreadRuntime:
     """Small stateful runtime for the Thread RPG 3.2 implementation boundary."""
 
-    def __init__(self, response_adapter: ResponseAdapter | None = None):
+    def __init__(
+        self,
+        response_adapter: ResponseAdapter | None = None,
+        turn_rendering_policy: TurnRenderingPolicy | None = None,
+    ):
         self._sessions: dict[str, ThreadState] = {}
         self._response_adapter = response_adapter or self._default_response
+        self.turn_rendering_policy = turn_rendering_policy or TurnRenderingPolicy()
 
     @staticmethod
     def _default_response(value: str, _state: ThreadState) -> str:
