@@ -11,6 +11,7 @@ def continuity_protocol(context):
             "landscape_id": state["landscape_id"],
             "identity": state["identity"],
             "memory": state["memory"],
+            "changed": True,
             "continuity_check": True,
         },
     )
