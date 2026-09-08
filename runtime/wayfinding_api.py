@@ -47,6 +47,18 @@ def _thread_from_payload(payload: Mapping[str, Any]) -> Thread:
     return Thread(str(payload["thread_id"]), participants, posts)
 
 
+def _evidence_to_dict(evidence: Any) -> dict[str, Any]:
+    """Serialize immutable Evidence without deepcopying MappingProxyType."""
+    return {
+        "protocol_id": evidence.protocol_id,
+        "status": evidence.status,
+        "transition_kind": evidence.transition_kind,
+        "transition_data": dict(evidence.transition_data),
+        "signals": list(evidence.signals),
+        "confidence": evidence.confidence,
+    }
+
+
 def execute_wayfinding_request(payload: Mapping[str, Any]) -> dict[str, Any]:
     """Execute one transport-level Wayfinding request."""
     thread = _thread_from_payload(payload["thread"])
@@ -67,7 +79,7 @@ def execute_wayfinding_request(payload: Mapping[str, Any]) -> dict[str, Any]:
         "narrative": result.narrative,
         "before": dict(result.before),
         "small_step": asdict(result.small_step),
-        "evidence": asdict(result.evidence),
+        "evidence": _evidence_to_dict(result.evidence),
         "after": dict(result.after),
     }
 
