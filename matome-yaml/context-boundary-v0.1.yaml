@@ -1,0 +1,59 @@
+id: context-boundary-v0.1
+title: Context Boundary Protocol
+version: 0.1
+status: implementation_handoff
+statement: >
+  Project LandscapeをRuntimeが扱う現在のContextとして切り出す。
+  ContextはLandscapeそのものではなく、現在の処理に必要な参照範囲を示す。
+principles:
+  - landscape_remains_authoritative
+  - context_is_a_view_not_a_replacement
+  - source_references_are_preserved
+  - unresolved_questions_are_preserved
+  - no_semantic_invention
+input:
+  - project_landscape
+  - requested_context
+output:
+  - context_snapshot
+  - unresolved_questions
+context_snapshot:
+  fields:
+    - context_id
+    - source_refs
+    - unresolved_questions
+    - requested_context
+    - parent_landscape_ref
+rules:
+  - ContextはLandscapeから参照を切り出すだけとする
+  - source contentを勝手に要約・統合しない
+  - unresolved_questionsを削除しない
+  - requested_contextの意味をRuntimeが推測しない
+  - ContextはLandscapeを置換しない
+boundaries:
+  context:
+    may:
+      - select_explicit_refs
+      - preserve_refs
+      - snapshot_current_scope
+    may_not:
+      - infer_domain_meaning
+      - rewrite_sources
+      - resolve_unknowns
+  runtime:
+    may:
+      - validate
+      - observe
+      - transition
+      - record_evidence
+    may_not:
+      - manufacture_context
+completion:
+  condition: >
+    Project Landscapeから、現在の処理範囲を明示したContext Snapshotを生成し、
+    後続Runtimeへ渡せること。
+non_goals:
+  - semantic_context_summarization
+  - automatic_context_inference
+  - memory_rewriting
+  - domain_diagnosis
