@@ -1,0 +1,53 @@
+matome:
+  id: r0054-temporal-evidence-selection
+  title: "R0054 — Temporal Evidence Selection"
+  version: "0.1"
+  status: "implementation_experiment_candidate"
+
+  question: >
+    複数時点のEvidenceを同一のLandscapeStateに保持した状態で、
+    指定したEvidenceを個別に参照できるか。
+
+  premise:
+    - "R0053で時間順に複数Evidenceを同一LandscapeState.evidenceへ保持できることを観測した"
+    - "R0054では既存のEvidence保持境界だけを使い、個別参照可能性を観測する"
+    - "新しいEvidence管理Subsystemは導入しない"
+
+  existing_contracts:
+    - LandscapeState
+    - EvidenceRecord
+    - apply_evidence
+
+  change:
+    - "時間順に3つのEvidenceを生成する"
+    - "Evidence A, B, Cを同一LandscapeStateへ順に適用する"
+    - "既存のevidence保持構造からA, B, Cを個別に参照する"
+
+  verification:
+    - "Evidence A, B, Cは別Recordとして保持される"
+    - "各Evidenceのprovenance/dataを個別に参照できる"
+    - "保持順序が観測可能である"
+    - "後続Evidenceが先行Evidenceの参照結果を上書きしない"
+
+  non_goals:
+    - "Evidence query/indexing system"
+    - "Evidence lineage reconstruction"
+    - "event sourcing adoption"
+    - "Provenance Graph"
+    - "historical state recovery"
+    - "semantic reconciliation"
+    - "new Runtime theory"
+    - "new Landscape schema"
+
+  failure_interpretation:
+    - "既存LandscapeStateのEvidence個別参照境界の不足"
+    - "Evidence identityの観測不能"
+    - "Evidence dataの混同"
+    - "テスト設計上の不足"
+
+  verification_rule:
+    - "One Change"
+    - "One Verification"
+    - "ファイル存在と実験成功を混同しない"
+    - "不明な履歴を推測で補完しない"
+    - "Evidenceを後から書き換えない"
