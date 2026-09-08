@@ -1,0 +1,62 @@
+name: HTTP API Vertical Slice
+
+on:
+  push:
+    paths:
+      - "runtime/http_api.py"
+      - "runtime/protocol_ir.py"
+      - "runtime/protocol_runtime.py"
+      - "runtime/prototype.py"
+      - "runtime/evidence.py"
+      - "runtime/landscape.py"
+      - "tests/test_http_api.py"
+      - ".github/workflows/http-api-vertical-slice.yml"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install pytest
+      - run: python -m pytest tests/test_http_api.py -q
+      - run: |
+          python -m runtime.http_api > /tmp/shirakami-api.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          python - <<'PY'
+          import json
+          import time
+          from urllib.request import Request, urlopen
+
+          time.sleep(0.5)
+          def request(method, path, payload=None):
+              data = None if payload is None else json.dumps(payload).encode()
+              req = Request('http://127.0.0.1:8000' + path, data=data, method=method)
+              req.add_header('Content-Type', 'application/json')
+              with urlopen(req) as response:
+                  return response.status, json.loads(response.read())
+
+          status, state = request('POST', '/sessions', {
+              'session_id': 'ci-http',
+              'landscape_ref': 'landscape-ci',
+              'landscape': {'scene_id': 'dogfight'}
+          })
+          assert status == 201
+          status, turn = request('POST', '/sessions/ci-http/turns', {'text': 'HTTPから歩いてみる'})
+          assert status == 200
+          assert turn['status'] == 'completed'
+          assert turn['transition_kind'] == 'thread.turn_added'
+          status, state = request('GET', '/sessions/ci-http/state')
+          assert status == 200
+          assert state['turn_count'] == 1
+          assert state['landscape']['text'] == 'HTTPから歩いてみる'
+          status, evidence = request('GET', '/sessions/ci-http/evidence')
+          assert status == 200
+          assert len(evidence) == 1
+          assert evidence[0]['transition_kind'] == 'thread.turn_added'
+          print('HTTP vertical slice: OK')
+          PY
