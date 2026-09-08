@@ -1,0 +1,49 @@
+id: protocol-applicability-gate-v0.1
+title: Protocol Applicability Gate
+version: 0.1
+status: implementation_handoff
+statement: >
+  Protocol Inputに対して、対象Protocolが宣言した適用条件を評価し、
+  実行可能性を境界として確定する。意味の推測や新しい適用条件の生成は行わない。
+input:
+  - protocol_input
+  - protocol_definition
+output:
+  - applicability_result
+applicability_result:
+  fields:
+    - protocol_id
+    - applicable
+    - unresolved_questions
+    - failed_conditions
+rules:
+  - Protocol定義に明示された条件のみ評価する
+  - 条件が不足している場合は未解決として保持する
+  - 意味的な適用先を推測しない
+  - Protocol定義を書き換えない
+  - 未解決を成功として扱わない
+boundaries:
+  gate:
+    may:
+      - validate_declared_conditions
+      - return_applicable
+      - return_not_applicable
+      - preserve_unresolved
+    may_not:
+      - infer_domain_meaning
+      - invent_conditions
+      - select_protocol
+      - diagnose
+  protocol:
+    declares: applicability_conditions
+    receives: protocol_input
+  runtime:
+    executes_only_if: applicable
+completion:
+  condition: >
+    Protocol InputとProtocol定義から、宣言済み条件に基づく適用結果を返せること。
+non_goals:
+  - semantic_protocol_selection
+  - domain_interpretation
+  - diagnosis
+  - automatic_protocol_chain
