@@ -1,0 +1,36 @@
+id: shirakami.http-api-boundary.v0.1
+title: Shirakami HTTP API Boundary
+version: 0.1
+status: implementation_handoff
+statement: >
+  HTTP is an external boundary for the existing Shirakami Runtime.
+  The API transports Landscape, turns, State, and Evidence without
+  introducing semantic interpretation into the Kernel.
+endpoints:
+  - method: POST
+    path: /sessions
+    purpose: create_session
+  - method: POST
+    path: /sessions/{id}/turns
+    purpose: submit_turn
+  - method: GET
+    path: /sessions/{id}/state
+    purpose: read_state
+  - method: GET
+    path: /sessions/{id}/evidence
+    purpose: read_evidence
+boundaries:
+  api:
+    may: transport
+    may_not: invent_domain_meaning
+  runtime:
+    may: parse/validate/instantiate/observe/transition/record_evidence
+    may_not: infer_semantic_truth
+  evidence:
+    rule: record/preserve
+    immutable: true
+non_goals:
+  - vendor_specific_web_framework
+  - model_selection
+  - semantic_diagnosis
+  - new_domain_theory
