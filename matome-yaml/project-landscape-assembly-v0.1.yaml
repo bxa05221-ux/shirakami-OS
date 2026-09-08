@@ -1,0 +1,52 @@
+id: project-landscape-assembly-v0.1
+title: Project Landscape Assembly Protocol
+version: 0.1
+status: implementation_handoff
+statement: >
+  Loaded Sourcesを一つの意味へ勝手に統合するのではなく、
+  それぞれのSourceの境界・状態・未解決性を保持したまま、
+  Runtimeが扱えるProject Landscapeとして束ねる。
+principles:
+  - source_content_is_opaque
+  - source_boundaries_are_preserved
+  - unresolved_questions_are_preserved
+  - source_authority_is_preserved
+  - runtime_does_not_invent_domain_meaning
+assembly:
+  input: LoadedSource[]
+  output:
+    - landscape_sources
+    - unresolved_questions
+  rules:
+    - LoadedSourceをsource_id単位で保持する
+    - source type/status/authorityを保持する
+    - contentの意味解釈を行わない
+    - 欠落したcontentを補完しない
+    - 未解決質問を別フィールドで保持する
+boundaries:
+  assembly:
+    may:
+      - group_loaded_sources
+      - preserve_metadata
+      - preserve_unresolved_questions
+    may_not:
+      - infer_domain_meaning
+      - rewrite_source_content
+      - resolve_source_conflicts
+  runtime:
+    may:
+      - validate
+      - observe
+      - transition
+      - record_evidence
+    may_not:
+      - invent_missing_source_content
+completion:
+  condition: >
+    Registryで選択されたLoadedSourceを、意味を改変せずに
+    Project LandscapeとしてRuntimeへ渡せること。
+non_goals:
+  - semantic_summarization
+  - source_merging
+  - conflict_resolution
+  - new_domain_theory
