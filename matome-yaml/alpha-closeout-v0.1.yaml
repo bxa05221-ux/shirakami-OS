@@ -1,0 +1,49 @@
+id: alpha-closeout-v0.1
+title: Shirakami OS Alpha Closeout
+subtitle:
+  - Implementation / Verification Closeout
+  - Landscape Boundary Verification
+version: 0.1
+status: implementation_handoff
+authority: implementation
+statement: >
+  Alpha implementation verification closes the current Landscape pipeline
+  boundary without changing Protocol theory.
+scope:
+  - Project Source Registry
+  - Project Landscape Loader
+  - Project Landscape Assembly
+  - Context Boundary
+  - Protocol Input
+  - Applicability Gate
+  - Protocol IR
+  - Protocol Runtime
+  - Evidence
+  - Landscape State
+verification:
+  missing_source:
+    expected: unresolved_question_preserved
+  applicability:
+    unresolved_condition:
+      expected: no_landscape_change
+    failed_condition:
+      expected: no_landscape_change
+  runtime_failure:
+    expected: failure_recorded_and_no_landscape_change
+  completed_transition:
+    expected: landscape_updated_and_evidence_preserved
+rules:
+  - HTTP adds no semantic interpretation.
+  - Unavailable sources remain unresolved questions.
+  - Applicability evaluates only declared conditions.
+  - Evidence records and preserves observed execution results.
+  - Landscape State applies only completed transition evidence.
+  - No new Protocol theory is introduced by this closeout.
+non_goals:
+  - Domain semantic interpretation
+  - LLM dependency
+  - Vendor-specific runtime behavior
+  - New lineage semantics
+next:
+  phase: beta
+  condition: alpha_boundary_verification_complete
