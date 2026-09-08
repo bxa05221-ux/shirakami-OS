@@ -1,0 +1,29 @@
+id: http-real-landscape-vertical-slice-v0.1
+title: HTTP Real Landscape Vertical Slice
+version: 0.1
+status: implementation_handoff
+
+purpose: >
+  Verify that a real Landscape artifact can enter Shirakami OS through the
+  HTTP boundary, receive a declared transition, produce Evidence, update the
+  Landscape State, and be read back through the HTTP state/evidence endpoints.
+
+landscape:
+  fixture: tests/fixtures/dogfight_scene.json
+
+flow:
+  - POST /sessions
+  - POST /sessions/{id}/turns
+  - GET /sessions/{id}/state
+  - GET /sessions/{id}/evidence
+
+rules:
+  - Preserve the supplied Landscape fields.
+  - Execute only the declared HTTP turn transition.
+  - Record Evidence produced by the transition.
+  - Read back observable state and Evidence without semantic rewriting.
+  - Do not require an LLM or vendor-specific adapter.
+
+verification:
+  test: tests/test_http_real_landscape_vertical_slice.py
+  ci_workflow: .github/workflows/http-real-landscape-vertical-slice.yml
