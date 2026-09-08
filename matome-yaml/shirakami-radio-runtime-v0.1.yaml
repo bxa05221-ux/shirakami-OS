@@ -1,0 +1,66 @@
+title: Shirakami Radio Runtime Handoff
+subtitle:
+  - Landscape to Radio Renderer
+  - Shirakami Radio vertical slice
+version: 0.1
+status: implementation_slice
+
+statement: >
+  Shirakami Radioは、Landscapeを起点として既存のRenzan/Kasen経路を通し、
+  人間へ「景色」として返すためのmedia rendererとして実装する。
+
+pipeline:
+  - Landscape
+  - Renzan
+  - Kasen
+  - Radio Renderer
+  - Human
+
+input:
+  required:
+    - observations
+  optional:
+    - title
+    - unresolved_questions
+
+boundary:
+  runtime:
+    may:
+      - preserve_landscape
+      - collect_viewpoints
+      - compose_reexpression
+      - render_radio
+    may_not:
+      - invent_domain_meaning
+      - diagnose_listener
+      - convert_unresolved_questions_into_answers
+  renderer:
+    role: human_facing_media_renderer
+    may:
+      - produce_radio_script
+    may_not:
+      - determine_semantic_truth
+
+uncertainty:
+  rule: 分からない時には聞く
+  behavior: missing_observations_are_held_as_a_question
+
+unresolved_questions:
+  rule: authored_questions_are_preserved_separately
+  rendering: do_not_mix_into_radio_script
+
+implementation:
+  module: runtime/radio.py
+  tests: tests/test_radio.py
+
+verification:
+  target: >
+    実Landscape相当の入力を受け、Renzan/Kasenを経由してラジオ用scriptを返し、
+    未解決の問いを勝手に回答へ変換しないこと。
+  method: one_change_one_verification
+
+non_goals:
+  - audio_synthesis
+  - fixed_llm_provider
+  - new_radio_theory
+  - automatic_domain_interpretation
