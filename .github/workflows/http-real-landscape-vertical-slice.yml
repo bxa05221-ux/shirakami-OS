@@ -2,11 +2,12 @@ name: HTTP Real Landscape Vertical Slice
 
 on:
   push:
-    branches: [feat/http-landscape-pipeline]
+    branches: [feat/http-landscape-pipeline, feat/alpha-closeout]
     paths:
       - "runtime/**"
       - "tests/fixtures/dogfight_scene.json"
       - "tests/test_http_landscape_pipeline.py"
+      - "tests/test_alpha_closeout.py"
       - ".github/workflows/http-real-landscape-vertical-slice.yml"
   workflow_dispatch:
 
@@ -18,4 +19,4 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python -m pytest tests/test_http_landscape_pipeline.py -q
+      - run: python -m pytest tests/test_http_landscape_pipeline.py tests/test_alpha_closeout.py -q
