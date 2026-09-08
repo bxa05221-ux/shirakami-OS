@@ -1,0 +1,256 @@
+id: project-source-v0.1
+title: Shirakami OS Project Source Protocol
+subtitle:
+  - Project Landscape Source Registry
+  - 的目YAML-centered Development Continuity
+version: 0.1
+status: implementation_handoff
+
+statement: >
+  Shirakami OSの開発において、プロジェクトに蓄積された情報を
+  無差別に単一のSource of Truthとして扱うのではなく、
+  文書の責務、Protocolとしての正式性、実験結果、Evidence、
+  未解決事項を区別して保持する。
+  的目YAMLをProtocolの正式な引継ぎ形式として扱い、
+  AIや開発者がプロジェクトを再開するときに、
+  現在のLandscapeとその根拠を追跡できる状態を維持する。
+
+principles:
+  landscape_first:
+    rule: >
+      プロジェクトの現在状態をLandscapeとして扱い、
+      特定のAIモデルやベンダーに継続性を依存させない。
+
+  matome_yaml_first:
+    rule: >
+      研究成果および実装への正式な引継ぎは、
+      的目YAMLとして明示されたものを基準とする。
+
+  source_separation:
+    rule: >
+      Vision、Constitution、Blueprint、Design、Implementation、
+      的目YAML、Evidence、Experimentを同一の権威レベルとして混同しない。
+
+  evidence_preservation:
+    rule: >
+      実験結果やObservableなTransitionはEvidenceとして記録し、
+      後から都合よく意味を書き換えない。
+
+  unresolved_preservation:
+    rule: >
+      未解決事項は確定情報へ変換せず、unresolvedとして保持する。
+
+  ask_when_unknown:
+    rule: 分からない時には聞く
+    behavior: >
+      必要な情報がSourceから確認できない場合、推測で補完せず、
+      不明点を明示して人間へ確認する。
+
+source_hierarchy:
+  vision:
+    responsibility: なぜ作るのか
+    authority: philosophical
+    may_contain:
+      - purpose
+      - vision
+    may_not_contain:
+      - api
+      - directory_structure
+      - class_design
+      - implementation_detail
+
+  constitution:
+    responsibility: 何を守るのか
+    authority: normative
+    may_contain:
+      - principles
+      - boundaries
+      - invariants
+    may_not_contain:
+      - implementation_detail
+      - class_design
+      - concrete_api
+
+  blueprint:
+    responsibility: どういう構造にするのか
+    authority: architectural
+    may_contain:
+      - components
+      - responsibilities
+      - boundaries
+      - relationships
+    may_not_contain:
+      - algorithms
+      - concrete_implementation
+
+  design:
+    responsibility: 具体的な仕様をどう定義するか
+    authority: specification
+    may_contain:
+      - api
+      - state_machine
+      - ir_format
+      - workspace_layout
+      - interface_contract
+
+  implementation:
+    responsibility: コードとしてどう実装するか
+    authority: executable
+    may_contain:
+      - source_code
+      - tests
+      - adapters
+      - runtime_components
+
+  matome_yaml:
+    responsibility: Protocolを正式に引き継ぐ
+    authority: protocol_handoff
+    rule: >
+      的目YAMLは、研究・設計・実装の間にあるProtocol境界を
+      明示し、Runtimeへ渡す正式な引継ぎ形式として扱う。
+
+  experiment:
+    responsibility: 仮説を実地で検証する
+    authority: observational
+    rule: >
+      Experimentは確定原則そのものではない。結果はObservationとして扱い、
+      Evidenceおよび次の判断へ接続する。
+
+  evidence:
+    responsibility: 実際に発生したObservable Transitionを記録する
+    authority: factual_record
+    immutable: true
+    rule:
+      - record
+      - preserve
+      - do_not_rewrite
+
+source_registry:
+  required_fields:
+    - id
+    - type
+    - path
+    - status
+    - authority
+  optional_fields:
+    - version
+    - supersedes
+    - superseded_by
+    - depends_on
+    - related_protocol
+    - related_experiment
+    - unresolved
+
+status_values:
+  - proposed
+  - exploratory
+  - active
+  - implementation_handoff
+  - implemented
+  - verified
+  - superseded
+  - archived
+
+authority_rule: >
+  statusとauthorityを混同しない。
+  最新の文書であることだけを理由に、上位の責務を持つ文書を
+  上書きしてはならない。
+
+retrieval_order:
+  default:
+    - current_project_landscape
+    - active_matome_yaml
+    - constitution
+    - blueprint
+    - design
+    - implementation
+    - relevant_evidence
+    - relevant_experiment
+    - unresolved_questions
+  rule: >
+    取得順序は探索の初期値であり、固定的な意味解釈手順ではない。
+    必要なSourceが不足している場合は追加取得し、
+    不明な場合は人間へ確認する。
+
+conflict_handling:
+  rule:
+    - do_not_silently_merge
+    - identify_conflicting_sources
+    - preserve_both_observations
+    - check_authority
+    - check_status
+    - ask_when_unresolved
+  important_distinction: >
+    Landscapeの状態一致と、過去のEvidence lineageの一致は同一ではない。
+    Checkpointから同じLandscapeを再構成できても、
+    それだけで過去のEvidence lineageを再構成したとはみなさない。
+
+project_continuity:
+  flow:
+    - Human_Question
+    - Observation
+    - Matome_YAML
+    - Design
+    - Implementation
+    - Experiment
+    - Evidence
+    - Landscape_Update
+    - Next_Matome_YAML
+
+  rule: >
+    プロジェクトの開発過程そのものをLandscapeとして保持し、
+    次のAIまたは開発者が途中から再開できる状態を作る。
+
+runtime_boundary:
+  may:
+    - locate_declared_sources
+    - validate_source_structure
+    - preserve_source_metadata
+    - expose_unresolved_items
+    - record_source_related_evidence
+  may_not:
+    - invent_missing_source_content
+    - silently_rewrite_authority
+    - convert_experiment_into_constitution
+    - convert_observation_into_domain_truth
+
+implementation_scope:
+  current:
+    - define_source_protocol
+    - establish_matome_yaml_as_handoff_format
+    - preserve_document_responsibility_boundaries
+  not_current:
+    - automatic_semantic_ranking_of_all_documents
+    - autonomous_source_authority_changes
+    - vendor_specific_memory_system
+    - new_cognitive_theory
+
+verification:
+  principle: One Change One Verification
+  target: >
+    プロジェクトの情報源を、責務と状態を保持したまま参照でき、
+    未解決事項を勝手に確定せず、必要な場合に人間へ確認できること。
+  minimum_cases:
+    - locate_active_matome_yaml
+    - distinguish_design_from_implementation
+    - preserve_unresolved_question
+    - detect_conflicting_sources
+    - distinguish_landscape_reconstruction_from_evidence_lineage
+
+next_action:
+  - add_source_registry_if_runtime_requires_it
+  - connect_registry_to_project_landscape_loader
+  - verify_with_real_shirakami_project_sources
+
+non_goals:
+  - single_document_source_of_truth
+  - automatic_truth_selection
+  - new_theory
+  - vendor_lock_in
+  - verification_for_verification
+
+handoff_phrase:
+  - "プロジェクト自身をLandscapeとして扱う。"
+  - "的目YAMLを正式な引継ぎ境界とする。"
+  - "分からない時には聞く。"
+  - "観測を確定情報へ勝手に変換しない。"
