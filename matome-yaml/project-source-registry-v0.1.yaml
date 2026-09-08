@@ -1,0 +1,30 @@
+id: project-source-registry.v0.1
+title: Project Source Registry
+version: "0.1"
+statement: >
+  Project sources are explicitly declared references. The Registry validates
+  their minimum structure and preserves source boundaries; it does not resolve
+  semantic conflicts or fabricate missing content.
+required_fields:
+  - id
+  - type
+  - path
+  - status
+  - authority
+active_statuses:
+  - active
+  - implementation_handoff
+  - implemented
+  - verified
+source_type_order:
+  - matome_yaml
+  - design
+  - blueprint
+  - constitution
+  - vision
+  - implementation
+  - experiment
+  - evidence
+conflict_rule:
+  duplicate_id: unresolved
+  resolution_owner: human
