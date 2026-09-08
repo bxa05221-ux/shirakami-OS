@@ -1,9 +1,4 @@
-"""Minimal dependency-free HTTP API boundary for Shirakami OS.
-
-The API exposes session creation, turns, state, and evidence without adding
-semantic interpretation to the Runtime. It is intentionally stdlib-only so
-that the vertical slice can run in CI without a web framework dependency.
-"""
+"""Dependency-free HTTP API boundary for the Shirakami Landscape pipeline."""
 from __future__ import annotations
 
 import json
@@ -11,24 +6,55 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 from urllib.parse import urlparse
 
+from .context_boundary import create_context_snapshot
 from .landscape import LandscapeState
+from .project_landscape_assembly import assemble_landscape
+from .project_landscape_loader import load_landscape
+from .protocol_applicability import evaluate_applicability
+from .protocol_input import create_protocol_input
 from .protocol_ir import build_protocol_ir
 from .protocol_runtime import execute_protocol_ir
-from .protocol_input import ProtocolInput
 from .prototype import Transition
+from .source_registry import build_registry
 
 
 class ShirakamiSessionStore:
     def __init__(self) -> None:
         self._sessions: dict[str, dict[str, Any]] = {}
 
-    def create(self, session_id: str, landscape_ref: str, landscape: dict[str, Any] | None = None) -> dict[str, Any]:
+    def create(
+        self,
+        session_id: str,
+        landscape_ref: str,
+        landscape: dict[str, Any] | None = None,
+        *,
+        sources: list[dict[str, object]] | None = None,
+        source_contents: dict[str, object] | None = None,
+        applicability_conditions: dict[str, object] | None = None,
+        applicability_available: dict[str, object] | None = None,
+    ) -> dict[str, Any]:
         if session_id in self._sessions:
             raise ValueError("session already exists")
+
+        raw_sources = sources or []
+        contents = source_contents or {}
+        registry = build_registry(raw_sources)
+        loaded = load_landscape(registry, contents)
+        project_landscape = assemble_landscape(loaded.sources, loaded.unresolved_questions)
+        context = create_context_snapshot(
+            project_landscape,
+            context_id=session_id,
+            parent_landscape_ref=landscape_ref,
+            requested_context="http-api",
+        )
         self._sessions[session_id] = {
             "session_id": session_id,
             "landscape_ref": landscape_ref,
             "landscape": LandscapeState.from_snapshot(landscape or {}),
+            "project_landscape": project_landscape,
+            "context": context,
+            "applicability_conditions": applicability_conditions or {},
+            "applicability_available": applicability_available or {},
             "evidence": [],
             "turns": [],
         }
@@ -36,11 +62,18 @@ class ShirakamiSessionStore:
 
     def state(self, session_id: str) -> dict[str, Any]:
         session = self._sessions[session_id]
+        context = session["context"]
         return {
             "session_id": session["session_id"],
             "landscape_ref": session["landscape_ref"],
             "landscape": dict(session["landscape"].snapshot()),
             "turn_count": len(session["turns"]),
+            "context": {
+                "context_id": context.context_id,
+                "parent_landscape_ref": context.parent_landscape_ref,
+                "source_ids": [item.source.ref.id for item in context.source_refs],
+                "unresolved_questions": list(context.unresolved_questions),
+            },
         }
 
     def evidence(self, session_id: str) -> list[dict[str, Any]]:
@@ -58,13 +91,22 @@ class ShirakamiSessionStore:
 
     def turn(self, session_id: str, text: str) -> dict[str, Any]:
         session = self._sessions[session_id]
-        context = ProtocolInput(
-            context_id=session_id,
-            parent_landscape_ref=session["landscape_ref"],
-            source_refs=(),
-            unresolved_questions=(),
-            requested_context="http-api",
+        context = create_protocol_input(session["context"])
+        applicability = evaluate_applicability(
+            context,
+            "thread.http.turn",
+            session["applicability_conditions"],
+            available=session["applicability_available"],
         )
+        if not applicability.applicable:
+            return {
+                "status": "not_applicable",
+                "protocol_id": "thread.http.turn",
+                "unresolved_questions": list(applicability.unresolved_questions),
+                "failed_conditions": list(applicability.failed_conditions),
+                "state": self.state(session_id),
+            }
+
         ir = build_protocol_ir(
             context,
             protocol_id="thread.http.turn",
@@ -108,7 +150,15 @@ class ShirakamiRequestHandler(BaseHTTPRequestHandler):
             length = int(self.headers.get("Content-Length", "0"))
             payload = json.loads(self.rfile.read(length) or b"{}")
             if path == "/sessions":
-                result = self.store.create(payload["session_id"], payload["landscape_ref"], payload.get("landscape"))
+                result = self.store.create(
+                    payload["session_id"],
+                    payload["landscape_ref"],
+                    payload.get("landscape"),
+                    sources=payload.get("sources"),
+                    source_contents=payload.get("source_contents"),
+                    applicability_conditions=payload.get("applicability_conditions"),
+                    applicability_available=payload.get("applicability_available"),
+                )
                 self._write_json(201, result)
                 return
             parts = path.split("/")
@@ -126,9 +176,6 @@ class ShirakamiRequestHandler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path.rstrip("/")
         parts = path.split("/")
         try:
-            if len(parts) == 3 and parts[1] == "sessions" and parts[2] == "state":
-                self._write_json(200, self.store.state(parts[1]))
-                return
             if len(parts) == 4 and parts[1] == "sessions" and parts[3] == "state":
                 self._write_json(200, self.store.state(parts[2]))
                 return
