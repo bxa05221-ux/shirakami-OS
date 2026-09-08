@@ -1,0 +1,33 @@
+id: thread-rpg-vertical-slice-v0.1
+title: Thread RPG 3.2 Vertical Slice
+version: 0.1
+status: implementation_handoff
+purpose: >
+  実LandscapeからContext、Protocol Input、Applicability、Protocol IR、Runtime、
+  Evidence、Landscape Stateまでを一本の最小経路として接続する。
+flow:
+  - landscape
+  - context_snapshot
+  - protocol_input
+  - applicability_gate
+  - protocol_ir
+  - runtime_execution
+  - evidence
+  - landscape_state
+rules:
+  - semantic_protocol_selectionは行わない
+  - declared applicabilityのみ評価する
+  - declared transitionのみ実行する
+  - failed executionはLandscapeを変更しない
+  - EvidenceはRecord and Preserveする
+  - RendererはこのVertical Sliceの意味判断を担当しない
+completion:
+  condition: >
+    実Landscapeを起点に、適用可能なProtocolのTransitionがRuntimeで実行され、
+    Observable Evidenceを経由してLandscape Stateへ反映されること。
+non_goals:
+  - 全Thread Renderer機能
+  - 全Protocolの自動選択
+  - 新規理論
+  - 永続化バックエンド
+  - 検証のためだけの追加機能
