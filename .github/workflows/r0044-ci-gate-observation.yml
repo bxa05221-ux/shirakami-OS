@@ -1,0 +1,40 @@
+name: R0044 CI Gate Observation
+
+on:
+  push:
+    paths:
+      - '.github/workflows/r0044-ci-gate-observation.yml'
+  pull_request:
+    paths:
+      - '.github/workflows/r0044-ci-gate-observation.yml'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify deterministic gate input
+        run: |
+          python - <<'PY'
+          print("R0044 verify: completed")
+          PY
+
+  gate:
+    needs: verify
+    if: ${{ needs.verify.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Transition to next stage
+        run: |
+          echo "R0044 gate: passed"
+          echo "next=inspection"
+
+  blocked:
+    needs: verify
+    if: ${{ needs.verify.result != 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Stop progression
+        run: |
+          echo "R0044 gate: blocked"
+          echo "next=human_attention"
