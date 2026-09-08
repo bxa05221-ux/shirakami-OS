@@ -1,0 +1,93 @@
+openapi: 3.0.3
+info:
+  title: Shirakami API
+  version: 0.1.0
+  description: >
+    Minimal external API boundary for Shirakami OS β1.0.
+    This contract exposes observation while preserving the existing
+    Landscape / Evidence / Protocol / Runtime boundary.
+servers:
+  - url: https://api.example.invalid
+    description: Placeholder server for the API contract
+paths:
+  /observe:
+    post:
+      operationId: observeLandscape
+      summary: Observe a Landscape input
+      description: >
+        Submit an observation to the Shirakami Runtime. The Runtime may
+        create or reference Evidence and return an observable result.
+        Domain interpretation remains outside the API contract.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObserveRequest'
+      responses:
+        '200':
+          description: Observation accepted and processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObserveResponse'
+        '400':
+          description: Invalid request
+        '404':
+          description: Landscape not found
+        '409':
+          description: State conflict
+        '500':
+          description: Runtime error
+components:
+  schemas:
+    ObserveRequest:
+      type: object
+      required:
+        - landscape_id
+        - input
+      properties:
+        landscape_id:
+          type: string
+          description: Identifier of the target Landscape.
+        input:
+          type: object
+          additionalProperties: true
+          description: Observable input supplied by the client.
+        protocol_id:
+          type: string
+          description: Optional protocol reference when explicitly selected.
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Client metadata. Not treated as domain truth.
+    ObserveResponse:
+      type: object
+      required:
+        - landscape_id
+        - observation_id
+        - state
+      properties:
+        landscape_id:
+          type: string
+        observation_id:
+          type: string
+        state:
+          type: string
+          enum:
+            - observed
+            - rejected
+        evidence_id:
+          type: string
+          nullable: true
+        protocol_id:
+          type: string
+          nullable: true
+        result:
+          type: object
+          additionalProperties: true
+          description: Runtime observation result.
+        provenance:
+          type: object
+          additionalProperties: true
+          description: Execution provenance where available.
