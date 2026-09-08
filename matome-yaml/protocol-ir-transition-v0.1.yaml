@@ -1,0 +1,45 @@
+id: protocol-ir-transition-v0.1
+title: Protocol IR Transition Boundary
+version: 0.1
+status: implementation_handoff
+statement: >
+  Applicability Gateを通過したProtocol Inputを、Protocolが宣言した
+  TransitionとしてRuntimeへ渡すための最小IR境界を定義する。
+input:
+  - protocol_input
+  - protocol_definition
+output:
+  - protocol_ir
+protocol_ir:
+  fields:
+    - protocol_id
+    - context_id
+    - parent_landscape_ref
+    - transition_kind
+    - transition_data
+rules:
+  - protocol_idは明示されたProtocol定義から取得する
+  - context_idとparent_landscape_refを保持する
+  - transition_kindはProtocol定義に宣言された値のみ使用する
+  - transition_dataはopaqueとしてRuntimeへ渡す
+  - Runtimeがdomain meaningを生成しない
+boundaries:
+  ir:
+    may:
+      - bind_declared_transition
+      - preserve_context_reference
+      - preserve_transition_data
+    may_not:
+      - invent_transition
+      - infer_domain_meaning
+      - rewrite_transition_data
+  runtime:
+    receives: protocol_ir
+    executes: declared_transition
+completion:
+  condition: >
+    適用済みProtocolの宣言済みTransitionを、意味改変なしにRuntimeへ渡せること。
+non_goals:
+  - semantic_planning
+  - automatic_transition_generation
+  - domain_interpretation
