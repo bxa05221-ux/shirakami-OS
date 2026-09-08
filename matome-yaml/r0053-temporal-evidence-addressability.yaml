@@ -1,0 +1,49 @@
+matome:
+  id: r0053-temporal-evidence-addressability
+  title: "R0053 — Temporal Evidence Addressability"
+  version: "0.1"
+  status: "implementation_experiment"
+
+  question: >
+    時間の異なるEvidenceを同一のLandscapeStateに保持したまま、
+    現在のLandscape snapshotを更新し、過去のEvidenceを個別に参照できるか。
+
+  existing_contracts:
+    - LandscapeState
+    - EvidenceRecord
+    - apply_evidence
+    - snapshot
+
+  change:
+    - "Evidence AをLandscapeStateへ適用する"
+    - "Evidence BをLandscapeStateへ適用する"
+    - "AとBが別Recordとして保持されることを確認する"
+    - "現在snapshotがBによる最新状態を反映することを確認する"
+
+  verification:
+    - "Evidence AとEvidence Bは別Recordとして保持される"
+    - "Evidence AのデータはEvidence Bによって上書きされない"
+    - "Evidenceの保持順序が観測可能である"
+    - "現在Landscape snapshotは最新Evidenceの状態を反映する"
+    - "snapshotから過去Evidence lineageを推測しない"
+
+  expected_boundary: >
+    時間順に保持されたEvidence
+    ≠
+    現在Landscape snapshot
+
+  non_goals:
+    - "Evidence query/indexing system"
+    - "Evidence lineage reconstruction"
+    - "event sourcing adoption"
+    - "Provenance Graph"
+    - "historical state recovery"
+    - "new Runtime theory"
+    - "new Landscape schema"
+
+  verification_rule:
+    - "One Change"
+    - "One Verification"
+    - "ファイル存在と実験成功を混同しない"
+    - "不明な履歴を推測で補完しない"
+    - "Evidenceを後から書き換えない"
