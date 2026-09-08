@@ -1,0 +1,21 @@
+name: HTTP Real Landscape Vertical Slice
+
+on:
+  push:
+    branches: [feat/writer-support-vertical-slice]
+    paths:
+      - "runtime/**"
+      - "tests/fixtures/dogfight_scene.json"
+      - "tests/test_http_real_landscape_vertical_slice.py"
+      - ".github/workflows/http-real-landscape-vertical-slice.yml"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pytest tests/test_http_real_landscape_vertical_slice.py -q
