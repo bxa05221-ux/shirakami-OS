@@ -1,0 +1,39 @@
+id: http-landscape-pipeline-v0.1
+title: HTTP Landscape Pipeline
+type: matome_yaml
+version: 0.1
+status: implementation_handoff
+authority: implementation
+statement: >
+  HTTP境界から受け取ったLandscapeを、既存のProject Source Registry、
+  Loader、Assembly、Context Boundary、Applicability Gate、Protocol Runtime、
+  Evidence、Landscape Stateの正規経路へ接続する。
+pipeline:
+  - source_registry
+  - project_landscape_loader
+  - project_landscape_assembly
+  - context_boundary
+  - protocol_input
+  - protocol_applicability
+  - protocol_ir
+  - protocol_runtime
+  - evidence
+  - landscape_state
+rules:
+  - HTTP境界は意味解釈を追加しない
+  - 未取得のsourceはunresolved_questionsとして保持する
+  - Applicabilityは宣言された条件だけを評価する
+  - Evidenceは記録・保存し、書き換えない
+  - Landscape Stateはcompleted transitionのEvidenceだけを適用する
+vertical_slice:
+  landscape: tests/fixtures/dogfight_scene.json
+  http_endpoints:
+    - POST /sessions
+    - POST /sessions/{id}/turns
+    - GET /sessions/{id}/state
+    - GET /sessions/{id}/evidence
+  verification: tests/test_http_landscape_pipeline.py
+non_goals:
+  - Protocol理論の変更
+  - source内容の意味解釈
+  - LLM依存の追加
