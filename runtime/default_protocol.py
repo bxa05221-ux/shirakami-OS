@@ -13,9 +13,13 @@ DEFAULT_PROTOCOL_YAML = """matome:
     without defining domain-specific interaction semantics.
   pipeline:
     - phase: request_resolution
+      action: resolve_protocol_request
     - phase: protocol_execution
+      action: execute_protocol
     - phase: evidence_capture
+      action: capture_observation
     - phase: observation
+      action: observe_landscape
 """
 
 DEFAULT_PROTOCOL_ID = "matome.protocol.default"
