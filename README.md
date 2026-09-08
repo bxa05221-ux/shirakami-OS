@@ -173,13 +173,15 @@ Please open issues for proposed changes to the Foundation. For patches or docume
 
 ## License
 
-Shirakami OS now uses a **layered licensing model**:
+Shirakami OS uses a **layered licensing model**:
 
 - **Source code and executable implementation artifacts** → MIT License (`LICENSE`)
 - **Specifications, protocols, schemas, architecture documents, and documentation** → CC BY 4.0 (`LICENSE-SPECIFICATION.md`)
 - **Shirakami OS name, logos, and project marks** → not granted as trademark or official-brand rights by either license
 - **Official certification, endorsement, commercial branding, and Enterprise offerings** → may be governed by separate terms or agreements
 
-This separation is intentional. The implementation is open for use and adaptation, while the specification and documentation remain reusable with attribution, and the project's identity and official status remain separately governed.
+This separation is intentional: implementation code is open for use and adaptation, while specifications and documentation are reusable with attribution. Project identity and official status remain separately governed.
+
+For a concise license reference, see `LICENSES/`. File- or directory-level notices take precedence where explicitly provided.
 
 See [`LICENSE`](LICENSE) and [`LICENSE-SPECIFICATION.md`](LICENSE-SPECIFICATION.md).
