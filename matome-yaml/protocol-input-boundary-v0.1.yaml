@@ -1,0 +1,48 @@
+id: protocol-input-boundary-v0.1
+title: Protocol Input Boundary
+version: 0.1
+status: implementation_handoff
+statement: >
+  Context SnapshotをProtocolが扱える入力境界へ渡す。
+  この境界はProtocolの意味を解釈せず、参照・未解決性・要求範囲を保持する。
+input:
+  - context_snapshot
+output:
+  - protocol_input
+protocol_input:
+  fields:
+    - context_id
+    - parent_landscape_ref
+    - source_refs
+    - unresolved_questions
+    - requested_context
+rules:
+  - Context Snapshotのsource referencesを保持する
+  - unresolved_questionsを保持する
+  - requested_contextをそのまま渡す
+  - source contentを改変しない
+  - Protocol applicabilityをこの境界で推測しない
+boundaries:
+  input_boundary:
+    may:
+      - validate_required_context_fields
+      - preserve_context
+      - create_protocol_input
+    may_not:
+      - infer_protocol_meaning
+      - select_protocol_semantically
+      - rewrite_context
+  protocol:
+    receives: protocol_input
+    determines: declared_applicability_and_conditions
+  runtime:
+    executes: declared_transition
+    records: observable_evidence
+completion:
+  condition: >
+    Context Snapshotを意味改変なしにProtocol InputとしてProtocolへ渡せること。
+non_goals:
+  - automatic_protocol_selection
+  - semantic_interpretation
+  - domain_diagnosis
+  - context_summarization
