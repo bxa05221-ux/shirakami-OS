@@ -200,5 +200,7 @@ Canonical CI Selection
         ↓
 Main Protection Design
         ↓
-R0053 Temporal Evidence Addressability
+R0055 formal handoff
 ```
+
+R0053 Temporal Evidence Addressability and R0054 Temporal Evidence Selection have already been completed in the experiment lineage. R0055 must not be implemented until a formal research-side 的目yaml handoff exists.
