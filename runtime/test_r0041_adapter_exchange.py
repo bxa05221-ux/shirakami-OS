@@ -20,7 +20,7 @@ def test_adapter_exchange_preserves_landscape_and_evidence():
 
     assert state_after_exchange == state_before_exchange
     assert evidence.protocol_id == "example.protocol"
-    assert evidence.status == "success"
+    assert evidence.status == "completed"
     assert dict(evidence.transition_data)["changed"] is True
 
 
