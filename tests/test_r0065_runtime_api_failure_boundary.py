@@ -23,7 +23,8 @@ def test_runtime_api_failed_execution_does_not_report_success():
 
     assert response.status_code == 400
     body = response.json()
-    assert body["success"] is False
-    assert body["event"] == "execution.failed"
-    assert body["output"] is None
-    assert body["error"]
+    assert body["detail"] == "unsupported operation"
+    assert "success" not in body
+    assert "event" not in body
+    assert "output" not in body
+    assert "error" not in body
