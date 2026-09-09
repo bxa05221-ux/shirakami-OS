@@ -1,6 +1,6 @@
 # R0067 — API / Observable Execution Boundary
 
-Status: implementation observation
+Status: completed
 
 ## Purpose
 
@@ -37,8 +37,15 @@ No Runtime behavior, Landscape schema, Adapter contract, Renderer contract, or A
 
 ## Verification
 
-The Artifact must pass the canonical `test-runtime` gate before entering protected `main`.
+- Corrected test commit: `ed501e9be84a932495506fbd6a15d07bf86ecdc6`
+- Runtime β0.1 Verification: success
+- `test-runtime` job: success
+- Runtime and boundary tests: success
+- Manga renderer compile: success
+- Japanese/English smoke-render: success
+- Protected PR #157 merge: success
+- Merge SHA: `445e3e7bf41254335576f9ced71226a589fcd843`
 
 ## Result
 
-Pending canonical verification and protected merge.
+R0067 completed successfully. The existing HTTP API execution path and the existing Landscape/Evidence observable execution path were independently exercised and correlated only through independently supplied input. No API response was promoted to Evidence, and no new integration contract or semantic authority was introduced.
