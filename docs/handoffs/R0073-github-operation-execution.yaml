@@ -1,0 +1,38 @@
+id: shirakami-os-r0073-github-operation-execution
+title: "Shirakami OS β1.0 — R0073 GitHub Operation Execution Handoff"
+version: "0.1"
+status: implementation_handoff
+
+phase:
+  from: "R0072 operation dispatcher"
+  to: "R0073 GitHub operation execution"
+  principle: "OperationPlanをGitHubの変更実行境界へ接続する"
+
+preceding_state:
+  r0072_merge_sha: "a7ef351c70c653ceb6edc1f6f826d634ceb48e48"
+  canonical_verification: "test-runtime"
+  protected_main: true
+
+objective: >
+  既存のOperationPlanを起点として、GitHub上のbranch作成、Artifact生成、
+  Pull Request生成までを一件の自動化境界として実行可能にする。
+
+scope:
+  allowed:
+    - "branch creation"
+    - "declared Artifact creation"
+    - "Pull Request creation"
+  forbidden:
+    - "automatic protected merge"
+    - "new theory"
+    - "new Protocol semantics"
+    - "Landscape schema redesign"
+    - "Adapter contract change"
+    - "Renderer contract change"
+    - "AI/model quality evaluation"
+
+rule:
+  - "One Change / One Verification"
+  - "protected main remains the only merge target"
+  - "unverified result is not success"
+  - "unknown history is not guessed"
