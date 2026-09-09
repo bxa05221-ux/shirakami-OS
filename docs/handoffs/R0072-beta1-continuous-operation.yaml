@@ -1,0 +1,50 @@
+id: shirakami-os-r0072-beta1-continuous-operation
+title: "Shirakami OS β1.0 — R0072 Continuous Operation"
+version: "0.1"
+status: implementation_handoff
+
+phase:
+  from: "R0071 renderer boundary re-observation closure"
+  to: "β1.0 continuous operation"
+  principle: "実運用上の変更を一件ずつ観測し、変更・検証・Evidenceを明示的に記録する"
+
+preceding_state:
+  r0071_closure_merge_sha: "1d499bdc0b35a29e82642b3a0ae27f1e3dc5eba3"
+  protected_main: true
+  canonical_verification: "test-runtime"
+
+objective: >
+  β1.0の連続運用を継続し、既存Runtime境界の一件の運用観測を独立したArtifactとして記録する。
+
+scope:
+  change: "one focused operational observation"
+  rule: "既存の構造・契約を観測し、必要以上の変更を行わない"
+  forbidden:
+    - "new theory"
+    - "new Protocol semantics"
+    - "Landscape schema redesign"
+    - "unnecessary contract changes"
+    - "AI/model quality evaluation"
+
+operational_invariants:
+  - "Landscape remains the continuity target"
+  - "Evidence remains independently observable and preserved"
+  - "Runtime does not invent domain meaning"
+  - "Adapter and Renderer remain outside semantic authority"
+  - "Unknown history is not filled by guesswork"
+
+verification:
+  rule:
+    - "One Change / One Verification"
+    - "file existence != experiment success"
+    - "unverified != success"
+    - "current != historical"
+  gate: "test-runtime"
+  merge_rule:
+    - "protected main only"
+    - "no direct unverified change"
+    - "no force push"
+
+next:
+  name: "R0072 operational observation"
+  rule: "一件だけ観測し、結果をEvidenceとして明示的に記録する。"
