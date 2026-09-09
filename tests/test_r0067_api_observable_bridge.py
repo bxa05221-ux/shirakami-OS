@@ -34,7 +34,7 @@ def test_api_execution_and_landscape_observation_remain_independently_consistent
     assert api_result["output"] == {"value": "r0067"}
     assert observable.evidence.protocol_id == "example.protocol"
     assert observable.after_state["input"] == {"value": "r0067"}
-    assert observable.observation["repository"] == "bxa05221-ux/shirakami-OS"
+    assert observable.observation["snapshot"]["repository"] == "bxa05221-ux/shirakami-OS"
     assert observable.evidence.id in observable.after_state["evidence"]
 
     # Correlate only the independently supplied input; do not treat API output
