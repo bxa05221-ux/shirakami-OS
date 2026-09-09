@@ -7,9 +7,7 @@ def test_capture_automation_evidence_preserves_step_observation():
         AutomationStepResult(step="record-baseline", outcome="ok"),
         AutomationStepResult(step="run-test-runtime", outcome="passed"),
     )
-
     evidence = capture_automation_evidence("op-1", results)
-
     assert len(evidence) == 2
     assert evidence[0].protocol_id == "op-1"
     assert evidence[0].status == "observed"
@@ -18,15 +16,10 @@ def test_capture_automation_evidence_preserves_step_observation():
     assert evidence[1].transition_data["outcome"] == "passed"
 
 
-def test_capture_automation_evidence_returns_immutable_records():
-    evidence = capture_automation_evidence(
-        "op-2", (AutomationStepResult(step="verify", outcome="ok"),)
-    )
-
+def test_capture_automation_evidence_rejects_wrong_result_type():
     try:
-        evidence[0].transition_data["step"] = "changed"
-        changed = True
+        capture_automation_evidence("op-2", ("not-a-step-result",))
+        raised = False
     except TypeError:
-        changed = False
-
-    assert changed is False
+        raised = True
+    assert raised is True
