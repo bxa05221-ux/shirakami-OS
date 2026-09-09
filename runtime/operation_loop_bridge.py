@@ -15,7 +15,7 @@ def bridge_operation_result(
     execute an operation, mutate Landscape/Evidence, or grant authority.
     """
     result = OperationResult(
-        operation_id=planned.operation_id,
+        operation_id=planned.identity[0],
         execution_id=planned.identity[1],
         outcome=outcome,
     )
