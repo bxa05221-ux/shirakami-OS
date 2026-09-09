@@ -1,0 +1,61 @@
+name: Shirakami Operation Dispatcher
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation_id:
+        description: "Operation ID"
+        required: true
+        type: string
+      base_ref:
+        description: "Protected baseline ref"
+        required: true
+        default: "main"
+        type: string
+      scope:
+        description: "Declared operation scope"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.base_ref }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build operation plan
+        env:
+          OPERATION_ID: ${{ inputs.operation_id }}
+          BASE_REF: ${{ inputs.base_ref }}
+          SCOPE: ${{ inputs.scope }}
+        run: |
+          python - <<'PY'
+          import os
+          from runtime.operation_runner import OperationDefinition, plan_operation
+
+          operation = OperationDefinition(
+              operation_id=os.environ["OPERATION_ID"],
+              base_ref=os.environ["BASE_REF"],
+              scope=os.environ["SCOPE"],
+          )
+          plan = plan_operation(operation)
+          print(f"operation_id={plan.operation_id}")
+          print(f"base_ref={plan.base_ref}")
+          print(f"verification_gate={plan.verification_gate}")
+          for index, step in enumerate(plan.steps, start=1):
+              print(f"step_{index}={step}")
+          PY
+
+      - name: Run canonical verification
+        run: python -m pytest runtime tests -q
