@@ -1,1 +1,0 @@
-R0061 operational loop observation is recorded in `R0061-BETA1-OPERATIONAL-LOOP.md`.
