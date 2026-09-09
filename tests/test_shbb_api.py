@@ -1,11 +1,18 @@
 """HTTP contract tests for the shbb-api observation boundary."""
 
+from pathlib import Path
+import sys
+
 import pytest
 
 pytest.importorskip("fastapi")
 pytest.importorskip("httpx")
 
-from shbb_api.app import create_app
+# Keep the external API artifact directory name as ``shbb-api`` while making
+# its Python module importable for the test runner.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "shbb-api"))
+
+from app import create_app
 
 
 def test_observe_e2e():
