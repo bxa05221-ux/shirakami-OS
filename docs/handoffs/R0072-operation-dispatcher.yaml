@@ -1,0 +1,31 @@
+id: shirakami-os-r0072-operation-dispatcher
+title: "Shirakami OS β1.0 — R0072 Operation Dispatcher Handoff"
+version: "0.1"
+status: implementation_handoff
+
+phase:
+  from: "R0071 operation runner boundary"
+  to: "R0073 GitHub operation execution"
+  principle: "計画された運用をGitHub実行境界へ接続する"
+
+preceding_state:
+  r0071_merge_sha: "7e7399bb0dac89c0a7e4a489f9f5889ecddb6341"
+  r0072_merge_sha: "a7ef351c70c653ceb6edc1f6f826d634ceb48e48"
+  canonical_verification: "test-runtime"
+  protected_main: true
+
+verified:
+  - "OperationPlan can be dispatched manually through GitHub Actions"
+  - "declared operation inputs are validated by the existing Operation Runner"
+  - "deterministic plan is observable in workflow output"
+  - "canonical Runtime verification executes successfully"
+
+boundary:
+  - "dispatcher is read-only with respect to GitHub state"
+  - "dispatcher does not mutate Landscape or Evidence"
+  - "dispatcher does not create or merge Pull Requests"
+  - "no new Protocol semantics or theory"
+
+next:
+  name: "R0073 GitHub Operation Execution"
+  rule: "OperationPlanからbranch・Artifact・Pull Request生成までを一件だけ自動化し、protected mergeは別の検証境界として保持する。"
