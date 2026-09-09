@@ -1,0 +1,53 @@
+id: shirakami-os-r0061-beta1-operation-loop
+title: "Shirakami OS β1.0 — R0061 Operation Loop Handoff"
+version: "0.1"
+status: implementation_handoff
+
+phase:
+  from: "β1.0 operation start"
+  to: "β1.0 continuous operation"
+  principle: "運用そのものを観測可能にする"
+
+preceding_state:
+  operation_start_merge_sha: "33da2869ef9b4a3722af47cc797a5f308d149c89"
+  verified_baseline: [R0057, R0058, R0059, R0060]
+  canonical_verification: "test-runtime"
+
+objective: >
+  β1.0 Operation Start後の最初の運用観測として、保護されたmainを起点に
+  既存のLandscape / Evidence / Protocol / Runtime / Adapter / Renderer境界を
+  維持したまま、運用ループを開始できることを記録する。
+
+scope:
+  change: "documentation-only operational observation"
+  forbidden:
+    - "new theory"
+    - "new Protocol semantics"
+    - "Landscape schema redesign"
+    - "Adapter contract change"
+    - "Renderer contract change"
+    - "AI/model quality evaluation"
+
+operational_invariants:
+  - "Landscape remains the continuity target"
+  - "Evidence remains independently observable"
+  - "Evidence is recorded and preserved"
+  - "Adapter remains exchangeable and has no semantic authority"
+  - "Renderer remains a presentation boundary and has no semantic authority"
+  - "Runtime does not invent domain meaning"
+  - "Unknown history is not filled by guesswork"
+
+verification:
+  rule: ["One Change / One Verification", "file existence != experiment success", "unverified != success"]
+  gate: "test-runtime"
+  merge_rule: ["protected main only", "no direct unverified change", "no force push"]
+
+completion_condition:
+  - "R0061 observation is addressable"
+  - "test-runtime succeeds"
+  - "protected main merge succeeds"
+  - "result is recorded without reconstructing historical lineage"
+
+next:
+  name: "β1.0 Continuous Operational Loop"
+  rule: "実運用上の変更を一件ずつ観測し、変更・検証・Evidenceを明示的に記録する。"
