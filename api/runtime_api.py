@@ -28,7 +28,7 @@ def execute(payload: dict[str, Any]) -> dict[str, Any]:
     return {
         "protocol": {"title": execution.protocol_title, "version": execution.protocol_version},
         "success": result.status == "completed",
-        "event": result.transition.kind,
+        "event": result.signals[0] if result.signals else None,
         "output": result.transition.data.get("output"),
         "error": None if result.status == "completed" else result.transition.data,
     }
