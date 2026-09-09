@@ -1,6 +1,6 @@
 # R0074 — Operation Replay Boundary
 
-Status: implementation observation
+Status: completed
 
 ## Purpose
 
@@ -38,8 +38,12 @@ The GitHub workflow uses the GitHub Actions `run_id` as the execution identity.
 
 Focused tests verify deterministic naming, distinct execution identities, safe normalization, and rejection of missing execution identity.
 
-Canonical `test-runtime` remains the merge gate.
+The R0074 implementation was merged through protected PR #173.
 
 ## Result
 
-Pending canonical verification and protected merge.
+Completed.
+
+- Implementation merge commit: `279f745eb4de396755b70f2c462226637b2069d4`
+- Protected `main` was verified to advance to the same commit after merge.
+- R0074 replay-safe execution naming is now part of the mainline operation execution path.
