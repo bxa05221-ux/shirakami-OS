@@ -1,6 +1,6 @@
 # R0073 — GitHub Operation Execution
 
-Status: implementation observation
+Status: completed
 
 ## Purpose
 
@@ -48,8 +48,12 @@ Protected merge is intentionally outside this workflow.
 
 The focused workflow contract test verifies the declared GitHub mutation boundaries and confirms that no merge command is present.
 
-The canonical `test-runtime` gate remains required before this change enters protected `main`.
+The canonical `test-runtime` gate completed successfully on the R0073 head commit.
+
+The change was merged through the protected Pull Request path.
 
 ## Result
 
-Pending canonical verification and protected merge.
+R0073 completed. The OperationPlan boundary is now connected to a minimal GitHub execution boundary while protected merge remains outside the workflow.
+
+Merge SHA: `ee968d7fccd81dfb04d74833206968564c03cb53`
