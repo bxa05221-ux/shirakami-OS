@@ -16,7 +16,7 @@ def bridge_operation_result(
     """
     result = OperationResult(
         operation_id=planned.operation_id,
-        execution_id=planned.execution_id,
+        execution_id=planned.identity[1],
         outcome=outcome,
     )
     return ExecutionBoundary(planned=planned, result=result)
