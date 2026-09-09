@@ -1,6 +1,6 @@
 # R0070 — Adapter Exchange in Continuous Operation Loop
 
-Status: implementation observation
+Status: completed
 
 ## Purpose
 
@@ -40,8 +40,12 @@ No Runtime behavior, Landscape schema, Adapter contract, Renderer contract, or A
 
 ## Verification
 
-The Artifact must pass the canonical `test-runtime` gate before entering protected `main`.
+- R0070 test commit: `f106e74e752a895bf6870b22fcef3911b7a48727`
+- Canonical `test-runtime` gate: success
+- Runtime/boundary verification: success
+- Protected PR #161: merged successfully
+- R0070 merge SHA: `2ef2da67388457a8f6d1f3f9e37ad6327611fe71`
 
 ## Result
 
-Pending canonical verification and protected merge.
+R0070 completed successfully. The existing Adapter exchange was observed between two sequential Landscape operations without mutating the current Landscape state or previously captured Evidence. The second operation continued from the first observed after-state, and both Evidence records remained independently observable and retained in order. No new integration contract, Protocol semantics, or semantic authority was introduced.
