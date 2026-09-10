@@ -52,7 +52,8 @@ def test_r0090_existing_contracts_form_downstream_vertical_path_without_oppai_en
     assert execution.result.status == "completed"
     assert evidence.protocol_id == "r0090.protocol"
     assert evidence.transition_data["input"] == {"raw_input": "hello r0090"}
-    assert snapshot["last_transition"] == "r0090.transition"
+    assert snapshot["changed"] is True
+    assert snapshot["input"] == {"raw_input": "hello r0090"}
 
 
 def test_r0090_oppai_http_reference_entry_still_uses_only_existing_adapter_boundary():
