@@ -10,15 +10,18 @@ from __future__ import annotations
 
 import json
 import sys
+from pathlib import Path
 from typing import Any
 
 from runtime.oppai_runtime_flow import execute
+from runtime.protocol_loader import load_matome
 
-PROTOCOLS = (
-    "shirakami-3d-pruim",
-    "shirakami-anmon-layer-reverse",
-    "shirakami-cognitive-echolocalization-hypothesis-v0.1",
-    "shirakami-thread-rpg-v3.2",
+ROOT = Path(__file__).resolve().parents[2]
+PROTOCOL_PATHS = (
+    ROOT / "protocols/language/3d-pruim.yaml",
+    ROOT / "protocols/language/anmon-layer-reverse.yaml",
+    ROOT / "protocols/language/cognitive-echolocalization-hypothesis-v0.1.yaml",
+    ROOT / "protocols/language/thread-rpg-v3.2.yaml",
 )
 
 
@@ -35,17 +38,26 @@ class ComparisonAdapter:
 
 def run(text: str) -> dict[str, Any]:
     adapter = ComparisonAdapter()
-    results = [execute(text, adapter, protocol=protocol) for protocol in PROTOCOLS]
+    artifacts = [(path, load_matome(path)) for path in PROTOCOL_PATHS]
+    results = [
+        execute(text, adapter, protocol=artifact.protocol_id)
+        for _, artifact in artifacts
+    ]
+    protocol_ids = [artifact.protocol_id for _, artifact in artifacts]
 
     return {
         "experiment_id": "language-protocol-same-landscape-001",
         "raw_input": text,
-        "protocols": list(PROTOCOLS),
+        "protocols": [
+            {"path": str(path.relative_to(ROOT)), "protocol_id": artifact.protocol_id}
+            for path, artifact in artifacts
+        ],
         "results": results,
         "comparison": {
             "same_raw_input": True,
             "same_canonical_input": len({r["input"] for r in results}) == 1,
-            "distinct_protocol_ids": len({r["protocol"] for r in results}) == len(PROTOCOLS),
+            "distinct_protocol_ids": len(set(protocol_ids)) == len(protocol_ids),
+            "protocol_id_collision_count": len(protocol_ids) - len(set(protocol_ids)),
             "semantic_effect_conclusion": "not_claimed",
             "ai_behavior_conclusion": "not_claimed",
             "research_status": "observation_only",
