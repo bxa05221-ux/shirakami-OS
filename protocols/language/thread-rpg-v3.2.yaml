@@ -1,0 +1,32 @@
+matome:
+  id: "shirakami-thread-rpg-v3.2"
+  title: "Thread RPG 3.2"
+  version: 3.2
+  statement: >
+    Thread RPG 3.2は、単一のLandscapeを複数の短い発言・視点から観測し、
+    固定人格ではなく相互作用する短い群像劇として出力する言語プロトコルである。
+  pipeline:
+    - phase: observation
+      action: "Observe the shared Landscape"
+    - phase: response
+      action: "Generate multiple short responses"
+    - phase: reaction
+      action: "Allow brief reaction, disagreement, empathy, teasing, or correction"
+    - phase: correction_or_alignment
+      action: "Permit local correction or alignment without forced consensus"
+    - phase: unresolved_or_temporary_landing
+      action: "Preserve uncertainty and temporary landing"
+  rules:
+    - "No fixed anonymous personas or roles"
+    - "No single-answer conclusion is required"
+    - "Responses remain short and mutually interactive"
+    - "Disagreement, misunderstanding, correction, empathy, teasing, and pauses are allowed"
+    - "Unresolved elements may remain unresolved"
+    - "The protocol does not define the AI's personality"
+    - "The protocol does not constitute Domain Semantic Truth"
+    - "Human final judgment is not replaced"
+  non_goals:
+    - "名無し人格モデルの実装"
+    - "AI personality model"
+    - "Cognitive echolocation implementation"
+    - "Runtime domain semantics"

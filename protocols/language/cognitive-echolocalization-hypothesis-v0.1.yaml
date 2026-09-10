@@ -1,0 +1,34 @@
+matome:
+  id: "shirakami-cognitive-echolocalization-hypothesis-v0.1"
+  title: "認知エコーロケーション基本仮説"
+  version: 0.1
+  statement: >
+    ユーザーが発話を投射し、AI・他者・スレッド等から返るエコーとの差異を観察し、
+    再投射する反復によって認知的位置が立ち現れる、という仮説を言語プロトコルとして予備的に起動する。
+  pipeline:
+    - phase: projection
+      action: "Project the user's utterance onto the shared Landscape"
+    - phase: echo
+      action: "Return multiple possible reactions or viewpoints without treating them as truth"
+    - phase: difference_observation
+      action: "Expose match, mismatch, misunderstanding, counterargument, empathy, teasing, or silence as observable differences"
+    - phase: re_projection
+      action: "Allow the user to re-articulate or revise the projection"
+    - phase: unresolved_continuity
+      action: "Preserve unresolved elements without forcing a cognitive conclusion"
+  rules:
+    - "Echo is not truth"
+    - "AI response is not experience"
+    - "The protocol does not assert the user's cognitive state"
+    - "Multiple viewpoints may disagree or misunderstand"
+    - "Unresolved elements may remain unresolved"
+    - "Human observation and final meaning remain authoritative"
+  non_goals:
+    - "Cognitive echolocation as Runtime domain semantics"
+    - "Automatic cognitive-state inference"
+    - "Experience or personality implementation"
+    - "A dedicated cognitive-echolocation Runtime mechanism"
+  experiment_boundary:
+    status: "research_hypothesis_activation"
+    interpretation: "not_claimed"
+    scientific_verification: "not_claimed"

@@ -36,6 +36,7 @@ def parse_matome(text: str) -> ProtocolIR:
     if not lines or lines[0].strip() != "matome:":
         raise ProtocolLoadError("root key must be 'matome'")
 
+    protocol_id = _optional_scalar(lines, "id")
     title = _scalar(lines, "title")
     version = _scalar(lines, "version")
     statement = _block_scalar(lines, "statement")
@@ -45,7 +46,7 @@ def parse_matome(text: str) -> ProtocolIR:
         raise ProtocolLoadError("Protocol requires title, version, and pipeline")
 
     return ProtocolIR(
-        protocol_id=_slug(title),
+        protocol_id=protocol_id or _slug(title),
         title=title,
         version=version,
         statement=statement,
@@ -59,6 +60,15 @@ def _scalar(lines: list[str], key: str) -> str:
         if line.startswith(prefix):
             return line[len(prefix):].strip().strip('"\'')
     raise ProtocolLoadError(f"missing matome.{key}")
+
+
+def _optional_scalar(lines: list[str], key: str) -> str | None:
+    prefix = f"  {key}:"
+    for line in lines:
+        if line.startswith(prefix):
+            value = line[len(prefix):].strip().strip('"\'')
+            return value or None
+    return None
 
 
 def _block_scalar(lines: list[str], key: str) -> str:
