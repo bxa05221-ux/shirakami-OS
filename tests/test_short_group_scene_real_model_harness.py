@@ -8,12 +8,7 @@ from examples.experiments import run_short_group_scene_real_model as harness
 class FakeAdapter:
     def __call__(self, input_text, protocol):
         assert protocol == "shirakami-short-group-scene-v32"
-        return {
-            "observation": "fake-model-observation",
-            "protocol": protocol,
-            "input": input_text,
-            "output": "fake model output",
-        }
+        return "fake model output"
 
 
 def test_real_model_harness_keeps_adapter_output_separate(monkeypatch, capsys):
