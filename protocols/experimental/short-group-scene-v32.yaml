@@ -1,0 +1,45 @@
+matome:
+  id: shirakami-short-group-scene-v32
+  title: "Short Group Scene Output Protocol"
+  version: "0.1"
+  status: "experimental"
+
+purpose: >
+  同一Landscapeへの応答を単一回答として固定せず、
+  複数の短い発話が相互に反応する短い群像劇として出力する。
+  固定人格・固定役割を生成することを目的としない。
+
+output_structure:
+  - observation
+  - response
+  - reaction
+  - correction_or_alignment
+  - unresolved_or_temporary_landing
+
+rules:
+  - "単一の回答者として結論を先取りしない"
+  - "複数の短い発話を相互作用させる"
+  - "発話者に固定人格や役割を割り当てない"
+  - "不確実性や未解決を保持する"
+  - "人間側の最終判断を代替しない"
+  - "群像劇そのものをDomain Truthとして扱わない"
+
+non_goals:
+  - "名無しという固定キャラクターの再現"
+  - "人格モデルの新規定義"
+  - "RuntimeへのDomain semantics追加"
+  - "AIの個性を事前定義すること"
+
+experiment:
+  hypothesis: >
+    出力構造として短い群像劇を指定することで、
+    同一AIにおいて単一回答とは異なる反応運動が観測される可能性がある。
+  observation_target:
+    - "複数発話間の反応"
+    - "修正・再調整"
+    - "結論の非先取り"
+    - "未解決状態の保持"
+    - "反復時に残る振る舞いの特徴"
+  evidence_boundary: >
+    本Protocolの存在だけではAIの個性や実験成功を主張しない。
+    実行結果は別Evidenceとして記録する。
