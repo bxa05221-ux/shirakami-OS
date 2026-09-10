@@ -47,3 +47,10 @@ def test_anmon_registry_api_smoke():
         ROOT / "protocols/language/anmon-layer-reverse.yaml",
         ["surface_capture", "layer_stripping", "b_side_extraction", "resonance_lock", "reverse_engineering", "consistency_check"],
     )
+
+
+def test_cognitive_echolocalization_hypothesis_activation_smoke():
+    _smoke(
+        ROOT / "protocols/language/cognitive-echolocalization-hypothesis-v0.1.yaml",
+        ["projection", "echo", "difference_observation", "re_projection", "unresolved_continuity"],
+    )
