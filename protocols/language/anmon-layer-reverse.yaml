@@ -1,0 +1,18 @@
+matome:
+  title: "暗問層逆算プロトコル"
+  version: 0.1
+  statement: >
+    人間を分解して暴くのではなく、表層の行動とその背後にある動機を観測し、その間にある問いを保持したまま、再び表層へ組み戻す。
+  pipeline:
+    - phase: surface_capture
+      action: "表層採取"
+    - phase: layer_stripping
+      action: "防衛層剥離"
+    - phase: b_side_extraction
+      action: "B面抽出"
+    - phase: resonance_lock
+      action: "温度固定"
+    - phase: reverse_engineering
+      action: "逆算再構築"
+    - phase: consistency_check
+      action: "巡礼整合"
