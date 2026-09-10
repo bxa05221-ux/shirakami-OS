@@ -1,0 +1,14 @@
+matome:
+  title: "3D Phase Rotational Urgency-Importance Matrix"
+  version: 0.1
+  statement: >
+    3D-PRUIMは、判断装置ではなく判断前処理・思考補助のための流路生成器である。
+  pipeline:
+    - phase: phase_rotation
+      action: "Phase rotation"
+    - phase: vector_decomposition
+      action: "Vector decomposition"
+    - phase: quadrant_classification
+      action: "Quadrant classification"
+    - phase: small_step_generation
+      action: "Small-step generation"
