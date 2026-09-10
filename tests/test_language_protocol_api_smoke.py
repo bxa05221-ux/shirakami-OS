@@ -54,3 +54,10 @@ def test_cognitive_echolocalization_hypothesis_activation_smoke():
         ROOT / "protocols/language/cognitive-echolocalization-hypothesis-v0.1.yaml",
         ["projection", "echo", "difference_observation", "re_projection", "unresolved_continuity"],
     )
+
+
+def test_thread_rpg_v32_registry_api_smoke():
+    _smoke(
+        ROOT / "protocols/language/thread-rpg-v3.2.yaml",
+        ["observation", "response", "reaction", "correction_or_alignment", "unresolved_or_temporary_landing"],
+    )
