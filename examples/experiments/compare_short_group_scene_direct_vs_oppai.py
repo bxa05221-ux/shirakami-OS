@@ -22,7 +22,8 @@ def main() -> None:
 
     adapter = AnthropicAdapter()
 
-    # Same adapter/model and same task text are used for both paths.
+    # Same adapter/model and same source task are used for both paths.
+    # The model-facing prompt is intentionally different in the OPPAI path.
     direct_output = adapter(text, {})
     oppai_result = execute(text, adapter, protocol=PROTOCOL)
 
@@ -40,7 +41,8 @@ def main() -> None:
         },
         "comparison_boundary": {
             "same_model": True,
-            "same_input": True,
+            "same_source_input": True,
+            "model_prompt_differs_by_design": True,
             "quality_conclusion": "not_claimed",
             "personality_conclusion": "not_claimed",
         },
