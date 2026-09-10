@@ -1,3 +1,5 @@
+from collections.abc import Mapping
+
 from examples.oppai_shirakami_api_minimal import ShirakamiRuntime
 from runtime.evidence import capture_evidence
 from runtime.landscape import LandscapeState
@@ -74,7 +76,8 @@ def test_r0090_oppai_evidence_metadata_is_not_an_evidence_record_contract():
 
     prepared = prepare("hello r0090", protocol="default")
 
+    assert isinstance(prepared.evidence, Mapping)
     assert prepared.evidence["schema"] == "OPPAI"
     assert "confidence" in prepared.evidence
-    assert not isinstance(prepared.evidence, type(capture_evidence))
-    assert not hasattr(prepared.evidence, "protocol_id")
+    assert "protocol_id" not in prepared.evidence
+    assert "transition_kind" not in prepared.evidence
