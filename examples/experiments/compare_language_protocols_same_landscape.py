@@ -1,9 +1,8 @@
 """Compare multiple language protocols on the same Landscape input.
 
-This experiment intentionally does not inject protocol YAML semantics into the
-model prompt. The current Runtime contract passes the selected protocol ID
-alongside the canonical input. The purpose is to observe that boundary before
-making any semantic-prompting change.
+The experiment loads protocol IDs from the actual Matome artifacts and then
+passes the same normalized input through the existing Runtime/Adapter boundary.
+It records identifier collisions rather than silently resolving them.
 """
 
 from __future__ import annotations
@@ -45,11 +44,22 @@ def run(text: str) -> dict[str, Any]:
     ]
     protocol_ids = [artifact.protocol_id for _, artifact in artifacts]
 
+    collisions: dict[str, list[str]] = {}
+    for path, artifact in artifacts:
+        collisions.setdefault(artifact.protocol_id, []).append(str(path.relative_to(ROOT)))
+    collision_groups = {key: value for key, value in collisions.items() if len(value) > 1}
+
     return {
         "experiment_id": "language-protocol-same-landscape-001",
         "raw_input": text,
         "protocols": [
-            {"path": str(path.relative_to(ROOT)), "protocol_id": artifact.protocol_id}
+            {
+                "path": str(path.relative_to(ROOT)),
+                "title": artifact.title,
+                "version": artifact.version,
+                "protocol_id": artifact.protocol_id,
+                "pipeline": [step["phase"] for step in artifact.pipeline],
+            }
             for path, artifact in artifacts
         ],
         "results": results,
@@ -58,6 +68,7 @@ def run(text: str) -> dict[str, Any]:
             "same_canonical_input": len({r["input"] for r in results}) == 1,
             "distinct_protocol_ids": len(set(protocol_ids)) == len(protocol_ids),
             "protocol_id_collision_count": len(protocol_ids) - len(set(protocol_ids)),
+            "protocol_id_collision_groups": collision_groups,
             "semantic_effect_conclusion": "not_claimed",
             "ai_behavior_conclusion": "not_claimed",
             "research_status": "observation_only",
