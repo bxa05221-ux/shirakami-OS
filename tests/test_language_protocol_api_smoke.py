@@ -45,6 +45,6 @@ def test_3d_pruim_registry_api_smoke():
 def test_anmon_registry_api_smoke():
     _smoke(
         ROOT / "protocols/language/anmon-layer-reverse.yaml",
-        "",
+        "protocol",
         ["surface_capture", "layer_stripping", "b_side_extraction", "resonance_lock", "reverse_engineering", "consistency_check"],
     )
