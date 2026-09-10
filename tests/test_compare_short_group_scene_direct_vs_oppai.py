@@ -28,6 +28,7 @@ def test_comparison_harness_keeps_direct_and_oppai_outputs_distinct(capsys):
     assert payload["direct"]["model_output"] == "fake-output-1"
     assert payload["oppai"]["model_output"] == "fake-output-2"
     assert payload["comparison_boundary"]["same_model"] is True
-    assert payload["comparison_boundary"]["same_input"] is True
+    assert payload["comparison_boundary"]["same_source_input"] is True
+    assert payload["comparison_boundary"]["model_prompt_differs_by_design"] is True
     assert payload["comparison_boundary"]["quality_conclusion"] == "not_claimed"
     assert len(calls) == 2
