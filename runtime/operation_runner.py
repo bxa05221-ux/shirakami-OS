@@ -57,10 +57,8 @@ def plan_operation(
         base_ref=operation.base_ref,
         verification_gate=operation.verification_gate,
         steps=(
-            "record-baseline",
-            "create-artifact",
             "run-test-runtime",
+            "create-artifact",
             "create-protected-pr",
-            "record-merge-result",
         ),
     )
