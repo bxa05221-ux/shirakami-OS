@@ -13,7 +13,7 @@ def test_request_connects_to_existing_operation_plan():
 
     assert plan.operation_id == "R0079"
     assert plan.base_ref == "main"
-    assert plan.steps[-1] == "record-merge-result"
+    assert plan.steps[-1] == "create-protected-pr"
 
 
 def test_mismatched_operation_identity_is_rejected():
