@@ -14,11 +14,9 @@ def test_r0072_operation_dispatcher_produces_deterministic_plan():
     assert plan.base_ref == "main"
     assert plan.verification_gate == "test-runtime"
     assert plan.steps == (
-        "record-baseline",
-        "create-artifact",
         "run-test-runtime",
+        "create-artifact",
         "create-protected-pr",
-        "record-merge-result",
     )
 
 

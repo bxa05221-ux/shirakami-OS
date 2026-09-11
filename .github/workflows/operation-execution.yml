@@ -36,6 +36,9 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install test dependency
+        run: python -m pip install pytest fastapi httpx
+
       - name: Build operation plan
         env:
           OPERATION_ID: ${{ inputs.operation_id }}
@@ -58,6 +61,9 @@ jobs:
           for index, step in enumerate(plan.steps, start=1):
               print(f"step_{index}={step}")
           PY
+
+      - name: Run canonical verification
+        run: python -m pytest runtime tests -q
 
       - name: Create operation branch and Artifact
         env:
@@ -127,6 +133,3 @@ jobs:
             --head "$branch" \
             --title "ops: ${OPERATION_ID} operation execution (${EXECUTION_ID})" \
             --body "Automated OperationPlan execution for ${OPERATION_ID}, execution ${EXECUTION_ID}. Scope: ${SCOPE}. Protected merge remains a separate verification boundary."
-
-      - name: Run canonical verification
-        run: python -m pytest runtime tests -q
