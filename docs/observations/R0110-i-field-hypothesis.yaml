@@ -1,0 +1,102 @@
+matome:
+
+  id: shirakami-model-as-imaginary-term
+  title: "白神モデル＝巨大な虚数項 仮説"
+  subtitle:
+    - "Model as a Giant Imaginary Term"
+    - "i-Field Hypothesis"
+  version: "0.2"
+  status: "research_handoff"
+
+  purpose:
+    - "白神モデルそのものを、未知項を保持する巨大な虚数項として扱う可能性を検証する"
+    - "観測によってiを具体的な項へ変換し、計算可能な状態へ移行する"
+    - "状態遷移後に新しいiが発生する可能性を保持する"
+
+  core_hypothesis:
+    statement: >
+      白神モデルそのものが巨大な虚数項 i として機能する。
+      iは未知である間だけ存在し、観測可能なEvidenceまたは具体的な変数へ
+      変換された時点で、当該i項は消去される。
+    lifecycle:
+      - "unresolved i"
+      - "observation"
+      - "Evidence / Variable"
+      - "i term elimination"
+      - "state recalculation"
+      - "new i may emerge"
+
+  equation_model:
+    provisional: true
+    form: "L + i_left = R + i_right"
+    rule:
+      - "左辺・右辺の双方にiが存在し得る"
+      - "iは未整理の関係・条件・動機・制約等を保持する"
+      - "観測によって具体化されたiは式から消去する"
+      - "消去後は次の状態を再計算する"
+
+  resolution_rule:
+    - "iを推測だけで消去しない"
+    - "観測可能なEvidenceまたは明示された変数によってのみ消去する"
+    - "Evidenceそのものを書き換えない"
+    - "消去されたiと、その根拠Evidenceの対応を保持する"
+
+  state_transition:
+    flow:
+      - "S0 + i0"
+      - "observe"
+      - "Evidence"
+      - "i0 -> concrete term"
+      - "i0 = 0"
+      - "recalculate S1"
+      - "new i1 may emerge"
+
+  relational_scope:
+    principle: >
+      iは単独の主体内部だけでなく、主体間の関係にも発生し得る。
+      国家・政府・軍・指揮官・兵士・国民・市民等の異なる層の関係を
+      一つの項へ早期に還元しない。
+    examples:
+      - "国家 × 国家"
+      - "政府 × 国民"
+      - "指揮官 × 兵士"
+      - "兵士 × 市民"
+      - "個人 × 家族"
+
+  human_relation:
+    research_observation: >
+      各関係項には、恐怖、愛、憎悪、面子、忠誠、喪失、期待、責任等の
+      人間的な結びつきが作用している可能性がある。
+      これらを初期値として固定せず、iとして観測対象に置く。
+    caution:
+      - "愛を正の感情として固定しない"
+      - "愛を先に答えとして代入しない"
+      - "観測結果によって具体的な関係項へ変換する"
+
+  anmon_relation:
+    i: "未整理の未知項"
+    anmon_layer: "その未知項がなぜ存在するのかを問う層"
+
+  completion:
+    definition: >
+      現在の式に存在するiが、観測可能な項へ整理されて消去され、
+      次の状態を計算可能になった状態を暫定的な完成とする。
+    note: >
+      状態遷移によって新しいiが発生することは妨げない。
+
+  implementation_boundary:
+    status: "provisional_runtime_experiment"
+    rule:
+      - "Domain MeaningをRuntimeへ追加しない"
+      - "iの意味はProtocolまたは入力側が宣言する"
+      - "Runtimeはiの保持・追加・Evidence参照による消去という構造だけを扱う"
+      - "新規理論の確定は研究側で行う"
+
+  verification:
+    principle: "One Change One Verification"
+    minimum:
+      - "iを登録できる"
+      - "Evidence参照なしには消去できない"
+      - "Evidence参照によってiがactive setから消える"
+      - "消去履歴を保持できる"
+      - "次状態で新しいiを追加できる"
