@@ -31,3 +31,30 @@ def test_resolution_requires_observable_evidence_reference():
         field.resolve("i1", "guessed", "")
 
     assert field.unresolved_count() == 1
+
+
+def test_i_remains_unresolved_until_all_required_evidence_is_available():
+    field = IField(
+        (
+            ImaginaryTerm(
+                "i1",
+                "left",
+                "what remains unorganized?",
+                required_evidence=("evidence-001", "evidence-002"),
+            ),
+        )
+    )
+
+    available = {"evidence-001": "observed"}
+    assert not field.can_resolve("i1", available)
+    with pytest.raises(ValueError):
+        field.resolve("i1", "guessed", "evidence-001", available)
+    assert field.unresolved_count() == 1
+
+    available["evidence-002"] = "observed"
+    assert field.can_resolve("i1", available)
+    resolved = field.resolve("i1", "resolved", "evidence-002", available)
+
+    assert resolved.value == "resolved"
+    assert field.unresolved_count() == 0
+    assert field.is_resolved()
