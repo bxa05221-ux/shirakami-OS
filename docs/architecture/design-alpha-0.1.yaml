@@ -1,0 +1,167 @@
+matome:
+  id: shirakami-architecture-design-alpha-0.1
+  title: "Shirakami Architecture Design α0.1"
+  version: "0.1"
+  status: design_handoff
+
+  purpose:
+    - "Blueprintで定義された責務を具体仕様へ落とす"
+    - "Runtime実装に必要な既存インターフェースを整理する"
+    - "API / State Machine / IR / Workspaceの境界を明示する"
+
+  source:
+    blueprint: "shirakami-architecture-blueprint-alpha-0.1"
+    implementation_baseline: "main@759e2bd93a063892a4e6dcd2018e597ebd6e57c5"
+    verification_gate: "test-runtime"
+
+  design_boundary:
+    allowed:
+      - "API仕様"
+      - "State Machine仕様"
+      - "Protocol IR仕様"
+      - "Workspace Layout"
+      - "Validation Specification"
+    forbidden:
+      - "Visionの変更"
+      - "Constitutionの変更"
+      - "Blueprint責務の再定義"
+      - "未検証実装の事実化"
+      - "新規理論の発明"
+
+  interfaces:
+
+    protocol:
+      observed_components:
+        - "ProtocolRegistry"
+        - "Protocol Request"
+        - "Protocol invocation"
+      specification:
+        registry:
+          role: "Protocol IDを解決し、Protocol構造を保持する"
+        request:
+          role: "Protocol IDと入力をRuntime境界へ渡す"
+        invocation:
+          role: "解決済みProtocol RequestをAdapter/Runtime側へ接続する"
+
+    runtime:
+      observed_components:
+        - "Runtime"
+        - "Transition"
+      specification:
+        execute:
+          input:
+            - "protocol_id"
+            - "execution context"
+          output:
+            - "observable execution result"
+        transition:
+          role: "宣言された状態変化を実行単位として表現する"
+
+    evidence:
+      observed_component:
+        - "capture_evidence"
+      specification:
+        role: "実行されたTransitionからObservable Evidenceを生成する"
+        invariant:
+          - "Evidenceは実行結果の観測記録として扱う"
+          - "Evidenceに意味上の最終判断を付与しない"
+
+    landscape:
+      observed_components:
+        - "LandscapeState"
+        - "execute_on_landscape"
+      specification:
+        role: "Runtime実行とLandscape Stateの連続性を接続する"
+        invariant:
+          - "Landscape Stateは実行経路上で継続可能である"
+          - "Evidence referenceを保持できる"
+
+  state_machine:
+    canonical_observed_path:
+      - "Input"
+      - "Observation"
+      - "Unresolved"
+      - "Evidence"
+      - "Resolution"
+      - "Protocol Request"
+      - "Protocol Invocation"
+      - "Transition"
+      - "Evidence"
+      - "Landscape State"
+
+    rule:
+      - "状態遷移はObservableな変化として検証可能であること"
+      - "未解決状態を勝手に解釈で解消しない"
+      - "ResolutionはEvidence referenceを保持する"
+      - "Transition結果はEvidenceへ接続可能である"
+
+  protocol_ir:
+    boundary:
+      input: "Matome YAML / registered Protocol structure"
+      output: "Runtimeが扱えるProtocol Request / IR"
+    invariant:
+      - "ProtocolのDomain MeaningをRuntimeへ移植しない"
+      - "Protocol IDを明示的に識別する"
+      - "入力とProtocol identityを分離する"
+
+  evidence_contract:
+    minimum_identity:
+      - "observable transition"
+      - "evidence reference"
+    preservation:
+      - "immutable observation"
+      - "replay時に過去Evidenceを上書きしない"
+
+  operation_identity:
+    operation_id:
+      role: "宣言されたOperationを識別"
+    execution_id:
+      role: "個別Executionを識別"
+    result_identity:
+      role: "Operation ID + Execution ID"
+    replay:
+      - "Executionごとに独立したArtifactを保持"
+      - "過去Executionを上書きしない"
+
+  workspace:
+    design_documents:
+      - "docs/architecture/"
+      - "docs/design/"
+    runtime_implementation:
+      - "runtime/"
+    protocol_definitions:
+      - "theory/"
+      - "plugins/"
+    verification:
+      - "runtime/test_*.py"
+      - "experiments/"
+    rule:
+      - "DesignとImplementationを同一責務として扱わない"
+      - "Historical/Experimental artifactsをCurrent implementationと混同しない"
+
+  validation:
+    canonical_gate: "test-runtime"
+    required:
+      - "API boundary validation"
+      - "State Machine continuity"
+      - "Protocol identity resolution"
+      - "Evidence preservation"
+      - "Landscape continuity"
+      - "Replay isolation"
+      - "Operation Result identity"
+
+  unresolved:
+    - "Protocol IRの最終表現形式"
+    - "Evidence Lineageの保存粒度"
+    - "過去Evidence参照の責務境界"
+    - "Runtime実行意味論の限界"
+
+  rule_for_unresolved: >
+    未解決事項はDesignで推測確定しない。
+    必要な実験または研究課題として保持し、
+    Evidenceにより確認された範囲だけを仕様へ昇格する。
+
+  next_action:
+    - "Design仕様を個別API / State Machine / IRへ分割する"
+    - "各変更を一つずつ実装しtest-runtimeで検証する"
+    - "検証後にImplementationへ反映する"
