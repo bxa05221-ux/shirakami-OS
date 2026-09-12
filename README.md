@@ -1,120 +1,225 @@
 # shirakami-OS
 
-> **Shirakami OS is not another AI model.**
-> It is a runtime for preserving, observing, and transferring human context across AI systems.
+> **Shirakami is not another AI model.**
+> It is a runtime and protocol-based interface for preserving, observing, and transferring human context across AI systems.
 
 [English](README.md) | [日本語](README.ja.md)
 
-----
-Version: α2.2  
-Status: Foundation Freeze
+---
+
+## 👋 New here? Start here.
+
+You do **not** need to understand GitHub to try Shirakami.
+
+If you only want to understand what this project is, use this path:
+
+1. **[Shirakami Model Launch Protocol](docs/protocols/SHIRAKAMI_MODEL_LAUNCH_PROTOCOL_v1.0.yaml)** — what is being launched
+2. **[Shirakami Radio Language UI](examples/shirakami_radio_ui/)** — the simplest human-facing interface
+3. **[MVP Quickstart](docs/architecture/MVP_QUICKSTART.md)** — run the implementation
+4. **[Reviewer Entry Point](docs/architecture/REVIEWER_ENTRY_POINT.md)** — inspect the architecture and evidence boundaries
+5. **[Thread RPG v1.2.1](products/thread-rpg-v1.2.1/)** — an existing public service artifact
+
+### In one sentence
+
+**Shirakami explores how a human can keep their context and judgment when the AI changes.**
+
+The AI is a simulator, observer, and hypothesis generator — **not the final authority**.
+
+---
+
+## Current status
+
+**β1.0 → Launch Model → Operational Rollout**
+
+This repository is moving from verified shakedown into real operational observation.
+
+Launch does **not** mean finished product. It means that a verified boundary is ready to be placed into real use, observed, and improved through evidence.
+
+For the current launch declaration, see:
+
+**[Shirakami Model Launch Protocol v1.0](docs/protocols/SHIRAKAMI_MODEL_LAUNCH_PROTOCOL_v1.0.yaml)**
+
+---
 
 ## What Shirakami Is
 
-Shirakami OS is an open-source **Personal AI Runtime / development architecture** for preserving and working with human context independently of a particular LLM or AI provider.
+Shirakami is an open-source **human-context / AI runtime architecture** designed to keep Landscape, Protocol, Evidence, and human judgment explicit and portable across changing AI systems.
 
 It makes these boundaries explicit:
 
-- **Landscape** — observable human/AI/project/context environment
-- **Protocol** — declares meaning and execution structure
+- **Landscape** — observable human / AI / project / context environment
+- **Evidence** — observed transitions and facts, separated from inference
+- **Protocol** — processing and interaction rules
 - **Runtime** — executes Protocols without owning domain truth
-- **Evidence** — preserves observable transitions
-- **Projection / Replay** — reconstruct and inspect Landscape state
-- **Adapter** — separates the Runtime from external AI and backend systems
+- **Adapter** — separates Runtime from external AI, UI, and backend systems
+- **Renderer / UI** — presents interaction without becoming semantic authority
 
-For readers coming from **AI memory, human context preservation, personal AI infrastructure, protocol-driven AI, evidence-driven AI, AI agents, or model-independent AI runtimes**, this repository is the implementation-oriented entry point.
+Recommended architecture reading order:
 
-## A Different Question
+**Landscape → Evidence → Protocol → Runtime → Adapter → Execution → Observation**
 
-AI models change.
-AI providers change.
-Interfaces change.
+---
 
-But human context should not have to disappear with them.
+## Try the Human-facing Interface
 
-Shirakami explores a different question:
+### Shirakami Radio
 
-> **What if the valuable asset is not the AI model, but the human landscape the AI learns to inherit?**
+**[Open the Shirakami Radio Language UI](examples/shirakami_radio_ui/)**
 
-**Landscape First.** The runtime is a service to Landscape, not the other way around.
+This is the smallest current interface for experiencing the Shirakami approach as a conversation.
 
-## Reviewer Entry Point
+The current MVP is intentionally simple:
 
-For external review, start here:
+- browser-based
+- Japanese conversation UI
+- Demo mode
+- optional Runtime endpoint
+- no account required by the static UI itself
+- no claim that an external AI is connected by default
 
-- **[Reviewer Entry Point](docs/architecture/REVIEWER_ENTRY_POINT.md)** — evidence-backed reading order and architecture boundaries.
-- **[MVP Quickstart](docs/architecture/MVP_QUICKSTART.md)** — the shortest route to running and testing the implementation.
+The UI is a **human-facing entry point**, not the Runtime itself.
 
-Recommended reading order:
+Audio is not required for this first rollout. Voice UI can be added later as a separate versioned interface.
 
-**Landscape → Evidence → Specification / Protocol → Runtime → Adapter → Execution → Observation**
+---
 
 ## Architecture
 
 ```text
-Landscape
-    ↓
-Evidence
-    ↓
-Protocol / Specification
-    ↓
+Human
+  ↓
+Shirakami Radio / UI
+  ↓
+Language UI Adapter
+  ↓
+Protocol
+  ↓
 Runtime
-    ↓
-Adapter
-    ↓
-External System / AI
+  ↓
+AI / Backend Adapter
+  ↓
+External AI or Service
+  ↓
+Response
+  ↓
+Renderer / UI
+  ↓
+Human
 ```
 
-Shirakami OS treats protocols, evidence, observable state, and human context as explicit architectural objects so that the surrounding AI model can change without forcing the human's accumulated context to disappear.
+The surrounding AI can change. The human Landscape and the boundaries around it are intended to remain portable.
 
-## Minimal Executable OS
+---
 
-The repository exposes one concrete vertical slice as the executable entry point:
+## Core Principles
+
+- **Human final authority** — AI does not receive final decision-making authority.
+- **Landscape First** — human context is not subordinate to the model.
+- **Hypotheses remain provisional** — inferred intent, emotion, or personality is not treated as fact.
+- **Uncertainty is preserved** — what is not understood is not silently filled in.
+- **Contradictions are signals** — disagreement and correction can update the working hypothesis.
+- **Evidence is preserved** — observed history is not silently rewritten.
+- **Runtime is replaceable** — the architecture should not depend on one AI vendor.
+- **One change, one verification** — operational changes are introduced and checked incrementally.
+
+---
+
+## Launch is an operation, not a completion certificate
+
+The launch model follows a continuous cycle:
 
 ```text
-boot Landscape
-      ↓
-   Protocol
-      ↓
-    Runtime
-      ↓
- Observable Transition
-      ↓
-    Evidence
-      ↓
- Landscape State
-      ↓
- Inspectable Result
+Observe
+  ↓
+Hypothesis
+  ↓
+Dialogue
+  ↓
+Echo
+  ↓
+Update
+  ↓
+Consistency Check
+  ↓
+Observe
+```
+
+The quality target is therefore not simply “did the AI answer correctly?”
+
+We also observe:
+
+- cognitive echoes
+- contradictions
+- misunderstandings
+- unresolved questions
+- protocol deviations
+- Runtime dependency
+- human corrections
+
+**Launch → Observe → Evidence → Refine → Verify → Next version**
+
+---
+
+## Minimal Executable Runtime
+
+The repository also contains a minimal executable vertical slice:
+
+```text
+Landscape
+   ↓
+Protocol
+   ↓
+Runtime
+   ↓
+Observable Transition
+   ↓
+Evidence
+   ↓
+Landscape State
+   ↓
+Inspectable Result
 ```
 
 Run:
 
 ```bash
-python shirakami_os.py
+python examples/quickstart/run.py
 ```
 
-The entry point is intentionally small. It does not claim to be the final architecture; it makes the minimum OS boundary directly executable and inspectable. The implementation is covered by `tests/test_shirakami_os.py`.
+For implementation details, see **[MVP Quickstart](docs/architecture/MVP_QUICKSTART.md)**.
+
+---
 
 ## Public Service Artifact
 
 The current public service artifact is **[Thread RPG v1.2.1](products/thread-rpg-v1.2.1/)** — a UI-for-AI dialogue protocol / multi-voice conversation system.
 
-Thread RPG is the public entry point for experiencing Shirakami concepts in a concrete form. It demonstrates how Protocol-driven interaction can produce a human-observable Landscape and serve as a basis for further observation.
-
-Other experimental artifacts, including Matome API v3.2 and related Evidence work, remain development/research artifacts and are not presented here as public service products.
+Other experimental artifacts remain development or research artifacts unless explicitly identified as public service artifacts.
 
 → **[Service Artifact Index](products/)**
 
-## Getting Started
+---
 
-- **MVP Quickstart → [docs/architecture/MVP_QUICKSTART.md](docs/architecture/MVP_QUICKSTART.md)**
-- Foundation / implementation boundary → [spec/](spec/)
-- Architecture → [docs/](docs/)
-- **User Manual (manga)** → [docs/manual/](docs/manual/)
-- Historical / active RFCs → [docs/rfc/](docs/rfc/)
-- Examples → [examples/](examples/)
-- Japanese introduction → [README.ja.md](README.ja.md)
-- Normative specifications → **[shirakami-specification](https://github.com/bxa05221-ux/shirakami-specification)**
+## For reviewers
+
+If you are here to evaluate the project rather than simply try it, start with:
+
+**[Reviewer Entry Point](docs/architecture/REVIEWER_ENTRY_POINT.md)**
+
+It provides the evidence-backed reading order and architecture boundaries.
+
+The repository deliberately distinguishes:
+
+- current implementation
+- normative specifications
+- observations / evidence
+- experiments
+- historical artifacts
+- research questions
+
+A file existing in the repository does **not** by itself mean that an experiment succeeded or that a concept is implemented in the canonical Runtime path.
+
+---
 
 ## Scope
 
@@ -124,62 +229,52 @@ Included:
 - Adapters and plugins
 - Executable examples
 - Evidence and observation mechanisms
+- Human-facing experimental UI
 
 Out of scope:
-- Research Notes
-- Historical Discussions
-- Stable normative specifications owned by `shirakami-specification`
 - Private user Landscape
+- Research notes as normative implementation
+- Historical discussions as current specification
+- Stable normative specifications owned by `shirakami-specification`
 
-## Principles
-- Landscape First.
-- Protocols describe Landscapes.
-- Runtime executes Protocols.
-- LLMs are replaceable. Landscape remains.
-
-## Why This Matters
-
-We are not trying to build a better model inside the model race.
-
-We are exploring the layer around the model:
-
-> **How can a human keep their Landscape when the AI changes?**
-
-This is an experimental open-source project. We welcome comparison, criticism, experiments, and alternative approaches.
+---
 
 ## Repository structure
-- spec/ — implementation-side Foundation and transition specifications
-- docs/ — architecture and reference notes
-- examples/ — minimal examples for runtime boundary
-- protocols/ — protocol source artifacts used by implementations
-- runtime/ — Runtime implementation
-- plugins/ — plugin and adapter implementations
-- products/ — public service artifact and reference implementations
 
-## User Manual (Manga)
+- `spec/` — implementation-side specifications
+- `docs/` — architecture, protocols, observations, and reference documentation
+- `examples/` — executable examples and UI prototypes
+- `protocols/` — protocol source artifacts
+- `runtime/` — Runtime implementation
+- `plugins/` — plugins and adapters
+- `products/` — public service artifacts
 
-The Public Alpha includes a minimal multilingual manga-style manual renderer.
+---
 
-- [Manual index](docs/manual/)
-- [Japanese SVG](docs/manual/manga-user-manual.ja.svg)
-- [English SVG](docs/manual/manga-user-manual.en.svg)
-- [Matome YAML source](protocols/manual/manga-user-manual.yaml)
-- [Rendering contract](spec/manual-rendering.md)
+## Related repositories
 
-The same manual structure can be rendered in different languages without changing the page structure. This is an experimental UI/documentation adapter, not a general manga-generation engine.
+- [shirakami-model](https://github.com/bxa05221-ux/shirakami-model) — Model / Vision
+- [shirakami-specification](https://github.com/bxa05221-ux/shirakami-specification) — Specification
+- [shirakami-research](https://github.com/bxa05221-ux/shirakami-research) — Research / theory
+- **shirakami-OS** — Runtime / Implementation
 
-## Contributing
-Please open issues for proposed changes to the Foundation. For patches or documentation fixes, create a branch named `fix/...` or `feat/...` and submit a PR against `main`.
+---
 
 ## License
 
-Shirakami OS now uses a **layered licensing model**:
+Shirakami uses a layered licensing model:
 
 - **Source code and executable implementation artifacts** → MIT License (`LICENSE`)
 - **Specifications, protocols, schemas, architecture documents, and documentation** → CC BY 4.0 (`LICENSE-SPECIFICATION.md`)
-- **Shirakami OS name, logos, and project marks** → not granted as trademark or official-brand rights by either license
+- **Shirakami name, logos, and project marks** → not granted as trademark or official-brand rights by either license
 - **Official certification, endorsement, commercial branding, and Enterprise offerings** → may be governed by separate terms or agreements
 
-This separation is intentional. The implementation is open for use and adaptation, while the specification and documentation remain reusable with attribution, and the project's identity and official status remain separately governed.
-
 See [`LICENSE`](LICENSE) and [`LICENSE-SPECIFICATION.md`](LICENSE-SPECIFICATION.md).
+
+---
+
+## Contributing
+
+Questions, criticism, experiments, and alternative approaches are welcome.
+
+For patches or documentation changes, create a `fix/...` or `feat/...` branch and submit a PR against `main`.
