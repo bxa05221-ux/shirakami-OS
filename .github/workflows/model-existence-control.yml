@@ -50,3 +50,5 @@ jobs:
         run: python experiments/activation_pump_check.py
       - name: Run background runner check
         run: python experiments/background_runner_check.py
+      - name: Run distorted celestial sphere boundary check
+        run: python experiments/distorted_celestial_sphere_boundary_check.py
