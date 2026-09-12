@@ -4,6 +4,7 @@ from runtime.oppai_schema import normalize
 from runtime.protocol_api import build_protocol_request, invoke_protocol
 from runtime.protocol_registry import ProtocolRegistry
 from runtime.prototype import Runtime, Transition
+from runtime.replay import evidence_fingerprint
 
 
 def test_r0112_oppai_i_protocol_runtime_adapter_evidence_path():
@@ -46,7 +47,7 @@ def test_r0112_oppai_i_protocol_runtime_adapter_evidence_path():
         },
     )
     evidence_1 = capture_evidence(observed)
-    evidence_ref = "evidence-r0112-001"
+    evidence_ref = evidence_fingerprint(evidence_1)
 
     assert evidence_1.protocol_id == "oppai.observation"
     assert evidence_1.transition_data["raw_input"] == raw_input
