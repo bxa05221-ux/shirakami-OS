@@ -5,7 +5,7 @@ on:
   push:
     paths:
       - 'experiments/model-existence-control-001.md'
-      - 'experiments/activation-boundary-check.py'
+      - 'experiments/activation_boundary_check.py'
       - '.github/workflows/model-existence-control.yml'
 
 jobs:
