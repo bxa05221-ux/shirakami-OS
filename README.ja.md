@@ -12,11 +12,33 @@ GitHubの構造を理解していなくても、白神を試せます。
 
 まずは次の順番だけ見てください。
 
-1. **[白神モデル ローンチ・プロトコル](docs/protocols/SHIRAKAMI_MODEL_LAUNCH_PROTOCOL_v1.0.yaml)** — 何をローンチするのか
-2. **[白神ラジオ 言語UI](examples/shirakami_radio_ui/)** — 人間向けの一番簡単な入口
-3. **[最小実装の導入・実行（MVPクイックスタート）](docs/architecture/MVP_QUICKSTART.md)** — 実装を動かす
-4. **[レビュー入口](docs/architecture/REVIEWER_ENTRY_POINT.md)** — 構造とEvidence（観測記録）の境界を見る
-5. **[スレッドRPG v1.2.1](products/thread-rpg-v1.2.1/)** — 既存の公開サービス・アーティファクト
+1. **[白神モデル ローンチ・プロトコル](docs/protocols/SHIRAKAMI_MODEL_LAUNCH_PROTOCOL_v1.0.yaml)** — 白神は今、どこまでできている？
+2. **[白神ラジオ 言語UI](examples/shirakami_radio_ui/)** — まず触ってみる
+3. **[最小実装の導入・実行（MVPクイックスタート）](docs/architecture/MVP_QUICKSTART.md)** — 自分のパソコンで動かしてみる
+4. **[レビュー入口](docs/architecture/REVIEWER_ENTRY_POINT.md)** — 白神の仕組みを詳しく見る
+5. **[スレッドRPG v1.2.1](products/thread-rpg-v1.2.1/)** — 既存の公開サービスを見る
+
+### AIで試す場合
+
+**GPTでの確認を推奨しています。**
+
+現在の白神の実装確認を行う場合は、まずGPTを使って試してください。
+
+そして、**他のAIモデルで試した結果のレポートも歓迎します。**
+
+モデルによって、同じProtocolや同じ入力からどのような違いが生じるのかを比較すること自体が、白神の観測になります。
+
+- GPTで試した結果
+- 他AIモデルで試した結果
+- うまく動かなかった場合の結果
+- GPTと他モデルで違った点
+- 「白神の意図が伝わらなかった」と感じた点
+
+などを、できるだけ元の状態を残したまま共有してください。
+
+**外部AIの回答そのものを「正解」とは扱いません。**
+
+AIによる観測は観測として記録し、必要に応じて白神側の実装・テスト・Evidenceで確認します。
 
 ### 一言でいうと
 
