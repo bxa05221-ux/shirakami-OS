@@ -15,8 +15,9 @@ GitHubの構造を理解していなくても、白神を試せます。
 1. **[白神モデル ローンチ・プロトコル](docs/protocols/SHIRAKAMI_MODEL_LAUNCH_PROTOCOL_v1.0.yaml)** — 白神は今、どこまでできている？
 2. **[白神ラジオ 言語UI](examples/shirakami_radio_ui/)** — まず触ってみる
 3. **[最小実装の導入・実行（MVPクイックスタート）](docs/architecture/MVP_QUICKSTART.md)** — 自分のパソコンで動かしてみる
-4. **[レビュー入口](docs/architecture/REVIEWER_ENTRY_POINT.md)** — 白神の仕組みを詳しく見る
-5. **[スレッドRPG v1.2.1](products/thread-rpg-v1.2.1/)** — 既存の公開サービスを見る
+4. **[白神を詳しく知る（Wiki）](docs/wiki/Home.ja.md)** — 白神の仕組みや考え方を読む
+5. **[仕組みを詳しく見る（レビュー入口）](docs/architecture/REVIEWER_ENTRY_POINT.md)** — ArchitectureとEvidenceの境界を確認する
+6. **[スレッドRPG v1.2.1](products/thread-rpg-v1.2.1/)** — 既存の公開サービスを見る
 
 ### AIで試す場合
 
@@ -105,6 +106,16 @@ RuntimeはDomain Truth（領域上の真実）を所有せず、Adapterによっ
 **UIはRuntimeそのものではありません。**
 
 最初のローンチでは音声を必須にしません。音声UIは別Version（次の版）で追加できる境界として残します。
+
+---
+
+## 白神を詳しく知る
+
+GitHubや技術用語に慣れていない人は、ここから読めます。
+
+→ **[白神を詳しく知る（Wiki）](docs/wiki/Home.ja.md)**
+
+Wikiでは、白神とは何か、まず何を試せばよいか、どんな仕組みなのか、開発・検証がどう行われているかを、READMEより詳しく説明しています。
 
 ---
 
@@ -204,7 +215,7 @@ python examples/quickstart/run.py
 
 ### 3. 詳しい導入手順を見る
 
-→ **[最小実装の導入・実行ガイド（MVPクイックスタート）](docs/architecture/MVP_QUICKSTART.md)**
+→ **[まず動かす：最小実装の導入・実行ガイド](docs/architecture/MVP_QUICKSTART.md)**
 
 ここでいう「MVP」は、完成した製品版ではなく、白神のRuntimeを最小構成で試すための実装を指します。
 
@@ -220,11 +231,11 @@ python examples/quickstart/run.py
 
 ---
 
-## レビューする人へ
+## 仕組みを詳しく見たい人へ
 
-実装やArchitecture（構造）を評価したい場合は、まずこちらから。
+実装やArchitecture（構造）を評価したい場合は、こちらから。
 
-**[レビュー入口](docs/architecture/REVIEWER_ENTRY_POINT.md)**
+→ **[仕組みを詳しく見る（レビュー入口）](docs/architecture/REVIEWER_ENTRY_POINT.md)**
 
 このRepositoryでは、次のものを意図的に分離しています。
 
