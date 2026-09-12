@@ -1,0 +1,36 @@
+name: Model existence control
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'experiments/model-existence-control-001.md'
+      - '.github/workflows/model-existence-control.yml'
+
+jobs:
+  control:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run control
+        run: |
+          python - <<'PY'
+          from dataclasses import dataclass
+
+          @dataclass
+          class State:
+              message: str
+              changed: bool = False
+
+          def plain_control(message: str):
+              return State(message=message, changed=True)
+
+          control = plain_control("existence-control")
+          assert control.changed is True
+          print(f"CONTROL changed={control.changed} message={control.message}")
+          PY
+      - name: Run Shirakami path
+        run: python shirakami_os.py
