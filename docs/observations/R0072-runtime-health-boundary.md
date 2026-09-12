@@ -1,6 +1,6 @@
 # R0072 — Runtime Health Boundary
 
-Status: implementation observation
+Status: verified
 
 ## Purpose
 
@@ -40,8 +40,10 @@ This observation does not introduce a new API contract. It verifies the existing
 
 ## Verification
 
-The Artifact must pass the canonical `test-runtime` gate before entering protected `main`.
+The R0072 Artifact passed the canonical `test-runtime` gate before entering protected `main`.
 
 ## Result
 
-Pending canonical verification and protected merge.
+Verified. R0072 was merged to protected `main` as commit `4ccad43fdbd261b18eebd4fe498f372ef3873580`.
+
+The existing `/health` boundary is operationally observable and the focused test confirms the expected HTTP 200 health payload without introducing new Runtime, Landscape, Evidence, Protocol, Adapter, or Renderer semantics.
