@@ -1,0 +1,64 @@
+matome:
+  id: R0115
+  title: "OPPAI–GitHub AI–Shirakami Runtime Operation Boundary"
+  version: "0.1"
+  status: "implementation_observation"
+
+purpose:
+  - "OPPAIがGitHub上の開発・実装環境に存在する事実を記録する"
+  - "OPPAI → Protocol → Runtime の既存実装境界を運用観測として固定する"
+  - "GitHub AIへのOPPAI供給について、確認済み事実と未確認事項を分離する"
+
+observed_artifacts:
+  - path: "docs/specs/OPPAI_Schema_v0.1.md"
+    role: "OPPAI schema"
+  - path: "src/shirakami/oppai.py"
+    role: "OPPAI boundary helper"
+  - path: "runtime/oppai_schema.py"
+    role: "runtime OPPAI schema"
+  - path: "runtime/oppai_runtime_flow.py"
+    role: "OPPAI -> Protocol -> Runtime flow"
+  - path: "docs/api/OPPAI_Shirakami_API_Minimal_v0.1.md"
+    role: "implementation API specification"
+  - path: "ci/oppai-ci-probe.txt"
+    role: "OPPAI CI probe"
+
+confirmed:
+  - "OPPAI is represented as repository artifacts, implementation helpers, runtime schema, API specification, and CI probe."
+  - "The repository contains an explicit OPPAI -> Protocol -> Runtime flow."
+  - "The OPPAI runtime flow keeps downstream execution adapter abstract and avoids coupling OPPAI to a model vendor."
+  - "GitHub is therefore functioning as an implementation and verification environment in which OPPAI artifacts participate."
+
+not_confirmed:
+  - "No evidence in the inspected repository artifacts alone proves that GitHub Copilot/AI system prompts are directly or continuously injected with OPPAI."
+  - "No claim is made that GitHub AI internally executes OPPAI as a hidden system instruction."
+
+operational_interpretation:
+  flow:
+    - "Human intent"
+    - "OPPAI"
+    - "GitHub AI-assisted implementation"
+    - "Git repository"
+    - "Runtime"
+    - "Evidence"
+    - "CI / verification"
+    - "Human judgment"
+  rule:
+    - "Do not treat GitHub AI as authority."
+    - "Treat repository artifacts and verification results as observable evidence."
+    - "Separate protocol presence from model prompt injection."
+    - "Do not expand theory from this observation."
+
+theory_boundary:
+  - "This record is an implementation/operation observation, not a new theory."
+  - "If direct GitHub AI prompt ingestion is to be established, capture the concrete instruction/configuration artifact and its execution evidence as a subsequent experiment."
+
+next_candidate:
+  id: "R0116"
+  title: "GitHub AI OPPAI Instruction Ingestion Verification"
+  condition: "Only execute if a concrete GitHub AI instruction/configuration surface can be identified."
+  success_criteria:
+    - "Concrete instruction source identified"
+    - "OPPAI content traceable to that source"
+    - "AI-assisted change attributable to the instruction path"
+    - "Result independently verifiable through repository history or CI"
