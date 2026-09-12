@@ -4,10 +4,10 @@ from runtime.background_runner import BackgroundRunner
 from runtime.prototype import Transition
 
 
-def anmon_test_protocol(input_data):
+def anmon_test_protocol(context):
     return Transition(
         kind="background.observe",
-        data={"observed": True, "text": input_data.get("text", "")},
+        data={"observed": True, "text": context.input.get("text", "")},
     )
 
 
