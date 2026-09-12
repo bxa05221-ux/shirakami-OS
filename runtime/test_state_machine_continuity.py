@@ -43,7 +43,7 @@ def test_state_machine_continuity_oppai_i_protocol_runtime_evidence_landscape():
     assert evidence_2.transition_data["evidence_ref"] == evidence_1_ref
     assert evidence_2.transition_data["resolved_i"] == raw_input
 
-    state = LandscapeState()
+    state = LandscapeState.empty()
     landscape_evidence = execute_on_landscape(
         state,
         Runtime(),
@@ -53,3 +53,5 @@ def test_state_machine_continuity_oppai_i_protocol_runtime_evidence_landscape():
     )
     assert landscape_evidence.transition_data["evidence_ref"] == evidence_1_ref
     assert landscape_evidence.transition_data["resolved_i"] == raw_input
+    assert state.snapshot()["evidence_ref"] == evidence_1_ref
+    assert state.snapshot()["resolved_i"] == raw_input
