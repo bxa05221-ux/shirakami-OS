@@ -6,17 +6,18 @@ as a Background Protocol; the test verifies one execution -> Evidence cycle.
 """
 
 from runtime.background_runner import BackgroundRunner
-from runtime.prototype import Transition
+from runtime.prototype import ExecutionContext, Transition
 
 
-def distorted_celestial_sphere_boundary(input_data):
+def distorted_celestial_sphere_boundary(context: ExecutionContext) -> Transition:
     """Test-only execution stub for the research-handoff protocol boundary."""
     return Transition(
         kind="cognitive_space.observe",
         data={
             "protocol": "distorted-celestial-sphere-protocol",
-            "observed_input": input_data.get("text", ""),
+            "observed_input": context.input.get("text", ""),
             "semantic_interpretation": False,
+            "changed": True,
         },
     )
 
