@@ -1,6 +1,6 @@
 # Shirakami Runtime（白神ランタイム）
 
-**人間のLandscapeを中心に据えた、Protocol-driven Runtime基盤**
+**人間のLandscape（文脈・景色）を中心に据えた、Protocol駆動のRuntime基盤**
 
 [English](README.md) | **日本語**
 
@@ -12,32 +12,32 @@ GitHubの構造を理解していなくても、白神を試せます。
 
 まずは次の順番だけ見てください。
 
-1. **[Shirakami Model Launch Protocol](docs/protocols/SHIRAKAMI_MODEL_LAUNCH_PROTOCOL_v1.0.yaml)** — 何をローンチするのか
-2. **[白神ラジオ Language UI](examples/shirakami_radio_ui/)** — 人間向けの一番簡単な入口
-3. **[MVP Quickstart](docs/architecture/MVP_QUICKSTART.md)** — 実装を動かす
-4. **[Reviewer Entry Point](docs/architecture/REVIEWER_ENTRY_POINT.md)** — 構造とEvidence境界を見る
-5. **[Thread RPG v1.2.1](products/thread-rpg-v1.2.1/)** — 既存の公開サービスアーティファクト
+1. **[白神モデル ローンチ・プロトコル](docs/protocols/SHIRAKAMI_MODEL_LAUNCH_PROTOCOL_v1.0.yaml)** — 何をローンチするのか
+2. **[白神ラジオ 言語UI](examples/shirakami_radio_ui/)** — 人間向けの一番簡単な入口
+3. **[最小実装の導入・実行（MVPクイックスタート）](docs/architecture/MVP_QUICKSTART.md)** — 実装を動かす
+4. **[レビュー入口](docs/architecture/REVIEWER_ENTRY_POINT.md)** — 構造とEvidence（観測記録）の境界を見る
+5. **[スレッドRPG v1.2.1](products/thread-rpg-v1.2.1/)** — 既存の公開サービス・アーティファクト
 
 ### 一言でいうと
 
 **白神は、AIが変わっても、人間が自分の文脈と判断を保てるかを試すプロジェクトです。**
 
-AIは、Simulator・Observer・Hypothesis Generatorとして使います。
+AIは、シミュレーター・観測者・仮説生成器として使います。
 **最終的な決定権は人間に残します。**
 
 ---
 
 ## 現在の状態
 
-**β1.0 → Launch Model → Operational Rollout**
+**β1.0 → ローンチモデル → 実運用展開**
 
 β1.0のシェイクダウンで検証してきた境界を、実運用の観測へ移していく段階です。
 
-ここでいうLaunchは「完成品になった」という意味ではありません。
+ここでいうローンチは「完成品になった」という意味ではありません。
 
-**検証された境界を現実の運用へ投入し、観測し、Evidenceを蓄積し、必要に応じて更新すること**を意味します。
+**検証された境界を現実の運用へ投入し、観測し、Evidence（観測記録）を蓄積し、必要に応じて更新すること**を意味します。
 
-→ **[Shirakami Model Launch Protocol v1.0](docs/protocols/SHIRAKAMI_MODEL_LAUNCH_PROTOCOL_v1.0.yaml)**
+→ **[白神モデル ローンチ・プロトコル v1.0](docs/protocols/SHIRAKAMI_MODEL_LAUNCH_PROTOCOL_v1.0.yaml)**
 
 ---
 
@@ -45,69 +45,69 @@ AIは、Simulator・Observer・Hypothesis Generatorとして使います。
 
 白神は、AIそのものを作るためのOSではありません。
 
-人間のLandscape、Protocol、Evidence、判断を明示的に扱い、AIやBackendが変わっても文脈を引き継げるようにするRuntime / Interface architectureです。
+人間のLandscape（文脈・景色）、Protocol（手順・規約）、Evidence（観測記録）、判断を明示的に扱い、AIやBackend（外部処理系）が変わっても文脈を引き継げるようにするRuntime / Interface基盤です。
 
 ```text
-Landscape
+Landscape（人間の文脈）
     ↓
-Evidence
+Evidence（観測記録）
     ↓
-Protocol
+Protocol（手順・規約）
     ↓
-Runtime
+Runtime（実行層）
     ↓
-Adapter
+Adapter（接続境界）
     ↓
-External AI / Backend
+外部AI / Backend（外部処理系）
 ```
 
-RuntimeはDomain Truthを所有せず、Adapterによって外部AIやBackendから分離されます。
+RuntimeはDomain Truth（領域上の真実）を所有せず、Adapterによって外部AIやBackendから分離されます。
 
 ---
 
 ## 人間向けの入口：白神ラジオ
 
-### **[白神ラジオ Language UIを開く](examples/shirakami_radio_ui/)**
+### **[白神ラジオ 言語UIを開く](examples/shirakami_radio_ui/)**
 
 白神ラジオは、白神を「読む」のではなく、まず会話として体験するための最小UIです。
 
-現在のMVPは意図的に小さくしています。
+現在のMVP（最小実装）は意図的に小さくしています。
 
-- ブラウザベース
-- 日本語会話UI
-- Demo mode
-- 任意のRuntime endpoint
+- ブラウザで動作
+- 日本語の会話UI
+- デモモード
+- 任意のRuntime接続先を指定可能
 - 静的UI自体にはアカウント不要
-- 外部AIがデフォルトで接続されているとは宣言しない
+- 外部AIが標準で接続されているとは宣言しない
 
 **UIはRuntimeそのものではありません。**
 
-最初のローンチでは音声を必須にしません。音声UIは別Versionで追加できる境界として残します。
+最初のローンチでは音声を必須にしません。音声UIは別Version（次の版）で追加できる境界として残します。
 
 ---
 
-## アーキテクチャ
+## 全体の流れ
 
 ```text
-Human
+人間
   ↓
-Shirakami Radio / UI
+白神ラジオ / UI
   ↓
-Language UI Adapter
+言語UI Adapter（接続層）
   ↓
-Protocol
+Protocol（手順・規約）
   ↓
-Runtime
+Runtime（実行層）
   ↓
-AI / Backend Adapter
+AI / Backend Adapter（外部接続層）
   ↓
-External AI / Service
+外部AI / サービス
   ↓
-Response
+応答
   ↓
-Renderer / UI
+Renderer / UI（表示層）
   ↓
-Human
+人間
 ```
 
 AIが交換されても、人間のLandscapeと、その周囲の境界を持ち運べることを目指します。
@@ -116,14 +116,14 @@ AIが交換されても、人間のLandscapeと、その周囲の境界を持ち
 
 ## 基本原則
 
-- **Human final authority** — AIに最終決定権を移さない
-- **Landscape First** — 人間の文脈をAIより上位の中心資産として扱う
-- **Hypotheses remain provisional** — 意図・感情・人格などの推測を事実化しない
-- **Uncertainty is preserved** — 未理解を勝手に埋めない
-- **Contradictions are signals** — 否定や修正を更新信号として扱う
-- **Evidence is preserved** — 観測された履歴を勝手に書き換えない
-- **Runtime is replaceable** — 特定AIベンダーへの固定を避ける
-- **One change, one verification** — 変更は小さく入れて検証する
+- **人間が最終決定者** — AIに最終決定権を移さない
+- **Landscape First（文脈を第一に）** — 人間の文脈をAIより上位の中心資産として扱う
+- **仮説は暫定のまま** — 意図・感情・人格などの推測を事実化しない
+- **不確実性を保存する** — 未理解を勝手に埋めない
+- **矛盾を更新信号として扱う** — 否定や修正を更新の手がかりにする
+- **Evidenceを保存する** — 観測された履歴を勝手に書き換えない
+- **Runtimeを交換可能にする** — 特定AIベンダーへの固定を避ける
+- **一つ変更したら一つ検証する** — 変更は小さく入れて検証する
 
 ---
 
@@ -132,19 +132,19 @@ AIが交換されても、人間のLandscapeと、その周囲の境界を持ち
 白神の認知サイクルは次のように置きます。
 
 ```text
-Observe
+観測
   ↓
-Hypothesis
+仮説
   ↓
-Dialogue
+対話
   ↓
-Echo
+反響
   ↓
-Update
+更新
   ↓
-Consistency Check
+整合性確認
   ↓
-Observe
+観測
 ```
 
 評価するのはAIの回答精度だけではありません。
@@ -153,87 +153,98 @@ Observe
 - 矛盾
 - 誤解
 - 未理解
-- プロトコル逸脱
-- Runtime依存
+- Protocolからの逸脱
+- Runtimeへの依存
 - 人間による修正
 
 を観測対象にします。
 
-**Launch → Observe → Evidence → Refine → Verify → Next Version**
+**ローンチ → 観測 → Evidence → 改良 → 検証 → 次の版**
 
 ---
 
-## 実装を動かす
+## 最小実装を導入して動かす
 
-最小Runtimeは次で実行できます。
+白神を実際に動かしてみたい場合は、以下が最小手順です。
+
+### 1. リポジトリを取得する
 
 ```bash
 git clone https://github.com/bxa05221-ux/shirakami-OS.git
 cd shirakami-OS
+```
+
+### 2. 最小実装を起動する
+
+```bash
 python examples/quickstart/run.py
 ```
 
-→ **[MVP Quickstart](docs/architecture/MVP_QUICKSTART.md)**
+### 3. 詳しい導入手順を見る
+
+→ **[最小実装の導入・実行ガイド（MVPクイックスタート）](docs/architecture/MVP_QUICKSTART.md)**
+
+ここでいう「MVP」は、完成した製品版ではなく、白神のRuntimeを最小構成で試すための実装を指します。
 
 ---
 
-## 公開サービスアーティファクト
+## 公開サービス・アーティファクト
 
-現在の公開サービスアーティファクトは **[Thread RPG v1.2.1](products/thread-rpg-v1.2.1/)** です。
+現在の公開サービス・アーティファクトは **[スレッドRPG v1.2.1](products/thread-rpg-v1.2.1/)** です。
 
 その他の実験的アーティファクトは、明示的に公開サービスとして指定されない限り、開発・研究用として扱います。
 
-→ **[Service Artifact Index](products/)**
+→ **[公開サービス・アーティファクト一覧](products/)**
 
 ---
 
 ## レビューする人へ
 
-実装やArchitectureを評価したい場合は、まずこちらから。
+実装やArchitecture（構造）を評価したい場合は、まずこちらから。
 
-**[Reviewer Entry Point](docs/architecture/REVIEWER_ENTRY_POINT.md)**
+**[レビュー入口](docs/architecture/REVIEWER_ENTRY_POINT.md)**
 
 このRepositoryでは、次のものを意図的に分離しています。
 
 - 現在の実装
-- Normative Specification
-- Observation / Evidence
-- Experiment
-- Historical Artifact
-- Research Question
+- 規範仕様
+- Observation / Evidence（観測・証拠記録）
+- Experiment（実験）
+- Historical Artifact（過去のアーティファクト）
+- Research Question（研究上の問い）
 
-**ファイルが存在すること自体は、その実験が成功したことや、Canonical Runtime pathに実装されたことを意味しません。**
+**ファイルが存在すること自体は、その実験が成功したことや、正規のRuntime経路に実装されたことを意味しません。**
 
 ---
 
-## Repositoryの構成
+## リポジトリの構成
 
-- `spec/` — 実装側Specification
-- `docs/` — Architecture、Protocol、Observation、参考文書
-- `examples/` — 実行可能な例とUI Prototype
-- `protocols/` — Protocol source artifacts
-- `runtime/` — Runtime implementation
+- `spec/` — 実装側の仕様
+- `docs/` — 構造、Protocol、観測、参考文書
+- `examples/` — 実行可能な例とUI試作
+- `protocols/` — Protocolの原資料
+- `runtime/` — Runtime実装
 - `plugins/` — Plugin / Adapter
-- `products/` — 公開サービスアーティファクト
+- `products/` — 公開サービス・アーティファクト
 
 ---
 
-## 関連Repository
+## 関連リポジトリ
 
-- [shirakami-model](https://github.com/bxa05221-ux/shirakami-model) — Model / Vision
-- [shirakami-specification](https://github.com/bxa05221-ux/shirakami-specification) — Specification
-- [shirakami-research](https://github.com/bxa05221-ux/shirakami-research) — Research / 理論
-- **shirakami-OS** — Runtime / Implementation
-
----
-
-## License
-
-Repositoryのライセンスについては、ルートの `LICENSE` および `LICENSE-SPECIFICATION.md` を参照してください。
+- [shirakami-model](https://github.com/bxa05221-ux/shirakami-model) — 白神モデル／ビジョン
+- [shirakami-specification](https://github.com/bxa05221-ux/shirakami-specification) — 仕様
+- [shirakami-research](https://github.com/bxa05221-ux/shirakami-research) — 研究／理論
+- **shirakami-OS** — Runtime／実装
 
 ---
 
-## Contributing
+## ライセンス
+
+リポジトリのライセンスについては、ルートの `LICENSE` および `LICENSE-SPECIFICATION.md` を参照してください。
+
+---
+
+## 参加・提案について
 
 質問、批判、実験、別アプローチを歓迎します。
 
