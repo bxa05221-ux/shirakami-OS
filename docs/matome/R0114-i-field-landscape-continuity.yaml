@@ -1,0 +1,48 @@
+matome:
+  id: R0114
+  title: "IField–Runtime–Evidence–Landscape State Continuity"
+  version: "0.1"
+  status: "implementation_candidate"
+
+purpose:
+  - "既存IFieldとRuntime/Evidence/LandscapeState境界の連続性を検証する"
+  - "未確定事項iがRuntime状態遷移に参加できることを確認する"
+
+flow:
+  - "i1"
+  - "IField"
+  - "Runtime.execute"
+  - "Transition"
+  - "Evidence"
+  - "LandscapeState.apply_evidence"
+  - "Evidence identity reference"
+  - "i1 resolve"
+  - "i1 removed"
+  - "i2 added"
+
+constraints:
+  - "新規State Machineを作らない"
+  - "Runtimeはiの意味を解釈しない"
+  - "Evidenceなしのresolveを許可しない"
+  - "既存Evidenceを変更しない"
+  - "既存Landscape境界を変更しない"
+
+success_criteria:
+  - "i1 remains unresolved before Evidence"
+  - "resolve requires evidence_ref"
+  - "Transition is observable"
+  - "Evidence is applied to LandscapeState"
+  - "resolved i1 retains an Evidence reference"
+  - "i1 leaves active IField"
+  - "i2 can be added after resolution"
+
+verification:
+  method: "single end-to-end test"
+  result:
+    success: "SUCCESS"
+    failure: "FAILURE"
+    unconfirmed: "UNKNOWN"
+
+theory_boundary:
+  - "理論拡張を行わない"
+  - "実装上の欠落はEvidenceとして研究側へ返す"
