@@ -52,3 +52,5 @@ jobs:
         run: python experiments/background_runner_check.py
       - name: Run distorted celestial sphere boundary check
         run: python experiments/distorted_celestial_sphere_boundary_check.py
+      - name: Run distorted celestial sphere star observation check
+        run: python experiments/distorted_celestial_sphere_observation_check.py
