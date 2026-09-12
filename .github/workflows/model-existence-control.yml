@@ -5,10 +5,12 @@ on:
   pull_request:
     paths:
       - 'experiments/**'
+      - 'runtime/**'
       - '.github/workflows/model-existence-control.yml'
   push:
     paths:
       - 'experiments/**'
+      - 'runtime/**'
       - '.github/workflows/model-existence-control.yml'
 
 jobs:
@@ -44,3 +46,5 @@ jobs:
         run: python experiments/activation_boundary_check.py
       - name: Run AI adapter boundary check
         run: python experiments/ai_adapter_boundary_check.py
+      - name: Run activation pump check
+        run: python experiments/activation_pump_check.py
