@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'experiments/model-existence-control-001.md'
+      - 'experiments/activation-boundary-check.py'
       - '.github/workflows/model-existence-control.yml'
 
 jobs:
@@ -15,7 +16,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Run control
+      - name: Run plain control
         run: |
           python - <<'PY'
           from dataclasses import dataclass
@@ -32,5 +33,7 @@ jobs:
           assert control.changed is True
           print(f"CONTROL changed={control.changed} message={control.message}")
           PY
-      - name: Run Shirakami path
+      - name: Run current Runtime path
         run: python shirakami_os.py
+      - name: Run activation boundary control
+        run: python experiments/activation_boundary_check.py
