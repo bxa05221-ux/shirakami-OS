@@ -1,13 +1,17 @@
 """Verify the minimal Background Protocol lifecycle boundary."""
 
 from runtime.background_runner import BackgroundRunner
-from runtime.prototype import Transition
+from runtime.prototype import ExecutionContext, Transition
 
 
-def anmon_test_protocol(context):
+def anmon_test_protocol(context: ExecutionContext) -> Transition:
     return Transition(
         kind="background.observe",
-        data={"observed": True, "text": context.input.get("text", "")},
+        data={
+            "observed": True,
+            "text": context.input.get("text", ""),
+            "changed": True,
+        },
     )
 
 
