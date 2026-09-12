@@ -48,3 +48,5 @@ jobs:
         run: python experiments/ai_adapter_boundary_check.py
       - name: Run activation pump check
         run: python experiments/activation_pump_check.py
+      - name: Run background runner check
+        run: python experiments/background_runner_check.py
