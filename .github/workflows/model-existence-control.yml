@@ -1,0 +1,50 @@
+name: Model existence control
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'experiments/**'
+      - 'runtime/**'
+      - '.github/workflows/model-existence-control.yml'
+  push:
+    paths:
+      - 'experiments/**'
+      - 'runtime/**'
+      - '.github/workflows/model-existence-control.yml'
+
+jobs:
+  control:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run plain control
+        run: |
+          python - <<'PY'
+          from dataclasses import dataclass
+
+          @dataclass
+          class State:
+              message: str
+              changed: bool = False
+
+          def plain_control(message: str):
+              return State(message=message, changed=True)
+
+          control = plain_control("existence-control")
+          assert control.changed is True
+          print(f"CONTROL changed={control.changed} message={control.message}")
+          PY
+      - name: Run current Runtime path
+        run: python shirakami_os.py
+      - name: Run activation boundary control
+        run: python experiments/activation_boundary_check.py
+      - name: Run AI adapter boundary check
+        run: python experiments/ai_adapter_boundary_check.py
+      - name: Run activation pump check
+        run: python experiments/activation_pump_check.py
