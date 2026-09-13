@@ -48,3 +48,5 @@ jobs:
         run: python experiments/ai_adapter_boundary_check.py
       - name: Run activation pump check
         run: python experiments/activation_pump_check.py
+      - name: Run activation E2E continuity check
+        run: python experiments/activation_e2e_continuity_check.py
