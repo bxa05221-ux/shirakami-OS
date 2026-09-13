@@ -1,0 +1,23 @@
+name: Real model observation
+
+on:
+  workflow_dispatch:
+
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate required secret names
+        run: |
+          test -n "$OPENAI_API_KEY"
+          test -n "$OPENAI_MODEL"
+      - name: Run one-shot real model observation
+        run: python experiments/real_model_observation.py
