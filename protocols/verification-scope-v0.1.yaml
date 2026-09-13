@@ -1,0 +1,120 @@
+title: Shirakami 検証スコープ・プロトコル
+subtitle:
+  - Shirakami Verification Scope Protocol
+  - Local Change / Whole-System Consistency Protocol
+version: 0.1
+status: operational
+
+purpose:
+  - 変更箇所を安全に検証する
+  - 変更による全体構造への影響を確認する
+  - 局所的なテスト成功をシステム全体の整合性と混同しない
+
+principles:
+  local:
+    name: 一変更一検証
+    rule: 一つの変更を行ったら、その変更が意図どおり動作することを確認する。
+  whole_system:
+    name: 節目ごとに俯瞰検証する
+    rule: 一定の変更・統合・節目において、Shirakami全体の構造と責務境界を確認する。
+
+verification_layers:
+  - local_change_verification
+  - whole_system_consistency
+
+local_verification:
+  targets:
+    - 新規コード
+    - 既存コードの変更
+    - 新規テスト
+    - Workflow変更
+    - Protocol統合
+    - Adapter変更
+    - Renderer変更
+  checks:
+    - 変更目的を満たしているか
+    - 既存機能を壊していないか
+    - 意図しない意味付与を行っていないか
+    - 該当テストが成功しているか
+    - 必要なCIが成功しているか
+  success_condition: 確認できるまで成功としない
+
+whole_system_verification:
+  architecture_paths:
+    primary:
+      - Landscape
+      - Evidence
+      - Protocol
+      - Runtime
+      - Adapter
+      - Backend
+    optional:
+      - Landscape
+      - Runtime
+      - Renderer
+  responsibility_boundaries:
+    - RuntimeがDomain Semantic Truthを持っていない
+    - Evidenceと解釈が混在していない
+    - ProtocolとImplementationが混在していない
+    - Adapterが意味決定を担っていない
+    - Rendererが意味の決定者になっていない
+  verification_system:
+    - 新規テストが既存の検証体系に接続されている
+    - CI Workflowとの接続が維持されている
+    - Model existence control等の既存検査体系との整合がある
+    - 特定テストだけ成功して全体検査から漏れていない
+  state_boundaries:
+    - 観測 != 解釈
+    - 候補 != 確定
+    - Evidence != 意味
+    - Runtime != Authority
+
+triggers:
+  - 複数の変更が一区切りしたとき
+  - Protocolを既存Runtimeへ統合するとき
+  - CI / Workflowを変更するとき
+  - Model existence control等の検証体系を変更するとき
+  - 新しい境界をRuntimeへ追加するとき
+  - ブランチを統合するとき
+  - リリース / Launch Model等の節目
+  - 実装中に責務境界の不整合が疑われたとき
+
+judgment:
+  local_verified: 個別変更について検証成功
+  whole_system_consistent: 俯瞰検証により変更後も既存の構造・責務・検証体系との整合を確認
+  verified: 必要な局所検証および、必要な場合の俯瞰検証が完了
+  rule: 局所テスト成功だけでは全体についてVerifiedとは宣言しない
+
+operation_flow:
+  - change
+  - local_verification
+  - success_confirmation
+  - milestone_check
+  - whole_system_verification
+  - consistency_confirmation
+  - verified
+
+no_milestone_action: 次の変更へ進む
+
+prohibitions:
+  - 局所テスト成功だけで全体整合を推測しない
+  - 俯瞰検証を理由に既存理論を勝手に変更しない
+  - 不整合を推測で修正しない
+  - 検証されていない状態をVerifiedと呼ばない
+  - 新しい理論的意味を実装側で追加しない
+
+positioning:
+  - 一変更一検証をShirakami検証プロトコルの下位原則として保持する
+  - 一変更一検証だけを検証体系全体とはしない
+  - 小さく変更し、小さく検証する
+  - 節目ごとに一度立ち止まって全体を見る
+
+core_principle: 局所を確かめ、全体を俯瞰する。
+
+sacred_equation: >
+  Local Verification + Whole-System Consistency = Verified
+
+symbolic_phrase:
+  - 一変更一検証。
+  - 節目ごとに俯瞰検証。
+  - 局所を確かめ、全体を俯瞰する。
