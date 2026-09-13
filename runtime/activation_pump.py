@@ -7,6 +7,7 @@ interpret human intent, or add vendor-specific behavior.
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping
 
+from .evidence import EvidenceRecord, capture_evidence
 from .oppai_runtime_flow import prepare
 from .protocol_api import build_protocol_request
 from .protocol_registry import ProtocolRegistry
@@ -20,6 +21,7 @@ class ActivationResult:
     protocol_version: str | None
     runtime_result: Any
     ai_output: Any
+    evidence: EvidenceRecord
 
 
 def activate(
@@ -53,10 +55,12 @@ def activate(
         transition,
         input_value=request.input,
     )
+    evidence = capture_evidence(runtime_execution.result)
     ai_output = ai_adapter(prepared.input_for_runtime, request.protocol_id)
     return ActivationResult(
         protocol_id=request.protocol_id,
         protocol_version=request.version,
         runtime_result=runtime_execution.result,
         ai_output=ai_output,
+        evidence=evidence,
     )
