@@ -50,3 +50,5 @@ jobs:
         run: python experiments/activation_pump_check.py
       - name: Run activation E2E continuity check
         run: python experiments/activation_e2e_continuity_check.py
+      - name: Run activation contract check
+        run: python experiments/activation_contract_check.py
