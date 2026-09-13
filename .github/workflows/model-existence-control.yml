@@ -58,3 +58,5 @@ jobs:
         run: python experiments/distorted_celestial_sphere_movement_check.py
       - name: Run distorted celestial sphere star history check
         run: python experiments/distorted_celestial_sphere_history_check.py
+      - name: Run distorted celestial sphere constellation candidate check
+        run: python experiments/distorted_celestial_sphere_constellation_candidate_check.py
