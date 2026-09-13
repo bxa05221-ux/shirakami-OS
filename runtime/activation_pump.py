@@ -44,6 +44,7 @@ def activate(
     artifact = entry.artifact
     protocol_ir = {
         "matome": {
+            "id": artifact.protocol_id,
             "title": artifact.title,
             "version": artifact.version,
             "statement": artifact.statement,
