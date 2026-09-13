@@ -38,7 +38,9 @@ def execute_protocol(
 
     title = str(matome.get("title", ""))
     version = str(matome.get("version", ""))
-    protocol_id = title or "anonymous.protocol"
+    # Preserve the registry-owned protocol identity when it is present in the
+    # Protocol IR. Fall back to the legacy title-based identity for older IR.
+    protocol_id = str(matome.get("id") or title or "anonymous.protocol")
 
     def runtime_protocol(context):
         candidate = transition(context.input)
