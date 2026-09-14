@@ -1,0 +1,113 @@
+id: github-semantic-handoff
+name: "GitHub Semantic Handoff Protocol"
+version: "0.1"
+status: experimental
+category: semantic_handoff
+
+purpose:
+  - "Select only the repository evidence required for a stated question."
+  - "Preserve source identity and retrieval scope before AI interpretation."
+  - "Separate repository evidence from AI-generated interpretation."
+
+principles:
+  - "Repository is a source, not an authority."
+  - "Do not give the AI the repository; give the AI the evidence required for the question."
+  - "No silent expansion of retrieval scope."
+  - "Commit or immutable reference should be preferred for reproducibility."
+  - "Human remains the final authority over interpretation and action."
+
+flow:
+  - human_request
+  - semantic_selection
+  - github_retrieval
+  - evidence_preservation
+  - anmon_check
+  - protocol_handoff
+  - ai_runtime
+  - human_review
+
+request:
+  required:
+    - purpose
+    - repository
+    - ref
+  optional:
+    - constraints
+    - exclusions
+    - output_format
+
+selection:
+  rule: "Select by semantic necessity, not repository size."
+  include:
+    - path
+    - reason
+    - relation_to_question
+  exclude:
+    - path
+    - reason
+  boundary:
+    - "Only explicitly selected resources enter the Evidence set."
+
+retrieval:
+  preserve:
+    - repository
+    - path
+    - ref
+    - commit_sha
+    - retrieval_purpose
+    - retrieved_content
+
+semantic_handoff:
+  format: matome_yaml
+  preserve_distinctions:
+    - fact
+    - interpretation
+    - hypothesis
+    - unresolved
+    - protocol
+
+anmon:
+  trigger:
+    - "Evidence is insufficient to answer the stated question."
+    - "Selected sources conflict materially."
+    - "Additional repository access would change the scope."
+  action: "Return a candidate question and request additional semantic selection."
+  prohibition: "Do not silently retrieve additional resources."
+
+runtime:
+  input:
+    - landscape
+    - evidence
+    - anmon
+    - protocol
+  authority: "proposal_only"
+  prohibition:
+    - "Runtime output must not be treated as repository authority."
+    - "AI interpretation must not silently mutate repository state."
+
+verification:
+  preferred_reference: commit_sha
+  transition_rule: "one_change_one_verification"
+  evidence_rule: "Source evidence remains distinguishable from interpretation."
+
+minimal_example:
+  question: "Can this repository support a model-independent reference architecture?"
+  selection:
+    include:
+      - README.md
+      - docs/architecture/REVIEWER_ENTRY_POINT.md
+      - docs/architecture/*
+      - spec/*
+    exclude:
+      - runtime/*
+      - plugins/*
+      - experimental/*
+    rationale:
+      - "Architecture classification"
+      - "Boundary verification"
+      - "Normative contract discovery"
+
+statement: >
+  GitHub Semantic Handoff is a boundary protocol between a repository and an AI runtime.
+  It converts a human question into a reproducible, semantically selected Evidence set
+  rather than transferring an entire repository as undifferentiated context.
