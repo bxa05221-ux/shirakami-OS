@@ -1,4 +1,4 @@
-# Shirakami OS — MVP Quickstart
+# Shirakami OS — MVP クイックスタート
 
 初めてRepositoryを見る人が、現在のRuntime境界を実際に実行・確認するための最短ルートです。
 
@@ -15,15 +15,13 @@ git clone https://github.com/bxa05221-ux/shirakami-OS.git
 cd shirakami-OS
 ```
 
-依存パッケージが必要な場合は、Repositoryの `requirements.txt` を使用してください。
-
 ## 2. Quickstartを実行
 
 ```bash
 python examples/quickstart/run.py
 ```
 
-このスクリプトはQuickstart用のProtocol YAMLを読み込み、現在のRuntime経路を実行します。
+このスクリプトは、Quickstart用のProtocol YAMLを読み込み、Runtimeを実行します。
 
 ```text
 Matome YAML
@@ -41,19 +39,16 @@ Evidence
 Landscape State
 ```
 
-最後に `SUCCESS` が表示されれば、Quickstartの実行経路が完了しています。
-
-> **注意:** 現在のQuickstart実装は、存在確認した `input.yaml` の内容を実行入力としては使用せず、`Hello Shirakami` をRuntimeへ渡します。これは現在の実装上の境界であり、`input.yaml` の読み込みを意味するものではありません。
+最後に `SUCCESS` が表示されれば、現在のMVP実行経路が完了しています。
 
 ## 3. 何を確認できるか
 
 Quickstartでは、外部AIを呼び出す前の白神OSの最小実行境界を確認できます。
 
 1. **Protocol** — 的目YAMLを読み込む
-2. **Protocol IR / Bridge** — Runtimeが扱える形式へ接続する
-3. **Runtime** — Protocolを実行する
-4. **Transition / Evidence** — 実行による状態変化を観測・記録する
-5. **Landscape State** — Evidenceを適用した状態を確認する
+2. **Runtime** — Protocolを実行する
+3. **Evidence** — 実行結果から状態変化を観測する
+4. **Landscape State** — Evidenceを適用した状態を確認する
 
 現在のQuickstartは、AIそのものを実行するデモではありません。Backend固有のAI処理をRuntime Coreから切り離し、まずRuntime境界そのものを検証可能にしています。
 
@@ -69,7 +64,6 @@ python -m pytest runtime tests -q
 
 - `examples/quickstart/run.py` — 実際に実行するQuickstart
 - `examples/quickstart/protocol.yaml` — Quickstartで読み込むProtocol
-- `examples/quickstart/input.yaml` — Quickstartに同梱される入力例
 - `runtime/` — Runtime実装
 - `tests/` — 実行可能な契約・回帰テスト
 - `protocols/` — Protocolのソースアーティファクト
