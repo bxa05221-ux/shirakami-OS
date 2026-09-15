@@ -6,8 +6,8 @@
 [English](README.md) | [日本語](README.ja.md)
 
 ----
-Version: α2.2  
-Status: Foundation Freeze
+Version: Prototype v1.0 (PV1.0)  
+Status: β1.0 Launch Model / Operational Rollout
 
 ## What Shirakami Is
 
@@ -158,7 +158,7 @@ This is an experimental open-source project. We welcome comparison, criticism, e
 
 ## User Manual (Manga)
 
-The Public Alpha includes a minimal multilingual manga-style manual renderer.
+The repository includes an experimental multilingual manga-style manual renderer.
 
 - [Manual index](docs/manual/)
 - [Japanese SVG](docs/manual/manga-user-manual.ja.svg)
