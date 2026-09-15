@@ -1,5 +1,6 @@
 name: Runtime β0.1 Verification
 
+# Repository-level documentation changes are included so the required runtime check remains the verification gate during rollout.
 on:
   push:
     paths:
