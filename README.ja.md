@@ -183,7 +183,11 @@ Evidenceは、何が起きたかを後から追跡できるようにするため
 
 ## 現在の状態
 
-**Public Alpha / Runtime β0.1 preparation**
+**Prototype v1.0 (PV1.0) / β1.0 Launch Model / Operational Rollout**
+
+PV1.0は、白神の基盤を実装として動かし、検証し、観測しながら運用へ投入するためのPrototype基準点です。
+
+これは完成品や理論完成を意味しません。未完成の仕様や実験的な構成は、その状態を明示したまま継続的に検証します。
 
 現在確認できている範囲：
 
@@ -196,6 +200,7 @@ Evidenceは、何が起きたかを後から追跡できるようにするため
 - GitHub Adapter / Backend境界
 - Quickstart
 - 自動テスト / CI
+- Protocol Firstの公開導線
 
 現在進行中：
 
@@ -206,9 +211,7 @@ Evidenceは、何が起きたかを後から追跡できるようにするため
 - Runtime API α0.1
 - Adapter Contractの整理
 
-まだ完成した製品ではありません。
-
-このRepositoryは、Architectureを実装で検証しながら公開している開発段階のプロジェクトです。
+β0.1などの表記を持つ文書は、個別の設計・実験・履歴として保持されています。Repository全体の現在状態を示す表記とは区別してください。
 
 ---
 
@@ -230,7 +233,7 @@ Quickstartでは、Protocol YAMLを読み込み、Protocol IRを生成し、Runt
 
 ## ユーザーズマニュアル（漫画版）
 
-Public Alphaでは、**的目YAML → 漫画Renderer → SVG**という最小の文書生成経路を試しています。
+実験的な文書生成経路として、**的目YAML → 漫画Renderer → SVG**という最小構成を試しています。
 
 - [漫画マニュアルの入口](docs/manual/)
 - [日本語版SVG](docs/manual/manga-user-manual.ja.svg)
