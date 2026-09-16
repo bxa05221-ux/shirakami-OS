@@ -1,57 +1,44 @@
 # β1.0 API Boundary Completion Checklist
 
-Status: **verification checklist — β1.0 external API boundary**
+Status: verification checklist for the current β1.0 prototype baseline.
 
 The frozen external API boundary remains `POST /observe`.
 
-## Completion scope
+## Confirmed scope
 
-This checklist applies to the current prototype baseline. It does not authorize a new endpoint, provider-specific AI invocation, Protocol semantic expansion, or production-readiness claim.
+- External boundary remains limited to `POST /observe`.
+- Required request fields are `landscape_id` and object-shaped `input`.
+- Invalid request-body forms are normalized to HTTP 400.
+- Response invariants are validated by the API implementation.
+- OpenAPI describes the implemented response contract.
+- `evidence_id` remains nullable and is not manufactured by the API.
+- `protocol_id` remains an explicit client reference.
 
-## Contract checks
+## Verified invalid-input classes
 
-- [x] External boundary is limited to `POST /observe`.
-- [x] Required request fields are `landscape_id` and object-shaped `input`.
-- [x] Invalid request-body forms are normalized to HTTP 400.
-- [x] Response shape is validated by the Runtime-facing API implementation.
-- [x] OpenAPI describes the implemented response invariants.
-- [x] `evidence_id` remains nullable and is not manufactured by the API.
-- [x] `protocol_id` remains an explicit client reference and is not reinterpreted by the API.
+Covered at TestClient and separately launched `uvicorn` process boundaries where applicable:
 
-## HTTP boundary checks
-
-The following invalid-input classes are covered at both the FastAPI TestClient level and the separately launched `uvicorn` process boundary where applicable:
-
-- missing `landscape_id`
-- empty `landscape_id`
+- missing or empty `landscape_id`
 - non-object `input`
-- non-object top-level request body
+- non-object top-level body
 - malformed JSON
-- empty request body
+- empty body
 
-## Submission Check
+## Required Submission Check
 
-Before declaring a change complete, verify:
+Before declaring a change complete:
 
-1. The target branch and base branch are correct.
-2. The diff contains only the intended files and behavior.
-3. CI results correspond to the current head SHA.
-4. The pull request state is distinguished from merge state.
-5. The merge commit and `main` branch are confirmed.
-6. The changed artifact is retrieved from `main` after merge.
+1. Confirm target and base branches.
+2. Confirm the diff contains only intended changes.
+3. Confirm CI corresponds to the current head SHA.
+4. Distinguish submitted, merged, and canonicalized states.
+5. Confirm the merge commit and `main` branch.
+6. Retrieve and inspect the changed artifact from `main` after merge.
 
-## Remaining boundary decisions
+## Explicitly out of scope
 
-The following are intentionally outside this checklist and require separate decisions:
-
-- authentication and authorization
-- persistent Evidence storage
-- production deployment and rate limiting
-- full Protocol execution over HTTP
-- provider-specific AI invocation
-- `/chat`, `/generate`, `/agent`, or `/diagnostic` endpoints
-- physical or robotic control endpoints
+Authentication, persistent Evidence storage, production deployment, rate limiting, full Protocol execution over HTTP, provider-specific AI invocation, and new `/chat`, `/generate`, `/agent`, or `/diagnostic` endpoints require separate decisions.
 
 ## Principle
 
-Passing tests demonstrates verified behavior for the tested scope. It does not, by itself, demonstrate that the change was correctly delivered to the canonical branch. Both verification and submission state must be checked.
+Passing tests verifies tested behavior. It does not alone verify correct delivery to the canonical branch.
