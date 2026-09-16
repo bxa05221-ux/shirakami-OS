@@ -49,6 +49,7 @@ components:
       properties:
         landscape_id:
           type: string
+          minLength: 1
           description: Identifier of the target Landscape.
         input:
           type: object
