@@ -1,5 +1,6 @@
 """Process-boundary verification for the external Shirakami API."""
 
+import os
 import subprocess
 import sys
 import time
@@ -14,6 +15,8 @@ pytest.importorskip("uvicorn")
 
 @pytest.fixture
 def api_process():
+    env = os.environ.copy()
+    env["PYTHONPATH"] = os.path.abspath(".")
     process = subprocess.Popen(
         [
             sys.executable,
@@ -27,6 +30,7 @@ def api_process():
             "8765",
         ],
         cwd="shbb-api",
+        env=env,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
