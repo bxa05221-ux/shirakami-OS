@@ -56,9 +56,20 @@ def observe(payload: dict[str, Any]) -> dict[str, Any]:
 
 def create_app():
     """Create the public Shirakami API application."""
-    from fastapi import FastAPI, HTTPException
+    from fastapi import FastAPI, HTTPException, Request
+    from fastapi.exceptions import RequestValidationError
+    from fastapi.responses import JSONResponse
 
     app = FastAPI(title="Shirakami API", version="0.1.0")
+
+    @app.exception_handler(RequestValidationError)
+    async def request_validation_exception_handler(
+        request: Request, exc: RequestValidationError
+    ) -> JSONResponse:
+        return JSONResponse(
+            status_code=400,
+            content={"detail": "request body must be an object"},
+        )
 
     @app.post("/observe")
     def observe_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
