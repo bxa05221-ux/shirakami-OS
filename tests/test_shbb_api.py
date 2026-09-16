@@ -107,6 +107,17 @@ def test_observe_rejects_non_object_request_body(body):
     assert response.status_code == 400
 
 
+def test_observe_rejects_malformed_json_request_body():
+    from fastapi.testclient import TestClient
+
+    response = TestClient(create_app()).post(
+        "/observe",
+        content=b'{"landscape_id":"example","input":{"text":"x"}',
+        headers={"Content-Type": "application/json"},
+    )
+    assert response.status_code == 400
+
+
 def test_observe_response_schema_rejects_invalid_state():
     from pydantic import ValidationError
 
