@@ -12,7 +12,7 @@ pytest.importorskip("httpx")
 # its Python module importable for the test runner.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "shbb-api"))
 
-from app import create_app
+from app import ObserveResponse, create_app
 
 
 def test_observe_e2e():
@@ -29,13 +29,14 @@ def test_observe_e2e():
 
     assert response.status_code == 200
     body = response.json()
-    assert body["landscape_id"] == "example-landscape"
-    assert body["state"] == "observed"
-    assert body["result"] == {"text": "今日は少し疲れた"}
-    assert body["evidence_id"] is None
-    assert body["protocol_id"] is None
-    assert body["provenance"]["transition"] is False
-    assert len(body["observation_id"]) == 16
+    validated = ObserveResponse.model_validate(body)
+    assert validated.landscape_id == "example-landscape"
+    assert validated.state == "observed"
+    assert validated.result == {"text": "今日は少し疲れた"}
+    assert validated.evidence_id is None
+    assert validated.protocol_id is None
+    assert validated.provenance.transition is False
+    assert len(validated.observation_id) == 16
 
 
 def test_observe_preserves_explicit_protocol_reference():
@@ -96,3 +97,37 @@ def test_observe_rejects_non_object_input():
         "/observe", json={"landscape_id": "example", "input": "x"}
     )
     assert response.status_code == 400
+
+
+def test_observe_response_schema_rejects_invalid_state():
+    from pydantic import ValidationError
+
+    payload = {
+        "landscape_id": "example",
+        "observation_id": "0123456789abcdef",
+        "state": "changed",
+        "evidence_id": None,
+        "protocol_id": None,
+        "result": {},
+        "provenance": {"runtime": "test", "transition": False},
+    }
+
+    with pytest.raises(ValidationError):
+        ObserveResponse.model_validate(payload)
+
+
+def test_observe_response_schema_rejects_invalid_observation_id():
+    from pydantic import ValidationError
+
+    payload = {
+        "landscape_id": "example",
+        "observation_id": "not-a-valid-id",
+        "state": "observed",
+        "evidence_id": None,
+        "protocol_id": None,
+        "result": {},
+        "provenance": {"runtime": "test", "transition": False},
+    }
+
+    with pytest.raises(ValidationError):
+        ObserveResponse.model_validate(payload)

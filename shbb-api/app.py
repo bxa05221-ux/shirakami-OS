@@ -1,9 +1,30 @@
 """HTTP API boundary for the Shirakami Runtime β1.0 observation path."""
 
 from hashlib import sha256
-from typing import Any
+from typing import Any, Literal
+
+from pydantic import BaseModel, Field
 
 from runtime.landscape import LandscapeState
+
+
+class ObservationProvenance(BaseModel):
+    """Runtime provenance returned by the observation boundary."""
+
+    runtime: str
+    transition: bool
+
+
+class ObserveResponse(BaseModel):
+    """Concrete implementation invariant for a successful observation."""
+
+    landscape_id: str
+    observation_id: str = Field(pattern=r"^[0-9a-f]{16}$")
+    state: Literal["observed"]
+    evidence_id: str | None
+    protocol_id: str | None
+    result: dict[str, Any]
+    provenance: ObservationProvenance
 
 
 def observe(payload: dict[str, Any]) -> dict[str, Any]:
@@ -21,7 +42,7 @@ def observe(payload: dict[str, Any]) -> dict[str, Any]:
         (landscape_id + "\n" + repr(sorted(snapshot.items()))).encode("utf-8")
     ).hexdigest()[:16]
 
-    return {
+    response = {
         "landscape_id": landscape_id,
         "observation_id": observation_id,
         "state": "observed",
@@ -30,6 +51,7 @@ def observe(payload: dict[str, Any]) -> dict[str, Any]:
         "result": snapshot,
         "provenance": {"runtime": "LandscapeState.from_snapshot", "transition": False},
     }
+    return ObserveResponse.model_validate(response).model_dump()
 
 
 def create_app():
