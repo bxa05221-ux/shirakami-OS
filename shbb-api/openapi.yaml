@@ -68,16 +68,20 @@ components:
         - landscape_id
         - observation_id
         - state
+        - evidence_id
+        - protocol_id
+        - result
+        - provenance
       properties:
         landscape_id:
           type: string
         observation_id:
           type: string
+          pattern: '^[0-9a-f]{16}$'
         state:
           type: string
           enum:
             - observed
-            - rejected
         evidence_id:
           type: string
           nullable: true
@@ -90,5 +94,15 @@ components:
           description: Runtime observation result.
         provenance:
           type: object
+          required:
+            - runtime
+            - transition
           additionalProperties: true
-          description: Execution provenance where available.
+          properties:
+            runtime:
+              type: string
+            transition:
+              type: boolean
+              enum:
+                - false
+          description: Execution provenance where available. Observation does not claim a state transition.
