@@ -108,3 +108,17 @@ def test_observe_http_rejects_non_object_request_body(api_process, body):
         urlopen(request, timeout=5)
 
     assert exc_info.value.code == 400
+
+
+def test_observe_http_rejects_malformed_json_request_body(api_process):
+    request = Request(
+        "http://127.0.0.1:8765/observe",
+        data=b'{"landscape_id":"process-landscape","input":{"text":"x"}',
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+
+    with pytest.raises(HTTPError) as exc_info:
+        urlopen(request, timeout=5)
+
+    assert exc_info.value.code == 400
