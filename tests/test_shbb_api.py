@@ -33,8 +33,42 @@ def test_observe_e2e():
     assert body["state"] == "observed"
     assert body["result"] == {"text": "今日は少し疲れた"}
     assert body["evidence_id"] is None
+    assert body["protocol_id"] is None
     assert body["provenance"]["transition"] is False
     assert len(body["observation_id"]) == 16
+
+
+def test_observe_preserves_explicit_protocol_reference():
+    from fastapi.testclient import TestClient
+
+    response = TestClient(create_app()).post(
+        "/observe",
+        json={
+            "landscape_id": "example",
+            "input": {"text": "x"},
+            "protocol_id": "protocol.example.v1",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["protocol_id"] == "protocol.example.v1"
+
+
+def test_observe_accepts_client_metadata_without_treating_it_as_result():
+    from fastapi.testclient import TestClient
+
+    response = TestClient(create_app()).post(
+        "/observe",
+        json={
+            "landscape_id": "example",
+            "input": {"text": "x"},
+            "metadata": {"trace": "client-only"},
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["result"] == {"text": "x"}
+    assert "metadata" not in response.json()["result"]
 
 
 def test_observe_rejects_missing_landscape_id():
@@ -42,6 +76,15 @@ def test_observe_rejects_missing_landscape_id():
 
     response = TestClient(create_app()).post(
         "/observe", json={"input": {"text": "x"}}
+    )
+    assert response.status_code == 400
+
+
+def test_observe_rejects_empty_landscape_id():
+    from fastapi.testclient import TestClient
+
+    response = TestClient(create_app()).post(
+        "/observe", json={"landscape_id": "", "input": {"text": "x"}}
     )
     assert response.status_code == 400
 
