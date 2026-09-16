@@ -99,6 +99,14 @@ def test_observe_rejects_non_object_input():
     assert response.status_code == 400
 
 
+@pytest.mark.parametrize("body", [["invalid"], "invalid"])
+def test_observe_rejects_non_object_request_body(body):
+    from fastapi.testclient import TestClient
+
+    response = TestClient(create_app()).post("/observe", json=body)
+    assert response.status_code == 400
+
+
 def test_observe_response_schema_rejects_invalid_state():
     from pydantic import ValidationError
 
