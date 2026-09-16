@@ -93,3 +93,18 @@ def test_observe_http_rejects_invalid_input(api_process):
         urlopen(request, timeout=5)
 
     assert exc_info.value.code == 400
+
+
+@pytest.mark.parametrize("body", [b'["invalid"]', b'"invalid"'])
+def test_observe_http_rejects_non_object_request_body(api_process, body):
+    request = Request(
+        "http://127.0.0.1:8765/observe",
+        data=body,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+
+    with pytest.raises(HTTPError) as exc_info:
+        urlopen(request, timeout=5)
+
+    assert exc_info.value.code == 400
