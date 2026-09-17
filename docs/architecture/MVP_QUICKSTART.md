@@ -1,36 +1,56 @@
-# MVP Quickstart
+# Shirakami OS — MVP Quickstart
 
-> This document is the shortest path to running the current Shirakami Runtime MVP.
+This is the shortest path for a first-time reviewer to verify that the Runtime boundary is executable.
 
-## Requirements
+## 1. Install
 
-- Python 3.11+
-- Git
+Python 3.11+ is sufficient for the current test/runtime path.
 
-## Run
+```bash
+pip install -r requirements.txt
+```
+
+## 2. Run the executable entry point
 
 ```bash
 python shirakami_os.py
 ```
 
-## Test
+This demonstrates the minimal OS boundary without requiring an external AI provider.
+
+## 3. Run the verification suite
 
 ```bash
-pytest runtime tests -q
+python -m pytest runtime tests -q
 ```
 
-## Current Boundary
+A green result confirms the current MVP execution path and its regression tests.
 
-The current MVP verifies the Runtime-side execution boundary and intentionally stops before provider-specific AI invocation.
-
-The Runtime is responsible for executing Protocol-side semantics and producing observable execution results. External AI providers remain replaceable adapters and are not required for this quickstart.
-
-## Repository Structure
+## 4. What this proves
 
 ```text
-Landscape → Evidence → Protocol → Runtime → Adapter → Backend
+Protocol
+   ↓
+Loader
+   ↓
+Current Selection
+   ↓
+MTM Compatibility
+   ↓
+Runtime
+   ↓
+Inspectable Result
 ```
 
-## Notes
+The current Runtime intentionally stops before provider-specific AI invocation. This keeps the MVP boundary small and makes the implementation inspectable.
 
-This quickstart is an implementation entry point, not a complete specification of the Shirakami Model. Consult the architecture and protocol documents for the relevant boundaries and limitations.
+## 5. What to inspect next
+
+- `runtime/` — Runtime implementation
+- `tests/` — executable contracts
+- `protocols/` — protocol source artifacts
+- `docs/architecture/REVIEWER_ENTRY_POINT.md` — broader review route
+
+## MVP status
+
+The MVP is an implementation proof, not a claim that the complete Shirakami architecture is finished.
