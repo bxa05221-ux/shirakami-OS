@@ -44,6 +44,7 @@ For external review, start here:
 
 - **[Reviewer Entry Point](docs/architecture/REVIEWER_ENTRY_POINT.md)** — evidence-backed reading order and architecture boundaries.
 - **[MVP Quickstart](docs/architecture/MVP_QUICKSTART.md)** — the shortest route to running and testing the implementation.
+- **[OPPAI Verification Status](docs/architecture/OPPAI_VERIFICATION_STATUS_v0.1.md)** — current verification scope for the human-input boundary.
 
 Recommended reading order:
 
@@ -54,11 +55,11 @@ Recommended reading order:
 ```text
 Landscape
     ↓
-Evidence
-    ↓
 Protocol / Specification
     ↓
 Runtime
+    ↓
+Evidence
     ↓
 Adapter
     ↓
