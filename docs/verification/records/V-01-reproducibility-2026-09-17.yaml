@@ -3,27 +3,31 @@ subject: "Quickstart / Reproducibility"
 version: "PV1.0"
 date: "2026-09-17"
 environment:
-  os: "GitHub Actions (dedicated workflow execution not independently identified)"
-  python: "3.11 / 3.12 configured; dedicated run evidence not verified"
+  os: "GitHub Actions Ubuntu 24.04"
+  python: "3.11.16 / 3.12.14"
   workflow: ".github/workflows/independent-reproduction.yml"
   workflow_commit: "64214a92842ab8058c4283d22adc107d4b187454"
+  run_id: 35176047099
 input:
   fixture: "examples/quickstart/run.py"
 expected:
   - "Quickstart executes successfully"
   - "Protocol IR, Evidence, and Landscape State are observable"
 observed:
-  - "Dedicated workflow configured with workflow_dispatch, pull_request, and push triggers"
-  - "Dedicated workflow captures environment metadata, Quickstart logs, runtime/adversarial logs, and JUnit XML artifacts"
-  - "Dedicated workflow run ID and artifact retrieval were not verified through the available connector"
-  - "Existing Runtime β0.1 CI success is not treated as dedicated independent reproduction evidence"
+  - "Dedicated workflow completed successfully for Python 3.11 and 3.12"
+  - "Quickstart completed with SUCCESS in both matrix jobs"
+  - "Runtime tests: 109 passed in both matrix jobs"
+  - "Bounded adversarial tests: 7 passed in both matrix jobs"
+  - "Eight evidence files were uploaded per matrix job, including logs and JUnit XML"
+  - "Artifact IDs: 10478169462 (Python 3.11), 10478995012 (Python 3.12)"
 status: PARTIAL
 limitations:
-  - "Dedicated workflow execution and artifact retrieval remain unverified"
   - "Third-party/local environment reproduction has not been performed"
-  - "Successful CI execution does not establish reproducibility across independent environments"
+  - "Artifact contents have been identified through job logs, but independent human review of the downloaded archives remains pending"
+  - "Successful GitHub-hosted execution does not establish reproducibility across independent environments"
 evidence:
-  - "Workflow definition verified at commit 64214a92842ab8058c4283d22adc107d4b187454"
-  - "Dedicated workflow run search returned no identifiable run through the available connector"
+  - "Workflow run 35176047099 completed successfully"
+  - "Both matrix jobs completed all execution and upload steps successfully"
+  - "Job logs record 109 runtime tests passed and 7 adversarial tests passed for each Python version"
 reviewer: ""
 quality_gate: HOLD_PENDING_GATES
