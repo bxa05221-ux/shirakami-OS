@@ -40,3 +40,16 @@ def test_prepare_runtime_protocol_rejects_missing_identity():
         assert str(exc) == "MTM protocol requires protocol_id"
     else:
         raise AssertionError("protocol without protocol_id was accepted")
+
+
+def test_prepare_runtime_protocol_freezes_nested_payload_snapshot():
+    source = {
+        "protocol_id": "nested.snapshot",
+        "version": "0.1",
+        "nested": {"items": ["original"]},
+    }
+
+    runtime_protocol = prepare_runtime_protocol(source)
+    source["nested"]["items"].append("mutated")
+
+    assert runtime_protocol.payload["nested"]["items"] == ["original"]
