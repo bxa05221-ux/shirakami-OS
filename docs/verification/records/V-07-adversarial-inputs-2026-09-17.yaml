@@ -7,17 +7,19 @@ status: PARTIAL
 scope:
   - Empty input
   - Wrong root
+  - Missing title
+  - Missing version
   - Missing statement
   - Empty statement
   - Pipeline item without action
 implemented:
   path: runtime/test_adversarial_inputs.py
-  commit: 671b4ae48e62adebcb0332592eb7edda67f31278
-  test_count: 5
+  commit: d9cc14ec40eac5cd6335e92b8253c31f8d1e9a9c
+  test_count: 7
 workflow:
   path: .github/workflows/independent-reproduction.yml
-  commit: 1e6593a39ab069c83d419a2ab676c8abbcfa18b0
   added_step: python -m pytest -q test_adversarial_inputs.py
+  working_directory: runtime
 observed:
   independent_workflow_execution: NOT_VERIFIED
   related_pr_ci:
@@ -26,7 +28,7 @@ observed:
     note: This was the existing Runtime beta verification workflow on the PR merge ref, not the dedicated independent-reproduction workflow.
     runtime_tests: "308 passed, 1 skipped"
     artifacts: none
-  result: The dedicated workflow's execution and adversarial-test output remain unconfirmed. A related PR CI run succeeded, but it is not sufficient evidence for V-07 execution.
+  result: The dedicated workflow execution and adversarial-test output remain unconfirmed. The test file and workflow path are now synchronized in this record.
 limitations:
   - This is a bounded deterministic test set, not a complete parser security assessment.
   - Input size/depth limits, YAML aliases/anchors, duplicate keys, encoding variation, resource exhaustion, and semantic prompt-injection threats remain untested.
