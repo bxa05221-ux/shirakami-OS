@@ -1,0 +1,23 @@
+verification_id: V-01
+subject: "Quickstart / Reproducibility"
+version: "PV1.0"
+date: "2026-09-17"
+environment:
+  os: "GitHub Actions runner (environment details not independently recorded)"
+  python: "NOT_RECORDED"
+  commit: "b2726660010aef3c51f4aa2dc7f2be716b8f1133"
+input:
+  fixture: "examples/quickstart/run.py"
+expected:
+  - "Quickstart executes successfully"
+  - "Protocol IR, Evidence, and Landscape State are observable"
+observed:
+  - "GitHub Actions check test-runtime completed successfully"
+  - "Independent third-party environment reproduction was not performed"
+status: PARTIAL
+limitations:
+  - "CI success does not establish reproducibility across third-party environments"
+  - "Python version, OS details, and exact quickstart output were not captured in this record"
+evidence:
+  - "GitHub Actions check: test-runtime, conclusion success, commit b2726660010aef3c51f4aa2dc7f2be716b8f1133"
+reviewer: ""
