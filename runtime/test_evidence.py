@@ -2,7 +2,7 @@ from dataclasses import FrozenInstanceError
 
 import pytest
 
-from evidence import EvidenceRecord, capture_evidence, is_transition_evidence
+from evidence import EvidenceRecord, _freeze, capture_evidence, is_transition_evidence
 from prototype import Runtime, example_protocol
 
 
@@ -47,3 +47,21 @@ def test_failure_result_remains_observable_without_transition_evidence():
     assert evidence.transition_data["error_type"] == "RuntimeError"
     assert evidence.transition_data["message"] == "boom"
     assert is_transition_evidence(evidence) is False
+
+
+def test_nested_evidence_data_is_deeply_immutable():
+    frozen = _freeze(
+        {
+            "nested": {"items": [{"changed": True}]},
+            "labels": ["observed"],
+        }
+    )
+
+    with pytest.raises(TypeError):
+        frozen["nested"]["items"][0]["changed"] = False
+
+    with pytest.raises(TypeError):
+        frozen["nested"]["items"] += ({"changed": False},)
+
+    with pytest.raises(TypeError):
+        frozen["labels"] += ("rewritten",)
