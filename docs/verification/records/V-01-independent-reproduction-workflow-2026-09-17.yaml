@@ -1,0 +1,38 @@
+verification_id: V-01-independent-reproduction-workflow
+name: Independent reproduction workflow
+version: "1.0"
+date: "2026-09-17"
+branch: docs/verification-v1.0
+status: NOT_RUN
+scope:
+  - GitHub Actions workflow definition
+  - Python version matrix
+  - Quickstart execution command
+  - Runtime test execution command
+implemented:
+  path: .github/workflows/independent-reproduction.yml
+  commit: f14f0010057dee9a2aab58ac5f9a6909d34fa094
+  triggers:
+    - workflow_dispatch
+    - push to docs/verification-v1.0
+  python_versions:
+    - "3.11"
+    - "3.12"
+  dependency:
+    - "pytest==8.4.2"
+  commands:
+    - python examples/quickstart/run.py
+    - python -m pytest -q
+observed:
+  workflow_file_created: true
+  workflow_file_retrieved_and_confirmed: true
+  workflow_execution: not_run
+limitations:
+  - The workflow has been created but no execution result has been collected in this verification step.
+  - Independent reproduction remains unverified until both matrix jobs complete and their logs are reviewed.
+  - Installing pytest from the public package index introduces network and package-distribution dependencies.
+  - The workflow does not yet archive structured execution logs as verification artifacts.
+quality_gate:
+  decision: HOLD_PENDING_GATES
+  next_action: Execute workflow_dispatch and record both Python matrix results, logs, and any failures.
+reviewer: human review pending
