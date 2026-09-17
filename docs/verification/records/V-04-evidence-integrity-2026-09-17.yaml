@@ -1,0 +1,46 @@
+verification_id: V-04
+subject: Evidence Integrity
+version: "1.0"
+date: "2026-09-17"
+environment:
+  source_ref: main
+  verification_branch: docs/verification-v1.0
+  execution: not independently executed in this verification pass
+input:
+  - successful ExecutionResult produced by Runtime.example_protocol
+  - failed ExecutionResult produced by a protocol raising RuntimeError
+expected:
+  - EvidenceRecord is immutable at the dataclass level
+  - transition_data cannot be mutated through the exposed mapping
+  - successful transitions are identifiable as transition evidence
+  - failure results remain observable but are not classified as transition evidence
+observed:
+  implementation:
+    - EvidenceRecord uses dataclass(frozen=True)
+    - transition_data is wrapped with MappingProxyType over a copied dictionary
+    - signals are copied to a tuple
+    - capture_evidence delegates to EvidenceRecord.from_result
+    - is_transition_evidence requires transition_kind and transition_data.changed to be truthy
+  tests:
+    - successful transition checks field projection and transition classification
+    - successful transition checks TypeError on transition_data mutation
+    - successful transition checks FrozenInstanceError on top-level field assignment
+    - failed execution checks observability and non-transition classification
+status: PARTIAL
+limitations:
+  - tests were inspected but not independently executed in this verification pass
+  - no cryptographic hash or signature is present in EvidenceRecord
+  - no explicit identity continuity identifier is present in EvidenceRecord
+  - immutability is structural at the record and mapping boundary, not proof of provenance or authenticity
+  - nested mutable values inside transition_data are not explicitly tested
+  - replay, tamper detection after serialization, persistence integrity, and cross-process identity continuity remain unverified
+evidence:
+  - runtime/evidence.py
+  - runtime/test_evidence.py
+reviewer: human review pending
+interpretation: >-
+  The current implementation establishes a narrow immutable evidence boundary and
+  distinguishes successful transition evidence from failure observations. It does
+  not yet establish cryptographic integrity, provenance, tamper detection, or
+  identity continuity. The appropriate public claim is structural immutability
+  within the runtime boundary, not independently verified evidence authenticity.
