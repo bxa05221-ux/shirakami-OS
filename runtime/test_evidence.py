@@ -79,3 +79,10 @@ def test_from_result_freezes_nested_transition_data():
 
     with pytest.raises(TypeError):
         evidence.transition_data["payload"]["items"][0]["value"] = 2
+
+
+def test_freezes_scalar_sets_as_frozensets():
+    frozen = _freeze({"tags": {"observed", "verified"}})
+
+    assert frozen["tags"] == frozenset({"observed", "verified"})
+    assert isinstance(frozen["tags"], frozenset)
