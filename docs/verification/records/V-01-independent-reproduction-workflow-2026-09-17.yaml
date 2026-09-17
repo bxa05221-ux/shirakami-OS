@@ -3,7 +3,7 @@ name: Independent reproduction workflow
 version: "1.0"
 date: "2026-09-17"
 branch: docs/verification-v1.0
-status: NOT_RUN
+status: PARTIAL
 scope:
   - GitHub Actions workflow definition
   - Python version matrix
@@ -26,13 +26,30 @@ implemented:
 observed:
   workflow_file_created: true
   workflow_file_retrieved_and_confirmed: true
-  workflow_execution: not_run
+  workflow_execution: completed_successfully
+  environment:
+    os: Ubuntu 24.04.5 LTS
+    runner_image: ubuntu-24.04
+  python_3_11:
+    version: 3.11.16
+    quickstart: PASS
+    runtime_tests: PASS
+    test_count: 102
+    result: "102 passed in 0.23s"
+  python_3_12:
+    quickstart: PASS
+    runtime_tests: PASS
+    test_count: 102
+    result: "102 passed"
+  evidence:
+    - Quickstart output showed protocol loading, observation, transition, evidence capture, and landscape state exposure.
+    - Runtime test suite completed with 102 passing tests in each matrix environment.
 limitations:
-  - The workflow has been created but no execution result has been collected in this verification step.
-  - Independent reproduction remains unverified until both matrix jobs complete and their logs are reviewed.
-  - Installing pytest from the public package index introduces network and package-distribution dependencies.
+  - Verification was executed on GitHub-hosted Ubuntu runners, not on an independently managed local or third-party environment.
+  - The workflow installs pytest from the public package index, introducing network and package-distribution dependencies.
   - The workflow does not yet archive structured execution logs as verification artifacts.
+  - The Python 3.12 result is recorded from the completed matrix run summary; detailed step logs should be retained for a stronger audit trail.
 quality_gate:
   decision: HOLD_PENDING_GATES
-  next_action: Execute workflow_dispatch and record both Python matrix results, logs, and any failures.
+  next_action: Retain run metadata and logs, then proceed to adversarial, persistence/replay, Evidence integrity, and Adapter boundary gates.
 reviewer: human review pending
