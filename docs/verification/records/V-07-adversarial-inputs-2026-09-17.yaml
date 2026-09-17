@@ -3,7 +3,7 @@ name: Bounded adversarial input checks
 version: "1.0"
 date: "2026-09-17"
 branch: docs/verification-v1.0
-status: NOT_RUN
+status: PARTIAL
 scope:
   - Empty input
   - Wrong root
@@ -19,13 +19,19 @@ workflow:
   commit: 1e6593a39ab069c83d419a2ab676c8abbcfa18b0
   added_step: python -m pytest -q test_adversarial_inputs.py
 observed:
-  execution: NOT_VERIFIED
-  result: Workflow was updated to execute the bounded adversarial test file, but the resulting run metadata and logs have not yet been independently retrieved.
+  independent_workflow_execution: NOT_VERIFIED
+  related_pr_ci:
+    run_id: 35174534418
+    conclusion: success
+    note: This was the existing Runtime beta verification workflow on the PR merge ref, not the dedicated independent-reproduction workflow.
+    runtime_tests: "308 passed, 1 skipped"
+    artifacts: none
+  result: The dedicated workflow's execution and adversarial-test output remain unconfirmed. A related PR CI run succeeded, but it is not sufficient evidence for V-07 execution.
 limitations:
   - This is a bounded deterministic test set, not a complete parser security assessment.
   - Input size/depth limits, YAML aliases/anchors, duplicate keys, encoding variation, resource exhaustion, and semantic prompt-injection threats remain untested.
-  - Test execution and logs must be confirmed from the workflow run before the status can be changed.
+  - Dedicated workflow execution and logs must be confirmed before V-07 can be marked PASS.
 quality_gate:
   decision: HOLD_PENDING_GATES
-  next_action: Retrieve the triggered workflow run and job logs, then expand the matrix for parser and resource-boundary cases.
+  next_action: Confirm or manually dispatch the dedicated workflow, retrieve its run/job logs, and retain structured evidence.
 reviewer: human review pending
