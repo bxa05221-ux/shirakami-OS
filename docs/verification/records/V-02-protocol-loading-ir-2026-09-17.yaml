@@ -1,0 +1,35 @@
+verification_id: V-02
+subject: "Matome YAML loading and Protocol IR conversion"
+version: "PV1.0"
+date: "2026-09-17"
+environment:
+  os: "NOT_RUN (local environment not captured)"
+  python: "NOT_RUN (local environment not captured)"
+  commit: "main inspection; verification record prepared on docs/verification-v1.0"
+input:
+  fixture: "runtime/test_protocol_loader.py::VALID"
+  implementation: "runtime/protocol_loader.py"
+expected:
+  - "Valid matome root is accepted"
+  - "title, version, statement, and pipeline are converted into ProtocolIR"
+  - "Missing root is rejected"
+  - "Pipeline item without action is rejected"
+observed:
+  - "ProtocolIR is a frozen dataclass with protocol_id, title, version, statement, and pipeline"
+  - "The loader accepts the documented small Matome YAML subset"
+  - "The existing tests cover valid loading, missing root, and missing action"
+  - "The implementation requires title, version, and at least one pipeline item"
+status: PARTIAL
+limitations:
+  - "Execution was not independently rerun in this record"
+  - "Full YAML syntax is not supported; the loader explicitly implements a limited subset"
+  - "Unknown fields, explicit type mismatch cases, empty input, malformed YAML/JSON, and rich protocol semantics were not separately verified"
+  - "The current parser uses line-oriented parsing rather than a general YAML parser"
+evidence:
+  - "runtime/protocol_loader.py"
+  - "runtime/test_protocol_loader.py"
+  - "GitHub Actions test-runtime success on verification branch commit b2726660010aef3c51f4aa2dc7f2be716b8f1133"
+reviewer: "human review pending"
+interpretation:
+  - "The current loader-to-IR boundary is defined and has focused unit-test coverage"
+  - "The result does not establish full YAML compatibility or complete Protocol semantics"
