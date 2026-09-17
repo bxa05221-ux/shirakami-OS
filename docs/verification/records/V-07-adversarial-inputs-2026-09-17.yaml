@@ -20,20 +20,26 @@ workflow:
   path: .github/workflows/independent-reproduction.yml
   added_step: python -m pytest -q test_adversarial_inputs.py
   working_directory: runtime
+  run_id: 35176047099
 observed:
-  independent_workflow_execution: NOT_VERIFIED
-  related_pr_ci:
-    run_id: 35174534418
-    conclusion: success
-    note: This was the existing Runtime beta verification workflow on the PR merge ref, not the dedicated independent-reproduction workflow.
-    runtime_tests: "308 passed, 1 skipped"
-    artifacts: none
-  result: The dedicated workflow execution and adversarial-test output remain unconfirmed. The test file and workflow path are now synchronized in this record.
+  independent_workflow_execution: VERIFIED
+  matrix:
+    - python: "3.11.16"
+      conclusion: success
+      runtime_tests: "109 passed"
+      adversarial_tests: "7 passed"
+      artifact_id: 10478169462
+    - python: "3.12.14"
+      conclusion: success
+      runtime_tests: "109 passed"
+      adversarial_tests: "7 passed"
+      artifact_id: 10478995012
+  result: "The dedicated workflow executed successfully for both Python versions, including all seven bounded adversarial input tests."
 limitations:
   - This is a bounded deterministic test set, not a complete parser security assessment.
   - Input size/depth limits, YAML aliases/anchors, duplicate keys, encoding variation, resource exhaustion, and semantic prompt-injection threats remain untested.
-  - Dedicated workflow execution and logs must be confirmed before V-07 can be marked PASS.
+  - Independent human review of downloaded structured artifacts remains pending.
 quality_gate:
   decision: HOLD_PENDING_GATES
-  next_action: Confirm or manually dispatch the dedicated workflow, retrieve its run/job logs, and retain structured evidence.
+  next_action: Expand adversarial coverage and perform human review of structured evidence.
 reviewer: human review pending
