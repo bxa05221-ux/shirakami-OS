@@ -1,0 +1,46 @@
+verification_id: V-03
+subject: "Runtime execution and observable state transition"
+version: "PV1.0"
+date: "2026-09-17"
+environment:
+  os: "NOT_RUN (local environment not captured)"
+  python: "NOT_RUN (local environment not captured)"
+  commit: "main inspection; verification record prepared on docs/verification-v1.0"
+input:
+  implementation:
+    - "runtime/prototype.py"
+    - "runtime/landscape.py"
+  tests:
+    - "runtime/test_prototype.py"
+    - "runtime/test_landscape.py"
+expected:
+  - "A valid protocol produces a completed ExecutionResult"
+  - "The result contains an observable Transition and execution signals"
+  - "Protocol exceptions become failed observable results"
+  - "Valid transition evidence updates LandscapeState"
+  - "Failure evidence does not update LandscapeState"
+  - "Evidence transition data remains unchanged after application"
+observed:
+  - "Runtime.execute() validates protocol_id, protocol, and input mapping"
+  - "Successful execution returns status completed, steps 1, and transition.observed"
+  - "Protocol exceptions return status failed with execution.failed"
+  - "Invalid protocol results are converted into execution.invalid_result"
+  - "LandscapeState.apply_evidence() accepts only transition evidence"
+  - "Existing tests assert successful transition application, evidence preservation, and failure non-application"
+status: PARTIAL
+limitations:
+  - "Execution was not independently rerun in this record"
+  - "The inspected Runtime is a minimal β0.1 prototype, not a multi-step production runtime"
+  - "The max_steps boundary is represented but the current execution path performs one protocol call"
+  - "Cross-process persistence, concurrent transitions, rollback, and long-running state-machine behavior were not verified"
+  - "The exact CI run associated with this record was not independently confirmed"
+evidence:
+  - "runtime/prototype.py"
+  - "runtime/test_prototype.py"
+  - "runtime/landscape.py"
+  - "runtime/test_landscape.py"
+reviewer: "human review pending"
+interpretation:
+  - "The current prototype exposes a clear execution-to-transition result boundary"
+  - "Landscape mutation is separated behind transition evidence rather than direct Runtime mutation"
+  - "The evidence supports focused β0.1 boundary behavior, but not full state-machine completeness or production durability"
