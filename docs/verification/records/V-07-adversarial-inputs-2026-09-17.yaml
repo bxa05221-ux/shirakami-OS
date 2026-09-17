@@ -14,14 +14,18 @@ implemented:
   path: runtime/test_adversarial_inputs.py
   commit: 671b4ae48e62adebcb0332592eb7edda67f31278
   test_count: 5
+workflow:
+  path: .github/workflows/independent-reproduction.yml
+  commit: 1e6593a39ab069c83d419a2ab676c8abbcfa18b0
+  added_step: python -m pytest -q test_adversarial_inputs.py
 observed:
-  execution: NOT_RUN
-  result: No independent execution evidence recorded yet.
+  execution: NOT_VERIFIED
+  result: Workflow was updated to execute the bounded adversarial test file, but the resulting run metadata and logs have not yet been independently retrieved.
 limitations:
   - This is a bounded deterministic test set, not a complete parser security assessment.
   - Input size/depth limits, YAML aliases/anchors, duplicate keys, encoding variation, resource exhaustion, and semantic prompt-injection threats remain untested.
-  - The test file must be executed in CI or an independently managed environment before the status can be changed.
+  - Test execution and logs must be confirmed from the workflow run before the status can be changed.
 quality_gate:
   decision: HOLD_PENDING_GATES
-  next_action: Execute the test file, retain logs, then expand the matrix for parser and resource-boundary cases.
+  next_action: Retrieve the triggered workflow run and job logs, then expand the matrix for parser and resource-boundary cases.
 reviewer: human review pending
