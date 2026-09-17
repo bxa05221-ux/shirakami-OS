@@ -4,6 +4,7 @@ The bridge deliberately does not interpret protocol meaning. It only exposes
 an immutable snapshot suitable for the existing Runtime boundary.
 """
 
+from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any, Mapping
 
@@ -22,7 +23,7 @@ class RuntimeProtocol:
 def prepare_runtime_protocol(protocol: MTMProtocol | Any) -> RuntimeProtocol:
     """Prepare an MTM protocol for Runtime without changing its payload."""
     normalized = protocol if isinstance(protocol, MTMProtocol) else normalize_protocol(protocol)
-    payload = dict(normalized.payload)
+    payload = deepcopy(dict(normalized.payload))
 
     protocol_id = payload.get("protocol_id")
     version = payload.get("version")
