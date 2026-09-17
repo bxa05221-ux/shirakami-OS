@@ -1,0 +1,27 @@
+verification_id: V-07-adversarial-inputs
+name: Bounded adversarial input checks
+version: "1.0"
+date: "2026-09-17"
+branch: docs/verification-v1.0
+status: NOT_RUN
+scope:
+  - Empty input
+  - Wrong root
+  - Missing statement
+  - Empty statement
+  - Pipeline item without action
+implemented:
+  path: runtime/test_adversarial_inputs.py
+  commit: 671b4ae48e62adebcb0332592eb7edda67f31278
+  test_count: 5
+observed:
+  execution: NOT_RUN
+  result: No independent execution evidence recorded yet.
+limitations:
+  - This is a bounded deterministic test set, not a complete parser security assessment.
+  - Input size/depth limits, YAML aliases/anchors, duplicate keys, encoding variation, resource exhaustion, and semantic prompt-injection threats remain untested.
+  - The test file must be executed in CI or an independently managed environment before the status can be changed.
+quality_gate:
+  decision: HOLD_PENDING_GATES
+  next_action: Execute the test file, retain logs, then expand the matrix for parser and resource-boundary cases.
+reviewer: human review pending
