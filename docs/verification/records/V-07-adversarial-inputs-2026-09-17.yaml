@@ -1,0 +1,45 @@
+verification_id: V-07-adversarial-inputs
+name: Bounded adversarial input checks
+version: "1.0"
+date: "2026-09-17"
+branch: docs/verification-v1.0
+status: PARTIAL
+scope:
+  - Empty input
+  - Wrong root
+  - Missing title
+  - Missing version
+  - Missing statement
+  - Empty statement
+  - Pipeline item without action
+implemented:
+  path: runtime/test_adversarial_inputs.py
+  commit: d9cc14ec40eac5cd6335e92b8253c31f8d1e9a9c
+  test_count: 7
+workflow:
+  path: .github/workflows/independent-reproduction.yml
+  added_step: python -m pytest -q test_adversarial_inputs.py
+  working_directory: runtime
+  run_id: 35176047099
+observed:
+  independent_workflow_execution: VERIFIED
+  matrix:
+    - python: "3.11.16"
+      conclusion: success
+      runtime_tests: "109 passed"
+      adversarial_tests: "7 passed"
+      artifact_id: 10478169462
+    - python: "3.12.14"
+      conclusion: success
+      runtime_tests: "109 passed"
+      adversarial_tests: "7 passed"
+      artifact_id: 10478995012
+  result: "The dedicated workflow executed successfully for both Python versions, including all seven bounded adversarial input tests."
+limitations:
+  - This is a bounded deterministic test set, not a complete parser security assessment.
+  - Input size/depth limits, YAML aliases/anchors, duplicate keys, encoding variation, resource exhaustion, and semantic prompt-injection threats remain untested.
+  - Independent human review of downloaded structured artifacts remains pending.
+quality_gate:
+  decision: HOLD_PENDING_GATES
+  next_action: Expand adversarial coverage and perform human review of structured evidence.
+reviewer: human review pending

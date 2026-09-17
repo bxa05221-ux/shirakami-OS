@@ -1,0 +1,33 @@
+verification_id: V-01
+subject: "Quickstart / Reproducibility"
+version: "PV1.0"
+date: "2026-09-17"
+environment:
+  os: "GitHub Actions Ubuntu 24.04"
+  python: "3.11.16 / 3.12.14"
+  workflow: ".github/workflows/independent-reproduction.yml"
+  workflow_commit: "64214a92842ab8058c4283d22adc107d4b187454"
+  run_id: 35176047099
+input:
+  fixture: "examples/quickstart/run.py"
+expected:
+  - "Quickstart executes successfully"
+  - "Protocol IR, Evidence, and Landscape State are observable"
+observed:
+  - "Dedicated workflow completed successfully for Python 3.11 and 3.12"
+  - "Quickstart completed with SUCCESS in both matrix jobs"
+  - "Runtime tests: 109 passed in both matrix jobs"
+  - "Bounded adversarial tests: 7 passed in both matrix jobs"
+  - "Eight evidence files were uploaded per matrix job, including logs and JUnit XML"
+  - "Artifact IDs: 10478169462 (Python 3.11), 10478995012 (Python 3.12)"
+status: PARTIAL
+limitations:
+  - "Third-party/local environment reproduction has not been performed"
+  - "Artifact contents have been identified through job logs, but independent human review of the downloaded archives remains pending"
+  - "Successful GitHub-hosted execution does not establish reproducibility across independent environments"
+evidence:
+  - "Workflow run 35176047099 completed successfully"
+  - "Both matrix jobs completed all execution and upload steps successfully"
+  - "Job logs record 109 runtime tests passed and 7 adversarial tests passed for each Python version"
+reviewer: ""
+quality_gate: HOLD_PENDING_GATES

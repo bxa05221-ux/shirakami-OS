@@ -1,0 +1,64 @@
+verification_id: V-07
+subject: Safety / Adversarial Inputs
+version: v1.0
+date: 2026-09-17
+environment:
+  repository: bxa05221-ux/shirakami-OS
+  branch: docs/verification-v1.0
+  execution: not independently executed in this verification pass
+input:
+  cases:
+    - invalid protocol_id
+    - non-callable protocol
+    - non-mapping input_data
+    - invalid execution budget
+    - protocol exception
+    - protocol returning a non-Transition value
+    - malformed Matome YAML root or missing required fields
+    - incomplete pipeline item
+    - unknown fields and oversized/deeply nested input
+    - malicious strings and resource-exhaustion patterns
+expected:
+  - Invalid execution inputs produce observable failed results rather than normal transitions.
+  - Protocol exceptions are contained as failed execution results.
+  - Invalid protocol results are rejected.
+  - Failed execution evidence must not update Landscape state.
+  - Parser failures must be explicit and must not silently create a valid ProtocolIR.
+  - Resource, transport, side-effect, and adversarial limits should be explicit where claimed.
+observed:
+  confirmed_by_code_review:
+    - Runtime validates protocol_id, callable protocol, and mapping input_data.
+    - Invalid budgets produce failed ExecutionResult values.
+    - Protocol exceptions are caught and represented as execution.failed.
+    - Non-Transition protocol results are represented as execution.invalid_result.
+    - The Matome subset loader rejects an invalid root, missing required fields, empty statement, and incomplete pipeline items.
+    - Landscape application is limited to transition evidence, and existing tests cover exclusion of failure evidence.
+  not_confirmed:
+    - Independent execution of the complete adversarial test matrix.
+    - Explicit maximum input size, nesting depth, string length, or execution time limits.
+    - Protection against memory exhaustion, recursion exhaustion, or denial-of-service inputs.
+    - Full unknown-field rejection and schema validation for all parser structures.
+    - YAML alias/anchor, duplicate-key, encoding, and parser differential behavior.
+    - Prompt-injection-like content handling as a semantic threat model.
+    - External side-effect isolation, authorization, sandboxing, and write controls beyond the prototype boundary.
+status: PARTIAL
+limitations:
+  - Findings are based on repository inspection and existing test definitions; tests were not independently run in this pass.
+  - The prototype contains basic validation and exception observation, not a complete security boundary.
+  - The loader intentionally supports only a small line-oriented Matome YAML subset.
+  - No production backend, untrusted multi-tenant execution, or hostile deployment environment was exercised.
+evidence:
+  - runtime/prototype.py
+  - runtime/test_prototype.py
+  - runtime/protocol_loader.py
+  - runtime/test_protocol_loader.py
+  - runtime/landscape.py
+  - runtime/test_landscape.py
+reviewer: human review pending
+interpretation: >-
+  The repository demonstrates basic fail-closed observation for several invalid
+  runtime inputs and prevents known failure evidence from updating Landscape in
+  the covered prototype path. This does not establish production-grade security
+  or adversarial robustness. Explicit resource limits, schema strictness,
+  side-effect controls, and independently executed adversarial tests remain
+  required before treating V-07 as complete.
