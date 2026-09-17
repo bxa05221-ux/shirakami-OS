@@ -10,6 +10,19 @@ except ImportError:  # legacy top-level runtime test imports
     from prototype import ExecutionResult
 
 
+def _freeze(value: Any) -> Any:
+    """Recursively freeze common mutable container values."""
+    if isinstance(value, Mapping):
+        return MappingProxyType({key: _freeze(item) for key, item in value.items()})
+    if isinstance(value, list):
+        return tuple(_freeze(item) for item in value)
+    if isinstance(value, tuple):
+        return tuple(_freeze(item) for item in value)
+    if isinstance(value, set):
+        return frozenset(_freeze(item) for item in value)
+    return value
+
+
 @dataclass(frozen=True)
 class EvidenceRecord:
     """Immutable record of an observed Runtime transition."""
@@ -27,7 +40,7 @@ class EvidenceRecord:
             protocol_id=result.protocol_id,
             status=result.status,
             transition_kind=result.transition.kind,
-            transition_data=MappingProxyType(dict(result.transition.data)),
+            transition_data=_freeze(result.transition.data),
             signals=tuple(result.signals),
         )
 
