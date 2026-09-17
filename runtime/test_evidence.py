@@ -3,7 +3,7 @@ from dataclasses import FrozenInstanceError
 import pytest
 
 from evidence import EvidenceRecord, _freeze, capture_evidence, is_transition_evidence
-from prototype import Runtime, example_protocol
+from prototype import Runtime, Transition, example_protocol
 
 
 def test_successful_transition_becomes_immutable_evidence():
@@ -65,3 +65,17 @@ def test_nested_evidence_data_is_deeply_immutable():
 
     with pytest.raises(TypeError):
         frozen["labels"] += ("rewritten",)
+
+
+def test_from_result_freezes_nested_transition_data():
+    def nested_protocol(context):
+        return Transition(
+            kind="nested.transition",
+            data={"payload": {"items": [{"value": 1}]}},
+        )
+
+    result = Runtime().execute("nested.protocol", nested_protocol, {})
+    evidence = EvidenceRecord.from_result(result)
+
+    with pytest.raises(TypeError):
+        evidence.transition_data["payload"]["items"][0]["value"] = 2
