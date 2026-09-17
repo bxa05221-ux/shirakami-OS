@@ -37,3 +37,7 @@ jobs:
       - name: Run runtime tests
         working-directory: runtime
         run: python -m pytest -q
+
+      - name: Run bounded adversarial input tests
+        working-directory: runtime
+        run: python -m pytest -q test_adversarial_inputs.py
