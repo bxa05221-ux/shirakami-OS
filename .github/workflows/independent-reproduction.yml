@@ -24,20 +24,29 @@ jobs:
 
       - name: Show environment
         run: |
-          python --version
-          python -m pip --version
-          uname -a
+          mkdir -p verification-artifacts
+          python --version | tee verification-artifacts/python-version.txt
+          python -m pip --version | tee verification-artifacts/pip-version.txt
+          uname -a | tee verification-artifacts/uname.txt
 
       - name: Install verification dependency
         run: python -m pip install --disable-pip-version-check "pytest==8.4.2"
 
       - name: Run quickstart
-        run: python examples/quickstart/run.py
+        run: python examples/quickstart/run.py | tee verification-artifacts/quickstart.log
 
       - name: Run runtime tests
         working-directory: runtime
-        run: python -m pytest -q
+        run: python -m pytest -q --junitxml=../verification-artifacts/runtime-tests.xml | tee ../verification-artifacts/runtime-tests.log
 
       - name: Run bounded adversarial input tests
         working-directory: runtime
-        run: python -m pytest -q test_adversarial_inputs.py
+        run: python -m pytest -q test_adversarial_inputs.py --junitxml=../verification-artifacts/adversarial-tests.xml | tee ../verification-artifacts/adversarial-tests.log
+
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: independent-reproduction-python-${{ matrix.python-version }}
+          path: verification-artifacts/
+          if-no-files-found: warn
