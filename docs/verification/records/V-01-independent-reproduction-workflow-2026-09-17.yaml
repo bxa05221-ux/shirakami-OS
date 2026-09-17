@@ -12,10 +12,14 @@ scope:
   - Structured verification artifact generation
 implemented:
   path: .github/workflows/independent-reproduction.yml
-  commit: 852d11176d47c1a73fcc66aa29ed070659d753c0
+  commit: 9524b6268525aee3c59a1453ef05a3956d84d1e8
   triggers:
     - workflow_dispatch
     - push to docs/verification-v1.0
+  permissions:
+    - contents: read
+  timeout_minutes: 15
+  fail_fast: false
   python_versions:
     - "3.11"
     - "3.12"
@@ -35,8 +39,11 @@ implemented:
 observed:
   workflow_file_created: true
   workflow_file_retrieved_and_confirmed: true
+  traceable_run_name_configured: true
   artifact_generation_configured: true
   workflow_execution: NOT_VERIFIED
+  run_id: NOT_IDENTIFIED
+  artifact_retrieval: NOT_VERIFIED
 limitations:
   - The updated workflow configuration has not yet been confirmed through a dedicated completed run.
   - Verification is intended to run on GitHub-hosted Ubuntu runners, not an independently managed local or third-party environment.
@@ -44,5 +51,9 @@ limitations:
   - Artifact presence, test counts, and detailed step logs require confirmation from an actual workflow run.
 quality_gate:
   decision: HOLD_PENDING_GATES
-  next_action: Execute or manually dispatch the dedicated workflow, retrieve run metadata, jobs, logs, and artifacts, then update this record with observed results.
+  next_action:
+    - Execute or manually dispatch the dedicated workflow.
+    - Identify the dedicated workflow run ID.
+    - Retrieve run metadata, jobs, logs, and artifacts.
+    - Update this record with observed results.
 reviewer: human review pending
