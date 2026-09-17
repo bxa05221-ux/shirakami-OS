@@ -3,21 +3,27 @@ subject: "Quickstart / Reproducibility"
 version: "PV1.0"
 date: "2026-09-17"
 environment:
-  os: "GitHub Actions runner (environment details not independently recorded)"
-  python: "NOT_RECORDED"
-  commit: "b2726660010aef3c51f4aa2dc7f2be716b8f1133"
+  os: "GitHub Actions (dedicated workflow execution not independently identified)"
+  python: "3.11 / 3.12 configured; dedicated run evidence not verified"
+  workflow: ".github/workflows/independent-reproduction.yml"
+  workflow_commit: "64214a92842ab8058c4283d22adc107d4b187454"
 input:
   fixture: "examples/quickstart/run.py"
 expected:
   - "Quickstart executes successfully"
   - "Protocol IR, Evidence, and Landscape State are observable"
 observed:
-  - "GitHub Actions check test-runtime completed successfully"
-  - "Independent third-party environment reproduction was not performed"
+  - "Dedicated workflow configured with workflow_dispatch, pull_request, and push triggers"
+  - "Dedicated workflow captures environment metadata, Quickstart logs, runtime/adversarial logs, and JUnit XML artifacts"
+  - "Dedicated workflow run ID and artifact retrieval were not verified through the available connector"
+  - "Existing Runtime β0.1 CI success is not treated as dedicated independent reproduction evidence"
 status: PARTIAL
 limitations:
-  - "CI success does not establish reproducibility across third-party environments"
-  - "Python version, OS details, and exact quickstart output were not captured in this record"
+  - "Dedicated workflow execution and artifact retrieval remain unverified"
+  - "Third-party/local environment reproduction has not been performed"
+  - "Successful CI execution does not establish reproducibility across independent environments"
 evidence:
-  - "GitHub Actions check: test-runtime, conclusion success, commit b2726660010aef3c51f4aa2dc7f2be716b8f1133"
+  - "Workflow definition verified at commit 64214a92842ab8058c4283d22adc107d4b187454"
+  - "Dedicated workflow run search returned no identifiable run through the available connector"
 reviewer: ""
+quality_gate: HOLD_PENDING_GATES
