@@ -13,6 +13,12 @@ on:
       - 'tests/**'
       - 'docs/specs/OPPAI_Schema_v0.1.md'
       - '.github/workflows/oppai-runtime.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '17 2 * * 1'
+
+permissions:
+  contents: read
 
 jobs:
   test:
