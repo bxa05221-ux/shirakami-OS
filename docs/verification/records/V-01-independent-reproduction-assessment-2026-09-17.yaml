@@ -1,0 +1,39 @@
+verification_id: V-01-independent-reproduction-assessment
+version: "1.0"
+date: "2026-09-17"
+scope: independent reproduction readiness assessment
+status: PARTIAL
+branch: docs/verification-v1.0
+observations:
+  - item: existing_ci_environment
+    result: OBSERVED
+    details:
+      workflow: .github/workflows/runtime-beta-0.1.yml
+      runner: ubuntu-latest
+      python: "3.11"
+      command: python -m pytest runtime tests -q
+      dependency_install: python -m pip install pytest fastapi httpx uvicorn
+      limitation: dependencies are not version-pinned
+  - item: workflow_trigger
+    result: OBSERVED
+    details:
+      push_and_pull_request: true
+      workflow_dispatch: false
+      limitation: no manually dispatchable independent verification run was identified
+  - item: quickstart
+    result: OBSERVED
+    details:
+      documented_python: "3.11+"
+      documented_commands:
+        - pip install -r requirements.txt
+        - python shirakami_os.py
+        - python -m pytest runtime tests -q
+      limitation: complete environment metadata and captured output are not yet recorded
+conclusion:
+  current_claim: existing CI provides reproducible automation evidence, not full independent reproduction proof
+  release_decision: HOLD_PENDING_GATES
+next_actions:
+  - record exact dependency versions and complete test output
+  - perform a separately documented clean-environment run
+  - retain PARTIAL until an independent environment is evidenced and reviewed
+reviewer: human review pending
