@@ -20,6 +20,30 @@ class AdversarialInputTests(unittest.TestCase):
     def test_wrong_root_is_rejected(self):
         self.assert_rejected("root:\n  title: invalid\n")
 
+    def test_missing_title_is_rejected(self):
+        self.assert_rejected(
+            """matome:
+  version: 0.1
+  statement: >
+    A statement.
+  pipeline:
+    - phase: observe
+      action: capture_input
+"""
+        )
+
+    def test_missing_version_is_rejected(self):
+        self.assert_rejected(
+            """matome:
+  title: Missing Version
+  statement: >
+    A statement.
+  pipeline:
+    - phase: observe
+      action: capture_input
+"""
+        )
+
     def test_missing_statement_is_rejected(self):
         self.assert_rejected(
             """matome:
