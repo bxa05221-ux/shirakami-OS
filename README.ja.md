@@ -264,6 +264,15 @@ Quickstartでは、Protocol YAMLを読み込み、Protocol IRを生成し、Runt
 
 つまり、概念・研究・仕様・実装を一つのRepositoryに混ぜるのではなく、それぞれのLandscapeを分離しています。
 
+### 目的別に見るなら
+
+- **白神モデルの全体像を知りたい** → [Shirakami Model](https://github.com/bxa05221-ux/shirakami-model)
+- **仕様を確認したい** → [Shirakami Specification](https://github.com/bxa05221-ux/shirakami-specification)
+- **理論・研究を確認したい** → [Shirakami Research](https://github.com/bxa05221-ux/shirakami-research)
+- **実装を動かしたい・コードをレビューしたい** → **このRepository（shirakami-OS）**
+
+Repository間で迷った場合は、[Repository Map](docs/architecture/REPOSITORY_MAP.md) を起点にしてください。
+
 ---
 
 ## 開発方針
