@@ -36,6 +36,7 @@ Landscapeが中心であり、RuntimeはLandscapeを扱うための交換可能�
 
 初めて見る場合は、まず以下から入ってください。
 
+- **[Repository Map](docs/architecture/REPOSITORY_MAP.md)** — Repository全体の構造と、目的別の入口
 - **[Reviewer Entry Point](docs/architecture/REVIEWER_ENTRY_POINT.md)** — ArchitectureとEvidenceを確認するための読み順
 - **[MVP Quickstart](docs/architecture/MVP_QUICKSTART.md)** — 最短で実装を実行・検証する入口
 
@@ -219,16 +220,19 @@ PV1.0は、白神の基盤を実装として動かし、検証し、観測しな
 
 Repositoryを取得して、最小Runtimeを実行できます。
 
+まず実行環境を準備します。Runtimeの実行自体はPython標準ライブラリで動作し、検証にはpytestを使用します。
+
 ```bash
 git clone https://github.com/bxa05221-ux/shirakami-OS.git
 cd shirakami-OS
-python examples/quickstart/run.py
+python shirakami_os.py
+python -m pip install pytest
+python -m pytest runtime tests -q
 ```
 
-Quickstartでは、Protocol YAMLを読み込み、Protocol IRを生成し、Runtimeを実行してEvidenceとLandscape Stateを確認します。
+最初の `python shirakami_os.py` で最小のOS境界を実行し、その後にテストスイートでRuntimeと既存テストを検証します。外部AIプロバイダーは、このMVP実行経路には必要ありません。
 
 → **[MVP Quickstart](docs/architecture/MVP_QUICKSTART.md)**
-
 ---
 
 ## ユーザーズマニュアル（漫画版）
@@ -262,6 +266,15 @@ Quickstartでは、Protocol YAMLを読み込み、Protocol IRを生成し、Runt
 | **shirakami-OS** | Foundation / Runtime / Implementation |
 
 つまり、概念・研究・仕様・実装を一つのRepositoryに混ぜるのではなく、それぞれのLandscapeを分離しています。
+
+### 目的別に見るなら
+
+- **白神モデルの全体像を知りたい** → [Shirakami Model](https://github.com/bxa05221-ux/shirakami-model)
+- **仕様を確認したい** → [Shirakami Specification](https://github.com/bxa05221-ux/shirakami-specification)
+- **理論・研究を確認したい** → [Shirakami Research](https://github.com/bxa05221-ux/shirakami-research)
+- **実装を動かしたい・コードをレビューしたい** → **このRepository（shirakami-OS）**
+
+Repository間で迷った場合は、[Repository Map](docs/architecture/REPOSITORY_MAP.md) を起点にしてください。
 
 ---
 

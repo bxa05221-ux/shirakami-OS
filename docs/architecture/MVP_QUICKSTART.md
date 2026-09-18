@@ -2,12 +2,14 @@
 
 This is the shortest path for a first-time reviewer to verify that the Runtime boundary is executable.
 
-## 1. Install
+## 1. Prepare
 
-Python 3.11+ is sufficient for the current test/runtime path.
+Python 3.11+ is sufficient for the current Runtime path. The executable entry point uses only the Python standard library.
+
+For the verification suite, install pytest if it is not already available:
 
 ```bash
-pip install -r requirements.txt
+python -m pip install pytest
 ```
 
 ## 2. Run the executable entry point
