@@ -36,6 +36,7 @@ Landscapeが中心であり、RuntimeはLandscapeを扱うための交換可能�
 
 初めて見る場合は、まず以下から入ってください。
 
+- **[Repository Map](docs/architecture/REPOSITORY_MAP.md)** — Repository全体の構造と、目的別の入口
 - **[Reviewer Entry Point](docs/architecture/REVIEWER_ENTRY_POINT.md)** — ArchitectureとEvidenceを確認するための読み順
 - **[MVP Quickstart](docs/architecture/MVP_QUICKSTART.md)** — 最短で実装を実行・検証する入口
 
