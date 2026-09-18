@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from execution_evidence import execute_current_protocol_with_evidence
-from protocol_loader import load_matome
-from protocol_registry import ProtocolRegistry, ProtocolRegistryError
+from runtime.execution_evidence import execute_current_protocol_with_evidence
+from runtime.protocol_loader import load_matome
+from runtime.protocol_registry import ProtocolRegistry, ProtocolRegistryError
 
 
 PROTOCOL = Path(__file__).resolve().parents[1] / "protocols" / "manual" / "manga-user-manual.yaml"
