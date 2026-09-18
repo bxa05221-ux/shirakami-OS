@@ -220,16 +220,19 @@ PV1.0は、白神の基盤を実装として動かし、検証し、観測しな
 
 Repositoryを取得して、最小Runtimeを実行できます。
 
+まず実行環境を準備します。Runtimeの実行自体はPython標準ライブラリで動作し、検証にはpytestを使用します。
+
 ```bash
 git clone https://github.com/bxa05221-ux/shirakami-OS.git
 cd shirakami-OS
-python examples/quickstart/run.py
+python shirakami_os.py
+python -m pip install pytest
+python -m pytest runtime tests -q
 ```
 
-Quickstartでは、Protocol YAMLを読み込み、Protocol IRを生成し、Runtimeを実行してEvidenceとLandscape Stateを確認します。
+最初の `python shirakami_os.py` で最小のOS境界を実行し、その後にテストスイートでRuntimeと既存テストを検証します。外部AIプロバイダーは、このMVP実行経路には必要ありません。
 
 → **[MVP Quickstart](docs/architecture/MVP_QUICKSTART.md)**
-
 ---
 
 ## ユーザーズマニュアル（漫画版）
