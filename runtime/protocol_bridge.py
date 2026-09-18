@@ -6,8 +6,12 @@ or implement domain-specific actions; those remain data carried by the IR.
 
 from typing import Any
 
-from protocol_loader import ProtocolIR
-from prototype import ExecutionContext, Transition
+try:
+    from .protocol_loader import ProtocolIR
+    from .prototype import ExecutionContext, Transition
+except ImportError:
+    from protocol_loader import ProtocolIR
+    from prototype import ExecutionContext, Transition
 
 
 def protocol_from_ir(protocol_ir: ProtocolIR):
