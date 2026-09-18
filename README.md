@@ -42,6 +42,7 @@ Shirakami explores a different question:
 
 For external review, start here:
 
+- **[Repository Map](docs/architecture/REPOSITORY_MAP.md)** — the repository structure and entry points by visitor intent.
 - **[Reviewer Entry Point](docs/architecture/REVIEWER_ENTRY_POINT.md)** — evidence-backed reading order and architecture boundaries.
 - **[MVP Quickstart](docs/architecture/MVP_QUICKSTART.md)** — the shortest route to running and testing the implementation.
 
