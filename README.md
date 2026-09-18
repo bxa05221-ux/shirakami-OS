@@ -9,6 +9,23 @@
 Version: Prototype v1.0 (PV1.0)  
 Status: β1.0 Launch Model / Operational Rollout
 
+## 5-Minute Orientation
+
+If you are new to Shirakami, you do not need to read the whole repository first.
+
+1. **Understand it** → [What Shirakami Is](#what-shirakami-is)
+2. **See the structure** → [Repository Map](docs/architecture/REPOSITORY_MAP.md)
+3. **Review the architecture** → [Reviewer Entry Point](docs/architecture/REVIEWER_ENTRY_POINT.md)
+4. **Run it** → [MVP Quickstart](docs/architecture/MVP_QUICKSTART.md)
+
+In one sentence:
+
+> **Shirakami OS is a runtime for preserving, observing, and transferring human context independently of a particular AI model or provider.**
+
+The shortest conceptual path is:
+
+**Landscape → Evidence → Protocol → Runtime → Adapter → External System / AI**
+
 ## What Shirakami Is
 
 Shirakami OS is an open-source **Personal AI Runtime / development architecture** for preserving and working with human context independently of a particular LLM or AI provider.
