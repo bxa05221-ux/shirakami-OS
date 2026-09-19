@@ -13,13 +13,12 @@ def test_full_shirakami_trace_round_trip():
         "matrix": {"priority": 2, "phase": 1, "relation": 3},
     }
 
-    protocols = [
-        {
-            "id": "protocol.alpha",
+    protocols = {
+        "protocol.alpha": {
             "accepted_states": [{"priority": 2, "phase": 1, "relation": 3}],
             "required_evidence": ["E-001"],
         }
-    ]
+    }
 
     routing = route_protocol(context, protocols)
     assert routing.status == "ready"
