@@ -50,4 +50,29 @@ Protocol B output ──compatible?──> Protocol C input
 
 This turns the water/gearbox model into a measurable repository property rather than a metaphor.
 
-**Status: automatically detected structure / compatibility verification pending**
+**Status: structural detector verified / selected Runtime→Evidence composition verified**
+
+### Selected executable verification
+
+The repository now contains an executable boundary test at
+`runtime/test_protocol_composition_evidence.py`.
+
+It verifies one limited composition:
+
+```text
+Protocol A output
+      ↓
+Protocol B input
+      ↓
+Runtime execution
+      ↓
+EvidenceRecord
+```
+
+The test deliberately does **not** claim that matching field names prove semantic
+compatibility. The detector reports structural overlap separately and marks
+semantic compatibility as `unknown` unless a stronger Protocol contract
+establishes it.
+
+This is a verification of one selected composition, not unrestricted Protocol
+permutation.
