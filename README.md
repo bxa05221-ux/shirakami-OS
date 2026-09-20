@@ -26,6 +26,25 @@ The shortest conceptual path is:
 
 **Landscape → Evidence → Protocol → Runtime → Adapter → External System / AI**
 
+## Information Flow / Protocol Gearbox
+
+Shirakami can also be understood as an **information water system**. Information held in a Landscape can be diverted through different Protocol routes and reused for different needs. Protocols act like a gearbox: the route can be changed by composing different Protocols and boundaries without requiring a different AI model for every use case.
+
+```text
+Information / Landscape
+          ↓
+       diversion
+      ↙    ↓    ↘
+ Protocol A  B  C
+      ↘    ↓    ↙
+        Evidence
+           ↓
+      re-observation
+           ↓
+       Landscape
+```
+
+This is an architectural interpretation of the existing implementation, not a claim of unrestricted arbitrary Protocol permutation. See **[Information Watershed Model](docs/architecture/INFORMATION_WATERSHED_MODEL.md)** for the evidence and verification boundary.
 ## What Shirakami Is
 
 Shirakami OS is an open-source **Personal AI Runtime / development architecture** for preserving and working with human context independently of a particular LLM or AI provider.
