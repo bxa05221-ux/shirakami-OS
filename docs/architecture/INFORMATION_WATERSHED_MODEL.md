@@ -63,7 +63,57 @@ The repository provides several concrete observations supporting this model:
 
 These observations support **reconfigurable routing** as an architectural direction. They do not, by themselves, prove unrestricted arbitrary Protocol permutation.
 
-## 4. What is actually reused
+## 4. n-gram and the one-stroke route
+
+The gearbox model becomes more precise when Protocol connections are treated as local transitions.
+
+If Protocol A produces a state that Protocol B can accept, the connection can be represented as:
+
+```text
+A.output → B.input
+```
+
+A sequence of such local connections forms a candidate route:
+
+```text
+2-gram:  A → B
+3-gram:  A → B → C
+4-gram:  A → B → C → D
+```
+
+Here, **n-gram is a route-candidate mechanism, not an authority or a semantic truth engine**. It can propose a next compatible Protocol from the recent sequence, while Protocol contracts and verification determine whether the transition is actually admissible.
+
+The resulting route can be understood as a **one-stroke route**: a continuous sequence of locally compatible Protocol transitions from a starting state toward a defined destination or stopping condition.
+
+```text
+Landscape
+   ↓
+Protocol A
+   ↓  compatible transition
+Protocol B
+   ↓  compatible transition
+Protocol D
+   ↓
+Runtime
+   ↓
+Evidence
+   ↓
+Landscape
+```
+
+The term "one-stroke" is architectural shorthand here, not a claim that every route is an Eulerian path or that Protocols may be reused without constraints.
+
+The intended separation is:
+
+- **n-gram** — generates candidate local connections
+- **Protocol boundary** — constrains admissible connections
+- **Runtime** — executes the selected route
+- **Evidence** — records what actually happened
+- **Human / system policy** — retains control over destination and acceptance
+
+This gives the water-system analogy an executable interpretation: **the water flows through a network of verified-compatible gates, while route construction determines where the flow is diverted.**
+
+## 5. What is actually reused
 
 The reusable unit is not only code.
 
@@ -80,7 +130,7 @@ Because these boundaries are explicit, a new use case does not necessarily requi
 
 The actual compatibility of a composition still has to be verified from its input/output contracts and tests.
 
-## 5. Information is not consumed once
+## 6. Information is not consumed once
 
 The water metaphor also clarifies the role of Evidence.
 
@@ -90,7 +140,7 @@ This is not a claim that Evidence is automatically converted into domain truth. 
 
 > **Shirakami does not treat information as a one-way answer pipeline. It provides boundaries through which information can flow, branch, be observed, and flow again.**
 
-## 6. Human control
+## 7. Human control
 
 The water does not choose where the canal is built.
 
@@ -98,7 +148,7 @@ In Shirakami, route composition remains a human/system design concern. AI may op
 
 This is consistent with the existing principle that Runtime does not own domain truth and that human final judgment remains outside AI authority.
 
-## 7. Verification boundary
+## 8. Verification boundary
 
 The next verification target is not to prove the metaphor. It is to test the architectural claim directly.
 
