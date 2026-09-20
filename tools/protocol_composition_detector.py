@@ -59,6 +59,18 @@ def detect(path: Path) -> dict[str, object]:
     }
 
 
+def compatibility_signal(source: dict[str, object], target: dict[str, object]) -> dict[str, object]:
+    """Report structural overlap without claiming semantic compatibility."""
+    source_outputs = set(source.get("outputs", []))
+    target_inputs = set(target.get("inputs", []))
+    overlap = sorted(source_outputs & target_inputs)
+    return {
+        "structural_match": bool(overlap),
+        "matching_fields": overlap,
+        "semantic_compatibility": "unknown",
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", default=".")
