@@ -32,6 +32,25 @@ Landscapeが中心であり、RuntimeはLandscapeを扱うための交換可能�
 
 ---
 
+## 情報水系 / Protocol Gearbox
+
+白神は、**情報を生態系の中で流す水系**としても捉えられます。Landscapeにある情報を分水し、異なるProtocolの経路へ流し、別々のニーズに利用できます。Protocolはギアボックスのように働き、用途ごとにAIそのものを作り直すのではなく、Protocolと境界の組み合わせ・順序を変えることで異なる経路を構成します。
+
+```text
+情報 / Landscape
+       ↓
+      分水
+   ↙   ↓   ↘
+ Protocol A B C
+   ↘   ↓   ↙
+    Evidence
+       ↓
+    再観測
+       ↓
+    Landscape
+```
+
+これは既存実装から導いたArchitecture上の解釈であり、任意のProtocol組み合わせが無条件に実行できることを意味しません。根拠と検証範囲は **[Information Watershed Model](docs/architecture/INFORMATION_WATERSHED_MODEL.md)** に記録しています。
 ## 外部レビューの入口
 
 初めて見る場合は、まず以下から入ってください。
