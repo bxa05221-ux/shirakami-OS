@@ -51,6 +51,17 @@ Landscapeが中心であり、RuntimeはLandscapeを扱うための交換可能�
 ```
 
 これは既存実装から導いたArchitecture上の解釈であり、任意のProtocol組み合わせが無条件に実行できることを意味しません。根拠と検証範囲は **[Information Watershed Model](docs/architecture/INFORMATION_WATERSHED_MODEL.md)** に記録しています。
+
+### n-gram / 一筆書き Route
+
+この経路モデルをさらに具体化すると、Protocol間の接続を局所的な遷移として扱えます。**n-gram**は、A → B や A → B → C のような短いProtocol列を表し、次に接続可能なProtocolを含む候補経路を構成するために使えます。実際に接続できるかどうかはProtocolの入出力境界と検証によって制約され、Runtimeが実行し、Evidenceが実際の状態変化を記録します。
+
+```text
+Protocol A → Protocol B → Protocol D
+          候補となる一筆書き経路
+```
+
+ここでいう「一筆書き」は、互換性のあるProtocol遷移を連続して辿るという建築上の表現です。任意のProtocolを無条件に並べ替えられることや、Euler路アルゴリズムを意味しません。n-gramは経路候補を構成する仕組みであり、AIに判断権を与えるものでもありません。
 ## 外部レビューの入口
 
 初めて見る場合は、まず以下から入ってください。
