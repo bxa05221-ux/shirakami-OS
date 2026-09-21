@@ -66,6 +66,22 @@ class OneStrokeRoutePipeline:
             raise ValueError("reviewer must be non-empty")
         return names
 
+    def propose_candidates_from_evidence(
+        self,
+        evidence: Sequence[EvidenceRecord],
+        *,
+        n: int = 2,
+    ) -> list[tuple[str, ...]]:
+        """Derive structural route candidates from explicit Evidence artifacts.
+
+        This is proposal-only: it does not select, authorize, or mutate the
+        Evolution Loop state. Human selection still enters through
+        ``prepare_candidate`` and the existing R0100 Human Gate.
+        """
+        from tools.protocol_route_candidates import generate_candidates_from_evidence
+
+        return generate_candidates_from_evidence(evidence, n)
+
     def prepare_candidate(
         self,
         route_id: str,

@@ -8,6 +8,12 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+from collections.abc import Iterable
+
+try:
+    from runtime.evidence import EvidenceRecord
+except ImportError:
+    from evidence import EvidenceRecord
 
 from tools.protocol_compatibility_matrix import build_matrix
 
@@ -44,6 +50,32 @@ def generate_candidates(
         extend((node,))
 
     return candidates
+
+
+def generate_candidates_from_evidence(
+    evidence: Iterable[EvidenceRecord],
+    n: int,
+) -> list[tuple[str, ...]]:
+    """Generate structural route candidates from explicit Protocol artifact Evidence.
+
+    Evidence must explicitly identify a Protocol artifact path in
+    ``transition_data["protocol_path"]``. No path is inferred from prose,
+    protocol identifiers, or arbitrary Evidence fields.
+    """
+    paths: list[Path] = []
+    seen: set[str] = set()
+    for record in evidence:
+        if not isinstance(record, EvidenceRecord):
+            raise TypeError("evidence must contain EvidenceRecord instances")
+        raw_path = record.transition_data.get("protocol_path")
+        if raw_path is None:
+            continue
+        if not isinstance(raw_path, str) or not raw_path.strip():
+            raise ValueError("protocol_path must be a non-empty string")
+        if raw_path not in seen:
+            seen.add(raw_path)
+            paths.append(Path(raw_path))
+    return generate_candidates(paths, n)
 
 
 def render_markdown(candidates: list[tuple[str, ...]], n: int) -> str:
