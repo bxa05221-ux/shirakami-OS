@@ -47,6 +47,22 @@ class OneStrokeRoutePipeline:
         self.runtime = runtime or EvidenceDrivenRuntime()
         self._selection: RouteSelection | None = None
 
+    def select_candidate(
+        self,
+        route_id: str,
+        candidate: Sequence[str],
+        *,
+        reviewer: str = "human",
+        approved: bool = False,
+    ) -> RouteSelection:
+        """Accept one generated Route Candidate at the Human Gate boundary."""
+        return self.select(
+            route_id,
+            candidate,
+            reviewer=reviewer,
+            approved=approved,
+        )
+
     def select(
         self,
         route_id: str,
