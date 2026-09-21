@@ -7,8 +7,12 @@ records consumable by the existing immutable EvidenceRecord model.
 from dataclasses import dataclass, field
 from typing import Any, Iterable, Mapping
 
-from .evidence import EvidenceRecord
-from .evolution_loop import EvidenceCandidate, EvidenceClass, TransitionRecord
+try:
+    from .evidence import EvidenceRecord
+    from .evolution_loop import EvidenceCandidate, EvidenceClass, TransitionRecord
+except ImportError:  # legacy top-level runtime test imports
+    from evidence import EvidenceRecord
+    from evolution_loop import EvidenceCandidate, EvidenceClass, TransitionRecord
 
 
 @dataclass(frozen=True)
