@@ -54,7 +54,7 @@ def compose_route(
             kind=f"route.{route_id}",
             data={
                 "route_id": route_id,
-                "route": names,
+                "route": list(names),
                 "trace": trace,
                 "final": dict(current),
                 "changed": True,
