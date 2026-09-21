@@ -1,0 +1,28 @@
+id: example-github-semantic-handoff
+version: "0.1"
+
+request:
+  purpose: architecture_review
+  question: "Can Shirakami be represented as a model-independent reference architecture?"
+  repository: bxa05221-ux/shirakami-OS
+  ref: main
+  constraints:
+    - "Use repository evidence only."
+    - "Start from the reviewer entry point."
+    - "Do not inspect runtime implementation unless architecture evidence is insufficient."
+
+expected_selection:
+  include:
+    - README.md
+    - docs/architecture/REVIEWER_ENTRY_POINT.md
+    - docs/architecture/Model_Agnostic_Value_Proposition.md
+    - docs/architecture/Human_AI_Operation_Principle.md
+  exclude:
+    - runtime/**
+    - plugins/**
+    - experimental/**
+
+handoff:
+  output: matome_yaml
+  preserve_commit_sha: true
+  human_review_required: true
