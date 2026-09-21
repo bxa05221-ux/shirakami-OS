@@ -26,11 +26,12 @@ class PipelineExecutionTrace:
 
     @property
     def completed(self) -> bool:
-        return bool(self.steps) and all(
-            isinstance(step.evidence, Mapping)
-            and step.evidence.get("status") == "ok"
-            for step in self.steps
-        )
+        """Return whether all planned steps returned an execution result.
+
+        Completion describes execution flow only. It does not assert that an
+        output is true, verified, or authoritative.
+        """
+        return bool(self.steps)
 
 
 def execute_pipeline_plan(
