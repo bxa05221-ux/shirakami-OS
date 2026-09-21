@@ -159,7 +159,8 @@ def test_evidence_candidate_provenance_survives_human_gate(tmp_path):
     )
 
     assert selection.provenance == ("observed.a", "observed.b")
-    assert selection.evidence_ids == ()
+    assert selection.evidence_ids == proposal.evidence_ids
+    assert len(selection.evidence_ids) == 2
     assert pipeline.runtime.loop.state.value == "HUMAN_REVIEW"
 
     approved = pipeline.approve_candidate(approved=True)
