@@ -12,6 +12,10 @@ on:
       - "docs/**"
       - "CHECKLIST.md"
       - ".github/workflows/runtime-beta-0.1.yml"
+      - "README.md"
+      - "README.ja.md"
+      - "VERSION"
+      - "CHANGELOG.md"
   pull_request:
     paths:
       - "runtime/**"
@@ -22,6 +26,10 @@ on:
       - "docs/**"
       - "CHECKLIST.md"
       - ".github/workflows/runtime-beta-0.1.yml"
+      - "README.md"
+      - "README.ja.md"
+      - "VERSION"
+      - "CHANGELOG.md"
 
 jobs:
   test-runtime:
