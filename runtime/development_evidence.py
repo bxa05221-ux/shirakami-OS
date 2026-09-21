@@ -100,9 +100,9 @@ def parse_development_evidence(
     observed_at = metadata.get("date", metadata.get("observed_at", "unknown"))
     protocol_id = metadata.get("protocol_id", "unknown")
     status = metadata.get("status", "unknown")
-    summary_values = _items(sections, "summary", "observation")
-    summary = " ".join(summary_values) if summary_values else "unknown"
-    claims = _items(sections, "change", "claims")
+    observation_values = _items(sections, "observation", "summary")
+    summary = " ".join(observation_values) if observation_values else "unknown"
+    claims = observation_values
     verification = _items(sections, "verification evidence", "verification")
     limitations = _items(sections, "boundary", "limitations")
     human_gate = metadata.get("human_gate", "unknown")
