@@ -166,6 +166,12 @@ Accepted Evidence
 
 Do not silently reconcile contradictory external interpretations.
 
+## Public Verification
+
+For a compact, reproducible external review route, use [Public Verification Pack](../PUBLIC_VERIFICATION_PACK.md).
+
+It is intentionally not a certification or production-readiness claim; it defines the current public verification boundary.
+
 ## Current Review Status
 
 - Repository entry point: established
