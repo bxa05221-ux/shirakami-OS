@@ -7,19 +7,34 @@ deterministic and provider-neutral; Human approval remains an explicit boundary.
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping
 
-from .evidence import EvidenceRecord, capture_evidence
-from .evolution_bridge import (
-    ContextSnapshot,
-    MismatchEvidence,
-    ProtocolCandidate,
-    VerificationResult,
-    candidate_to_evidence,
-    mismatch_to_evidence,
-    transition_to_evidence,
-)
-from .evolution_loop import EvolutionLoop, LoopState
-from .evidence_store import EvidenceStore
-from .prototype import ExecutionResult, Runtime, Transition
+try:
+    from .evidence import EvidenceRecord, capture_evidence
+    from .evolution_bridge import (
+        ContextSnapshot,
+        MismatchEvidence,
+        ProtocolCandidate,
+        VerificationResult,
+        candidate_to_evidence,
+        mismatch_to_evidence,
+        transition_to_evidence,
+    )
+    from .evolution_loop import EvolutionLoop, LoopState
+    from .evidence_store import EvidenceStore
+    from .prototype import ExecutionResult, Runtime, Transition
+except ImportError:  # legacy top-level runtime test imports
+    from evidence import EvidenceRecord, capture_evidence
+    from evolution_bridge import (
+        ContextSnapshot,
+        MismatchEvidence,
+        ProtocolCandidate,
+        VerificationResult,
+        candidate_to_evidence,
+        mismatch_to_evidence,
+        transition_to_evidence,
+    )
+    from evolution_loop import EvolutionLoop, LoopState
+    from evidence_store import EvidenceStore
+    from prototype import ExecutionResult, Runtime, Transition
 
 
 @dataclass(frozen=True)
@@ -248,9 +263,7 @@ class EvidenceDrivenRuntime:
                 expected=expected_transition_kind,
                 observed=observed,
                 uncertainty=verification.uncertainty,
-                source_evidence=(
-                    f"R0100:{execution.transition.kind}",
-                ),
+                source_evidence=(f"R0100:{execution.transition.kind}",),
                 context=self._context.as_mapping(),
             )
             self.store = self.store.append(mismatch_to_evidence(mismatch))
