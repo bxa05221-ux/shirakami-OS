@@ -1,5 +1,6 @@
 from runtime.one_stroke_route_pipeline import OneStrokeRoutePipeline
 from runtime.prototype import ExecutionContext, Transition
+from runtime.evidence import EvidenceRecord
 
 
 def _protocol(name, suffix):
@@ -161,3 +162,72 @@ def test_evolution_loop_mismatch_does_not_advance_to_accepted():
         and record.status == "completed"
         for record in pipeline.runtime.store.all()
     )
+
+
+
+def test_evidence_derives_structural_candidates_without_authorization(tmp_path):
+    a = tmp_path / "a.yaml"
+    b = tmp_path / "b.yaml"
+    a.write_text("title: A\noutput:\n  - shared\n", encoding="utf-8")
+    b.write_text("title: B\ninput:\n  - shared\n", encoding="utf-8")
+
+    evidence = (
+        EvidenceRecord(
+            protocol_id="observed.a",
+            status="observed",
+            transition_kind="protocol.observed",
+            transition_data={"protocol_path": str(a)},
+            signals=("PROTOCOL_ARTIFACT",),
+        ),
+        EvidenceRecord(
+            protocol_id="observed.b",
+            status="observed",
+            transition_kind="protocol.observed",
+            transition_data={"protocol_path": str(b)},
+            signals=("PROTOCOL_ARTIFACT",),
+        ),
+    )
+
+    pipeline = OneStrokeRoutePipeline()
+    candidates = pipeline.propose_candidates_from_evidence(evidence, n=2)
+
+    assert candidates == [(str(a), str(b))]
+    assert pipeline.runtime.loop.state.value == "IDLE"
+
+
+def test_evidence_candidate_requires_explicit_human_gate(tmp_path):
+    a = tmp_path / "a.yaml"
+    b = tmp_path / "b.yaml"
+    a.write_text("title: A\noutput:\n  - shared\n", encoding="utf-8")
+    b.write_text("title: B\ninput:\n  - shared\n", encoding="utf-8")
+
+    evidence = (
+        EvidenceRecord(
+            protocol_id="observed.a",
+            status="observed",
+            transition_kind="protocol.observed",
+            transition_data={"protocol_path": str(a)},
+            signals=("PROTOCOL_ARTIFACT",),
+        ),
+        EvidenceRecord(
+            protocol_id="observed.b",
+            status="observed",
+            transition_kind="protocol.observed",
+            transition_data={"protocol_path": str(b)},
+            signals=("PROTOCOL_ARTIFACT",),
+        ),
+    )
+
+    pipeline = OneStrokeRoutePipeline()
+    candidate = pipeline.propose_candidates_from_evidence(evidence, n=2)[0]
+    selection = pipeline.prepare_candidate("route.evidence", candidate)
+
+    assert selection.candidate == candidate
+    assert pipeline.runtime.loop.state.value == "HUMAN_REVIEW"
+
+    try:
+        pipeline.execute({})
+    except RuntimeError as exc:
+        assert "not authorized" in str(exc)
+    else:
+        raise AssertionError("Evidence-derived candidate must not authorize execution")
