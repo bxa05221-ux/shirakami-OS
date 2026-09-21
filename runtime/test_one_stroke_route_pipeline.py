@@ -1,1 +1,39 @@
-from runtime.one_stroke_route_pipeline import OneStrokeRoutePipeline\nfrom runtime.prototype import ExecutionContext, Transition\n\ndef _protocol(name, suffix):\n    def run(context: ExecutionContext) -> Transition:\n        return Transition(kind=f"step.{name}", data={"value": f"{context.input.get('value', '')}{suffix}"})\n    return run\n\ndef test_selected_route_requires_human_gate():\n    pipeline = OneStrokeRoutePipeline()\n    try:\n        pipeline.select("route.demo", ("a", "b"), approved=False)\n    except PermissionError:\n        pass\n    else:\n        raise AssertionError("route selection must fail closed without approval")\n\ndef test_selected_route_runs_once_and_verifies_to_evidence():\n    pipeline = OneStrokeRoutePipeline()\n    selection = pipeline.select("route.demo", ("a", "b", "c"), reviewer="human", approved=True)\n    result = pipeline.execute({"a": _protocol("a", "A"), "b": _protocol("b", "B"), "c": _protocol("c", "C")}, {"value": ""})\n    assert selection == result.selection\n    assert result.execution.status == "success"\n    assert result.execution.transition.kind == "route.route.demo"\n    assert result.execution.transition.data["route"] == ["a", "b", "c"]\n    assert result.execution.transition.data["final"]["value"] == "ABC"\n    assert result.verification.status == "pass"\n    assert any(record.transition_kind == "route.route.demo" for record in result.evidence)\n\ndef test_selected_route_stops_on_missing_protocol():\n    pipeline = OneStrokeRoutePipeline()\n    pipeline.select("route.demo", ("a", "b"), approved=True)\n    try:\n        pipeline.execute({"a": _protocol("a", "A")})\n    except KeyError as exc:\n        assert "b" in str(exc)\n    else:\n        raise AssertionError("missing Protocol must stop execution")\n
+from runtime.one_stroke_route_pipeline import OneStrokeRoutePipeline
+from runtime.prototype import ExecutionContext, Transition
+
+def _protocol(name, suffix):
+    def run(context: ExecutionContext) -> Transition:
+        value = context.input.get("value", "")
+        return Transition(kind=f"step.{name}", data={"value": f"{value}{suffix}"})
+    return run
+
+def test_selected_route_requires_human_gate():
+    pipeline = OneStrokeRoutePipeline()
+    try:
+        pipeline.select("route.demo", ("a", "b"), approved=False)
+    except PermissionError:
+        pass
+    else:
+        raise AssertionError("route selection must fail closed without approval")
+
+def test_selected_route_runs_once_and_verifies_to_evidence():
+    pipeline = OneStrokeRoutePipeline()
+    selection = pipeline.select("route.demo", ("a", "b", "c"), reviewer="human", approved=True)
+    result = pipeline.execute({"a": _protocol("a", "A"), "b": _protocol("b", "B"), "c": _protocol("c", "C")}, {"value": ""})
+    assert selection == result.selection
+    assert result.execution.status == "success"
+    assert result.execution.transition.kind == "route.route.demo"
+    assert result.execution.transition.data["route"] == ["a", "b", "c"]
+    assert result.execution.transition.data["final"]["value"] == "ABC"
+    assert result.verification.status == "pass"
+    assert any(record.transition_kind == "route.route.demo" for record in result.evidence)
+
+def test_selected_route_stops_on_missing_protocol():
+    pipeline = OneStrokeRoutePipeline()
+    pipeline.select("route.demo", ("a", "b"), approved=True)
+    try:
+        pipeline.execute({"a": _protocol("a", "A")})
+    except KeyError as exc:
+        assert "b" in str(exc)
+    else:
+        raise AssertionError("missing Protocol must stop execution")
