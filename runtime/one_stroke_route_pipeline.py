@@ -47,31 +47,12 @@ class OneStrokeRoutePipeline:
         self.runtime = runtime or EvidenceDrivenRuntime()
         self._selection: RouteSelection | None = None
 
-    def select_candidate(
+    def _validate_selection(
         self,
         route_id: str,
         candidate: Sequence[str],
-        *,
-        reviewer: str = "human",
-        approved: bool = False,
-    ) -> RouteSelection:
-        """Accept one generated Route Candidate at the Human Gate boundary."""
-        return self.select(
-            route_id,
-            candidate,
-            reviewer=reviewer,
-            approved=approved,
-        )
-
-    def select(
-        self,
-        route_id: str,
-        candidate: Sequence[str],
-        *,
-        reviewer: str = "human",
-        approved: bool = False,
-    ) -> RouteSelection:
-        """Register a candidate and require explicit Human Gate approval."""
+        reviewer: str,
+    ) -> tuple[str, ...]:
         names = tuple(candidate)
         if len(names) < 2:
             raise ValueError("candidate must contain at least two Protocols")
@@ -83,6 +64,22 @@ class OneStrokeRoutePipeline:
             raise ValueError("route_id must be non-empty")
         if not reviewer.strip():
             raise ValueError("reviewer must be non-empty")
+        return names
+
+    def prepare_candidate(
+        self,
+        route_id: str,
+        candidate: Sequence[str],
+        *,
+        reviewer: str = "human",
+    ) -> RouteSelection:
+        """Enter R0100 HUMAN_REVIEW without granting execution authority."""
+        names = self._validate_selection(route_id, candidate, reviewer)
+        if self.runtime.loop.state.value not in {"IDLE", "ACCEPTED"}:
+            raise RuntimeError(
+                f"Evolution Loop not ready for a new route candidate: "
+                f"{self.runtime.loop.state.value}"
+            )
 
         self._selection = RouteSelection(route_id, names, reviewer)
         self.runtime.observe(
@@ -90,10 +87,60 @@ class OneStrokeRoutePipeline:
             ContextSnapshot(protocol_id=route_id),
         )
         self.runtime.analyze(route_id, protocol_exists=False, diff_ref=route_id)
-        if not approved or not self.runtime.approve(approved=True, reviewer=reviewer):
+        if self.runtime.loop.state.value != "HUMAN_REVIEW":
             self._selection = None
-            raise PermissionError("Human approval required before route execution")
+            raise RuntimeError("route candidate did not reach HUMAN_REVIEW")
         return self._selection
+
+    def approve_candidate(self, *, approved: bool = True) -> RouteSelection:
+        """Resolve the existing R0100 Human Gate for the prepared candidate."""
+        if self._selection is None:
+            raise RuntimeError("no route candidate is awaiting human review")
+        if not self.runtime.approve(
+            approved=approved,
+            reviewer=self._selection.reviewer,
+        ):
+            if not approved:
+                self._selection = None
+                raise PermissionError("route candidate rejected by Human Gate")
+            raise PermissionError("Human approval required before route execution")
+        if approved:
+            return self._selection
+        raise PermissionError("route candidate rejected by Human Gate")
+
+    def select_candidate(
+        self,
+        route_id: str,
+        candidate: Sequence[str],
+        *,
+        reviewer: str = "human",
+        approved: bool = False,
+    ) -> RouteSelection:
+        """Accept one generated Route Candidate at the Human Gate boundary."""
+        selection = self.prepare_candidate(
+            route_id,
+            candidate,
+            reviewer=reviewer,
+        )
+        if not approved:
+            raise PermissionError("Human approval required before route execution")
+        return self.approve_candidate(approved=True)
+
+    def select(
+        self,
+        route_id: str,
+        candidate: Sequence[str],
+        *,
+        reviewer: str = "human",
+        approved: bool = False,
+    ) -> RouteSelection:
+        """Backward-compatible alias for select_candidate."""
+        return self.select_candidate(
+            route_id,
+            candidate,
+            reviewer=reviewer,
+            approved=approved,
+        )
 
     def execute(
         self,
@@ -103,6 +150,12 @@ class OneStrokeRoutePipeline:
         """Execute the selected route once, then verify and retain Evidence."""
         if self._selection is None:
             raise RuntimeError("no human-approved route is selected")
+        if self.runtime.loop.state.value != "READY":
+            raise RuntimeError(
+                f"route is not authorized for execution: "
+                f"{self.runtime.loop.state.value}"
+            )
+
         missing = [name for name in self._selection.candidate if name not in protocols]
         if missing:
             raise KeyError(f"missing Protocol implementations: {missing}")
