@@ -117,3 +117,24 @@ def test_execute_requires_registered_protocol() -> None:
     )
     assert executed.status_code == 200
     assert executed.json()["status"] == "completed"
+
+
+def test_execution_handle_round_trip_and_verify() -> None:
+    client = _client()
+    client.post("/v1/observe", json={"observation": {}, "context": _context()})
+    client.post("/v1/analyze", json={"protocol_id": "http.example", "protocol_exists": True})
+    executed = client.post("/v1/execute", json={"protocol_id": "http.example", "input_data": {"x": 1}})
+    assert executed.status_code == 200
+    execution_id = executed.json()["execution_id"]
+    status = client.get(f"/v1/executions/{execution_id}")
+    assert status.status_code == 200
+    assert status.json()["execution_id"] == execution_id
+    verified = client.post(f"/v1/executions/{execution_id}/verify", json={"expected_transition_kind": "http.example"})
+    assert verified.status_code == 200
+    assert verified.json()["status"] == "pass"
+
+
+def test_unknown_execution_handle_fails_closed() -> None:
+    client = _client()
+    assert client.get("/v1/executions/unknown").status_code == 404
+    assert client.post("/v1/executions/unknown/verify", json={}).status_code == 404
