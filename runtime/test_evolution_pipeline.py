@@ -1,4 +1,4 @@
-from evolution_bridge import ContextSnapshot
+from evolution_bridge import ContextSnapshot, MismatchEvidence
 from evolution_pipeline import EvidenceDrivenRuntime
 from prototype import Transition
 
@@ -51,7 +51,7 @@ def test_human_review_rejects_without_execution():
     assert app.loop.state.value == "IDLE"
 
 
-def test_mismatch_reenters_diff():
+def test_mismatch_reenters_diff_and_externalizes_the_discrepancy():
     app = EvidenceDrivenRuntime()
     app.observe({"input": "hello"}, ContextSnapshot(protocol_id="P1"))
     app.analyze("P1")
@@ -59,7 +59,24 @@ def test_mismatch_reenters_diff():
         lambda context: Transition("actual.transition", {"changed": True}),
         "P1",
     )
-    verification = app.verify(result, expected_transition_kind="expected.transition")
+    verification = app.verify(
+        result,
+        expected_transition_kind="expected.transition",
+        diff_ref="D001",
+    )
     assert verification.status == "mismatch"
     assert app.loop.state.value == "DIFF"
-    assert any(r.signals == ("MISMATCH",) for r in app.store.all())
+
+    mismatches = [
+        record for record in app.store.all()
+        if record.signals == ("MISMATCH",)
+    ]
+    assert len(mismatches) >= 2
+    formal = [
+        record for record in mismatches
+        if record.transition_kind == "R0100:mismatch"
+    ][-1]
+    assert formal.transition_data["expected"] == "expected.transition"
+    assert formal.transition_data["observed"] == "actual.transition"
+    assert formal.transition_data["diff_ref"] == "D001"
+    assert formal.transition_data["uncertainty"] == "medium"
