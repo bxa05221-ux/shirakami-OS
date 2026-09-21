@@ -1,0 +1,67 @@
+matome:
+  id: shirakami-launch-model-declaration
+  title: "Shirakami β1.0 — Launch Model Declaration"
+  version: "0.1"
+  status: "launch_model"
+  declaration:
+    name: "Shirakami β1.0 Launch Model"
+    meaning: >
+      シェイクダウンを経て、検証された実装基盤を
+      実運用へ展開可能なモデルとして扱う。
+  boundary:
+    not:
+      - "final product"
+      - "theory completion"
+      - "universal AI control"
+      - "autonomous authority"
+    is:
+      - "verified implementation baseline"
+      - "operational runtime"
+      - "replaceable AI execution boundary"
+      - "human final judgment preserved"
+  architecture:
+    - "Landscape"
+    - "Evidence"
+    - "Protocol"
+    - "Runtime"
+    - "Adapter"
+    - "Backend"
+  verification:
+    canonical_gate: "test-runtime"
+    state_machine_continuity: "verified"
+    evidence_identity: "verified"
+    adapter_renderer_continuity: "verified"
+    operation_loop: "operational"
+    protected_merge_path: "verified in observed executions"
+  operational_principles:
+    - "AI is simulator, not authority"
+    - "Landscape remains outside Runtime semantic ownership"
+    - "Evidence is preserved"
+    - "Protocol semantics are not invented by Runtime"
+    - "Runtime remains replaceable"
+    - "Artifact mismatch is not silently repaired"
+  result_boundary:
+    operation_result:
+      role: "execution observation"
+      authority: "none"
+      semantic_finality: false
+    note: >
+      OperationResultは世界の最終結果ではなく、
+      一つのOperation Executionについて観測された結果を記録する境界である。
+  i_field:
+    status: "provisional"
+    role: "unresolved-term boundary"
+    rule:
+      - "i is not an answer"
+      - "resolve requires observable Evidence"
+      - "resolve does not infer meaning"
+      - "resolved state may lead to subsequent state and next i"
+  rollout:
+    next_phase: "operational rollout"
+    rule: >
+      ローンチ後も理論を勝手に拡張せず、
+      実運用で発生したEvidenceを観測し、
+      必要な理論的課題のみ研究側へ返す。
+  declaration_phrase: >
+    Shirakami β1.0 は、シェイクダウンを完了した実装基盤として
+    ローンチモデルへ移行する。
