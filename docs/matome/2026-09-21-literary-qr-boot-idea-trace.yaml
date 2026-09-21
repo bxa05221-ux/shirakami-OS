@@ -1,0 +1,103 @@
+matome:
+  title: "小説付属ProtocolからQR構想への発想経路"
+  codename: "Literary-to-Shirakami-Concept"
+  version: "0.1"
+  date: "2026-09-21"
+  status: "idea_trace"
+
+  origin:
+    problem:
+      statement: >
+        白神のProtocolや構造を知的成果として残したいが、
+        特許としての保護が難しい領域について、
+        別の形で著作物として固定・公開できないか。
+
+    first_idea:
+      statement: >
+        小説などの著作物に白神Protocolを
+        「オマケ」として収録する。
+
+  evolution:
+    step_01:
+      title: "Protocolを作品に収録する"
+      idea: >
+        小説本体に白神Protocolを付属させ、
+        作品とProtocolを一体として公開する。
+
+    step_02:
+      title: "読者がProtocolを利用できるようにする"
+      idea: >
+        Protocolを読むだけでなく、
+        読者がAIと組み合わせて利用できる形にする。
+
+    step_03:
+      title: "Guide AI構想"
+      idea: >
+        小説世界を案内したり、
+        読者の読書体験を補助したりするGuide AIを、
+        作品付属Protocolとして提供する。
+
+    step_04:
+      title: "Protocolだけでは環境が不足する"
+      observation: >
+        Protocolを渡しても、
+        それを解釈・実行するRuntimeやLandscape、
+        Evidence等の環境構造が必要になる。
+
+    step_05:
+      title: "GitHubを外部環境として利用する"
+      idea: >
+        白神のLandscape / Protocol / Evidence / Runtime等を
+        GitHub Repository上に保持し、
+        AI側から外部参照させる。
+
+    step_06:
+      title: "GitHub接続型・白神環境"
+      hypothesis: >
+        AI内部に白神構造を固定するのではなく、
+        GitHub Repositoryを外部環境として参照させることで、
+        LLMを交換可能なまま白神Runtimeへ接続できる。
+
+    step_07:
+      title: "URLを物理媒体へ移す"
+      observation: >
+        GitHub Repositoryへの入口がURLであるなら、
+        URLはQRコードに埋め込むことができる。
+
+    step_08:
+      title: "QRブート構想"
+      hypothesis: >
+        QRコードを白神Repositoryへのブート参照として利用し、
+        物理的な作品から白神環境への入口を提供できる。
+
+  conceptual_chain: >
+    特許困難
+    → 著作物へのProtocol収録
+    → 読者利用
+    → Guide AI
+    → 実行環境
+    → GitHub Repository
+    → URL
+    → QR
+    → 白神環境への入口
+
+  original_intent:
+    statement: "小説のオマケとしてProtocolを残す"
+
+  evolved_concept:
+    statement: >
+      小説にProtocolと白神環境への入口を付属させる。
+
+  significance:
+    - "知財保存の発想から始まった"
+    - "AI実装を最初から目的としていたわけではない"
+    - "必要条件を辿ることでGuide AI構想へ発展した"
+    - "GitHub接続仮説からQRという物理インターフェースへ到達した"
+
+  classification:
+    type: "発想経路"
+    not:
+      - "実装仕様"
+      - "技術検証結果"
+      - "法的判断"
+      - "完成システム"
