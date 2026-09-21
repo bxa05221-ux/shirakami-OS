@@ -164,6 +164,10 @@ For an independent, reproducible review of the current implementation, see **[Pu
 
 It separates reproducible checks from claims that remain outside the current verification boundary.
 
+## 30-Minute External Review
+
+For a first independent review, use the **[30-Minute External Review Guide](docs/EXTERNAL_REVIEW_GUIDE_30MIN.md)** alongside the Public Verification Pack. It turns the repository's review boundary into a concrete 30-minute route: read → run → inspect → compare → record.
+
 ## Reviewer Entry Point
 
 For external review, start here:

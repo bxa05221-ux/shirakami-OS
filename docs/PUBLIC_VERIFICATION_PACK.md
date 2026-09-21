@@ -29,6 +29,10 @@ Observe
 Compare implementation with specification
 ```
 
+## 1.5 30-minute route
+
+For a timed first-pass review, use the [30-Minute External Review Guide](EXTERNAL_REVIEW_GUIDE_30MIN.md). It is a practical companion to this pack and does not expand the verification claims made here.
+
 ## 2. Reproduce the minimal Runtime
 
 Requirements:

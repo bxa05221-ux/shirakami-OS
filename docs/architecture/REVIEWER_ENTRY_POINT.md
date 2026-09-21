@@ -166,6 +166,10 @@ Accepted Evidence
 
 Do not silently reconcile contradictory external interpretations.
 
+## 30-Minute Review Route
+
+For a timed first-pass external review, use the [30-Minute External Review Guide](../EXTERNAL_REVIEW_GUIDE_30MIN.md). It follows the same evidence boundary as this entry point and the Public Verification Pack.
+
 ## Public Verification
 
 For a compact, reproducible external review route, use [Public Verification Pack](../PUBLIC_VERIFICATION_PACK.md).
