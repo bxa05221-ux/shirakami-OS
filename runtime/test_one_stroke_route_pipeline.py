@@ -52,14 +52,8 @@ def test_generated_candidate_flows_through_human_gate_runtime_and_evidence(tmp_p
 
     a = tmp_path / "a.yaml"
     b = tmp_path / "b.yaml"
-    a.write_text("title: A
-output:
-  - shared
-", encoding="utf-8")
-    b.write_text("title: B
-input:
-  - shared
-", encoding="utf-8")
+    a.write_text("""title: A\noutput:\n  - shared\n""", encoding="utf-8")
+    b.write_text("""title: B\ninput:\n  - shared\n""", encoding="utf-8")
 
     pipeline = OneStrokeRoutePipeline()
     generated = generate_candidates([a, b], 2)
@@ -125,14 +119,8 @@ def test_evolution_loop_mismatch_does_not_advance_to_accepted():
 def test_evidence_derives_structural_candidates_without_authorization(tmp_path):
     a = tmp_path / "a.yaml"
     b = tmp_path / "b.yaml"
-    a.write_text("title: A
-output:
-  - shared
-", encoding="utf-8")
-    b.write_text("title: B
-input:
-  - shared
-", encoding="utf-8")
+    a.write_text("""title: A\noutput:\n  - shared\n""", encoding="utf-8")
+    b.write_text("""title: B\ninput:\n  - shared\n""", encoding="utf-8")
     evidence = (
         EvidenceRecord(protocol_id="observed.a", status="observed", transition_kind="protocol.observed",
                        transition_data={"protocol_path": str(a)}, signals=("PROTOCOL_ARTIFACT",)),
@@ -149,14 +137,8 @@ input:
 def test_evidence_candidate_provenance_survives_human_gate(tmp_path):
     a = tmp_path / "a.yaml"
     b = tmp_path / "b.yaml"
-    a.write_text("title: A
-output:
-  - shared
-", encoding="utf-8")
-    b.write_text("title: B
-input:
-  - shared
-", encoding="utf-8")
+    a.write_text("""title: A\noutput:\n  - shared\n""", encoding="utf-8")
+    b.write_text("""title: B\ninput:\n  - shared\n""", encoding="utf-8")
     evidence = (
         EvidenceRecord(protocol_id="observed.a", status="observed", transition_kind="protocol.observed",
                        transition_data={"protocol_path": str(a)}, signals=("PROTOCOL_ARTIFACT",)),
@@ -189,14 +171,8 @@ input:
 def test_evidence_candidate_requires_explicit_human_gate(tmp_path):
     a = tmp_path / "a.yaml"
     b = tmp_path / "b.yaml"
-    a.write_text("title: A
-output:
-  - shared
-", encoding="utf-8")
-    b.write_text("title: B
-input:
-  - shared
-", encoding="utf-8")
+    a.write_text("""title: A\noutput:\n  - shared\n""", encoding="utf-8")
+    b.write_text("""title: B\ninput:\n  - shared\n""", encoding="utf-8")
     evidence = (
         EvidenceRecord(protocol_id="observed.a", status="observed", transition_kind="protocol.observed",
                        transition_data={"protocol_path": str(a)}, signals=("PROTOCOL_ARTIFACT",)),
