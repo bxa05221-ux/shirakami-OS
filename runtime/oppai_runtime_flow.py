@@ -9,8 +9,10 @@ from typing import Any, Callable, Mapping
 import re
 
 from runtime.oppai_schema import OppaiObservation, normalize
+from runtime.pipeline import PipelinePlan, build_pipeline_plan
 from runtime.protocol_api import ProtocolRequest, build_protocol_request
 from runtime.protocol_registry import ProtocolRegistry
+from runtime.adapter import PipelineAdapter, PipelineAdapterRequest, PipelineAdapterResult
 
 
 @dataclass(frozen=True)
@@ -28,6 +30,15 @@ class OppaiProtocolCandidate:
     protocol_id: str
     basis: str
     metadata: Mapping[str, Any]
+
+
+@dataclass(frozen=True)
+class SelectedPipelineExecution:
+    """Observable result of the explicit OPPAI -> Protocol -> Pipeline -> Adapter path."""
+
+    request: ProtocolRequest
+    plan: PipelinePlan
+    steps: tuple[PipelineAdapterResult, ...]
 
 
 def prepare(
@@ -60,7 +71,7 @@ def _observable_terms(text: str) -> set[str]:
     """Extract conservative lexical terms without inferring hidden intent."""
     return {
         term
-        for term in re.findall(r"[\\wぁ-んァ-ヶ一-龯]{2,}", text.lower())
+        for term in re.findall(r"[\wぁ-んァ-ヶ一-龯]{2,}", text.lower())
         if term not in {"です", "ます", "する", "した", "して", "ください"}
     }
 
@@ -147,6 +158,52 @@ def build_selected_protocol_request(
             "context": dict(context or {}),
             "oppai_unresolved": list(prepared.observation.unresolved),
         },
+    )
+
+
+def execute_selected_pipeline(
+    text: str,
+    registry: ProtocolRegistry,
+    selected_protocol: str,
+    adapter: PipelineAdapter,
+    context: Mapping[str, Any] | None = None,
+) -> SelectedPipelineExecution:
+    """Execute one explicitly selected Protocol through its derived Pipeline.
+
+    This is the vertical β0.1 bridge:
+    Natural Language -> OPPAI -> Human-selected Protocol -> Pipeline -> Adapter.
+
+    Backend selection remains outside this function. The supplied Adapter is the
+    explicit execution boundary, so OPPAI and Runtime never silently choose an AI.
+    """
+    request = build_selected_protocol_request(
+        text,
+        registry,
+        selected_protocol,
+        context=context,
+    )
+    entry = registry.select_current(request.protocol_id)
+    plan = build_pipeline_plan(entry.artifact, context=context)
+
+    results: list[PipelineAdapterResult] = []
+    for step in plan.steps:
+        results.append(
+            adapter.execute(
+                PipelineAdapterRequest(
+                    protocol_id=plan.protocol_id,
+                    version=plan.version,
+                    phase=step.phase,
+                    action=step.action,
+                    input=request.input,
+                    context=plan.context,
+                )
+            )
+        )
+
+    return SelectedPipelineExecution(
+        request=request,
+        plan=plan,
+        steps=tuple(results),
     )
 
 
