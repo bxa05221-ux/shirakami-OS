@@ -20,14 +20,14 @@ def test_end_to_end_cycle_reaches_accepted():
     assert verification.status == "pass"
     assert app.loop.state.value == "ACCEPTED"
 
-    # The accepted cycle leaves observation, execution, and verification
-    # as the canonical Evidence records. ContextSnapshot remains the
-    # externalized execution context rather than a duplicate store record.
+    # The accepted cycle preserves observation, context, and execution.
+    # A successful verification transition is not promoted as duplicate
+    # Evidence because it adds no new failure or mismatch information.
     records = app.store.all()
     assert len(records) == 3
     assert [record.transition_kind for record in records] == [
         "R0100:observe",
-        "example.transition",
+        "R0100:context_snapshot",
         "example.transition",
     ]
 
