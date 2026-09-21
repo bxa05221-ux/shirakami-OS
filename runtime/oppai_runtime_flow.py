@@ -6,6 +6,7 @@ It demonstrates the vertical boundary without coupling OPPAI to a model vendor.
 
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping
+import re
 
 from runtime.oppai_schema import OppaiObservation, normalize
 from runtime.protocol_api import ProtocolRequest, build_protocol_request
@@ -55,6 +56,15 @@ def prepare(
     )
 
 
+def _observable_terms(text: str) -> set[str]:
+    """Extract conservative lexical terms without inferring hidden intent."""
+    return {
+        term
+        for term in re.findall(r"[\\wぁ-んァ-ヶ一-龯]{2,}", text.lower())
+        if term not in {"です", "ます", "する", "した", "して", "ください"}
+    }
+
+
 def discover_protocol_candidates(
     text: str,
     registry: ProtocolRegistry,
@@ -68,6 +78,7 @@ def discover_protocol_candidates(
     """
     observation = normalize(text, context)
     hinted_ids = None
+    input_terms = _observable_terms(observation.raw_input)
     if context is not None and "protocol_candidates" in context:
         raw_hints = context["protocol_candidates"]
         if not isinstance(raw_hints, (list, tuple)):
@@ -91,10 +102,22 @@ def discover_protocol_candidates(
 
         metadata["oppai_canonical_prompt"] = observation.canonical_prompt
         metadata["oppai_unresolved"] = tuple(observation.unresolved)
+        basis = "context.protocol_candidates" if hinted_ids is not None else "registry.current"
+        if hinted_ids is None:
+            searchable = " ".join(
+                str(metadata.get(field, "")) for field in ("title", "statement")
+            ).lower()
+            matched_terms = tuple(
+                sorted(term for term in input_terms if term in searchable)
+            )
+            if matched_terms:
+                basis = "observable.lexical_match"
+                metadata["matched_terms"] = matched_terms
+
         candidates.append(
             OppaiProtocolCandidate(
                 protocol_id=entry.protocol_id,
-                basis="context.protocol_candidates" if hinted_ids is not None else "registry.current",
+                basis=basis,
                 metadata=metadata,
             )
         )
