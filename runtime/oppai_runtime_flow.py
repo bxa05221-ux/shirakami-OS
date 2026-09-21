@@ -20,6 +20,15 @@ class OppaiRuntimeResult:
     evidence: Mapping[str, Any]
 
 
+@dataclass(frozen=True)
+class OppaiProtocolCandidate:
+    """An explicitly discoverable Protocol candidate, not a selection."""
+
+    protocol_id: str
+    basis: str
+    metadata: Mapping[str, Any]
+
+
 def prepare(
     text: str,
     protocol: str = "default",
@@ -44,6 +53,44 @@ def prepare(
             "confidence": observation.confidence,
         },
     )
+
+
+def discover_protocol_candidates(
+    text: str,
+    registry: ProtocolRegistry,
+    context: Mapping[str, Any] | None = None,
+) -> tuple[OppaiProtocolCandidate, ...]:
+    """Expose currently available Protocol candidates without selecting one.
+
+    This is deliberately a registry-level discovery experiment. Semantic
+    matching, ranking, automatic selection, and Pipeline identity remain
+    outside this function.
+    """
+    observation = normalize(text, context)
+    candidates: list[OppaiProtocolCandidate] = []
+
+    for entry in registry.list_current_candidates():
+        artifact = entry.artifact
+        metadata: dict[str, Any] = {
+            "state": entry.state,
+            "lifecycle": entry.lifecycle,
+        }
+        for field in ("title", "version", "statement", "pipeline"):
+            value = getattr(artifact, field, None)
+            if value is not None:
+                metadata[field] = value
+
+        metadata["oppai_canonical_prompt"] = observation.canonical_prompt
+        metadata["oppai_unresolved"] = tuple(observation.unresolved)
+        candidates.append(
+            OppaiProtocolCandidate(
+                protocol_id=entry.protocol_id,
+                basis="registry.current",
+                metadata=metadata,
+            )
+        )
+
+    return tuple(candidates)
 
 
 def build_selected_protocol_request(
