@@ -119,16 +119,23 @@ class ShirakamiHTTPTransport:
                 payload.input_data,
             )
 
+        @app.get("/v1/executions/{execution_id}")
+        def get_execution(execution_id: str) -> dict[str, Any]:
+            result = self.api.get_execution(execution_id)
+            if result is None:
+                raise HTTPException(status_code=404, detail="unknown execution_id")
+            return result
+
+        @app.post("/v1/executions/{execution_id}/verify")
+        def verify_execution(execution_id: str, payload: VerifyInput) -> dict[str, Any]:
+            result = self.api.verify_execution(execution_id, expected_transition_kind=payload.expected_transition_kind, diff_ref=payload.diff_ref)
+            if result is None:
+                raise HTTPException(status_code=404, detail="unknown execution_id")
+            return asdict(result)
+
         @app.post("/v1/verify")
         def verify(payload: VerifyInput) -> dict[str, Any]:
-            raise HTTPException(
-                status_code=501,
-                detail=(
-                    "HTTP verification requires a runtime execution handle; "
-                    "use the semantic API directly until execution handles are "
-                    "part of the transport contract."
-                ),
-            )
+            raise HTTPException(status_code=400, detail="use /v1/executions/{execution_id}/verify; execution_id is required")
 
         @app.get("/v1/evidence")
         def evidence(
