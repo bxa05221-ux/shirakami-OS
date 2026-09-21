@@ -6,8 +6,8 @@
 [English](README.md) | [日本語](README.ja.md)
 
 ----
-Version: Prototype v1.0 (PV1.0)  
-Status: β1.0 Launch Model / Operational Rollout
+Version: Prototype v1.1 (PV1.1)  
+Status: β1.1 Evidence-Driven Runtime / Operational Baseline
 
 ## 5-Minute Orientation
 
