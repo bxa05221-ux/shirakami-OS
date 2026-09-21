@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from typing import Any, Callable, Mapping
 
 from runtime.oppai_schema import OppaiObservation, normalize
+from runtime.protocol_api import ProtocolRequest, build_protocol_request
+from runtime.protocol_registry import ProtocolRegistry
 
 
 @dataclass(frozen=True)
@@ -40,6 +42,31 @@ def prepare(
             "corrections_preserved": True,
             "interaction_separated_from_fact": True,
             "confidence": observation.confidence,
+        },
+    )
+
+
+def build_selected_protocol_request(
+    text: str,
+    registry: ProtocolRegistry,
+    selected_protocol: str,
+    context: Mapping[str, Any] | None = None,
+) -> ProtocolRequest:
+    """Bridge an explicit OPPAI selection into the canonical ProtocolRequest path.
+
+    Selection is intentionally explicit: this helper does not choose a Protocol.
+    It represents the post-Human-Gate handoff from OPPAI observation to the
+    existing ProtocolRegistry/ProtocolRequest boundary.
+    """
+    prepared = prepare(text, protocol=selected_protocol, context=context)
+    return build_protocol_request(
+        registry,
+        selected_protocol,
+        {
+            "raw_input": prepared.observation.raw_input,
+            "canonical_prompt": prepared.observation.canonical_prompt,
+            "context": dict(context or {}),
+            "oppai_unresolved": list(prepared.observation.unresolved),
         },
     )
 
