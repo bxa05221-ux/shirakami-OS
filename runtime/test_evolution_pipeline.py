@@ -19,7 +19,16 @@ def test_end_to_end_cycle_reaches_accepted():
     verification = app.verify(result, expected_transition_kind="example.transition")
     assert verification.status == "pass"
     assert app.loop.state.value == "ACCEPTED"
-    assert len(app.store.all()) >= 4
+
+    # The accepted cycle should leave the three canonical Evidence boundaries:
+    # observation, execution, and verification.
+    records = app.store.all()
+    assert len(records) == 3
+    assert [record.transition_kind for record in records] == [
+        "R0100:observe",
+        "example.transition",
+        "example.transition",
+    ]
 
 
 def test_new_protocol_requires_human_review_then_accepts():
