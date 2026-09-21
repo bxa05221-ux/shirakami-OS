@@ -1,0 +1,57 @@
+matome:
+  id: shirakami-anmon-layer-reverse-r0010-observation
+  title: "暗問層逆算プロトコル — R0010 継続実験観測"
+  version: "0.1"
+  status: "observation_handoff"
+  source: "R0010継続実験.txt"
+  purpose:
+    - "暗問層逆算プロトコルを既存Runtime境界へ投入した際の観測を引き継ぐ"
+    - "Protocolの意味論をRuntimeへ移植せず、Transition/Evidenceとして観測できるか確認する"
+  observed_structure:
+    protocol_entry:
+      fields: ["matome.title","version","statement","pipeline"]
+    pipeline:
+      - {phase: "surface_capture", action: "capture_surface"}
+      - {phase: "layer_stripping", action: "identify_defensive_layer"}
+      - {phase: "b_side_extraction", action: "extract_motivational_hypothesis"}
+      - {phase: "resonance_lock", action: "preserve_original_temperature"}
+      - {phase: "reverse_engineering", action: "reconstruct_surface"}
+      - {phase: "consistency_check", action: "compare_reconstructed_surface"}
+  runtime_boundary:
+    rule: >
+      RuntimeはProtocolの意味を解釈せず、Protocolが生成したTransitionを受け取る。
+      防衛層等の意味をRuntime Coreへ移植しない。
+  evidence_boundary:
+    observed_fields:
+      - "protocol_id"
+      - "status"
+      - "transition_kind"
+      - "transition_data"
+      - "signals"
+      - "confidence"
+    rule: >
+      A面、B面、暗問層、恥、恐れ、喪失、巡礼理由等を
+      Runtime専用フィールドとして固定する必要はなく、
+      Protocol側のtransition_dataとして保持可能と観測された。
+  landscape_projection:
+    observation: >
+      Landscape ProjectionはEvidenceのTransition Dataを現在のLandscapeへ投影する。
+      Runtimeが暗問層の意味そのものを理解しなくても、
+      暗問層を扱うProtocolが実行されたという状態を残せる。
+  next_test:
+    input:
+      surface:
+        utterance: "別に心配してねえよw"
+        context: "本当は相手を心配している"
+        timing: "相手が弱音を吐いた直後"
+      observation:
+        joke: true
+        silence: false
+        aa: false
+    pending:
+      - "CI結果の確認"
+      - "R0010-A: 構造的に通過"
+      - "R0010-B: 問いを問いのまま保持できるか"
+    research_boundary:
+      - "観測・解釈・仮説の区別が壊れる場合のみ研究側へフィードバック"
+      - "新しいEvidence schemaを自動追加しない"
