@@ -52,6 +52,48 @@ class VerificationResult:
     observed: Mapping[str, Any] = field(default_factory=dict)
 
 
+@dataclass(frozen=True)
+class MismatchEvidence:
+    """Immutable external record of expected-vs-observed discrepancy."""
+
+    protocol_id: str
+    expected: Any
+    observed: Any
+    uncertainty: str
+    diff_ref: str = ""
+    source_evidence: tuple[str, ...] = ()
+    context: Mapping[str, Any] = field(default_factory=dict)
+
+    def as_mapping(self) -> Mapping[str, Any]:
+        return {
+            "type": EvidenceClass.MISMATCH.value,
+            "protocol_id": self.protocol_id,
+            "expected": self.expected,
+            "observed": self.observed,
+            "uncertainty": self.uncertainty,
+            "diff_ref": self.diff_ref,
+            "source_evidence": self.source_evidence,
+            "context": dict(self.context),
+        }
+
+
+def mismatch_to_evidence(
+    mismatch: MismatchEvidence,
+    *,
+    protocol_id: str | None = None,
+) -> EvidenceRecord:
+    """Convert a formal mismatch object into canonical immutable Evidence."""
+
+    resolved_protocol = protocol_id or mismatch.protocol_id or "R0100"
+    return EvidenceRecord(
+        protocol_id=resolved_protocol,
+        status="mismatch",
+        transition_kind="R0100:mismatch",
+        transition_data=mismatch.as_mapping(),
+        signals=(EvidenceClass.MISMATCH.value,),
+    )
+
+
 def transition_to_evidence(
     record: TransitionRecord,
     *,
