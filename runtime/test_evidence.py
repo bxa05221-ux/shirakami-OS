@@ -47,3 +47,43 @@ def test_failure_result_remains_observable_without_transition_evidence():
     assert evidence.transition_data["error_type"] == "RuntimeError"
     assert evidence.transition_data["message"] == "boom"
     assert is_transition_evidence(evidence) is False
+
+
+def test_evidence_has_stable_identity():
+    first = EvidenceRecord(
+        protocol_id="observed.protocol",
+        status="observed",
+        transition_kind="protocol.observed",
+        transition_data={"protocol_path": "protocol.yaml"},
+        signals=("PROTOCOL_ARTIFACT",),
+    )
+    second = EvidenceRecord(
+        protocol_id="observed.protocol",
+        status="observed",
+        transition_kind="protocol.observed",
+        transition_data={"protocol_path": "protocol.yaml"},
+        signals=("PROTOCOL_ARTIFACT",),
+    )
+
+    assert first.evidence_id == second.evidence_id
+    assert len(first.evidence_id) == 64
+    assert first.evidence_id != first.protocol_id
+
+
+def test_evidence_identity_changes_when_observation_changes():
+    first = EvidenceRecord(
+        protocol_id="observed.protocol",
+        status="observed",
+        transition_kind="protocol.observed",
+        transition_data={"protocol_path": "protocol.yaml"},
+        signals=("PROTOCOL_ARTIFACT",),
+    )
+    changed = EvidenceRecord(
+        protocol_id="observed.protocol",
+        status="observed",
+        transition_kind="protocol.observed",
+        transition_data={"protocol_path": "other.yaml"},
+        signals=("PROTOCOL_ARTIFACT",),
+    )
+
+    assert first.evidence_id != changed.evidence_id
