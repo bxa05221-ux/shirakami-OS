@@ -117,3 +117,30 @@ def test_execution_handle_mismatch_becomes_evidence() -> None:
     assert verification is not None
     assert verification.status == "mismatch"
     assert api.query_evidence(signal="MISMATCH")
+
+
+def test_execution_handle_is_stable_and_verifiable() -> None:
+    api = _api()
+    api.observe({}, _context())
+    api.analyze("api.example", protocol_exists=True)
+    result = api.execute(_protocol, "api.example", {})
+    execution_id = result["execution_id"]
+    handle = api.get_execution(execution_id)
+    assert handle is not None
+    assert handle["execution_id"] == execution_id
+    assert handle["status"] == "completed"
+    assert api.get_execution("missing-execution-id") is None
+    verification = api.verify_execution(execution_id, expected_transition_kind="api.example")
+    assert verification is not None
+    assert verification.status == "pass"
+
+
+def test_execution_handle_mismatch_becomes_evidence() -> None:
+    api = _api()
+    api.observe({}, _context())
+    api.analyze("api.example", protocol_exists=True)
+    result = api.execute(_protocol, "api.example", {})
+    verification = api.verify_execution(result["execution_id"], expected_transition_kind="different", diff_ref="diff-1")
+    assert verification is not None
+    assert verification.status == "mismatch"
+    assert api.query_evidence(signal="MISMATCH")
