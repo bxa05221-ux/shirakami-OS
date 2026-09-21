@@ -68,7 +68,7 @@ def test_execute_and_query_are_provider_neutral() -> None:
 
     result = api.execute(_protocol, "api.example", {"input": 1})
 
-    assert result["status"] == "executed"
+    assert result["status"] == "completed"
     assert result["transition"]["kind"] == "api.example"
 
     evidence = api.query_evidence(protocol_id="api.example")
