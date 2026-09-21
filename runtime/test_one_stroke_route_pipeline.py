@@ -54,7 +54,6 @@ def test_selected_route_stops_on_missing_protocol():
         raise AssertionError("missing Protocol must stop execution")
 
 
-
 def test_generated_candidate_flows_through_human_gate_runtime_and_evidence(tmp_path):
     from tools.protocol_route_candidates import generate_candidates
 
@@ -85,4 +84,80 @@ def test_generated_candidate_flows_through_human_gate_runtime_and_evidence(tmp_p
     assert result.verification.status == "pass"
     assert any(
         record.transition_kind == "route.route.generated" for record in result.evidence
+    )
+
+
+def test_route_candidate_enters_evolution_loop_human_review_before_approval():
+    pipeline = OneStrokeRoutePipeline()
+    selection = pipeline.prepare_candidate(
+        "route.loop",
+        ("a", "b", "c"),
+        reviewer="human",
+    )
+
+    assert selection.candidate == ("a", "b", "c")
+    assert pipeline.runtime.loop.state.value == "HUMAN_REVIEW"
+    assert not any(
+        record.transition_kind == "route.route.loop"
+        for record in pipeline.runtime.store.all()
+    )
+
+
+def test_evolution_loop_approval_then_one_stroke_execution_and_evidence():
+    pipeline = OneStrokeRoutePipeline()
+    pipeline.prepare_candidate(
+        "route.loop",
+        ("a", "b", "c"),
+        reviewer="human",
+    )
+
+    selection = pipeline.approve_candidate(approved=True)
+    assert selection.candidate == ("a", "b", "c")
+    assert pipeline.runtime.loop.state.value == "READY"
+
+    result = pipeline.execute(
+        {
+            "a": _protocol("a", "A"),
+            "b": _protocol("b", "B"),
+            "c": _protocol("c", "C"),
+        },
+        {"value": ""},
+    )
+
+    assert result.verification.status == "pass"
+    assert pipeline.runtime.loop.state.value == "ACCEPTED"
+    assert result.execution.transition.data["route"] == ["a", "b", "c"]
+    assert any(
+        record.transition_kind == "route.route.loop"
+        for record in result.evidence
+    )
+    human_decisions = [
+        record for record in pipeline.runtime.store.all()
+        if record.signals == ("HUMAN_DECISION",)
+    ]
+    assert human_decisions
+
+
+def test_evolution_loop_mismatch_does_not_advance_to_accepted():
+    pipeline = OneStrokeRoutePipeline()
+    pipeline.prepare_candidate("route.loop", ("a", "b"), reviewer="human")
+    pipeline.approve_candidate(approved=True)
+
+    result = pipeline.runtime.execute(
+        lambda context: Transition("unexpected.transition", {"changed": True}),
+        "route.loop",
+        {"value": ""},
+    )
+    verification = pipeline.runtime.verify(
+        result,
+        expected_transition_kind="route.expected",
+        diff_ref="route.loop",
+    )
+
+    assert verification.status == "mismatch"
+    assert pipeline.runtime.loop.state.value == "DIFF"
+    assert not any(
+        record.transition_kind == "route.route.loop"
+        and record.status == "completed"
+        for record in pipeline.runtime.store.all()
     )
