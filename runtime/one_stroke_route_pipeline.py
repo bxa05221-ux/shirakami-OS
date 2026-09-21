@@ -237,7 +237,10 @@ class OneStrokeRoutePipeline:
         if self._approval is None:
             raise RuntimeError("execution approval envelope is missing")
 
-        from .approval_route_bridge import require_approved_route
+        try:
+            from .approval_route_bridge import require_approved_route
+        except ImportError:
+            from approval_route_bridge import require_approved_route
 
         selection = require_approved_route(self._selection, self._approval)
         missing = [name for name in selection.candidate if name not in protocols]
