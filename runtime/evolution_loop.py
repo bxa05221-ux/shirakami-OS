@@ -5,7 +5,7 @@ It validates declared transitions, records every attempted transition, and
 promotes meaningful failures/mismatches/human decisions to Evidence.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Mapping
 
@@ -53,7 +53,7 @@ class TransitionRecord:
     accepted: bool
     reason: str = ""
     evidence_class: EvidenceClass = EvidenceClass.NONE
-    context: Mapping[str, Any] = None  # type: ignore[assignment]
+    context: Mapping[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -132,7 +132,13 @@ class EvolutionLoop:
         self._promote(record)
         return TransitionResult(True, source, self.state, event)
 
-    def _record_rejection(self, source, event, reason, context):
+    def _record_rejection(
+        self,
+        source: LoopState,
+        event: str,
+        reason: str,
+        context: Mapping[str, Any],
+    ) -> TransitionResult:
         record = TransitionRecord(
             from_state=source,
             event=event,
@@ -155,6 +161,6 @@ class EvolutionLoop:
                 source="transition_record",
                 state=record.to_state.value,
                 event=record.event,
-                payload=dict(record.context or {}),
+                payload=dict(record.context),
             )
         )
