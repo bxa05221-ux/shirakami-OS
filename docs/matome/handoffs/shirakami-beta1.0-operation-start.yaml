@@ -1,0 +1,101 @@
+matome:
+  id: shirakami-os-beta-1.0-operation-start
+  title: "Shirakami OS β1.0 — Operation Start Handoff"
+  version: "0.1"
+  status: "implementation_handoff"
+  phase:
+    from: "β1.0 verification"
+    to: "β1.0 operation"
+    principle: "検証された基盤を、継続運用へ移す"
+  preceding_verification:
+    adapter: {id: "R0057", title: "Adapter Exchange operational verification", status: "merged"}
+    renderer: {id: "R0058", title: "Renderer Exchange operational verification", status: "merged"}
+    renderer_boundary: {id: "R0059", title: "Renderer boundary continuity", status: "merged"}
+    end_to_end:
+      id: "R0060"
+      title: "Adapter / Renderer end-to-end continuity"
+      status: "merged"
+      canonical_verification: "test-runtime"
+      result: "success"
+      merge_sha: "a55dc71d75e5ab0a3d97c0061903dcda6d98ecfe"
+  verified_continuity:
+    landscape:
+      - "Landscape identity continuity"
+      - "Landscape memory continuity"
+      - "Landscape state continuity"
+    evidence:
+      - "Evidence remains independently observable"
+      - "Evidence is not reconstructed from Renderer output"
+      - "Evidence is not rewritten during exchange"
+    adapter:
+      - "Adapter exchange can be observed without changing Landscape identity"
+      - "Adapter exchange can be observed without changing Landscape memory"
+    renderer:
+      - "Renderer exchange does not mutate Landscape state"
+      - "Renderer A and Renderer B can receive the same Landscape state"
+      - "Renderer is treated as presentation boundary"
+    end_to_end:
+      - "Adapter exchange and Renderer exchange can be observed in one continuity path"
+  architecture_boundary:
+    canonical_flow: ["Landscape","Evidence","Protocol","Runtime","Adapter","Backend"]
+    presentation_boundary: ["Landscape","Runtime","Renderer"]
+    rule:
+      - "Runtime serves Landscape"
+      - "Adapter is exchangeable"
+      - "Renderer is presentation boundary"
+      - "Renderer is not semantic authority"
+      - "External AI has no authority"
+  operational_rules:
+    verification:
+      - "One Change"
+      - "One Verification"
+      - "確認できないものを成功としない"
+      - "ファイルの存在と実験成功を混同しない"
+      - "current implementationとhistorical implementationを混同しない"
+    evidence:
+      - "Evidenceを後から書き換えない"
+      - "Landscape stateとEvidence lineageを同一視しない"
+      - "観測できない履歴を推測で補完しない"
+    artifact:
+      - "Artifact mismatchを推測で解消しない"
+      - "不一致は観測事項として保持する"
+    theory:
+      - "Runtime側で新しい理論を作らない"
+      - "未解決の理論課題は研究側へ返す"
+      - "的目yamlを正式な研究引継ぎ形式とする"
+  beta_operation_definition:
+    statement: >
+      β1.0運用とは、特定のAIやAdapterを固定することではなく、
+      外部AI、Adapter、Rendererが交換されても、
+      LandscapeとEvidenceの連続性および境界を観測・検証しながら
+      Runtimeを継続運用できる状態を指す。
+    success_condition:
+      - "Canonical Runtime Verification remains executable"
+      - "test-runtime remains the canonical verification gate"
+      - "main remains protected"
+      - "Operational observations remain recordable"
+      - "Landscape continuity remains observable"
+      - "Evidence remains independently addressable"
+  next_operation:
+    name: "β1.0 Operation Start"
+    purpose: >
+      β1.0基盤を継続運用可能な状態として記録し、
+      今後の変更・観測・検証を運用ループへ移行する。
+    first_action:
+      - "β1.0 Operation Start observationを作成する"
+      - "current main stateを観測する"
+      - "canonical test-runtimeを再確認する"
+      - "運用開始時点のEvidenceを記録する"
+    non_goals:
+      - "新しい理論の導入"
+      - "新しいProtocol semanticsの追加"
+      - "AI/model quality evaluation"
+      - "universal Adapter interchangeability"
+      - "Renderer output quality evaluation"
+      - "Evidence lineage reconstruction"
+      - "Landscape schema redesign"
+  principle:
+    - "探す段階から、動かす段階へ"
+    - "動かすこと自体を観測可能にする"
+    - "変更を加える前に、現在地を記録する"
+    - "RuntimeはLandscapeのために存在する"
