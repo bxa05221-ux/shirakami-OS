@@ -7,7 +7,8 @@ this module.
 
 from __future__ import annotations
 
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
+from uuid import uuid4
 from typing import Any, Callable, Mapping
 
 try:
@@ -20,11 +21,35 @@ except ImportError:
     from prototype import ExecutionResult, Transition
 
 
+@dataclass(frozen=True)
+class ExecutionHandle:
+    """Immutable reference to one externally addressable execution."""
+    execution_id: str
+    protocol_id: str
+    status: str
+    result: dict[str, Any]
+
+
+class ExecutionHandleStore:
+    """Append-only in-memory execution-handle boundary for alpha 0.2."""
+    def __init__(self) -> None:
+        self._records: dict[str, ExecutionHandle] = {}
+
+    def create(self, protocol_id: str, result: dict[str, Any]) -> ExecutionHandle:
+        handle = ExecutionHandle(str(uuid4()), protocol_id, result.get("status", "unknown"), dict(result))
+        self._records[handle.execution_id] = handle
+        return handle
+
+    def get(self, execution_id: str) -> ExecutionHandle | None:
+        return self._records.get(execution_id)
+
+
 class ShirakamiAPI:
     """Bidirectional semantic boundary between UI/external systems and Runtime."""
 
-    def __init__(self, runtime: EvidenceDrivenRuntime | None = None) -> None:
+    def __init__(self, runtime: EvidenceDrivenRuntime | None = None, executions: ExecutionHandleStore | None = None) -> None:
         self.runtime = runtime or EvidenceDrivenRuntime()
+        self.executions = executions or ExecutionHandleStore()
 
     def observe(
         self,
@@ -81,15 +106,37 @@ class ShirakamiAPI:
         input_data: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
         result = self.runtime.execute(protocol, protocol_id, input_data)
-        return {
+        payload = {
             "status": result.status,
-            "transition": {
-                "kind": result.transition.kind,
-                "data": dict(result.transition.data),
-            },
+            "protocol_id": result.protocol_id,
+            "transition": {"kind": result.transition.kind, "data": dict(result.transition.data)},
             "signals": list(result.signals),
-            "evidence": self._evidence_for_protocol(protocol_id)[-1:]
+            "steps": result.steps,
+            "evidence": self._evidence_for_protocol(protocol_id)[-1:],
         }
+        handle = self.executions.create(protocol_id, payload)
+        return {**payload, "execution_id": handle.execution_id}
+
+    def get_execution(self, execution_id: str) -> dict[str, Any] | None:
+        handle = self.executions.get(execution_id)
+        if handle is None:
+            return None
+        return {"execution_id": handle.execution_id, "protocol_id": handle.protocol_id, "status": handle.status, "result": dict(handle.result)}
+
+    def verify_execution(self, execution_id: str, *, expected_transition_kind: str | None = None, diff_ref: str = "") -> VerificationResult | None:
+        handle = self.executions.get(execution_id)
+        if handle is None:
+            return None
+        payload = handle.result
+        transition = payload["transition"]
+        execution = ExecutionResult(
+            status=str(payload["status"]),
+            protocol_id=str(payload["protocol_id"]),
+            transition=Transition(kind=str(transition["kind"]), data=dict(transition.get("data", {}))),
+            signals=tuple(payload.get("signals", ())),
+            steps=int(payload.get("steps", 0)),
+        )
+        return self.verify(execution, expected_transition_kind=expected_transition_kind, diff_ref=diff_ref)
 
     def verify(
         self,
