@@ -52,3 +52,37 @@ def test_selected_route_stops_on_missing_protocol():
         assert "b" in str(exc)
     else:
         raise AssertionError("missing Protocol must stop execution")
+
+
+
+def test_generated_candidate_flows_through_human_gate_runtime_and_evidence(tmp_path):
+    from tools.protocol_route_candidates import generate_candidates
+
+    a = tmp_path / "a.yaml"
+    b = tmp_path / "b.yaml"
+    a.write_text("title: A\noutput:\n  - shared\n", encoding="utf-8")
+    b.write_text("title: B\ninput:\n  - shared\n", encoding="utf-8")
+
+    pipeline = OneStrokeRoutePipeline()
+    generated = generate_candidates([a, b], 2)
+    assert generated == [(str(a), str(b))]
+
+    selection = pipeline.select_candidate(
+        "route.generated",
+        generated[0],
+        reviewer="human",
+        approved=True,
+    )
+    result = pipeline.execute(
+        {
+            str(a): _protocol("a", "A"),
+            str(b): _protocol("b", "B"),
+        },
+        {"value": ""},
+    )
+    assert selection.candidate == generated[0]
+    assert result.execution.transition.data["route"] == list(generated[0])
+    assert result.verification.status == "pass"
+    assert any(
+        record.transition_kind == "route.route.generated" for record in result.evidence
+    )
