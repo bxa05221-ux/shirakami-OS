@@ -226,6 +226,22 @@ Other experimental artifacts, including Matome API v3.2 and related Evidence wor
 
 → **[Service Artifact Index](products/)**
 
+## Five-Minute Runtime Demonstration
+
+For a concrete end-to-end demonstration of the current Evidence-driven route loop:
+
+```bash
+python examples/evidence_route_demo.py
+```
+
+The demo shows the actual boundary in sequence:
+
+**Evidence → structural Candidate → HUMAN_REVIEW → explicit Human Gate → READY → One-Stroke Runtime → Verification → Evidence**
+
+It uses temporary Protocol artifacts and does not require an external AI provider. The approval step is deliberately explicit; candidate generation alone cannot authorize execution.
+
+→ [Demo source](examples/evidence_route_demo.py)
+
 ## Getting Started
 
 - **MVP Quickstart → [docs/architecture/MVP_QUICKSTART.md](docs/architecture/MVP_QUICKSTART.md)**
