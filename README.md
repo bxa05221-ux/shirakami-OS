@@ -55,6 +55,47 @@ Shirakami explores a different question:
 
 **Landscape First.** The runtime is a service to Landscape, not the other way around.
 
+## The Residue Problem
+
+Shirakami began from a practical question:
+
+> **What happens to the residue that remains around an AI interaction?**
+
+By “residue,” we mean context that can otherwise remain implicit: conversation noise, unintended associations, stale context, ambiguous assumptions, unexplained influences, or other traces that may affect the next step without being clearly visible.
+
+The point is not to claim that all such influence can be extracted from an AI's internal state. Instead, Shirakami asks how much of the **externally observable influence** can be made explicit, recorded, inspected, and carried forward as part of the human Landscape.
+
+```text
+Observation
+    ↓
+Evidence
+    ↓
+Analysis
+    ↓
+Protocol Candidate
+    ↓
+Human Gate
+    ↓
+Runtime
+    ↓
+Verification
+    ↓
+Mismatch
+    ↓
+Evidence
+    ↺
+```
+
+A mismatch is not simply discarded as an error. The expected and observed states can be preserved separately as **Mismatch Evidence**, including uncertainty, context, and an optional diff reference.
+
+Shirakami does not try to make residue disappear.
+
+> **It tries to externalize what would otherwise remain implicit.**
+
+That applies not only to AI-related effects. Human mistakes, ambiguous decisions, failed assumptions, and environmental changes can also become observable Evidence. They can then be inspected, corrected, reused, or rejected without silently rewriting the past.
+
+This is one reason Shirakami treats **Evidence as a first-class architectural boundary**.
+
 ## Reviewer Entry Point
 
 For external review, start here:
