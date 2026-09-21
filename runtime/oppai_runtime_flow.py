@@ -60,16 +60,25 @@ def discover_protocol_candidates(
     registry: ProtocolRegistry,
     context: Mapping[str, Any] | None = None,
 ) -> tuple[OppaiProtocolCandidate, ...]:
-    """Expose currently available Protocol candidates without selecting one.
+    """Expose Protocol candidates without selecting one.
 
-    This is deliberately a registry-level discovery experiment. Semantic
-    matching, ranking, automatic selection, and Pipeline identity remain
-    outside this function.
+    context["protocol_candidates"] is an explicit upstream hint only.
+    It may narrow discovery, but OPPAI does not infer or rank the hint.
+    Without the hint, all current non-archived Protocols remain candidates.
     """
     observation = normalize(text, context)
-    candidates: list[OppaiProtocolCandidate] = []
+    hinted_ids = None
+    if context is not None and "protocol_candidates" in context:
+        raw_hints = context["protocol_candidates"]
+        if not isinstance(raw_hints, (list, tuple)):
+            raise ValueError("context.protocol_candidates must be a list or tuple")
+        hinted_ids = {str(protocol_id) for protocol_id in raw_hints}
 
+    candidates: list[OppaiProtocolCandidate] = []
     for entry in registry.list_current_candidates():
+        if hinted_ids is not None and entry.protocol_id not in hinted_ids:
+            continue
+
         artifact = entry.artifact
         metadata: dict[str, Any] = {
             "state": entry.state,
@@ -85,7 +94,7 @@ def discover_protocol_candidates(
         candidates.append(
             OppaiProtocolCandidate(
                 protocol_id=entry.protocol_id,
-                basis="registry.current",
+                basis="context.protocol_candidates" if hinted_ids is not None else "registry.current",
                 metadata=metadata,
             )
         )
