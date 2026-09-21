@@ -4,7 +4,7 @@ This module intentionally keeps imported development evidence separate from the
 transition-oriented ``EvidenceRecord`` used by the Runtime.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import re
 from types import MappingProxyType
 from typing import Mapping
@@ -25,7 +25,7 @@ class DevelopmentEvidence:
     verification: tuple[str, ...] = ()
     human_gate: str = "unknown"
     limitations: tuple[str, ...] = ()
-    provenance: Mapping[str, str] = MappingProxyType({})
+    provenance: Mapping[str, str] = field(default_factory=lambda: MappingProxyType({}))
 
     def as_dict(self) -> dict[str, object]:
         """Return a deterministic, JSON-compatible representation."""
