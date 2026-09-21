@@ -6,7 +6,7 @@ from runtime.protocol_registry import ProtocolRegistry
 
 def test_oppai_to_selected_protocol_pipeline_adapter_vertical_flow():
     registry = ProtocolRegistry()
-    register_temporary_matome(
+    entry = register_temporary_matome(
         registry,
         """matome:
   title: "文章作成"
@@ -30,16 +30,16 @@ def test_oppai_to_selected_protocol_pipeline_adapter_vertical_flow():
     result = execute_selected_pipeline(
         "文章を整理して",
         registry,
-        "文章作成",
+        entry.protocol_id,
         PipelineAdapter(backend, backend_id="test-backend"),
         context={"time": "night"},
     )
 
-    assert result.request.protocol_id == "文章作成"
-    assert result.plan.protocol_id == "文章作成"
+    assert result.request.protocol_id == entry.protocol_id
+    assert result.plan.protocol_id == entry.protocol_id
     assert [step.phase for step in result.plan.steps] == ["observe", "organize"]
     assert [item.backend for item in result.steps] == ["test-backend", "test-backend"]
     assert seen == [
-        ("文章作成", "0.1", "observe", "inspect"),
-        ("文章作成", "0.1", "organize", "structure"),
+        (entry.protocol_id, "0.1", "observe", "inspect"),
+        (entry.protocol_id, "0.1", "organize", "structure"),
     ]
