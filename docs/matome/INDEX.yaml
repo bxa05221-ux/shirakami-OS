@@ -1,12 +1,17 @@
 matome_index:
   id: "shirakami-matome-index"
   title: "白神プロジェクト 的目YAML INDEX"
-  version: "0.1"
+  version: "0.2"
   status: "collection_in_progress"
   purpose: "プロジェクト内で確認できた的目YAMLおよびSemantic Handoff資産を一覧化する。原資産の意味を統合・再解釈しない。"
   master:
     - {path: "docs/matome/PROJECT_MASTER.yaml", role: "project_master_landscape"}
     - {path: "docs/matome/project-landscape.yaml", role: "project_landscape_entry"}
+  imported_assets:
+    - {id: "shirakami-launch-model-declaration", title: "Shirakami β1.0 — Launch Model Declaration", source: "AA使用方針整理.txt", category: "handoff / launch model", status: "imported", target: "docs/matome/handoffs/shirakami-launch-model-declaration.yaml"}
+    - {id: "shirakami-os-beta-1.0-operation-start", title: "Shirakami OS β1.0 — Operation Start Handoff", source: "β1.0完成.txt", category: "handoff / operation", status: "imported", target: "docs/matome/handoffs/shirakami-beta1.0-operation-start.yaml"}
+    - {id: "shirakami-language-protocol-runtime-completion", title: "Shirakami Runtime — 言語プロトコル起動基盤 完成引継ぎ", source: "運用観測の整理.txt", category: "handoff / runtime", status: "imported", target: "docs/matome/handoffs/shirakami-language-protocol-runtime-completion.yaml"}
+    - {id: "shirakami-anmon-layer-reverse-r0010-observation", title: "暗問層逆算プロトコル — R0010 継続実験観測", source: "R0010継続実験.txt", category: "experiment / observation", status: "imported", target: "docs/matome/observations/anmon-layer-reverse-r0010-observation.yaml"}
   discovered_assets:
     - {id: "matome-session-matome-no-kore-kara", title: "的目のこれから - QRコード規格化と業界標準化の設計", version: "matome_v2.2_qrcode_standardization", source: "Library: matome session matome no kore kara.yml", category: "semantic-representation / standardization", status: "historical", target: "docs/matome/archive/matome-session-matome-no-kore-kara.yml"}
     - {id: "shirakami-os-integrated-protocol", title: "白神OS統合プロトコル", version: "vNext_proto_rc1", source: "Library: matome shirakami os integration session.yml", category: "core protocol / historical", status: "historical", target: "docs/matome/archive/shirakami-os-integrated-protocol.yml"}
@@ -17,11 +22,8 @@ matome_index:
     - {id: "shirakami-project-v1", title: "白神プロジェクト モデル全体再編", version: "1.0", source: "Library: shirakami project v1.docx", category: "historical architecture", status: "historical", target: "docs/matome/archive/shirakami-project-v1.yaml"}
     - {id: "shirakami-runtime-observation", title: "Shirakami OS implementation observation", version: "β0.1-era observation", source: "Library: 貼り付けたマークダウン（1）(2).md", category: "implementation observation", status: "historical_observation", target: "docs/matome/observations/shirakami-runtime-observation.yaml"}
   known_project_materials_not_yet_individually_imported:
-    - "β1.0完成.txt"
-    - "R0010継続実験.txt"
+    - "Artifact mismatch検出.txt"
     - "実装引継ぎ要約.txt"
-    - "運用観測の整理.txt"
-    - "AA使用方針整理.txt"
     - "認知ランドスケープ整理.txt"
     - "歪天球モデルの考察.txt"
     - "GitHub整理の評価.txt"
