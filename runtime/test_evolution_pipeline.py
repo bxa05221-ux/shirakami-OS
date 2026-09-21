@@ -8,7 +8,6 @@ def test_end_to_end_cycle_reaches_accepted():
     app.observe({"input": "hello"}, ContextSnapshot(landscape={"place": "test"}, protocol_id="P1"))
     analysis = app.analyze("P1")
     assert analysis.protocol_id == "P1"
-    app.approve()
     result = app.execute(
         lambda context: Transition("example.transition", {"changed": True}),
         "P1",
