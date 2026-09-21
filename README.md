@@ -158,6 +158,12 @@ That applies not only to AI-related effects. Human mistakes, ambiguous decisions
 
 This is one reason Shirakami treats **Evidence as a first-class architectural boundary**.
 
+## Public Verification Pack
+
+For an independent, reproducible review of the current implementation, see **[Public Verification Pack](docs/PUBLIC_VERIFICATION_PACK.md)**.
+
+It separates reproducible checks from claims that remain outside the current verification boundary.
+
 ## Reviewer Entry Point
 
 For external review, start here:

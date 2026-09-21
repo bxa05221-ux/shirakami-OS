@@ -94,6 +94,12 @@ Evidence
 
 実装境界の詳細：[Evidence → Route Candidate Bridge α0.4](docs/EVIDENCE_ROUTE_CANDIDATE_ALPHA_0_4.md)
 
+## 公開検証パック
+
+第三者が現在の実装を再現・検証するための入口として、**[公開検証パック](docs/PUBLIC_VERIFICATION_PACK.md)** を用意しています。
+
+再現できる検証項目と、現在まだ保証していない事項を分けて記載しています。
+
 ## 外部レビューの入口
 
 初めて見る場合は、まず以下から入ってください。
