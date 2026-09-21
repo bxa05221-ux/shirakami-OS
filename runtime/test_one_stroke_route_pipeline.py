@@ -1,11 +1,13 @@
 from runtime.one_stroke_route_pipeline import OneStrokeRoutePipeline
 from runtime.prototype import ExecutionContext, Transition
 
+
 def _protocol(name, suffix):
     def run(context: ExecutionContext) -> Transition:
         value = context.input.get("value", "")
         return Transition(kind=f"step.{name}", data={"value": f"{value}{suffix}"})
     return run
+
 
 def test_selected_route_requires_human_gate():
     pipeline = OneStrokeRoutePipeline()
@@ -16,17 +18,30 @@ def test_selected_route_requires_human_gate():
     else:
         raise AssertionError("route selection must fail closed without approval")
 
+
 def test_selected_route_runs_once_and_verifies_to_evidence():
     pipeline = OneStrokeRoutePipeline()
-    selection = pipeline.select("route.demo", ("a", "b", "c"), reviewer="human", approved=True)
-    result = pipeline.execute({"a": _protocol("a", "A"), "b": _protocol("b", "B"), "c": _protocol("c", "C")}, {"value": ""})
+    selection = pipeline.select(
+        "route.demo", ("a", "b", "c"), reviewer="human", approved=True
+    )
+    result = pipeline.execute(
+        {
+            "a": _protocol("a", "A"),
+            "b": _protocol("b", "B"),
+            "c": _protocol("c", "C"),
+        },
+        {"value": ""},
+    )
     assert selection == result.selection
-    assert result.execution.status == "success"
+    assert result.execution.status == "completed"
     assert result.execution.transition.kind == "route.route.demo"
     assert result.execution.transition.data["route"] == ["a", "b", "c"]
     assert result.execution.transition.data["final"]["value"] == "ABC"
     assert result.verification.status == "pass"
-    assert any(record.transition_kind == "route.route.demo" for record in result.evidence)
+    assert any(
+        record.transition_kind == "route.route.demo" for record in result.evidence
+    )
+
 
 def test_selected_route_stops_on_missing_protocol():
     pipeline = OneStrokeRoutePipeline()
