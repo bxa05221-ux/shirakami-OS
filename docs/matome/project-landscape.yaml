@@ -1,0 +1,211 @@
+matome:
+
+  id: shirakami-project-landscape
+  title: "Shirakami Project Landscape"
+  subtitle:
+    - "白神プロジェクト全体像"
+    - "Project Semantic Handoff"
+    - "Project Landscape"
+  version: "0.1"
+  status: "project_baseline"
+
+statement: >
+  Shirakami Projectは、AIそのものを作るプロジェクトではない。
+  人間のLandscapeを中心に置き、AI・Protocol・Runtime・Evidence・Adapter・Renderer
+  を組み合わせることで、AIが変化しても人間側のContextと判断主体を保持できる
+  実行環境を構築するプロジェクトである。
+
+identity:
+
+  project_name: "Shirakami Project"
+
+  former_name:
+    - "Shirakami OS"
+
+  current_understanding: >
+    OSという名称は歴史的名称として保持するが、
+    実装上の中心はProtocol / Runtime / Landscape / Evidence
+    によって構成されるAI生息空間・言語プロトコル実行基盤として扱う。
+
+  core_statement:
+    - "AIは権威ではなくシミュレーターである"
+    - "Human LandscapeはAIモデルの外側に保持する"
+    - "Protocolは意味と実行境界を宣言する"
+    - "RuntimeはDomain Meaningを勝手に発明しない"
+    - "Evidenceは観測された事実を保持する"
+    - "AI / Adapter / Rendererは交換可能である"
+    - "最終判断は人間に残す"
+
+architecture:
+
+  primary_flow:
+    - "Landscape"
+    - "Evidence"
+    - "Protocol"
+    - "Runtime"
+    - "Adapter"
+    - "Backend"
+
+  extended_flow:
+    - "Human"
+    - "Landscape"
+    - "Protocol"
+    - "Runtime"
+    - "Adapter"
+    - "External AI"
+    - "Renderer"
+    - "Human"
+
+  semantic_boundary:
+    landscape:
+      role: "人間側のContext・状態・経験・関係性を保持する"
+    protocol:
+      role: "意味・規則・問い・手順を宣言する"
+    runtime:
+      role: "Protocolを実行可能な境界へ接続する"
+    adapter:
+      role: "外部AI・Backendとの交換境界を担う"
+    evidence:
+      role: "Observableな変化と実行履歴を記録する"
+    renderer:
+      role: "Landscapeを人間が受け取れる媒体へ再表現する"
+
+development_model:
+
+  principle:
+    - "理論と実装を分離する"
+    - "研究成果は的目YAMLとして受領する"
+    - "実装上必要な補助以外の理論拡張を勝手に行わない"
+    - "理論的課題は研究側へフィードバックする"
+    - "実験結果はEvidenceとして残す"
+    - "成功を推測せず、CI・テスト・観測によって確認する"
+
+  development_loop:
+    - "Research"
+    - "Matome YAML"
+    - "Design"
+    - "Implementation"
+    - "Experiment"
+    - "Verification"
+    - "Evidence"
+    - "Next Matome YAML"
+
+document_architecture:
+
+  vision:
+    question: "なぜ作るのか"
+    restriction:
+      - "実装詳細を書かない"
+
+  constitution:
+    question: "何を守るのか"
+    restriction:
+      - "実装詳細を書かない"
+
+  blueprint:
+    question: "どういう構造にするのか"
+    restriction:
+      - "アルゴリズムを書かない"
+
+  design:
+    question: "具体的な仕様をどう定義するか"
+
+  implementation:
+    question: "コードとしてどう実装するか"
+
+  matome_yaml:
+    question: "何が生まれ、何が確認され、どこへ引き継ぐのか"
+    role: >
+      研究・対話・実験・実装の間で意味を失わずに
+      Contextを引き継ぐSemantic Handoff Layerとして機能する。
+
+known_protocols:
+
+  - "暗問層逆算プロトコル"
+  - "3D位相回転アイゼンハワーマトリクス"
+  - "ThreadRPG"
+  - "連山"
+  - "歌仙"
+  - "ガイドAI"
+  - "漫画パイプライン"
+  - "ラジオ"
+  - "認知エコーロケーション"
+  - "i-Field"
+
+verification:
+
+  principle:
+    - "ファイルの存在と実験成功を同一視しない"
+    - "Landscape snapshotとEvidence lineageを同一視しない"
+    - "外部AIの評価をTruth authorityにしない"
+    - "Artifact mismatchを黙って修正しない"
+
+  evidence_rule: >
+    観測された事実と、その後の解釈・仮説を分離する。
+
+current_phase:
+
+  release_line:
+    name: "Shirakami β1.0"
+    meaning: >
+      シェイクダウンを経た検証済み実装基盤を、
+      実運用へ展開可能なモデルとして扱う。
+
+  not:
+    - "最終製品"
+    - "理論の完成"
+    - "万能AI"
+    - "自律的な意思決定主体"
+
+  is:
+    - "検証可能な実装基盤"
+    - "Protocol-driven Runtime"
+    - "Landscape continuity infrastructure"
+    - "Evidence-driven development environment"
+
+historical_direction:
+
+  origin:
+    - "AIを使う現場での観察"
+    - "ThreadRPG"
+    - "的目YAML"
+    - "Landscape"
+    - "Evidence"
+    - "Protocol"
+    - "Runtime"
+
+  transformation: >
+    個別のAI活用方法を作ることから始まり、
+    AIそのものではなく、
+    AIと人間の間に存在するContext・意味・判断境界を
+    保持する基盤へ発展した。
+
+  important_observation: >
+    Shirakamiの中心的な成果は、
+    より賢いAIを作ることではなく、
+    AIが変わっても人間側のLandscapeを失わない
+    構造を実装・検証できるようになったことである。
+
+handoff_rules:
+
+  - "このYAMLをプロジェクト全体の意味的入口として扱う"
+  - "個別Protocolの内容をこのYAMLへ重複記載しない"
+  - "実装状態はGitHubとEvidenceを正とする"
+  - "理論の最新版は研究側の正式な的目YAMLを正とする"
+  - "このYAMLはプロジェクト全体のLandscapeを示す"
+  - "新しい重要な境界が確立した場合はversionを更新する"
+
+non_goals:
+
+  - "AIモデルそのものの開発"
+  - "特定ベンダーへの依存"
+  - "AIによる最終判断の代替"
+  - "未検証の理論を実装事実として扱うこと"
+  - "Protocolの意味をRuntimeへ埋め込むこと"
+
+symbolic_phrase:
+
+  - "AIが変わっても、人間の景色を残す。"
+  - "描くとは、暴くことではない。"
+  - "観測できない成功を、成功とは呼ばない。"
+  - "意味はProtocolに、実行はRuntimeに、事実はEvidenceに。"
