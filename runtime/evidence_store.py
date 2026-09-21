@@ -7,7 +7,10 @@ Persistence can be replaced later without changing the Evolution Loop contract.
 from collections.abc import Iterable
 from dataclasses import dataclass
 
-from .evidence import EvidenceRecord
+try:
+    from .evidence import EvidenceRecord
+except ImportError:  # Support the repository's legacy direct-module test execution.
+    from evidence import EvidenceRecord
 
 
 @dataclass(frozen=True)
