@@ -38,5 +38,7 @@ def test_candidate_discovery_does_not_activate_a_protocol():
 
     assert len(candidates) == 2
     assert [candidate.protocol_id for candidate in candidates] == ["alpha", "beta"]
+    assert candidates[0].basis == "registry.current"
+    assert candidates[1].basis == "observable.lexical_match"
     assert registry.snapshot()["alpha"].state == "experimental"
     assert registry.snapshot()["beta"].state == "experimental"
