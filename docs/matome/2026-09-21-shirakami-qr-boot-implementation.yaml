@@ -1,0 +1,131 @@
+matome:
+  title: "Shirakami QR Boot 実装構想"
+  codename: "Shirakami-QR-Boot"
+  version: "0.1"
+  date: "2026-09-21"
+  status: "implementation_concept"
+
+  purpose: >
+    作品等に配置したQRコードを起点として、
+    GitHub上の白神環境を参照し、
+    Runtimeを起動するための最小ブート経路を構築する。
+
+  architecture:
+    physical_entry:
+      component: "QR"
+      role: "Repositoryへのboot reference"
+
+    repository:
+      component: "GitHub Repository"
+      role: "白神環境の外部定義"
+      expected_contents:
+        - "Landscape"
+        - "Protocol"
+        - "Evidence"
+        - "Specification"
+        - "Runtime configuration"
+        - "Boot Manifest"
+
+    manifest:
+      name: "Shirakami Boot Manifest"
+      role: "白神環境の起動情報を定義"
+
+    runtime:
+      role: "外部構造の解釈・実行境界"
+
+    adapter:
+      role: "RuntimeとLLMの接続"
+
+    llm:
+      role: "交換可能なAIエンジン"
+
+  boot_flow:
+    - "QR読み取り"
+    - "Repository URL取得"
+    - "Boot Manifest取得"
+    - "Manifest検証"
+    - "Repository構造検証"
+    - "Landscape / Protocol / Evidenceロード"
+    - "Runtime起動"
+    - "Adapter接続"
+    - "LLM接続"
+
+  security_boundary:
+    qr:
+      can:
+        - "Repositoryへの参照を提供する"
+      cannot:
+        - "実行権限を与える"
+        - "Human Gateを代替する"
+        - "外部Reality変更を許可する"
+
+    runtime:
+      requirements:
+        - "入力検証"
+        - "Repository検証"
+        - "Manifest検証"
+        - "Protocol検証"
+        - "Evidence境界"
+        - "Human Gate"
+
+  mvp:
+    name: "Shirakami QR Boot MVP"
+    components:
+      - "GitHub Repository"
+      - "Boot Manifest"
+      - "QR generator"
+      - "Manifest loader"
+      - "Repository validator"
+      - "Runtime entrypoint"
+    acceptance:
+      - "QRからRepository URLを取得できる"
+      - "Boot Manifestを発見できる"
+      - "Manifestを検証できる"
+      - "Runtime入口を特定できる"
+      - "Runtimeを起動できる"
+      - "QR取得だけではProtocol実行権限を得られない"
+
+  future:
+    applications:
+      - "小説付属Guide AI"
+      - "児童書"
+      - "教材"
+      - "施設掲示"
+      - "製品付属Protocol"
+      - "イベント会場"
+      - "特定Landscapeへの入口"
+    granularity:
+      - "白神環境"
+      - "Protocol"
+      - "Landscape"
+      - "Evidence"
+      - "Runtime"
+      - "Guide AI"
+
+  non_goals:
+    - "QR自体をRuntime化する"
+    - "QRだけでLLMを白神化する"
+    - "QRだけで安全性を保証する"
+    - "Human Gateを省略する"
+    - "外部Realityを自動変更する"
+
+  verification_status:
+    conceptually_supported:
+      - "QRによるURL参照"
+      - "GitHub Repositoryを外部参照先とする構成"
+      - "白神Runtimeの外部構造参照"
+      - "LLM Adapterの交換可能性"
+    implementation_unverified:
+      - "QR → Boot Manifest"
+      - "Manifest → Repository verification"
+      - "Repository → Runtime boot"
+      - "任意LLMへのAdapter接続"
+
+  next_implementation_step:
+    priority: 1
+    task: "Shirakami Boot Manifestの最小仕様を定義する"
+
+  boundary_statement: >
+    本構想は「QRを読めばAIが白神になる」というものではない。
+    QRを白神環境への参照として利用し、
+    Runtimeがその環境をロード・検証・実行する構成である。
