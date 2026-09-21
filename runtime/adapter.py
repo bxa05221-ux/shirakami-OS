@@ -4,7 +4,8 @@ Adapters expose external boundaries without embedding backend-specific
 semantics in the Runtime Kernel.
 """
 
-from typing import Any, Mapping, Protocol
+from dataclasses import dataclass
+from typing import Any, Callable, Mapping, Protocol
 
 try:
     from .landscape import LandscapeState
