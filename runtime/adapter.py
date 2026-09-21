@@ -4,7 +4,8 @@ Adapters expose external boundaries without embedding backend-specific
 semantics in the Runtime Kernel.
 """
 
-from typing import Any, Mapping, Protocol
+from dataclasses import dataclass
+from typing import Any, Callable, Mapping, Protocol
 
 try:
     from .landscape import LandscapeState
@@ -48,3 +49,51 @@ def adapt_landscape_observation(state: LandscapeState) -> Mapping[str, Any]:
         "snapshot": state.snapshot(),
         "evidence_lineage": evidence_lineage,
     }
+
+class AdapterExecutionError(ValueError):
+    """Raised when a Pipeline step cannot cross the Adapter boundary."""
+
+
+@dataclass(frozen=True)
+class PipelineAdapterRequest:
+    protocol_id: str
+    version: str
+    phase: str
+    action: str
+    input: Mapping[str, Any]
+    context: Mapping[str, Any]
+
+
+@dataclass(frozen=True)
+class PipelineAdapterResult:
+    output: Any
+    backend: str | None
+    evidence: Mapping[str, Any]
+
+
+class PipelineAdapter:
+    """Replaceable boundary from a Pipeline step to an external backend."""
+
+    def __init__(self, backend: Callable[[PipelineAdapterRequest], Any], backend_id: str | None = None):
+        if not callable(backend):
+            raise AdapterExecutionError("backend must be callable")
+        self._backend = backend
+        self.backend_id = backend_id
+
+    def execute(self, request: PipelineAdapterRequest) -> PipelineAdapterResult:
+        for field in ("protocol_id", "version", "phase", "action"):
+            if not getattr(request, field):
+                raise AdapterExecutionError(f"{field} is required")
+        output = self._backend(request)
+        return PipelineAdapterResult(
+            output=output,
+            backend=self.backend_id,
+            evidence={
+                "event": "adapter.pipeline_execution",
+                "protocol_id": request.protocol_id,
+                "version": request.version,
+                "phase": request.phase,
+                "action": request.action,
+                "backend_declared": self.backend_id is not None,
+            },
+        )
