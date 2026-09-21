@@ -339,6 +339,22 @@ PV1.0は、白神の基盤を実装として動かし、検証し、観測しな
 
 ---
 
+## 5分で見るRuntime循環デモ
+
+現在のEvidence-drivenな経路を、実際に一度通して確認できます。
+
+```bash
+python examples/evidence_route_demo.py
+```
+
+このデモでは、次の境界を順番に実行します。
+
+**Evidence → 構造的Candidate → HUMAN_REVIEW → 明示的Human Gate → READY → One-Stroke Runtime → Verification → Evidence**
+
+一時的なProtocol Artifactを使うため、外部AIプロバイダーは不要です。承認ステップは意図的に明示されています。Candidate生成だけでは実行権限を得られません。
+
+→ [デモ本体](examples/evidence_route_demo.py)
+
 ## 5分Quickstart
 
 Repositoryを取得して、最小Runtimeを実行できます。
