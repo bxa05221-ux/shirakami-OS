@@ -49,7 +49,9 @@ class ExecuteInput(BaseModel):
 
 
 class VerifyInput(BaseModel):
-    execution: dict[str, Any]
+    # Optional for handle-based verification: the execution is resolved by path.
+    # Retained for the legacy semantic verification boundary.
+    execution: dict[str, Any] = Field(default_factory=dict)
     expected_transition_kind: str | None = None
     diff_ref: str = ""
 
@@ -128,14 +130,21 @@ class ShirakamiHTTPTransport:
 
         @app.post("/v1/executions/{execution_id}/verify")
         def verify_execution(execution_id: str, payload: VerifyInput) -> dict[str, Any]:
-            result = self.api.verify_execution(execution_id, expected_transition_kind=payload.expected_transition_kind, diff_ref=payload.diff_ref)
+            result = self.api.verify_execution(
+                execution_id,
+                expected_transition_kind=payload.expected_transition_kind,
+                diff_ref=payload.diff_ref,
+            )
             if result is None:
                 raise HTTPException(status_code=404, detail="unknown execution_id")
             return asdict(result)
 
         @app.post("/v1/verify")
         def verify(payload: VerifyInput) -> dict[str, Any]:
-            raise HTTPException(status_code=400, detail="use /v1/executions/{execution_id}/verify; execution_id is required")
+            raise HTTPException(
+                status_code=400,
+                detail="use /v1/executions/{execution_id}/verify; execution_id is required",
+            )
 
         @app.get("/v1/evidence")
         def evidence(
