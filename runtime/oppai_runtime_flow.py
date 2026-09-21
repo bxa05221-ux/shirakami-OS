@@ -68,10 +68,22 @@ def prepare(
 
 
 def _observable_terms(text: str) -> set[str]:
-    """Extract conservative lexical terms without inferring hidden intent."""
+    """Extract conservative lexical terms without inferring hidden intent.
+
+    Latin/alphanumeric runs are kept as words. Japanese runs additionally emit
+    adjacent two-character observations so that compounds such as 「文章」 and
+    「整理」 can be observed without attempting full morphological inference.
+    """
+    terms = {
+        term
+        for term in re.findall(r"[A-Za-z0-9_]{2,}", text.lower())
+        if term not in {"desu", "masu"}
+    }
+    for run in re.findall(r"[ぁ-んァ-ヶ一-龯]{2,}", text):
+        terms.update(run[index:index + 2].lower() for index in range(len(run) - 1))
     return {
         term
-        for term in re.findall(r"[\wぁ-んァ-ヶ一-龯]{2,}", text.lower())
+        for term in terms
         if term not in {"です", "ます", "する", "した", "して", "ください"}
     }
 
