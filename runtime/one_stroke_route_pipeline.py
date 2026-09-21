@@ -11,7 +11,6 @@ from typing import Any, Mapping, Sequence
 
 try:
     from .approval_envelope import ApprovalEnvelope
-    from .approval_route_bridge import require_approved_route
     from .evolution_bridge import ContextSnapshot, VerificationResult
     from .evolution_pipeline import EvidenceDrivenRuntime
     from .evidence import EvidenceRecord
@@ -19,7 +18,6 @@ try:
     from .prototype import ExecutionResult
 except ImportError:
     from approval_envelope import ApprovalEnvelope
-    from approval_route_bridge import require_approved_route
     from evolution_bridge import ContextSnapshot, VerificationResult
     from evolution_pipeline import EvidenceDrivenRuntime
     from evidence import EvidenceRecord
@@ -238,6 +236,8 @@ class OneStrokeRoutePipeline:
             )
         if self._approval is None:
             raise RuntimeError("execution approval envelope is missing")
+
+        from .approval_route_bridge import require_approved_route
 
         selection = require_approved_route(self._selection, self._approval)
         missing = [name for name in selection.candidate if name not in protocols]
