@@ -10,9 +10,11 @@ from typing import Any, Callable, Mapping
 from .evidence import EvidenceRecord, capture_evidence
 from .evolution_bridge import (
     ContextSnapshot,
+    MismatchEvidence,
     ProtocolCandidate,
     VerificationResult,
     candidate_to_evidence,
+    mismatch_to_evidence,
     transition_to_evidence,
 )
 from .evolution_loop import EvolutionLoop, LoopState
@@ -212,6 +214,7 @@ class EvidenceDrivenRuntime:
         execution: ExecutionResult,
         *,
         expected_transition_kind: str | None = None,
+        diff_ref: str = "",
     ) -> VerificationResult:
         observed = execution.transition.kind
         matched = (
@@ -237,6 +240,21 @@ class EvidenceDrivenRuntime:
                 f"verification result transition failed: {result.reason}"
             )
         self.store = self.store.extend(self._loop_evidence())
+
+        if not matched:
+            mismatch = MismatchEvidence(
+                protocol_id=execution.protocol_id,
+                diff_ref=diff_ref,
+                expected=expected_transition_kind,
+                observed=observed,
+                uncertainty=verification.uncertainty,
+                source_evidence=(
+                    f"R0100:{execution.transition.kind}",
+                ),
+                context=self._context.as_mapping(),
+            )
+            self.store = self.store.append(mismatch_to_evidence(mismatch))
+
         return verification
 
     def _loop_evidence(self) -> tuple[EvidenceRecord, ...]:
