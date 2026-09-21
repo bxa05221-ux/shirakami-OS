@@ -245,7 +245,7 @@ Evidenceは、何が起きたかを後から追跡できるようにするため
 
 ## 現在の状態
 
-**Prototype v1.0 (PV1.0) / β1.0 Launch Model / Operational Rollout**
+**Prototype v1.1 (PV1.1) / β1.1 Evidence-Driven Runtime / Operational Baseline**
 
 PV1.0は、白神の基盤を実装として動かし、検証し、観測しながら運用へ投入するためのPrototype基準点です。
 
