@@ -62,6 +62,38 @@ Protocol A → Protocol B → Protocol D
 ```
 
 ここでいう「一筆書き」は、互換性のあるProtocol遷移を連続して辿るという建築上の表現です。任意のProtocolを無条件に並べ替えられることや、Euler路アルゴリズムを意味しません。n-gramは経路候補を構成する仕組みであり、AIに判断権を与えるものでもありません。
+
+## 現在検証できるRuntime循環
+
+現在の実装では、保守的なEvolution Loopと、構造的Protocol Route候補生成、一筆書きRuntime実行が接続されています。
+
+```text
+Evidence
+   ↓
+明示されたProtocol Artifact
+   ↓
+構造的n-gram Candidate
+   ↓
+HUMAN_REVIEW
+   ↓
+Human Gate
+   ↓
+READY
+   ↓
+One-Stroke Runtime
+   ↓
+Verification
+   ↓
+ACCEPTED / DIFF
+   ↓
+Evidence
+   ↺
+```
+
+重要なのは境界です。**EvidenceからCandidateは生成できますが、EvidenceやCandidate自身が実行を承認することはありません。** 構造的一致から意味的互換性を推論せず、実行には既存のR0100 Human Gateによる明示的な人間の承認が必要です。実行結果はVerificationを経てEvidenceとして記録されます。
+
+実装境界の詳細：[Evidence → Route Candidate Bridge α0.4](docs/EVIDENCE_ROUTE_CANDIDATE_ALPHA_0_4.md)
+
 ## 外部レビューの入口
 
 初めて見る場合は、まず以下から入ってください。

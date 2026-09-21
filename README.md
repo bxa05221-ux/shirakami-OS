@@ -56,6 +56,38 @@ Protocol A → Protocol B → Protocol D
 ```
 
 Here, “one-stroke” means a continuous chain of compatible Protocol transitions. It is not a claim of unrestricted Protocol permutation or an Eulerian-path algorithm. The model is a route-construction mechanism, not an AI authority.
+
+## Current Verified Runtime Loop
+
+The current implementation connects a conservative Evolution Loop to structural Protocol route generation and one-stroke execution:
+
+```text
+Evidence
+   ↓
+Explicit Protocol Artifact
+   ↓
+Structural n-gram Candidate
+   ↓
+HUMAN_REVIEW
+   ↓
+Human Gate
+   ↓
+READY
+   ↓
+One-Stroke Runtime
+   ↓
+Verification
+   ↓
+ACCEPTED / DIFF
+   ↓
+Evidence
+   ↺
+```
+
+The important boundary is intentional: **Evidence can generate a candidate, but it cannot authorize execution.** Semantic compatibility is not inferred from structural matching. Execution requires explicit human approval through the existing R0100 Human Gate, and verification records the observed result as Evidence.
+
+See [Evidence → Route Candidate Bridge α0.4](docs/EVIDENCE_ROUTE_CANDIDATE_ALPHA_0_4.md) for the implementation boundary.
+
 ## What Shirakami Is
 
 Shirakami OS is an open-source **Personal AI Runtime / development architecture** for preserving and working with human context independently of a particular LLM or AI provider.

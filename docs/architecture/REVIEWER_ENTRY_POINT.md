@@ -25,13 +25,14 @@ Evidence / Observation
 
 1. **Repository README** — implementation-layer scope and architecture
 2. **Normative Specification** — [shirakami-specification](https://github.com/bxa05221-ux/shirakami-specification)
-3. **Foundation / implementation boundary** — [`spec/README.md`](../../spec/README.md)
-4. **Architecture baseline** — [`docs/Shirakami_OS_Alpha2.2.md`](../Shirakami_OS_Alpha2.2.md)
-5. **Active / historical RFCs** — [`docs/rfc/`](../rfc/)
-6. **Runtime implementation** — [`runtime/`](../../runtime/)
-7. **Adapters / plugins** — [`plugins/`](../../plugins/)
-8. **Evidence / observation records** — [`docs/observations/`](../observations/)
-9. **Examples / protocol source artifacts** — [`examples/`](../../examples/) and [`protocols/`](../../protocols/)
+3. **Current verified Evolution Loop** — [`Evidence → Route Candidate Bridge α0.4`](../EVIDENCE_ROUTE_CANDIDATE_ALPHA_0_4.md)
+4. **Foundation / implementation boundary** — [`spec/README.md`](../../spec/README.md)
+5. **Architecture baseline** — [`docs/Shirakami_OS_Alpha2.2.md`](../Shirakami_OS_Alpha2.2.md)
+6. **Active / historical RFCs** — [`docs/rfc/`](../rfc/)
+7. **Runtime implementation** — [`runtime/`](../../runtime/)
+8. **Adapters / plugins** — [`plugins/`](../../plugins/)
+9. **Evidence / observation records** — [`docs/observations/`](../observations/)
+10. **Examples / protocol source artifacts** — [`examples/`](../../examples/) and [`protocols/`](../../protocols/)
 
 ## MVP Execution Path
 
@@ -177,6 +178,8 @@ Do not silently reconcile contradictory external interpretations.
 - Event Sourcing / Workflow divergence: pending external review
 - Landscape layer placement: pending verification
 - Rich Protocol Semantics boundary: deferred
+- Evidence → structural Route Candidate proposal: implemented (α0.4)
+- Route Candidate → Human Gate → One-Stroke Runtime → Verification: implemented (α0.3)
 - Migration policy: pending explicit contract
 
 ## Review Rule
