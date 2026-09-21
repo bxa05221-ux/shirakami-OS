@@ -46,6 +46,7 @@ class EvidenceDrivenRuntime:
         self.store = store or EvidenceStore()
         self.runtime = runtime or Runtime()
         self.loop = EvolutionLoop()
+        self._evidence_cursor = 0
 
     def observe(self, observation: Mapping[str, Any], context: ContextSnapshot) -> None:
         self.loop.dispatch("observe", observation)
@@ -75,17 +76,16 @@ class EvidenceDrivenRuntime:
             source_evidence=relevant,
         )
 
-    def approve(self) -> None:
-        result = self.loop.dispatch("execute", human_approved=True)
-        if not result.accepted:
-            raise RuntimeError(f"execution gate failed: {result.reason}")
-
     def execute(
         self,
         protocol: Callable[[Any], Transition],
         protocol_id: str,
         input_data: Mapping[str, Any] | None = None,
     ) -> ExecutionResult:
+        if self.loop.state is LoopState.READY:
+            gate = self.loop.dispatch("execute")
+            if not gate.accepted:
+                raise RuntimeError(f"execution gate failed: {gate.reason}")
         if self.loop.state is not LoopState.EXECUTE:
             raise RuntimeError(f"runtime not ready for execution: {self.loop.state.value}")
         result = self.runtime.execute(protocol_id, protocol, input_data)
@@ -124,7 +124,9 @@ class EvidenceDrivenRuntime:
 
     def _loop_evidence(self) -> tuple[EvidenceRecord, ...]:
         records = []
-        for record in self.loop.records[len(records):]:
+        new_records = self.loop.records[self._evidence_cursor:]
+        self._evidence_cursor = len(self.loop.records)
+        for record in new_records:
             evidence = transition_to_evidence(record)
             if evidence is not None:
                 records.append(evidence)
@@ -140,7 +142,6 @@ def example_cycle(
     runtime = EvidenceDrivenRuntime()
     runtime.observe(observation, context)
     analysis = runtime.analyze(protocol_id)
-    runtime.approve()
     execution = runtime.execute(protocol, protocol_id, observation)
     verification = runtime.verify(execution)
     return EvolutionRun(analysis, execution, verification, runtime.store.all())
