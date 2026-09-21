@@ -27,7 +27,9 @@ jobs:
           python-version: '3.11'
       - run: python -m pytest tests/test_r0025_landscape_import.py -q
       - run: python -m runtime.operational_github_read > /tmp/landscape-observation.json
-      - run: python - <<'PY'
+      - name: Import observed Landscape
+        run: |
+          python - <<'PY'
           import json
           from runtime.landscape_import import import_observation
 
@@ -35,4 +37,4 @@ jobs:
               observation = json.load(f)
           state = import_observation(observation)
           print(json.dumps(state.snapshot(), ensure_ascii=False, indent=2))
-        PY
+          PY
