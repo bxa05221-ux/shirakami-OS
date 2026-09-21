@@ -47,6 +47,7 @@ class EvidenceDrivenRuntime:
         self.runtime = runtime or Runtime()
         self.loop = EvolutionLoop()
         self._evidence_cursor = 0
+        self._evidence_cursor = 0
 
     def observe(self, observation: Mapping[str, Any], context: ContextSnapshot) -> None:
         self.loop.dispatch("observe", observation)
@@ -82,6 +83,10 @@ class EvidenceDrivenRuntime:
         protocol_id: str,
         input_data: Mapping[str, Any] | None = None,
     ) -> ExecutionResult:
+        if self.loop.state is LoopState.READY:
+            gate = self.loop.dispatch("execute")
+            if not gate.accepted:
+                raise RuntimeError(f"execution gate failed: {gate.reason}")
         if self.loop.state is LoopState.READY:
             gate = self.loop.dispatch("execute")
             if not gate.accepted:
