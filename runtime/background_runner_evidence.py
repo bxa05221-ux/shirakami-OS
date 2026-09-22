@@ -1,8 +1,10 @@
 """Immutable Evidence records emitted by the bounded Background Runner."""
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from runtime.background_runner import RunnerEvent
+if TYPE_CHECKING:
+    from runtime.background_runner import RunnerEvent
 
 
 @dataclass(frozen=True)
@@ -18,7 +20,7 @@ class RunnerEvidence:
     runner_state: str
 
     @classmethod
-    def from_event(cls, event: RunnerEvent) -> "RunnerEvidence":
+    def from_event(cls, event: "RunnerEvent") -> "RunnerEvidence":
         return cls(
             event=event.event,
             protocol_identity=event.protocol_identity,
