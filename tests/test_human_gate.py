@@ -84,3 +84,14 @@ def test_approval_does_not_create_activation_scheduler_or_runner():
     assert not hasattr(envelope, "activation")
     assert not hasattr(envelope, "scheduler")
     assert not hasattr(envelope, "runner")
+
+
+def test_missing_protocol_identity_fails_closed():
+    c = candidate()
+    del c["protocol_identity"]
+    with pytest.raises(HumanGateError, match="missing explicit protocol identity"):
+        process_human_gate(
+            candidate=c,
+            reviewer_identity="human-test",
+            decision="approve",
+        )
