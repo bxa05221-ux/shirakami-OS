@@ -76,6 +76,9 @@ class TransitionRule:
 
 DEFAULT_RULES = (
     TransitionRule(LoopState.IDLE, "observe", LoopState.OBSERVE, EvidenceClass.OBSERVATION),
+    # External Activation has already crossed the human authorization boundary.
+    # This transition only synchronizes the internal execution lifecycle.
+    TransitionRule(LoopState.IDLE, "activated_execution", LoopState.READY),
     TransitionRule(LoopState.OBSERVE, "evidence", LoopState.EVIDENCE),
     TransitionRule(LoopState.EVIDENCE, "analyze", LoopState.ANALYZE),
     TransitionRule(LoopState.ANALYZE, "existing_protocol", LoopState.READY),
@@ -91,6 +94,7 @@ DEFAULT_RULES = (
     TransitionRule(LoopState.DIFF, "reobserve", LoopState.OBSERVE, EvidenceClass.MISMATCH),
     TransitionRule(LoopState.DIFF, "stop", LoopState.STOPPED, EvidenceClass.SAFETY),
     TransitionRule(LoopState.ACCEPTED, "observe", LoopState.OBSERVE, EvidenceClass.OBSERVATION),
+    TransitionRule(LoopState.ACCEPTED, "activated_execution", LoopState.READY),
 )
 
 
