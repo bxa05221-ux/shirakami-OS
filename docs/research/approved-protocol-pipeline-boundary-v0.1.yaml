@@ -1,0 +1,114 @@
+matome:
+  title: "白神モデル Approved Protocol Pipeline 境界"
+  codename: "Approved Protocol Pipeline Boundary"
+  version: "0.1"
+  status: "research"
+  authority: "meaning"
+
+purpose:
+  statement: >
+    既に人間によって承認されたActivationを複数束ねて実行へ渡すための
+    Pipeline境界を定義する。Pipeline自体はProtocolを選択せず、
+    権限を生成・拡張せず、承認済み実行単位の順序と整合性だけを管理する。
+
+principles:
+  - "PipelineはDecision Actorではない"
+  - "PipelineはAuthority Sourceではない"
+  - "Approval済みでないProtocolを流さない"
+  - "Protocol identityを推論しない"
+  - "Activation identityを推論しない"
+  - "Approval scopeを拡張しない"
+  - "Pipeline順序を意味判断として扱わない"
+  - "一変更一検証"
+
+input:
+  type: "ReleasedActivation"
+  requirements:
+    - "activation_identity"
+    - "protocol_identity"
+    - "approval_identity"
+    - "approved_execution"
+    - "explicit_execution_scope"
+
+pipeline:
+  role: "ordered_execution_handoff"
+  authority: false
+  executable: false
+  responsibilities:
+    - "承認済みActivationの順序保持"
+    - "identityの保持"
+    - "各Activationの実行結果記録"
+    - "失敗・停止時の後続実行制御"
+  must_not:
+    - "Protocolを自動選択する"
+    - "CandidateをApproval済みにする"
+    - "Approvalを生成する"
+    - "Approval scopeを変更する"
+    - "Activationを生成する"
+    - "Protocol内容を変更する"
+    - "Verification mismatchを成功として扱う"
+
+ordering:
+  rule: "explicit_order_only"
+  semantics: >
+    Pipeline内の順序は呼び出し側が明示する。
+    Pipeline自身がProtocolの優先順位や意味的適合性を推論して並べ替えない。
+
+failure:
+  default: "fail_closed"
+  stop_conditions:
+    - "missing_activation_identity"
+    - "missing_protocol_identity"
+    - "missing_approval_identity"
+    - "execution_not_authorized"
+    - "invalid_approval_scope"
+    - "activation_identity_mismatch"
+    - "protocol_identity_mismatch"
+    - "verification_mismatch"
+  rule: "失敗したActivation以降の未実行Activationは自動実行しない"
+
+evidence:
+  rule: "each_activation_remains_traceable"
+  requirements:
+    - "pipeline_identity"
+    - "activation_identity"
+    - "protocol_identity"
+    - "approval_identity"
+    - "execution_order"
+    - "execution_result"
+  semantics:
+    - "PipelineはEvidenceを作る権限主体ではない"
+    - "実行結果を観測可能な形で保持する"
+    - "Landscapeへの意味的投影は既存Evidence境界に従う"
+
+verification:
+  required:
+    - "未承認Activationを拒否する"
+    - "identity mismatchを拒否する"
+    - "scope mismatchを拒否する"
+    - "明示順序を保持する"
+    - "失敗時に後続を止める"
+    - "Pipelineがauthorityを生成しない"
+
+non_goals:
+  - "自動Protocol選択"
+  - "自動Promotion"
+  - "自動Approval"
+  - "自動Activation生成"
+  - "semantic ranking"
+  - "provider-specific execution"
+  - "Human Gate変更"
+  - "ApprovalEnvelope変更"
+
+handoff:
+  research_to_runtime:
+    - "このmatome YAMLを意味上の入力としてRuntimeへ渡す"
+    - "RuntimeはPipeline構造を実装する"
+    - "RuntimeはProtocolの意味を拡張しない"
+    - "実装上の未解決点はImplementation FindingとしてResearchへ返す"
+
+authority:
+  research: "semantic definition"
+  runtime: "implementation"
+  human: "final authorization"
+  github: "implementation source of truth"
