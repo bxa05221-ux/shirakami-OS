@@ -1,0 +1,152 @@
+matome:
+  title: "白神モデル 第二段階・Scheduler実行境界"
+  codename: "Shirakami Scheduler Boundary"
+  version: "0.1"
+  status: "candidate"
+  date: "2026-09-22"
+
+purpose:
+  statement: >
+    第一段階で固定した実行制御境界を維持したまま、
+    既承認Activationの実行タイミングを扱うSchedulerの境界を定義する。
+  goal:
+    - "実行タイミングを自動化する"
+    - "承認そのものは自動化しない"
+    - "Activationの内容をSchedulerが変更しない"
+    - "Schedulerが新しいauthorityを生成しない"
+
+authority:
+  source: "Human-authorized Approval Envelope"
+  scheduler_authority:
+    create_approval: false
+    promote_protocol: false
+    select_candidate: false
+    expand_scope: false
+    modify_approved_protocol: false
+  rule: >
+    Schedulerは既存の承認済みActivationを実行時刻に到達させるだけであり、
+    実行権限そのものを生成してはならない。
+
+lifecycle:
+  - "Approved Protocol"
+  - "Activation"
+  - "Scheduled Activation"
+  - "Activation Pump"
+  - "Runtime"
+  - "Verification"
+  - "Evidence"
+
+scheduler:
+  role: "execution timing coordinator"
+  input:
+    required:
+      - "approved protocol identity"
+      - "activation identity"
+      - "approval envelope identity"
+      - "schedule definition"
+      - "iteration budget"
+  output:
+    - "scheduled activation release request"
+  must:
+    - "preserve protocol identity"
+    - "preserve activation identity"
+    - "preserve approval identity"
+    - "preserve iteration budget"
+    - "emit observable scheduling event"
+    - "stop on identity or authority mismatch"
+  must_not:
+    - "create Approval Envelope"
+    - "promote Candidate"
+    - "select among unapproved Candidates"
+    - "rewrite Protocol"
+    - "expand execution scope"
+    - "convert Verification mismatch into success"
+
+activation_pump_binding:
+  scheduler_may:
+    - "request release of an already-approved Activation"
+  scheduler_may_not:
+    - "release an Activation lacking valid approval"
+    - "alter the Activation before release"
+    - "bypass Activation Pump validation"
+  principle: >
+    Scheduler is upstream of release timing, not upstream of authority.
+
+fail_closed:
+  - "missing_approval_identity"
+  - "missing_activation_identity"
+  - "invalid_schedule"
+  - "invalid_iteration_budget"
+  - "identity_mismatch"
+  - "authority_mismatch"
+  - "expired_or_invalid_activation"
+  - "activation_pump_rejection"
+
+observability:
+  required_events:
+    - "schedule_registered"
+    - "schedule_triggered"
+    - "release_requested"
+    - "release_rejected"
+  evidence:
+    scheduler_event_must_be_traceable_to:
+      - "protocol_identity"
+      - "activation_identity"
+      - "approval_identity"
+      - "schedule_identity"
+  no_silent_mutation: true
+
+boundary:
+  invariant: >
+    Scheduler may determine when an already-authorized execution is requested,
+    but may not determine what is authorized.
+  forbidden_shortcuts:
+    - "Scheduler -> Approval"
+    - "Scheduler -> Candidate promotion"
+    - "Scheduler -> scope expansion"
+    - "Scheduler -> Runtime bypass"
+    - "Scheduler -> silent Protocol mutation"
+
+verification:
+  required:
+    - "approved activation is released only at the defined schedule"
+    - "unapproved activation is rejected"
+    - "identity is preserved"
+    - "iteration budget is preserved"
+    - "invalid schedule fails closed"
+    - "scheduler cannot bypass Activation Pump"
+    - "scheduler events are observable"
+
+scope:
+  included:
+    - "Scheduler boundary definition"
+    - "Schedule identity"
+    - "Approval/Activation identity preservation"
+    - "Scheduler -> Activation Pump contract"
+    - "Fail-closed conditions"
+    - "Observable scheduling events"
+  excluded:
+    - "persistent worker implementation"
+    - "worker pool"
+    - "automatic protocol generation"
+    - "automatic protocol promotion"
+    - "provider-specific execution"
+    - "AIwitness"
+    - "API productization"
+
+relationship_to_baseline:
+  execution_control_boundary_v1_0:
+    status: "immutable prerequisite"
+    rule: "This specification must not weaken or bypass the first-stage authority boundary."
+
+change_control:
+  rule: "一変更一検証"
+  promotion_to_baseline: "Human-authorized only"
+
+handoff:
+  source: "Research / Architecture"
+  target: "Runtime"
+  artifact: "Matome YAML"
+  semantic_authority: "Research / Matome YAML"
+  implementation_authority: "GitHub Repository"
+  final_authority: "Human"
