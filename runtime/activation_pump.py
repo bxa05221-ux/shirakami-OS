@@ -10,6 +10,7 @@ class ReleasedActivation:
     activation_id: str
     candidate_id: str
     protocol_id: str
+    approval_reviewer: str
     lifecycle_event: str = "activated_execution"
     release_id: str = ""
 
@@ -37,5 +38,6 @@ def release_activation(
         activation_id=activation.activation_id,
         candidate_id=activation.candidate_id,
         protocol_id=activation.protocol_id,
+        approval_reviewer=activation.approval_reviewer,
         release_id=release_id,
     )
