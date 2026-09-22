@@ -1,0 +1,107 @@
+matome:
+  title: "白神モデル Landscape → Observation → Protocol Candidate 境界"
+  codename: "Landscape Observation Boundary"
+  version: "0.1"
+  status: "research"
+  authority: "meaning"
+
+purpose:
+  statement: >
+    現在のLandscapeを、そのまま実行可能なProtocolや権限として扱わず、
+    観測可能な状態を明示的なObservationとして切り出し、
+    Protocol Candidate生成へ安全に引き渡すための意味境界を定義する。
+
+principles:
+  - "LandscapeはContextでありAuthorityではない"
+  - "ObservationとInterpretationを分離する"
+  - "ObservationはCandidateではない"
+  - "CandidateはAuthorizationではない"
+  - "Evidenceの存在だけではLandscape変更を意味しない"
+  - "不確実性を事実へ変換しない"
+  - "一変更一検証"
+
+flow:
+  current:
+    - "Evidence"
+    - "EvidenceStore"
+    - "Explicit Landscape Projection"
+    - "Landscape"
+  proposed:
+    - "Landscape"
+    - "Observation"
+    - "Protocol Candidate"
+    - "Structural Validation"
+    - "HUMAN_REVIEW"
+    - "Approval Envelope"
+    - "Activation"
+
+observation:
+  role: "現在Landscapeから観測可能な状態を取り出す"
+  authority: false
+  executable: false
+  immutable: true
+  required_properties:
+    - "observation_identity"
+    - "source_landscape_context"
+    - "observed_state"
+    - "provenance"
+    - "uncertainty"
+    - "timestamp_or_run_context"
+  must_not:
+    - "domain_truthを自動確定する"
+    - "Protocolを自動生成済みとして扱う"
+    - "authorizationを生成する"
+    - "Landscapeを暗黙に変更する"
+    - "観測されていない意味を補完する"
+
+candidate_generation:
+  input:
+    - "Observation"
+    - "declared human intent when available"
+    - "applicable Protocol Generation Policy"
+  output:
+    type: "Protocol Candidate"
+    authority: false
+    executable: false
+  constraints:
+    - "候補生成と認可を分離する"
+    - "構造生成と意味判断を分離する"
+    - "代替候補や不確実性を必要に応じて保持する"
+    - "Human GateなしにApproved Protocolへ昇格しない"
+
+landscape_boundary:
+  evidence_to_landscape:
+    rule: "explicit transition evidence only"
+  landscape_to_observation:
+    rule: "observe without mutation"
+  observation_to_candidate:
+    rule: "propose without authorization"
+
+verification:
+  required:
+    - "ObservationがLandscapeを変更しない"
+    - "Observationがauthorityを持たない"
+    - "Observationのprovenanceが追跡可能"
+    - "Candidateが自動実行されない"
+    - "Human Gate境界が維持される"
+  failure:
+    action: "fail_closed"
+
+non_goals:
+  - "自動Promotion"
+  - "自動Approval"
+  - "Landscapeの自動再解釈"
+  - "Runtimeへのdomain semanticsの埋め込み"
+  - "Provider-specific AI invocation"
+
+handoff:
+  research_to_runtime:
+    - "このmatome YAMLを意味上の入力としてRuntimeへ渡す"
+    - "RuntimeはObservation構造を実装するが、意味を拡張しない"
+    - "実装上の未解決点はImplementation FindingとしてResearchへ返す"
+
+authority:
+  research: "semantic definition"
+  runtime: "implementation"
+  human: "final authorization"
+  github: "implementation source of truth"
