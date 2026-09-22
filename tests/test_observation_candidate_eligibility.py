@@ -32,7 +32,6 @@ def test_complete_observation_is_eligible():
 @pytest.mark.parametrize(
     ("field", "value", "reason"),
     [
-        ("observation_identity", "", "missing_observation_identity"),
         ("source_landscape_context", {}, "missing_source_landscape_context"),
         ("provenance", {}, "missing_provenance"),
         ("uncertainty", "", "missing_uncertainty"),
@@ -44,6 +43,11 @@ def test_missing_required_context_fails_closed(field, value, reason):
 
     assert result.eligible is False
     assert reason in result.reasons
+
+
+def test_missing_observation_identity_fails_closed_at_observation_boundary():
+    with pytest.raises(ValueError, match="observation_identity is required"):
+        make_observation(observation_identity="")
 
 
 def test_empty_observed_state_is_still_an_observed_state():
