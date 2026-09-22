@@ -80,14 +80,14 @@ def validate_protocol_candidate(
     if not isinstance(execution, Mapping):
         errors.append("execution must be a mapping")
     else:
-        forbidden_execution = {
-            "approved": True,
+        required_execution = {
+            "approved": False,
             "approval_envelope": None,
             "activation": None,
             "scheduler": None,
             "runner": None,
         }
-        for field, expected in forbidden_execution.items():
+        for field, expected in required_execution.items():
             if field not in execution:
                 errors.append(f"execution.{field} is required")
             elif execution[field] != expected:
