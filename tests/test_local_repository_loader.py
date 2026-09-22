@@ -38,6 +38,6 @@ def test_github_and_local_repository_loaders_produce_same_protocol(tmp_path: Pat
 
     assert local_protocol == github_protocol
     assert local_protocol.title == "SHIRAKAMI LOCAL REPOSITORY"
-    assert local_protocol.pipeline == [
-        {"phase": "observe", "action": "inspect"}
-    ]
+    assert local_protocol.pipeline == (
+        {"phase": "observe", "action": "inspect"},
+    )
