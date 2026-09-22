@@ -1,0 +1,184 @@
+matome:
+  title: "白神モデル Observation → Protocol Candidate 意味充足境界"
+  codename: "Observation Candidate Sufficiency Boundary"
+  version: "0.1"
+  status: "research"
+  authority: "meaning"
+
+purpose:
+  statement: >
+    Landscape ObservationをProtocol Candidateへ引き渡す際に、
+    ObservationがCandidate生成のための意味上の最低条件を満たしているかを
+    定義する。Observationの存在そのものをCandidate生成の根拠とはせず、
+    観測された事実・文脈・由来・不確実性を保持したまま、
+    Candidate生成可能性とAuthorizationを分離する。
+
+principles:
+  - "ObservationはCandidateではない"
+  - "Observationの存在はCandidate生成を自動的に意味しない"
+  - "Candidate eligibilityとCandidate generationを分離する"
+  - "Candidate generationとAuthorizationを分離する"
+  - "Observed FactとInterpretationを分離する"
+  - "Uncertaintyは欠陥ではなくObservationの属性として保持する"
+  - "意味上不足するObservationはfail closedする"
+  - "RuntimeはResearchで定義されていないdomain semanticsを発明しない"
+  - "一変更一検証"
+
+input:
+  source:
+    - "LandscapeObservation"
+  required_properties:
+    - "observation_identity"
+    - "source_landscape_context"
+    - "observed_state"
+    - "provenance"
+    - "uncertainty"
+    - "timestamp_or_run_context"
+  rule: >
+    Candidate eligibilityの判定対象はObservationそのものであり、
+    Observationを再解釈して新しい事実を生成してはならない。
+
+semantic_sufficiency:
+  purpose: "Candidate生成に必要な意味上の最低条件を定義する"
+  dimensions:
+    traceability:
+      required:
+        - "observation_identity"
+        - "provenance"
+      rule: >
+        Candidateの由来をObservationまで追跡できなければならない。
+    context:
+      required:
+        - "source_landscape_context"
+        - "observed_state"
+      rule: >
+        Candidate生成の基礎となる観測対象と観測された状態が
+        区別可能でなければならない。
+    temporal_binding:
+      required:
+        - "timestamp_or_run_context"
+      rule: >
+        Observationがいつ、またはどのrun contextで成立したものかを
+        追跡可能でなければならない。
+    uncertainty:
+      required:
+        - "uncertainty"
+      rule: >
+        Observationに含まれる不確実性を失わずにCandidateへ引き継げる
+        状態でなければならない。不確実性の存在だけを理由に
+        Candidate eligibilityを否定してはならない。
+    non_speculation:
+      rule: >
+        Candidateの基礎となる意味をObservationから追跡でき、
+        Observationに存在しないdomain factを補わずにCandidateを
+        構成できなければならない。
+
+eligibility:
+  status:
+    eligible: >
+      Required propertiesとsemantic_sufficiencyの各条件を満たし、
+      Candidateの意味的な出発点をObservationまで追跡できる状態。
+    ineligible: >
+      Required propertiesまたはsemantic_sufficiencyの条件が不足し、
+      Candidateの意味的出発点をObservationだけから追跡できない状態。
+  rule: >
+    eligibilityはCandidateの価値、優先順位、成功可能性を評価するものではない。
+    Candidate selectionやsemantic rankingを含まない。
+  fail_closed:
+    - "missing_observation_identity"
+    - "missing_source_landscape_context"
+    - "missing_observed_state"
+    - "missing_provenance"
+    - "missing_uncertainty"
+    - "missing_timestamp_or_run_context"
+    - "untraceable_candidate_basis"
+    - "required_domain_fact_would_have_to_be_invented"
+
+candidate_generation:
+  rule: >
+    Eligible ObservationからCandidateを生成する場合も、Candidateの各要素を
+    Observationに存在しない事実として補完してはならない。
+  preservation:
+    - "origin_observation_identity"
+    - "origin"
+    - "assumptions"
+    - "uncertainty"
+    - "provenance"
+  allowed:
+    - "ObservationをCandidateのoriginとして参照する"
+    - "Observationから直接追跡可能なintentを記述する"
+    - "不確実性や未確定事項をassumptionsとして明示する"
+    - "未確定のsteps/outputsを空または未定義として保持する"
+  forbidden:
+    - "Observationにないdomain factの創作"
+    - "Observationの不確実性を確定事実へ変換"
+    - "Candidate生成をApprovalとみなす"
+    - "Candidate生成をActivationとみなす"
+    - "Candidate生成によるLandscapeの暗黙変更"
+
+candidate_state:
+  initial:
+    status: "CANDIDATE"
+    authority: false
+    executable: false
+  rule: >
+    Candidateは意味的に十分なObservationから生成されても、
+    Human Gateおよび既存のApproval境界を経由するまで実行権限を持たない。
+
+observation_boundary:
+  input: "LandscapeObservation"
+  output: "ProtocolCandidateArtifact"
+  invariants:
+    - "Observationはimmutable"
+    - "Observationはnon-authoritative"
+    - "Observationはnon-executable"
+    - "Candidateはnon-authoritative"
+    - "Candidateはnon-executable"
+    - "Landscapeは変更されない"
+    - "Approvalは生成されない"
+    - "Activationは生成されない"
+
+human_gate:
+  rule: >
+    Candidate eligibilityまたはCandidate generationがHuman Gateを置換しない。
+    CandidateをApproved Protocolへ昇格させる権限は既存のHuman Gateにのみ属する。
+
+verification:
+  required:
+    - "complete Observationがeligibleになる"
+    - "required property欠落Observationがineligibleになる"
+    - "untraceable candidate basisがfail closedする"
+    - "uncertaintyを保持したObservationがeligibleになり得る"
+    - "Observationにないdomain factを補わない"
+    - "Candidate生成でLandscapeが変更されない"
+    - "Candidate生成でApprovalが生成されない"
+    - "Candidate生成でActivationが生成されない"
+    - "Candidateがauthority=falseを保持する"
+    - "Candidateがexecutable=falseを保持する"
+    - "Human Gate境界を迂回しない"
+
+non_goals:
+  - "automatic approval"
+  - "automatic promotion"
+  - "automatic activation"
+  - "candidate ranking"
+  - "candidate selection"
+  - "domain-specific semantic interpretation"
+  - "Landscape reinterpretation"
+  - "Human Gate redesign"
+  - "scheduler"
+  - "persistent background service"
+  - "provider-specific execution"
+
+handoff:
+  research_to_runtime:
+    - "このmatome YAMLを意味上の入力としてRuntimeへ渡す"
+    - "Runtimeはeligibilityとrepresentationの境界のみ実装する"
+    - "Runtimeはdomain-specific triggerやrankingを追加しない"
+    - "Candidate生成の実装上の未解決点はImplementation FindingとしてResearchへ返す"
+
+authority:
+  research: "semantic definition"
+  runtime: "implementation"
+  human: "final authorization"
+  github: "implementation source of truth"
