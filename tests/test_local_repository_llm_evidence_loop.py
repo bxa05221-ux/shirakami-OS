@@ -67,7 +67,7 @@ def test_local_repository_llm_response_reaches_evidence_without_becoming_authori
     assert evidence.transition_data["input"]["adapter_output"] == "deterministic-model-output"
     assert evidence.transition_data["input"]["adapter_backend"] == "llm-a"
     assert evidence.transition_data["input"]["human_gate"] == "pending"
-    assert landscape.snapshot()["adapter_output"] == "deterministic-model-output"
+    assert landscape.snapshot()["input"]["adapter_output"] == "deterministic-model-output"
     assert "judgment" not in landscape.snapshot()
     assert "decision" not in landscape.snapshot()
 
