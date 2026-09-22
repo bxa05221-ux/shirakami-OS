@@ -1,0 +1,78 @@
+matome:
+  title: "Evidence → Landscape Projection Boundary"
+  codename: "Shirakami Evidence Landscape Projection"
+  version: "0.1"
+  status: "research-review"
+  purpose: >
+    EvidenceStoreに蓄積されたEvidenceRecordをLandscapeへ投影する境界を明確化し、
+    観測記録とLandscapeの状態変化を混同しないための意味引継ぎ単位とする。
+
+authority:
+  meaning: "Research"
+  implementation: "Runtime"
+  final_decision: "Human"
+
+principles:
+  - "Evidenceの存在だけではLandscapeを変更しない"
+  - "Runnerの観測Evidenceは原則として観測記録として保持する"
+  - "Landscapeへの反映は明示的なtransition evidenceに限定する"
+  - "Runtimeはtransitionの意味を新規発明しない"
+  - "EvidenceStoreはappend-onlyの観測保管境界として扱う"
+  - "EvidenceそのものをProjection処理で変更しない"
+  - "一変更一検証を維持する"
+
+existing_semantics:
+  transition_predicate: "is_transition_evidence"
+  current_condition:
+    - "transition_kindが存在する"
+    - "transition_data.changed が true"
+  landscape_behavior:
+    - "transition evidenceのみLandscapeState.apply_evidence()で反映する"
+    - "非transition evidenceはLandscapeを変更しない"
+
+runner_evidence:
+  default_role: "observation"
+  rule: >
+    RunnerEvidenceから生成されたcanonical EvidenceRecordは、
+    changed=trueを持たない限りLandscape transitionとして解釈しない。
+  forbidden:
+    - "runner eventを自動的にLandscape transitionへ昇格する"
+    - "observationから意味的変更を推測する"
+
+projection_boundary:
+  input: "EvidenceStore"
+  output: "LandscapeState"
+  rule: >
+    Projection adapterは既存のtransition evidence判定を利用し、
+    明示的transition evidenceだけをLandscapeへ投影する。
+  must_not:
+    - "EvidenceRecordを変更する"
+    - "EvidenceStoreを変更する"
+    - "authorityを生成する"
+    - "Protocolをpromoteする"
+    - "verification mismatchをsuccessへ変換する"
+    - "新しいtransition semanticsをRuntime内で定義する"
+
+implementation_gate:
+  proceed_if:
+    - "既存のtransition semanticsだけで実装可能"
+    - "Research上の意味変更を必要としない"
+  return_to_research_if:
+    - "新しいtransition判定規則が必要"
+    - "Runner observationをLandscape stateへ昇格させる意味付けが必要"
+    - "Evidenceのstatus/transition_kind/dataの意味変更が必要"
+
+verification:
+  required:
+    - "非transition Runner evidenceがLandscapeを変更しない"
+    - "明示的transition evidenceがLandscapeへ反映される"
+    - "EvidenceStoreがProjection前後で不変である"
+    - "Projectionがauthorityを生成しない"
+    - "既存Runtime testsが継続してpassする"
+
+handoff:
+  next:
+    - "Research review"
+    - "Projection adapter implementation only after semantic gate"
+  feedback:
+    - "Runtime → Implementation Finding → Matome YAML → Research"
