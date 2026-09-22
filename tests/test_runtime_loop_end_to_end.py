@@ -24,10 +24,12 @@ def build_approved_release():
     landscape = LandscapeState.empty()
     initial_snapshot = landscape.snapshot()
 
+    # Candidate Eligibility requires explicit source landscape context.
+    source_context = {"landscape": "runtime-loop-test"}
     observation = LandscapeObservation.from_landscape(
         landscape,
         observation_identity="observation-e2e-001",
-        provenance={"source": "runtime-loop-test"},
+        provenance={"source": "runtime-loop-test", "landscape": "runtime-loop-test"},
         uncertainty="test",
         timestamp_or_run_context={"run": "e2e-001"},
     )
