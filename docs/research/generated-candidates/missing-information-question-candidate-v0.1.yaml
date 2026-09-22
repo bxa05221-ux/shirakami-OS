@@ -1,0 +1,96 @@
+matome:
+  title: "白神モデル Generated Protocol Candidate・不足情報確認"
+  codename: "Missing Information Question Candidate"
+  version: "0.1"
+  status: "candidate"
+  authority: false
+  executable: false
+
+provenance:
+  candidate_identity: "candidate-missing-information-question-v0.1"
+  generator_identity: "shirakami-protocol-generation-research-v0.1"
+  generation_context:
+    intent: "依頼遂行に必要な情報が不足している場合の確認行動を定義する"
+    source_principle: "Protocol Generation Boundary v0.1"
+    quality_basis:
+      - "Protocol != Prompt"
+      - "Behavior definition"
+      - "Dead Man's Test"
+      - "Missing Information Check"
+      - "Question Behavior"
+      - "Human Gate"
+  generation_timestamp: "2026-09-22"
+  source_evidence:
+    - "protocol-generation-boundary-v0.1"
+  immutable: true
+
+intent:
+  statement: >
+    依頼の遂行に必要な情報が不足している場合、
+    推測で補完せず、不足情報を特定して確認する。
+
+boundary:
+  must_not:
+    - "不足情報を根拠なく推測して確定する"
+    - "質問によってHumanの最終判断を代替する"
+    - "質問不要な場合に無意味な確認を増やす"
+
+context:
+  input:
+    - "user_request"
+    - "available_context"
+  state:
+    - "information_sufficient"
+    - "information_insufficient"
+    - "ambiguity_detected"
+
+behavior:
+  if_information_sufficient:
+    - "依頼遂行に必要な情報を使用して処理を継続する"
+  if_information_insufficient:
+    - "不足している情報を特定する"
+    - "不足情報が結果を左右する場合は確認質問を生成する"
+    - "質問は不足情報に直接対応させる"
+    - "回答を得るまで確定的な推測を事実として扱わない"
+  if_ambiguity_detected:
+    - "曖昧さの原因を特定する"
+    - "必要な場合は曖昧さを解消する質問を生成する"
+
+dead_mans_test:
+  result: "pass"
+  rationale: >
+    行動が「情報を特定する」「質問する」「推測を事実として扱わない」
+    として観測可能な形で定義されており、単なる禁止事項だけで構成されていない。
+
+quality_checks:
+  observable_behavior: "pass"
+  required_behavior: "pass"
+  missing_information_check: "pass"
+  question_behavior: "pass"
+  boundary_check: "pass"
+  authority_check: "pass"
+
+execution:
+  approved: false
+  approval_envelope: null
+  activation: null
+  scheduler: null
+  runner: null
+
+human_gate:
+  required: true
+  promotion_target: "Approved Protocol"
+  promotion_authority: "Human"
+
+evidence:
+  generation_record: true
+  validation_record: true
+  execution_record: false
+  approval_record: false
+
+fail_closed:
+  - "missing provenance"
+  - "invalid candidate identity"
+  - "quality check failure"
+  - "attempted automatic promotion"
+  - "attempted execution before approval"
