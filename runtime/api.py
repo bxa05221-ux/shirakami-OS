@@ -15,10 +15,12 @@ try:
     from .evolution_bridge import ContextSnapshot, VerificationResult
     from .evolution_pipeline import AnalysisResult, EvidenceDrivenRuntime
     from .prototype import ExecutionResult, Transition
+    from .semantic_handoff import SemanticHandoff
 except ImportError:
     from evolution_bridge import ContextSnapshot, VerificationResult
     from evolution_pipeline import AnalysisResult, EvidenceDrivenRuntime
     from prototype import ExecutionResult, Transition
+    from semantic_handoff import SemanticHandoff
 
 
 @dataclass(frozen=True)
@@ -57,9 +59,23 @@ class ShirakamiAPI:
         context: ContextSnapshot,
     ) -> dict[str, Any]:
         self.runtime.observe(observation, context)
+
+        # Observation identity belongs to the boundary, not to execution
+        # authority. It lets downstream consumers refer to this observation
+        # without turning the handoff into an approval artifact.
+        observation_id = str(uuid4())
+        handoff = SemanticHandoff(
+            observation_id=observation_id,
+            landscape=context.landscape,
+            protocol_id=context.protocol_id,
+            runtime_state=self.runtime.loop.state.value,
+            evidence_ids=(),
+            metadata=context.metadata,
+        )
         return {
             "state": self.runtime.loop.state.value,
             "evidence": self._evidence(),
+            "semantic_handoff": dict(handoff.as_mapping()),
         }
 
     def analyze(
