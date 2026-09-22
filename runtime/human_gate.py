@@ -51,7 +51,10 @@ def process_human_gate(
             approval_envelope=None,
         )
 
-    protocol_id = candidate.get("protocol_identity", candidate_identity)
+    protocol_id = candidate.get("protocol_identity")
+    if not protocol_id:
+        raise HumanGateError("missing explicit protocol identity")
+
     provenance = candidate.get("provenance", ())
     evidence_ids = candidate.get("evidence_ids", ())
 
