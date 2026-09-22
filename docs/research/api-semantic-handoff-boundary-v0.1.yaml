@@ -1,0 +1,151 @@
+matome:
+  title: "API Semantic Handoff Boundary v0.1"
+  codename: "Shirakami API Semantic Handoff"
+  version: "0.1"
+  status: "research-defined"
+  issue: 437
+
+purpose: >
+  外部APIを単なるHTTP輸送ではなく、白神の意味を壊さずに
+  Observationを外部利用者とRuntimeの間で受け渡すSemantic Boundaryとして定義する。
+  APIは意味を伝達するが、権限を生成しない。
+
+boundary:
+  source: "Landscape Observation"
+  transport: "External API"
+  destination: "External Client / Runtime"
+  authority_created: false
+  execution_created: false
+
+minimum_observation_envelope:
+  required:
+    - "landscape_id"
+    - "input"
+  optional_reference:
+    - "protocol_id"
+  generated:
+    - "observation_id"
+    - "state"
+    - "evidence_id"
+    - "result"
+    - "provenance"
+
+identity:
+  observation:
+    rule: >
+      API-generated observation_id identifies the observed representation and must not
+      be interpreted as execution or approval identity.
+  protocol:
+    rule: >
+      protocol_id is a reference only. The API must preserve an explicitly supplied
+      protocol identity and must not infer one when absent.
+  execution:
+    rule: "No execution identity is created by /observe."
+  approval:
+    rule: "No ApprovalEnvelope identity is created or inferred."
+
+provenance:
+  required:
+    - "observation_id"
+    - "provenance.runtime"
+    - "provenance.transition"
+  invariant:
+    transition: false
+    statement: >
+      /observe is observational. A successful response must not represent the API
+      call itself as a Landscape transition or execution event.
+
+uncertainty:
+  rule: >
+    The API must not convert absent, ambiguous, or unverified information into
+    certainty. Unknown semantic fields remain unknown.
+  preservation: >
+    Serialization may transport uncertainty, but transport must not resolve it
+    implicitly.
+
+semantic_fields:
+  reference_fields:
+    - "protocol_id"
+    - "landscape_id"
+    - "observation_id"
+    - "evidence_id"
+  observational_fields:
+    - "state"
+    - "result"
+    - "provenance"
+  authority_fields:
+    forbidden:
+      - "approval"
+      - "approval_envelope"
+      - "execution_authorized"
+      - "human_authorized"
+      - "activation"
+      - "execution_id"
+
+human_gate:
+  representation:
+    rule: >
+      Human Gate remains outside /observe. API output may be consumed by a UI that
+      displays Human Gate state, but /observe must not create, infer, or mutate that state.
+  authority_source: "human_authorized_approval"
+
+unknown_fields:
+  rule: >
+    Unknown or future fields must not acquire semantic meaning merely because they
+    are transported through the API.
+  implementation_guidance:
+    - "reject malformed required fields"
+    - "do not infer missing protocol identity"
+    - "do not synthesize authority fields"
+    - "do not reinterpret arbitrary input as executable instructions"
+
+fail_closed:
+  - "missing landscape_id"
+  - "empty landscape_id"
+  - "input is not an object"
+  - "malformed request body"
+  - "implicit protocol identity"
+  - "attempt to create execution authority"
+
+forbidden:
+  - "protocol selection"
+  - "candidate selection"
+  - "candidate ranking"
+  - "approval creation"
+  - "promotion"
+  - "activation creation"
+  - "execution creation"
+  - "provider-specific AI invocation as API semantics"
+  - "Landscape mutation through /observe"
+  - "semantic completion of missing information"
+
+non_goals:
+  - "/chat"
+  - "/generate"
+  - "generic agent endpoint"
+  - "automatic protocol generation"
+  - "production authentication"
+  - "persistent Evidence storage"
+
+verification:
+  required:
+    - "valid observation preserves explicit protocol_id"
+    - "observation_id is returned"
+    - "provenance.transition remains false"
+    - "no authority fields are synthesized"
+    - "invalid input fails closed"
+    - "missing protocol_id does not cause implicit inference"
+  rule: "one change / one verification"
+
+handoff:
+  research_to_runtime:
+    rule: "Implement only this semantic boundary."
+  runtime_to_research:
+    rule: >
+      If implementation requires semantic interpretation not defined here,
+      record an Implementation Finding rather than changing Runtime meaning locally.
+
+principle:
+  - "APIは意味を渡すが、権限を作らない。"
+  - "ObservationはExecutionではない。"
+  - "明示されていない意味をAPIが補完しない。"
