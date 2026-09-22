@@ -5,6 +5,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+from runtime.api_semantic_handoff import preserve_protocol_reference, validate_semantic_handoff
 from runtime.landscape import LandscapeState
 
 
@@ -29,6 +30,8 @@ class ObserveResponse(BaseModel):
 
 def observe(payload: dict[str, Any]) -> dict[str, Any]:
     """Execute the minimal observation boundary without inventing a transition."""
+    validate_semantic_handoff(payload)
+
     landscape_id = payload.get("landscape_id")
     input_value = payload.get("input")
     if not isinstance(landscape_id, str) or not landscape_id:
@@ -39,7 +42,7 @@ def observe(payload: dict[str, Any]) -> dict[str, Any]:
     state = LandscapeState.from_snapshot(input_value)
     snapshot = dict(state.snapshot())
     observation_id = sha256(
-        (landscape_id + "\n" + repr(sorted(snapshot.items()))).encode("utf-8")
+        (landscape_id + "\\n" + repr(sorted(snapshot.items()))).encode("utf-8")
     ).hexdigest()[:16]
 
     response = {
@@ -47,7 +50,7 @@ def observe(payload: dict[str, Any]) -> dict[str, Any]:
         "observation_id": observation_id,
         "state": "observed",
         "evidence_id": None,
-        "protocol_id": payload.get("protocol_id"),
+        "protocol_id": preserve_protocol_reference(payload),
         "result": snapshot,
         "provenance": {"runtime": "LandscapeState.from_snapshot", "transition": False},
     }
