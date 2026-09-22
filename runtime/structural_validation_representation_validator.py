@@ -106,6 +106,10 @@ def validate_structural_validation_representation(
         errors.append("origin must be a mapping")
     elif origin.get("observation_identity") != representation.origin_observation_identity:
         errors.append("origin.observation_identity must preserve provenance")
+        if not origin.get("provenance"):
+            errors.append("origin.provenance must preserve provenance")
+        if not origin.get("uncertainty"):
+            errors.append("origin.uncertainty must be preserved")
 
     return {
         "valid": not errors,
