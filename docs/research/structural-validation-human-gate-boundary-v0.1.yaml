@@ -1,0 +1,128 @@
+matome:
+  title: "白神モデル Structural Validation Result → Human Gate 境界"
+  codename: "Structural Validation to Human Gate Boundary"
+  version: "0.1"
+  status: "research"
+  authority: "meaning"
+
+purpose:
+  statement: >
+    Structural Validation ResultをHuman Gateへ明示的に引き渡し、
+    構造検証の合格を人間による承認へ混同しないための意味境界を定義する。
+
+finding:
+  source: "Implementation Finding #387"
+  observation:
+    - "Structural Validation Resultは非権威的な構造検証結果である"
+    - "既存Human Gateはvalidation結果とreviewer identityおよびdecisionを要求する"
+    - "Validation PASSはApprovalEnvelopeを生成しない"
+  consequence:
+    - "Validation ResultからApprovalへの暗黙昇格は禁止する"
+    - "Candidate identityをHuman Gateまで保持する"
+
+principles:
+  - "Validation PASSはApprovalではない"
+  - "Human GateがPromotion境界である"
+  - "Validation Resultはauthorityを持たない"
+  - "Human decisionとstructural validationを分離する"
+  - "Candidate identityとprovenanceを保持する"
+  - "一変更一検証"
+
+boundary:
+  input:
+    type: "StructuralValidationResult"
+    authority: false
+    executable: false
+  output:
+    type: "Human Gate input"
+    authority: false
+    executable: false
+  rule: >
+    Structural Validation Resultに含まれる検証結果とidentityのみを
+    Human Gateの入力として明示的に引き渡し、
+    human decisionが存在するまでは権限を生成しない。
+  preserve:
+    - "candidate_identity"
+    - "origin_observation_identity"
+    - "valid"
+    - "errors"
+    - "authority=false"
+    - "executable=false"
+  forbidden:
+    - "Validation PASSから自動Approval"
+    - "reviewer identityの推定"
+    - "human decisionの推定"
+    - "ApprovalEnvelopeの自動生成"
+    - "execution開始"
+    - "semantic truthの判定"
+
+human_gate:
+  role: "final promotion boundary"
+  requirements:
+    - "validation result is explicitly supplied"
+    - "candidate_identity is preserved"
+    - "reviewer identity is explicitly supplied"
+    - "decision is explicitly supplied"
+  decision:
+    approve:
+      result: "eligible for existing ApprovalEnvelope creation"
+      authority_source: "explicit human decision"
+    reject:
+      result: "candidate is not promoted"
+      authority_source: "none"
+
+validation:
+  pass_means:
+    - "structurally valid"
+  pass_does_not_mean:
+    - "human approval"
+    - "semantic validity"
+    - "safety approval"
+    - "consent"
+    - "authorization"
+    - "execution readiness"
+
+fail_closed:
+  triggers:
+    - "missing candidate identity"
+    - "missing validation result"
+    - "validation result authority true"
+    - "validation result executable true"
+    - "missing reviewer identity at decision time"
+    - "missing human decision"
+  action: "no promotion; no approval; no execution"
+
+handoff:
+  research_to_runtime:
+    - "このmatome YAMLを意味上の入力としてRuntimeへ渡す"
+    - "RuntimeはValidation Resultから既存Human Gateへの明示的入力境界を実装する"
+    - "既存Human GateのPromotion意味は変更しない"
+  runtime_to_research:
+    - "既存Human Gateとの表現差異が新たな意味判断を要求する場合はImplementation FindingとしてResearchへ返す"
+
+verification:
+  required:
+    - "valid result reaches Human Gate without authority creation"
+    - "invalid result cannot promote"
+    - "candidate identity is preserved"
+    - "reviewer identity is never inferred"
+    - "human decision is required"
+    - "ApprovalEnvelope is created only by existing human-approved path"
+    - "validation does not start execution"
+  failure:
+    action: "fail_closed"
+
+non_goals:
+  - "Human Gate semantic redesign"
+  - "ApprovalEnvelope redesign"
+  - "automatic approval"
+  - "automatic promotion"
+  - "execution"
+  - "semantic truth evaluation"
+  - "provider-specific AI invocation"
+
+authority:
+  research: "semantic definition"
+  runtime: "implementation"
+  human: "final authorization"
+  github: "implementation source of truth"
