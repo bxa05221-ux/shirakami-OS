@@ -1,0 +1,152 @@
+matome:
+  title: "白神モデル Human Gate → Approval Envelope 境界"
+  codename: "Human Gate Approval Envelope Boundary"
+  version: "0.1"
+  status: "research"
+  authority: "meaning"
+
+purpose:
+  statement: >
+    Human Gateで明示された人間の承認を、既存ApprovalEnvelopeへ
+    意味を変えずに引き渡すための境界を定義する。
+    Runtimeが不足するProtocol identityやEvidence linkageを推測して
+    承認対象の意味を補完することを禁止する。
+
+finding:
+  source: "Implementation Finding #390"
+  observation:
+    - "Human Gateは明示的なreviewer identityとdecisionを要求する"
+    - "approve時に既存ApprovalEnvelopeが生成される"
+    - "Structural Validation Resultにはprotocol identityとevidence linkageが明示されていない"
+    - "既存Runtime adapterはcandidate identityをprotocol identityとして扱い、evidence_idsを空としている"
+  consequence:
+    - "実装上動作することだけを理由に意味的なidentity mappingを確定してはならない"
+    - "Evidence linkageをRuntimeが推測してはならない"
+
+principles:
+  - "Human GateのapproveがAuthorization生成の唯一の契機である"
+  - "ApprovalEnvelopeはHuman decisionの結果でありValidation PASSの結果ではない"
+  - "Candidate identityとProtocol identityを同一視しない"
+  - "Observation provenanceとApproval provenanceを混同しない"
+  - "Evidence linkageを推測しない"
+  - "不足情報は明示的に不足として扱う"
+  - "一変更一検証"
+
+boundary:
+  input:
+    type: "Human Gate approved decision"
+    authority: "explicit human decision"
+  output:
+    type: "ApprovalEnvelope"
+    authority: "execution authorization only when explicitly authorized"
+  rule: >
+    ApprovalEnvelopeへ渡すidentity、provenance、evidence linkageは、
+    Human Gate inputまたはそれ以前の明示的なartifactに存在する情報のみを
+    使用する。不在の意味情報をcandidate identity等から自動推定しない。
+
+identity:
+  candidate_identity:
+    role: "candidate artifact identity"
+    rule: "must be preserved"
+  protocol_identity:
+    role: "approved protocol identity"
+    rule: >
+      Candidate identityと同一であることを意味上明示的に定義していない限り、
+      自動的に同一視しない。
+  observation_identity:
+    role: "origin observation provenance"
+    rule: "preserve as provenance; do not relabel as protocol identity"
+  approval_identity:
+    role: "human-authorized approval"
+    rule: "created only through explicit Human Gate approval"
+
+provenance:
+  rule: >
+    ApprovalEnvelopeのprovenanceは、Human Gateまでに明示的に定義された
+    provenance情報のみを保持する。
+  forbidden:
+    - "observation identityをprotocol identityへ暗黙変換"
+    - "candidate identityをprotocol identityへ暗黙変換"
+    - "missing provenanceの自動補完"
+
+evidence:
+  rule: >
+    evidence_idsは明示的なEvidence linkageが存在する場合のみ設定する。
+    存在しない場合、RuntimeはEvidence identityを推測・生成してはならない。
+  forbidden:
+    - "validation resultからEvidence IDを捏造"
+    - "observation identityをEvidence IDとして扱う"
+    - "空のEvidence listを意味的にcompleteと扱う"
+
+human_gate:
+  approval:
+    required:
+      - "validation result is explicitly supplied"
+      - "candidate identity is preserved"
+      - "reviewer identity is explicitly supplied"
+      - "decision is explicitly approve"
+    authority_source: "explicit human decision"
+  reject:
+    result: "no ApprovalEnvelope"
+    authority_source: "none"
+
+approval_envelope:
+  existing_contract:
+    immutable: true
+    execution_authorized: true
+    reviewer: "explicit human reviewer"
+  creation:
+    rule: >
+      既存ApprovalEnvelopeの生成機構を再設計せず、
+      明示的Human approvalの結果としてのみ生成する。
+  no_auto:
+    - "Validation PASS"
+    - "candidate identity"
+    - "observation identity"
+    - "runtime confidence"
+    - "structural similarity"
+
+fail_closed:
+  triggers:
+    - "missing candidate identity"
+    - "missing reviewer identity"
+    - "missing human approve decision"
+    - "protocol identity required but unavailable"
+    - "required provenance unavailable"
+    - "required evidence linkage unavailable"
+  action: "no approval envelope; no execution authorization"
+
+handoff:
+  research_to_runtime:
+    - "このmatome YAMLを意味上の入力としてRuntimeへ渡す"
+    - "Runtimeはidentity/provenance/evidence mappingを明示的情報に限定する"
+    - "不足情報を推測する既存adapter挙動は必要に応じて修正する"
+  runtime_to_research:
+    - "ApprovalEnvelopeに必要な意味情報が既存artifactに存在しない場合はImplementation FindingとしてResearchへ返す"
+
+verification:
+  required:
+    - "explicit human approval is required"
+    - "candidate identity remains traceable"
+    - "protocol identity is not inferred without semantic definition"
+    - "observation identity remains provenance"
+    - "evidence linkage is not fabricated"
+    - "rejected candidate produces no ApprovalEnvelope"
+    - "approved candidate produces immutable ApprovalEnvelope only through Human Gate"
+    - "no execution starts at this boundary"
+
+non_goals:
+  - "Human Gate redesign"
+  - "ApprovalEnvelope redesign"
+  - "automatic approval"
+  - "automatic protocol identity generation"
+  - "automatic Evidence linkage"
+  - "Activation changes"
+  - "Runner changes"
+  - "provider-specific AI invocation"
+
+authority:
+  research: "semantic definition"
+  runtime: "implementation"
+  human: "final authorization"
+  github: "implementation source of truth"
