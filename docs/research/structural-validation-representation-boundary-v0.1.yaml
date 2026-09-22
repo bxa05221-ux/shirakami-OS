@@ -1,0 +1,137 @@
+matome:
+  title: "白神モデル Structural Validation Representation → Validator 境界"
+  codename: "Structural Validation Representation Boundary"
+  version: "0.1"
+  status: "research"
+  authority: "meaning"
+
+purpose:
+  statement: >
+    ProtocolCandidateArtifactから生成されたStructuralValidationRepresentationを、
+    既存の旧Mapping/YAML Validatorへ無理に適合させず、
+    構造検証の意味と表現境界を明示する。
+
+finding:
+  source: "Implementation Finding #384"
+  observation:
+    - "StructuralValidationRepresentationはProtocolCandidateArtifactの明示情報のみを保持する"
+    - "既存Validatorは旧Mapping/YAML candidate contractを前提としている"
+    - "両者は同一表現ではない"
+  consequence:
+    - "旧Validatorへ直接渡すための暗黙変換は禁止する"
+    - "不足している意味情報をRuntimeで生成してはならない"
+
+principles:
+  - "RepresentationとValidation Semanticsを分離する"
+  - "構造検証のために意味情報を捏造しない"
+  - "旧Contractとの互換性を自動仮定しない"
+  - "Validation PASSはApprovalを意味しない"
+  - "Human GateをPromotion境界として維持する"
+  - "Candidate identityとObservation provenanceを保持する"
+  - "一変更一検証"
+
+boundary:
+  input:
+    type: "StructuralValidationRepresentation"
+    authority: false
+    executable: false
+  output:
+    type: "StructuralValidationResult"
+    authority: false
+    executable: false
+  rule: >
+    ValidatorはRepresentationに実際に存在する情報だけを構造的に検証し、
+    不在の意味情報を補完しない。
+  forbidden:
+    - "generator identityの推定"
+    - "generation contextの推定"
+    - "quality check結果の自動生成"
+    - "execution authorityの付与"
+    - "Human approvalの推定"
+    - "semantic truthの判定"
+
+legacy_validator:
+  status: "legacy-contract"
+  rule: >
+    既存protocol_candidate_validatorは旧Mapping/YAML contractのValidatorとして保持し、
+    StructuralValidationRepresentationとの直接互換性を仮定しない。
+  compatibility:
+    automatic_mapping: false
+    semantic_defaults: false
+    silent_field_invention: false
+  future_options:
+    - "新Representation専用Validatorを追加する"
+    - "明示的なRepresentation AdapterをResearch定義に基づいて追加する"
+    - "旧Validator contract自体をResearchで再定義する"
+
+validation:
+  scope: "structure only"
+  required_checks:
+    - "candidate_identity exists"
+    - "origin_observation_identity exists"
+    - "candidate status is CANDIDATE"
+    - "authority is false"
+    - "executable is false"
+    - "required explicit candidate fields are present"
+    - "approval declares HUMAN_REVIEW"
+    - "verification remains separate from execution"
+  result:
+    pass_means: "structurally valid"
+    pass_does_not_mean:
+      - "semantic validity"
+      - "safety approval"
+      - "consent"
+      - "authorization"
+      - "execution readiness"
+
+provenance:
+  preserve:
+    - "candidate_identity"
+    - "origin_observation_identity"
+    - "origin"
+    - "intent"
+  rule: "Validator must not erase or replace provenance."
+
+fail_closed:
+  triggers:
+    - "missing candidate identity"
+    - "missing observation identity"
+    - "authority true"
+    - "executable true"
+    - "status not CANDIDATE"
+    - "required explicit field missing"
+    - "representation type mismatch"
+  action: "validation failure; no promotion; no execution"
+
+handoff:
+  research_to_runtime:
+    - "このmatome YAMLを意味上の入力としてRuntimeへ渡す"
+    - "Runtimeは新Representationに対する明示的構造検証境界を実装する"
+    - "旧Validatorとの互換性を自動生成しない"
+  runtime_to_research:
+    - "旧Contractとの互換性が必要になった場合は新たなImplementation FindingとしてResearchへ返す"
+
+verification:
+  required:
+    - "valid StructuralValidationRepresentation passes structural checks"
+    - "malformed representation fails closed"
+    - "no missing semantic fields are fabricated"
+    - "candidate remains non-authoritative"
+    - "candidate remains non-executable"
+    - "provenance remains traceable"
+    - "validation does not invoke Human Gate approval"
+    - "validation does not start execution"
+
+non_goals:
+  - "Human Gate変更"
+  - "ApprovalEnvelope変更"
+  - "Activation変更"
+  - "automatic promotion"
+  - "semantic truth evaluation"
+  - "provider-specific AI invocation"
+
+authority:
+  research: "semantic definition"
+  runtime: "implementation"
+  human: "final authorization"
+  github: "implementation source of truth"
