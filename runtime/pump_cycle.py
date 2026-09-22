@@ -11,12 +11,14 @@ from typing import Any, Callable, Mapping
 
 try:
     from .activated_cycle import ActivatedCycleError, execute_activated_cycle
+    from .activation import ActivationResult
     from .activation_pump import PumpRelease
     from .evolution_bridge import VerificationResult
     from .evolution_pipeline import EvidenceDrivenRuntime
     from .prototype import ExecutionResult, Transition
 except ImportError:
     from activated_cycle import ActivatedCycleError, execute_activated_cycle
+    from activation import ActivationResult
     from activation_pump import PumpRelease
     from evolution_bridge import VerificationResult
     from evolution_pipeline import EvidenceDrivenRuntime
@@ -40,20 +42,18 @@ def execute_released_cycle(
     if release.status != "released":
         raise PumpCycleError("observable cycle requires a released Pump event")
 
-    if not release.protocol_id.strip():
+    if not isinstance(release.protocol_id, str) or not release.protocol_id.strip():
         raise PumpCycleError("released protocol_id is required")
+
+    activation = ActivationResult(
+        protocol_id=release.protocol_id,
+        status="activated",
+        context=release.context,
+    )
 
     try:
         return execute_activated_cycle(
-            activation=type(
-                "ReleasedActivation",
-                (),
-                {
-                    "protocol_id": release.protocol_id,
-                    "status": "activated",
-                    "context": release.context,
-                },
-            )(),
+            activation=activation,
             runtime=runtime,
             protocol=protocol,
             expected_transition_kind=expected_transition_kind,
