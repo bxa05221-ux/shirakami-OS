@@ -37,6 +37,33 @@ def test_observe_exposes_evidence_boundary() -> None:
     )
 
 
+def test_observe_returns_immutable_semantic_handoff() -> None:
+    api = _api()
+    result = api.observe({"signal": "hello"}, _context())
+
+    handoff = result["semantic_handoff"]
+    assert handoff["protocol_id"] == "api.example"
+    assert handoff["runtime_state"] == "EVIDENCE"
+    assert handoff["landscape"] == {"topic": "ui-for-ai"}
+    assert handoff["metadata"] == {"source": "test"}
+    assert handoff["evidence_ids"] == ()
+    assert handoff["observation_id"]
+
+    assert "approval" not in handoff
+    assert "human_gate_result" not in handoff
+    assert "execution_authorization" not in handoff
+    assert "scope_expansion" not in handoff
+    assert "candidate_promotion" not in handoff
+    assert "provider_authority" not in handoff
+
+
+def test_observe_creates_distinct_observation_identity() -> None:
+    api = _api()
+    first = api.observe({}, _context())["semantic_handoff"]["observation_id"]
+    second = api.observe({}, _context())["semantic_handoff"]["observation_id"]
+    assert first != second
+
+
 def test_human_gate_requires_explicit_authorization() -> None:
     api = _api()
     api.observe({}, _context())
