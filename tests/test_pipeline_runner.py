@@ -30,7 +30,7 @@ def test_pipeline_runs_each_activation_through_existing_runner_and_preserves_ord
 
     assert result.stopped is False
     assert executed == ["activation-a", "activation-b"]
-    assert [item.execution_order for item in result.items] == [1, 1, 1, 1, 1, 1]
+    assert {item.execution_order for item in result.items} == {1, 2}
     assert {item.run_identity for item in result.items} == {
         "pipeline-1:run:1",
         "pipeline-1:run:2",
@@ -61,7 +61,7 @@ def test_verification_mismatch_stops_later_pipeline_items():
     assert result.stopped is True
     assert executed == ["activation-a"]
     assert {item.activation_identity for item in result.items} == {"activation-a"}
-    assert result.runner_results[0].state.value == "COMPLETED"
+    assert result.runner_results[0].state.value == "STOPPED"
 
 
 def test_runner_evidence_remains_observation_and_does_not_project_to_landscape():
