@@ -1,13 +1,15 @@
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
+from runtime.approval_envelope import ApprovalEnvelope
+
 
 @dataclass(frozen=True)
 class HumanGateDecision:
     candidate_identity: str
     decision: str
     reviewer_identity: str
-    approval_envelope: Optional[Dict[str, Any]] = None
+    approval_envelope: Optional[ApprovalEnvelope] = None
 
 
 class HumanGateError(ValueError):
@@ -49,16 +51,23 @@ def process_human_gate(
             approval_envelope=None,
         )
 
-    approval_envelope = {
-        "candidate_identity": candidate_identity,
-        "reviewer_identity": reviewer_identity,
-        "authority_source": "human_gate",
-        "immutable": True,
-    }
+    protocol_id = candidate.get("protocol_identity", candidate_identity)
+    provenance = candidate.get("provenance", ())
+    evidence_ids = candidate.get("evidence_ids", ())
+
+    try:
+        envelope = ApprovalEnvelope(
+            candidate_id=candidate_identity,
+            protocol_id=protocol_id,
+            provenance=tuple(provenance),
+            evidence_ids=tuple(evidence_ids),
+        ).authorize_execution(reviewer_identity)
+    except (TypeError, ValueError) as exc:
+        raise HumanGateError(str(exc)) from exc
 
     return HumanGateDecision(
         candidate_identity=candidate_identity,
         decision="approve",
         reviewer_identity=reviewer_identity,
-        approval_envelope=approval_envelope,
+        approval_envelope=envelope,
     )
