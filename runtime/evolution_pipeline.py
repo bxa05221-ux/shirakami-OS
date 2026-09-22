@@ -194,6 +194,26 @@ class EvidenceDrivenRuntime:
         self.store = self.store.extend(self._loop_evidence())
         return result.accepted
 
+    def bind_activated_execution(self, protocol_id: str) -> None:
+        """Synchronize an externally authorized Activation into READY state.
+
+        This does not create approval, promote a candidate, or widen authority.
+        Authorization is established by the upstream Approval Envelope/Activation.
+        """
+        if not isinstance(protocol_id, str) or not protocol_id.strip():
+            raise RuntimeError("activated protocol_id is required")
+        if self.loop.state is LoopState.READY:
+            return
+        result = self.loop.dispatch(
+            "activated_execution",
+            {"protocol_id": protocol_id, "source": "activation"},
+        )
+        if not result.accepted:
+            raise RuntimeError(
+                f"activated execution binding failed: {result.reason}"
+            )
+        self.store = self.store.extend(self._loop_evidence())
+
     def execute(
         self,
         protocol: Callable[[Any], Transition],
