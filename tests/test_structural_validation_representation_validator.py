@@ -19,6 +19,8 @@ def make_representation() -> StructuralValidationRepresentation:
         origin={
             "observation_identity": "observation-001",
             "observed_state": {"mode": "observed"},
+            "provenance": {"source": "test"},
+            "uncertainty": "test-uncertainty",
         },
         intent={"objective": "inspect"},
         assumptions=("Observation is not domain truth.",),
@@ -148,3 +150,24 @@ def test_validation_does_not_mutate_representation():
     assert dict(representation.candidate) == before
     with pytest.raises(TypeError):
         representation.candidate["status"] = "READY"
+
+
+def test_missing_provenance_or_uncertainty_fails_closed():
+    representation = make_representation()
+
+    for field in ("provenance", "uncertainty"):
+        candidate = dict(representation.candidate)
+        origin = dict(candidate["origin"])
+        origin.pop(field)
+        candidate["origin"] = origin
+
+        malformed = StructuralValidationRepresentation(
+            candidate_identity=representation.candidate_identity,
+            origin_observation_identity=representation.origin_observation_identity,
+            candidate=candidate,
+        )
+
+        result = validate_structural_validation_representation(malformed)
+
+        assert result["valid"] is False
+        assert any(field in error for error in result["errors"])
