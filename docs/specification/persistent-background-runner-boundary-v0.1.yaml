@@ -1,0 +1,175 @@
+matome:
+  title: "白神モデル 第二段階・Persistent Background Runner実行境界"
+  codename: "Shirakami Persistent Background Runner Boundary"
+  version: "0.1"
+  status: "candidate"
+  date: "2026-09-22"
+
+purpose:
+  statement: >
+    SchedulerおよびActivation Pumpで既に承認・解放された実行を、
+    継続的に処理するBackground Runnerの権限境界を定義する。
+  principle:
+    - "Runnerは実行主体であって、意思決定主体ではない"
+    - "継続性を与えてもauthorityは増えない"
+    - "停止条件は権限境界の一部である"
+
+authority:
+  source: "Human-authorized Approval Envelope"
+  runner_authority:
+    execute_released_activation: true
+    repeat_within_iteration_budget: true
+    maintain_run_identity: true
+    emit_evidence: true
+    create_approval: false
+    promote_protocol: false
+    select_candidate: false
+    expand_scope: false
+    modify_approved_protocol: false
+    modify_approval_envelope: false
+    reinterpret_mismatch_as_success: false
+
+input:
+  required:
+    - "released activation"
+    - "protocol identity"
+    - "activation identity"
+    - "approval identity"
+    - "iteration budget"
+    - "run identity"
+
+execution:
+  runner_must:
+    - "preserve protocol identity"
+    - "preserve activation identity"
+    - "preserve approval identity"
+    - "preserve run identity"
+    - "decrement or account for iteration budget"
+    - "stop when budget is exhausted"
+    - "stop on identity mismatch"
+    - "stop on authority mismatch"
+    - "stop on verification mismatch when configured as terminal"
+    - "emit observable execution events"
+  runner_must_not:
+    - "create a new approval"
+    - "promote a candidate"
+    - "choose an unapproved candidate"
+    - "expand execution scope"
+    - "rewrite the protocol"
+    - "change the approval envelope"
+    - "bypass Verification"
+    - "continue after fail-closed condition"
+
+iteration_budget:
+  principle: >
+    Background execution is bounded by an explicitly authorized iteration budget.
+  required: true
+  exhaustion_behavior: "stop"
+  budget_extension:
+    automatic: false
+    human_authorized: true
+
+state:
+  allowed:
+    - "READY"
+    - "RUNNING"
+    - "WAITING"
+    - "VERIFYING"
+    - "COMPLETED"
+    - "STOPPED"
+    - "FAILED"
+  forbidden:
+    - "SELF_APPROVED"
+    - "SELF_PROMOTED"
+    - "SCOPE_EXPANDED"
+  transition_rule: >
+    Runner may transition execution state but may not transition authority state.
+
+verification:
+  relationship: "Runner -> Verification -> Evidence"
+  mismatch:
+    action: "stop"
+    success_reinterpretation: false
+    authority_expansion: false
+    automatic_protocol_rewrite: false
+
+evidence:
+  required_identity:
+    - "protocol_identity"
+    - "activation_identity"
+    - "approval_identity"
+    - "run_identity"
+    - "iteration"
+    - "runner_state"
+  required_events:
+    - "runner_started"
+    - "iteration_started"
+    - "iteration_completed"
+    - "verification_requested"
+    - "runner_stopped"
+    - "runner_failed"
+  no_silent_mutation: true
+
+fail_closed:
+  - "missing_protocol_identity"
+  - "missing_activation_identity"
+  - "missing_approval_identity"
+  - "missing_run_identity"
+  - "invalid_iteration_budget"
+  - "identity_mismatch"
+  - "authority_mismatch"
+  - "verification_mismatch"
+  - "released_activation_invalid"
+
+forbidden_shortcuts:
+  - "Runner -> Approval"
+  - "Runner -> Candidate promotion"
+  - "Runner -> Candidate selection"
+  - "Runner -> Scope expansion"
+  - "Runner -> Protocol mutation"
+  - "Runner -> Verification bypass"
+  - "Runner -> automatic recovery by authority expansion"
+
+relationship_to_frozen_boundaries:
+  execution_control_boundary_v1_0:
+    rule: "immutable prerequisite"
+  scheduler_boundary_v0_1:
+    rule: "Runner consumes only released Activation; it does not replace Scheduler or Activation Pump."
+
+scope:
+  included:
+    - "Persistent Runner authority boundary"
+    - "Run identity"
+    - "Iteration budget"
+    - "State transitions"
+    - "Stop/fail-closed behavior"
+    - "Runner -> Verification -> Evidence contract"
+  excluded:
+    - "worker pool"
+    - "distributed execution"
+    - "automatic protocol generation"
+    - "automatic protocol promotion"
+    - "AIwitness"
+    - "API productization"
+    - "provider-specific execution"
+
+verification_requirements:
+  - "Runner cannot execute without valid released Activation"
+  - "Runner cannot exceed iteration budget"
+  - "Runner preserves all identities"
+  - "Runner stops on authority mismatch"
+  - "Runner cannot bypass Verification"
+  - "Runner cannot create or expand authority"
+  - "Runner emits traceable Evidence"
+
+change_control:
+  rule: "一変更一検証"
+  promotion_to_baseline: "Human-authorized only"
+
+handoff:
+  source: "Research / Architecture"
+  target: "Runtime"
+  artifact: "Matome YAML"
+  semantic_authority: "Research / Matome YAML"
+  implementation_authority: "GitHub Repository"
+  final_authority: "Human"
