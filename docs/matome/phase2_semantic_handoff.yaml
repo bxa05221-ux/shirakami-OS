@@ -1,0 +1,38 @@
+matome:
+  title: "白神 Phase 2・Semantic Handoff"
+  codename: "Shirakami Semantic Handoff Boundary"
+  status: "phase2_implementation_candidate"
+
+  purpose:
+    statement: >
+      APIとRuntimeの境界を越えてContextを安全に受け渡し、
+      transport dataとexecution authorityを分離する。
+
+  carries:
+    - "observation_id"
+    - "landscape"
+    - "protocol_id"
+    - "runtime_state"
+    - "evidence_ids"
+    - "metadata"
+
+  must_not_carry:
+    - "approval"
+    - "human_gate_result"
+    - "execution_authorization"
+    - "scope_expansion"
+    - "candidate_promotion"
+    - "provider_authority"
+
+  relationship:
+    context_snapshot: "existing immutable Runtime context"
+    semantic_handoff: "explicit cross-boundary envelope"
+    approval_envelope: "separate authority artifact"
+
+  invariants:
+    immutable: true
+    authority_creation: false
+    authority_inference: false
+    protocol_mutation: false
+
+  principle: "Context may cross the boundary. Authority may not."
