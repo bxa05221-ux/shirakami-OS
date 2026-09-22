@@ -93,7 +93,7 @@ DEFAULT_RULES = (
     TransitionRule(LoopState.DIFF, "protocol_change", LoopState.PROTOCOL_CANDIDATE, EvidenceClass.MISMATCH),
     TransitionRule(LoopState.DIFF, "reobserve", LoopState.OBSERVE, EvidenceClass.MISMATCH),
     TransitionRule(LoopState.DIFF, "stop", LoopState.STOPPED, EvidenceClass.SAFETY),
-    TransitionRule(LoopState.ACCEPTED, "observe", LoopState.OBSERVE, EvidenceClass.OBSERVATION),
+    TransitionRule(LoopState.ACCEPTED, "observe", LoopState.OBSERVE, EvidenceClass.OBSERVATION),\n    TransitionRule(LoopState.ACCEPTED, "activated_execution", LoopState.READY),
     TransitionRule(LoopState.ACCEPTED, "activated_execution", LoopState.READY),
 )
 
