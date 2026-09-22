@@ -42,7 +42,12 @@ def execute_activated_cycle(
     if not activation.protocol_id.strip():
         raise ActivatedCycleError("activated protocol_id is required")
 
-    runtime.bind_activated_execution(activation.protocol_id)\n\n    execution = runtime.execute(
+    try:
+        runtime.bind_activated_execution(activation.protocol_id)
+    except RuntimeError as exc:
+        raise ActivatedCycleError(str(exc)) from exc
+
+    execution = runtime.execute(
         protocol,
         activation.protocol_id,
         input_data if input_data is not None else activation.context,
