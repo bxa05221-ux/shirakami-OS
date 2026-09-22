@@ -31,6 +31,7 @@ def build_approved_release():
         provenance={"source": "runtime-loop-test", "landscape": "runtime-loop-test"},
         uncertainty="test",
         timestamp_or_run_context={"run": "e2e-001"},
+        source_landscape_context={"landscape": "runtime-loop-test"},
     )
     assert landscape.snapshot() == initial_snapshot
 
