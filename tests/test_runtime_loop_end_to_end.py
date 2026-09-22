@@ -9,7 +9,7 @@ from runtime.evidence_landscape_projection import is_projectable, project_store
 from runtime.evidence_store import EvidenceStore
 from runtime.landscape import LandscapeState
 from runtime.landscape_observation import LandscapeObservation
-from runtime.observation_candidate import ProtocolCandidateArtifact
+from runtime.candidate_generation import generate_protocol_candidate
 from runtime.protocol_candidate_validation import (
     to_structural_validation_representation,
 )
@@ -33,13 +33,21 @@ def build_approved_release():
     )
     assert landscape.snapshot() == initial_snapshot
 
-    artifact = ProtocolCandidateArtifact.from_observation(
+    artifact = generate_protocol_candidate(
         observation,
         candidate_identity="candidate-e2e-001",
         human_intent={"objective": "verify runtime loop"},
     )
     representation = to_structural_validation_representation(artifact)
     validation = validate_structural_validation_representation(representation)
+
+    assert artifact.origin["observation_identity"] == observation.observation_identity
+    assert artifact.origin["provenance"] == observation.provenance
+    assert artifact.origin["uncertainty"] == observation.uncertainty
+    assert artifact.steps == ()
+    assert artifact.outputs == ()
+    assert artifact.authority is False
+    assert artifact.executable is False
 
     assert validation["valid"] is True
     assert validation["authority"] is False
