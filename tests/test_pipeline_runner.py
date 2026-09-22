@@ -55,7 +55,7 @@ def test_verification_mismatch_stops_later_pipeline_items():
         activations=activations,
         iteration_budget=1,
         execute=lambda current, iteration: executed.append(current.activation_id) or True,
-        verify=lambda current, iteration: current.activation_id == "activation-a",
+        verify=lambda current, iteration: False,
     )
 
     assert result.stopped is True
