@@ -1,0 +1,123 @@
+matome:
+  title: "白神モデル Pipeline Runner Result → Landscape Observation 境界"
+  codename: "Pipeline Runner Observation Boundary"
+  version: "0.1"
+  status: "research"
+  authority: "meaning"
+
+purpose:
+  statement: >
+    Approved PipelineとBackground Runnerによって得られた実行結果を、
+    Landscapeを変更せずに明示的なObservationとして次の観測サイクルへ
+    引き渡すための意味境界を定義する。
+
+principles:
+  - "PipelineはAuthority Sourceではない"
+  - "Runner ResultはObservationでありDomain Truthではない"
+  - "EvidenceはLandscape変更を自動的に意味しない"
+  - "ObservationはImmutableである"
+  - "ObservationはAuthorityを持たない"
+  - "ObservationはExecutableではない"
+  - "ObservationとInterpretationを分離する"
+  - "ObservationからCandidateへの生成とAuthorizationを分離する"
+  - "一変更一検証"
+
+input:
+  source:
+    - "PipelineRunnerResult"
+    - "canonical Evidence when available"
+  requirements:
+    - "pipeline_identity"
+    - "execution_order"
+    - "activation_identity"
+    - "protocol_identity"
+    - "approval_identity"
+    - "run_identity"
+    - "execution_result_or_evidence"
+  rule: >
+    入力された実行結果は観測対象として扱い、成功・失敗・停止などの結果を
+    domain truthやLandscape transitionとして自動解釈しない。
+
+observation:
+  role: "next-cycle observable context"
+  authority: false
+  executable: false
+  immutable: true
+  required_properties:
+    - "observation_identity"
+    - "source_landscape_context"
+    - "observed_state"
+    - "provenance"
+    - "uncertainty"
+    - "timestamp_or_run_context"
+  provenance:
+    must_preserve:
+      - "pipeline_identity"
+      - "execution_order"
+      - "activation_identity"
+      - "protocol_identity"
+      - "approval_identity"
+      - "run_identity"
+  uncertainty:
+    rule: >
+      Runnerの結果状態を、それだけで確定的なdomain truthへ変換しない。
+      観測された事実と不確実性を分離して保持する。
+
+landscape:
+  rule: "no_implicit_mutation"
+  statement: >
+    Pipeline Runner ResultからObservationを生成することはLandscapeを変更しない。
+    Landscapeへの変更は既存の明示的transition evidence投影境界だけが担う。
+  forbidden:
+    - "runner success → Landscape successの自動変換"
+    - "runner failure → domain failureの自動確定"
+    - "execution order → semantic priorityの推論"
+    - "evidence existence → landscape transitionの推論"
+
+candidate_boundary:
+  rule: "observation_before_candidate"
+  statement: >
+    ObservationはProtocol Candidateではない。ObservationからCandidateを生成する
+    場合も、既存のObservation → Protocol Candidate境界を経由する。
+  forbidden:
+    - "Observation → Approved Protocol"
+    - "Observation → Activation"
+    - "Observation → Authorization"
+
+verification:
+  required:
+    - "Observation生成でLandscapeが変更されない"
+    - "pipeline identityが保持される"
+    - "execution orderが保持される"
+    - "activation/protocol/approval/run identityが追跡可能"
+    - "Observationがauthorityを持たない"
+    - "Observationがexecutableにならない"
+    - "runner resultがdomain truthへ自動変換されない"
+    - "existing Evidence → Landscape projection boundaryを迂回しない"
+  failure:
+    action: "fail_closed"
+
+non_goals:
+  - "Self-Observation policyの完成"
+  - "automatic protocol generation"
+  - "automatic approval"
+  - "automatic promotion"
+  - "semantic ranking"
+  - "scheduler"
+  - "persistent background service"
+  - "provider-specific execution"
+  - "Landscape semantic reinterpretation"
+  - "Human Gate redesign"
+
+handoff:
+  research_to_runtime:
+    - "このmatome YAMLを意味上の入力としてRuntimeへ渡す"
+    - "RuntimeはPipeline Runner ResultからObservationへの明示的representation boundaryのみ実装する"
+    - "新しいdomain semanticsをRuntimeへ埋め込まない"
+    - "実装上の未解決点はImplementation FindingとしてResearchへ返す"
+
+authority:
+  research: "semantic definition"
+  runtime: "implementation"
+  human: "final authorization"
+  github: "implementation source of truth"
