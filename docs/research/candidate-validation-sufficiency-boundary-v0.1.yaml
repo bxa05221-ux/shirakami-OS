@@ -1,0 +1,115 @@
+matome:
+  title: "Candidate Generation → Structural Validation Semantic Boundary"
+  codename: "Shirakami Candidate Validation Sufficiency Boundary"
+  version: "0.1"
+  status: "research-defined"
+  issue: 418
+  purpose: >
+    Define what Structural Validation may establish about a generated
+    ProtocolCandidateArtifact while preserving the distinction between
+    generation, structural validity, domain truth, and authority.
+  principles:
+    - "Generation is not validation."
+    - "Structural validity is not domain truth."
+    - "Validation is not approval."
+    - "Validation is not promotion."
+    - "Validation is not activation."
+    - "Validation does not rank or select candidates."
+    - "Observed provenance and uncertainty remain preserved."
+    - "Missing domain semantics remain missing."
+  input:
+    required:
+      - "ProtocolCandidateArtifact"
+    preconditions:
+      - "candidate status is CANDIDATE"
+      - "authority is false"
+      - "executable is false"
+      - "candidate identity is present"
+      - "origin observation identity is present"
+      - "provenance is traceable"
+    failure: "fail_closed"
+  validation_scope:
+    establishes:
+      - "required structural fields are present"
+      - "candidate identity is internally consistent"
+      - "origin observation identity is preserved"
+      - "provenance is traceable"
+      - "authority remains false"
+      - "executable remains false"
+      - "approval remains absent"
+      - "activation remains absent"
+      - "unsupported semantic fields may remain empty"
+    does_not_establish:
+      - "domain truth"
+      - "candidate usefulness"
+      - "candidate priority"
+      - "candidate ranking"
+      - "candidate selection"
+      - "human approval"
+      - "promotion authority"
+      - "activation authority"
+      - "execution correctness"
+      - "external-world correctness"
+  uncertainty:
+    rule: "Validation must not convert uncertainty into certainty."
+  semantics:
+    rule: "Structural Validation checks representation and boundary invariants; it must not invent missing domain semantics."
+    empty_fields:
+      steps: "valid when unsupported by the originating Observation"
+      outputs: "valid when unsupported by the originating Observation"
+      constraints: "valid when no explicit constraint exists"
+      evidence_plan: "valid when no explicit plan exists"
+  authority:
+    rule: "A successful validation result carries no approval or execution authority."
+    forbidden:
+      - "ApprovalEnvelope creation"
+      - "promotion"
+      - "activation"
+      - "scope expansion"
+  provenance:
+    required:
+      - "candidate identity"
+      - "origin observation identity"
+      - "origin provenance"
+      - "uncertainty"
+    preservation: "lossless within the validation representation"
+  fail_closed:
+    - "missing candidate identity"
+    - "missing origin observation identity"
+    - "missing provenance"
+    - "status not CANDIDATE"
+    - "authority=true"
+    - "executable=true"
+    - "approval present"
+    - "activation present"
+    - "provenance mismatch"
+  verification:
+    required:
+      - "valid candidate passes structural validation"
+      - "missing identity fails"
+      - "missing provenance fails"
+      - "invalid status fails"
+      - "authority cannot pass"
+      - "executable cannot pass"
+      - "uncertainty is preserved"
+      - "empty unsupported semantics remain valid"
+      - "validation creates no authority"
+      - "validation does not mutate candidate"
+      - "validation does not create approval or activation"
+      - "domain correctness is not asserted"
+  non_goals:
+    - "domain semantic validation"
+    - "candidate ranking"
+    - "candidate selection"
+    - "automatic approval"
+    - "automatic promotion"
+    - "automatic activation"
+    - "execution verification"
+    - "external fact verification"
+  handoff:
+    research_to_runtime:
+      rule: "Implement only this semantic boundary."
+    runtime_to_research:
+      rule: "Implementation mismatches become Findings; theory is not changed in Runtime."
+  change_control:
+    rule: "one change / one verification"
