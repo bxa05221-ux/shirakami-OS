@@ -1,0 +1,200 @@
+matome:
+  title: "白神モデル 第一段階・実行制御境界の完成"
+  codename: "Shirakami Execution Control Boundary"
+  status: "first_stage_boundary"
+  date: "2026-09-22"
+
+  purpose:
+    statement: >
+      自動生成・自動実行を許容しながら、
+      Protocolの承認・昇格・権限拡大を自動化機構から分離し、
+      Humanによる最終的な決定権を保持する。
+
+  core_principle:
+    - "Generation may be automated."
+    - "Promotion remains human-authorized."
+    - "Activation prepares."
+    - "Pump releases."
+    - "Runner continues bounded execution."
+    - "Execution remains observable."
+
+  lifecycle:
+    01: "Protocol Candidate"
+    02: "Structural Validation"
+    03: "HUMAN_REVIEW"
+    04: "Approval Envelope"
+    05: "Human Gate"
+    06: "Approved Protocol"
+    07: "Activation"
+    08: "Activation Pump"
+    09: "Background Runner"
+    10: "Runtime"
+    11: "Verification"
+    12: "Evidence"
+    13: "Landscape"
+
+  authority_boundary:
+    authority_source: "human_authorized_approval"
+    automation:
+      generation: true
+      observation: true
+      execution: true
+      bounded_repetition: true
+      approval: false
+      promotion: false
+      candidate_selection: false
+      authority_expansion: false
+      verification_override: false
+
+  components:
+    protocol_candidate:
+      role: "生成されたProtocol候補"
+      authority: false
+      promotion: "human_required"
+    structural_validation:
+      role: "構造的妥当性の検証"
+      authority: false
+      human_judgment: "not_replaced"
+    human_review:
+      role: "Humanによる判断"
+      authority_boundary: true
+    approval_envelope:
+      role: "実行権限の明示的保持"
+      immutable: true
+    human_gate:
+      role: "CandidateからApproved Protocolへの昇格境界"
+      authority: "human"
+    approved_protocol:
+      role: "実行可能となったProtocol"
+      source: "human_authorized_promotion"
+    activation:
+      role: "Approved Protocolの実行準備"
+      creates_authority: false
+      consumes_authority: true
+    activation_pump:
+      role: "既に承認されたActivationのrelease"
+      creates_authority: false
+      promotes_protocol: false
+      selects_candidate: false
+      scope_expansion: false
+    background_runner:
+      role: "bounded execution context"
+      consumes: "released_activation"
+      may:
+        - "maintain run identity"
+        - "repeat authorized execution"
+        - "preserve protocol identity"
+        - "stop on mismatch"
+        - "emit observable execution results"
+      must_not:
+        - "approve protocol"
+        - "reject protocol"
+        - "promote candidate"
+        - "select candidate"
+        - "create approval envelope"
+        - "expand execution scope"
+        - "reinterpret mismatch as success"
+        - "grant authority"
+    runtime:
+      role: "Protocol execution"
+      authority: false
+      lifecycle_binding:
+        event: "activated_execution"
+        meaning: "externally authorized activationを内部READY状態へ同期"
+      approval_creation: false
+    verification:
+      role: "実行結果の検証"
+      results:
+        - "pass"
+        - "mismatch"
+      mismatch:
+        becomes_success: false
+        broadens_authority: false
+        continues_automatically: false
+    evidence:
+      role: "実行・判断・失敗・Mismatchの記録"
+      authority_creation: false
+      silent_protocol_mutation: false
+    landscape:
+      role: "Evidenceを次の観測空間へ戻す"
+      protocol_rewrite: "not_automatic"
+
+  fail_closed:
+    - "invalid_activation"
+    - "invalid_pump_release"
+    - "missing_protocol_identity"
+    - "invalid_iteration_budget"
+    - "runtime_lifecycle_binding_failure"
+    - "verification_mismatch"
+
+  forbidden_shortcuts:
+    - "Candidate -> Runtime"
+    - "Candidate -> Activation"
+    - "Structural Validation -> Approval"
+    - "Activation -> authority_creation"
+    - "Pump -> approval"
+    - "Runner -> promotion"
+    - "Runner -> scope_expansion"
+    - "Verification mismatch -> success"
+    - "Evidence -> silent authorization"
+
+  completed_scope:
+    - "Protocol Candidate lifecycle boundary"
+    - "Candidate provenance"
+    - "Stable Evidence identity"
+    - "Approval Envelope"
+    - "Human Gate"
+    - "Approved Protocol activation boundary"
+    - "Activation -> Runtime"
+    - "Runtime -> Verification"
+    - "Verification -> Evidence"
+    - "Activation Pump contract"
+    - "Activation Pump release"
+    - "Pump -> Evidence cycle"
+    - "Background Runner boundary"
+    - "Runner -> bounded execution"
+    - "Execution authority boundary documentation"
+
+  intentionally_excluded:
+    - "scheduler"
+    - "worker_pool"
+    - "persistent_background_service"
+    - "automatic_protocol_promotion"
+    - "provider_specific_execution"
+    - "automatic_protocol_generation"
+    - "full_AIwitness"
+    - "API_productization"
+
+  architectural_conclusion:
+    statement: >
+      白神第一段階では、Protocolの生成・実行を自動化できる一方、
+      実行権限の生成・Protocol昇格・権限拡大はHumanの決定境界から
+      自動化機構へ移譲されない。
+    boundary:
+      human_decision:
+        - "approval"
+        - "promotion"
+        - "authority"
+      automation:
+        - "generation"
+        - "activation preparation"
+        - "release"
+        - "bounded execution"
+        - "verification"
+        - "evidence recording"
+
+  next_stage:
+    name: "Shirakami Phase 2"
+    candidates:
+      - "API extraction"
+      - "AIwitness"
+      - "automatic protocol generation"
+      - "Scheduler"
+      - "Persistent Background Runner"
+      - "provider-independent external runtime"
+    prerequisite:
+      - "first_stage_authority_boundary_preserved"
+
+  slogan:
+    primary: "AIが動いても、決定権は動かない。"
+    technical: "Execution may be automated. Authority remains human."
