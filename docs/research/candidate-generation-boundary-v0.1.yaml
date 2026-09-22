@@ -1,0 +1,138 @@
+# Candidate Generation Boundary v0.1
+
+matome:
+  title: "Candidate Eligibility → Candidate Generation Boundary"
+  codename: "Shirakami Candidate Generation Boundary"
+  version: "0.1"
+  status: "research-defined"
+  issue: 413
+
+purpose: >
+  Define the semantic boundary by which an Observation that has passed
+  Candidate Eligibility may be represented as a Protocol Candidate Artifact,
+  without inventing domain meaning or creating authority.
+
+principles:
+  - "Eligibility is not generation."
+  - "Generation is not selection."
+  - "Generation is not authorization."
+  - "Observed facts remain distinguishable from interpretation."
+  - "Uncertainty must be preserved."
+  - "Provenance must remain traceable to the originating Observation."
+  - "Runtime must not invent missing domain semantics."
+
+input:
+  required:
+    - "LandscapeObservation"
+    - "CandidateEligibilityResult(eligible=true)"
+  eligibility:
+    rule: "Only eligible observations may cross this boundary."
+    failure: "fail_closed"
+
+generation:
+  output: "ProtocolCandidateArtifact"
+  status: "CANDIDATE"
+  authority: false
+  executable: false
+  allowed_transfer:
+    - "candidate_identity"
+    - "origin_observation_identity"
+    - "origin"
+    - "observed_context"
+    - "observed_state"
+    - "provenance"
+    - "uncertainty"
+    - "timestamp_or_run_context"
+  interpretation:
+    rule: >
+      Generator may structure observed material into the Candidate artifact,
+      but may not create domain facts, priorities, rankings, or semantic
+      conclusions not present in the Observation.
+    missing_semantics: "remain explicit rather than invented"
+
+candidate_fields:
+  assumptions:
+    rule: "May contain explicit generator assumptions only when traceable and labeled as assumptions."
+  inputs:
+    rule: "May preserve observed inputs; must not invent external inputs."
+  steps:
+    rule: "May remain empty when no executable steps are supplied by the Observation."
+  outputs:
+    rule: "May remain empty when no outputs are specified."
+  constraints:
+    rule: "May preserve explicit observed constraints; no invented constraints."
+  stop_conditions:
+    rule: "May preserve explicit stop conditions; no authority expansion."
+  evidence_plan:
+    rule: "May preserve an explicit evidence plan; absence does not authorize invention."
+  approval:
+    rule: "Must not create or imply ApprovalEnvelope."
+  verification:
+    rule: "Must not create approval or promotion authority."
+
+provenance:
+  required:
+    - "origin_observation_identity"
+    - "observation provenance"
+  preservation:
+    - "source_landscape_context"
+    - "timestamp_or_run_context"
+    - "uncertainty"
+  rule: >
+    Candidate provenance must remain sufficient to trace its semantic basis
+    back to the originating Observation.
+
+forbidden:
+  - "candidate ranking"
+  - "candidate selection"
+  - "priority assignment"
+  - "approval creation"
+  - "promotion"
+  - "activation creation"
+  - "Landscape mutation"
+  - "domain-truth inference"
+  - "silent completion of missing semantics"
+  - "reinterpretation of uncertainty as certainty"
+
+fail_closed:
+  - "ineligible Observation"
+  - "missing Observation identity"
+  - "missing provenance"
+  - "missing required observation context"
+  - "authority=true"
+  - "executable=true"
+
+verification:
+  required:
+    - "eligible Observation generates Candidate"
+    - "ineligible Observation cannot generate Candidate"
+    - "provenance preserved"
+    - "uncertainty preserved"
+    - "no domain semantics invented"
+    - "empty semantic fields remain empty when unsupported"
+    - "Candidate remains non-authoritative"
+    - "Candidate remains non-executable"
+    - "no Landscape mutation"
+    - "no ApprovalEnvelope"
+    - "no Activation"
+    - "no ranking or selection"
+
+non_goals:
+  - "automatic candidate generation from arbitrary domain data"
+  - "candidate ranking"
+  - "candidate selection"
+  - "Human Gate redesign"
+  - "automatic approval"
+  - "automatic promotion"
+  - "automatic activation"
+  - "scheduler"
+  - "provider-specific execution"
+
+handoff:
+  research_to_runtime:
+    rule: "Implement only this semantic boundary."
+  runtime_to_research:
+    rule: "Implementation mismatches become Findings; theory is not changed in Runtime."
+
+change_control:
+  rule: "one change / one verification"
