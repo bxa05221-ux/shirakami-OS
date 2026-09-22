@@ -1,0 +1,104 @@
+matome:
+  title: "会話進度とGitHub実装進度の同期管理"
+  codename: "Conversation-GitHub Synchronization"
+  version: "0.1"
+  status: "research-defined"
+  issue: 427
+
+  context:
+    project: "白神モデルβ版研究"
+    related_protocol: "Shirakami Project Handoff Protocol"
+    trigger: >
+      ChatGPT Project上の作業進行とGitHub Repository上の実装進行が
+      同一経路で進まない場合、作業地点の認識にずれが生じる。
+
+  finding:
+    statement: >
+      会話履歴上の「現在地点」とGitHub上の「実装上の現在地点」は
+      同一であるとは限らない。
+    cause:
+      - "複数のChatGPT Projectから同一Repositoryを操作できる"
+      - "会話ごとに作業履歴が分離される"
+      - "Branch / PR / CIの状態は会話履歴とは独立して変化する"
+      - "会話上の前提をそのまま実装上の現在地点として扱うと進度が分岐する"
+
+  authority:
+    semantic_meaning: "的目YAML"
+    implementation_state: "GitHub Repository"
+    working_context: "ChatGPT Project"
+    rule: >
+      ChatGPT Projectの会話進度を実装上の正本として扱わず、
+      GitHub Repositoryの現在状態を実装上の基準点とする。
+
+  synchronization:
+    before_next_implementation:
+      - "Repository current stateを確認する"
+      - "Open PRを確認する"
+      - "各PRのbase/headを確認する"
+      - "最新HEADを確認する"
+      - "CI / verification statusを確認する"
+      - "直前の変更内容を確認する"
+      - "未実施の次工程を特定する"
+
+    state_model:
+      - "CURRENT"
+      - "VERIFIED"
+      - "NEXT"
+
+    rule: >
+      「次へ進む」は会話履歴から直接決定せず、
+      GitHub上のCURRENTとVERIFIEDを同期確認した後にNEXTを決定する。
+
+  operational_change:
+    old:
+      flow: "Conversation → Next Task → Implementation"
+    new:
+      flow: >
+        Conversation Intent
+        → GitHub State Synchronization
+        → CURRENT
+        → VERIFIED
+        → NEXT
+        → Implementation
+        → Verification
+        → GitHub
+
+  guard:
+    name: "GitHub State Synchronization Gate"
+    purpose: >
+      複数Project・複数Conversationから同一Repositoryを操作した場合でも、
+      実装進度の分岐を防止する。
+    rule:
+      - "実装開始前にGitHub状態を確認する"
+      - "会話上の前提とRepository状態が異なる場合はRepositoryを優先する"
+      - "重複Branch / PRを作成しない"
+      - "未確認CIを検証済みとして扱わない"
+      - "既存PRを確認せず新規実装を開始しない"
+
+  current_case:
+    related_prs:
+      - "#421"
+      - "#422"
+      - "#425"
+      - "#426"
+    observation: >
+      複数の作業経路が存在し得るため、会話上の進度と
+      GitHub上のPR系列を同期してから次工程へ進む必要がある。
+    handling: >
+      #426を直ちに破棄・統合せず、GitHub上の現在状態を確認したうえで
+      本流との重複・包含関係を判断する。
+
+  research_feedback:
+    category: "Implementation Finding"
+    meaning: >
+      白神のHandoff Protocolそのものに、
+      「作業開始前のRepository State Synchronization」
+      を追加する必要性が確認された。
+    theory_change: false
+    runtime_change: false
+
+  principle:
+    - "会話の進度ではなくRepositoryの状態を実装基準とする"
+    - "Projectを分けてもLandscapeを分断しない"
+    - "作業を分けてもImplementation Stateを分岐させない"
+    - "一変更一検証"
