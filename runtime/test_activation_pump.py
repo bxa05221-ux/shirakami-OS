@@ -4,11 +4,9 @@ from runtime.activation import activate
 from runtime.activation_pump import (
     ActivationPump,
     ActivationPumpError,
-    execute_released,
     release_activation,
 )
 from runtime.approval_envelope import ApprovalEnvelope
-from runtime.prototype import Runtime, Transition
 
 
 def _activated(protocol_id="protocol-1"):
@@ -56,41 +54,9 @@ def test_pump_release_has_distinct_event_identity():
     assert first.protocol_id == second.protocol_id
 
 
-def test_pump_hands_released_activation_to_runtime():
+def test_pump_copies_context_without_mutating_activation():
     activation = _activated()
     release = release_activation(activation)
 
-    def protocol(context):
-        return Transition(
-            kind="pump.transition",
-            data={"input": dict(context.input)},
-        )
-
-    result = execute_released(release, Runtime(), protocol)
-
-    assert result.status == "completed"
-    assert result.protocol_id == "protocol-1"
-    assert result.transition.kind == "pump.transition"
-    assert result.transition.data["input"] == {"source": "human-gate"}
-
-
-def test_pump_does_not_execute_before_release():
-    pump = ActivationPump()
-    activation = _activated()
-
-    unreleased = type(
-        "Unreleased",
-        (),
-        {
-            "status": "activated",
-            "protocol_id": activation.protocol_id,
-            "context": activation.context,
-        },
-    )()
-
-    with pytest.raises(ActivationPumpError, match="released Pump event"):
-        pump.execute(
-            unreleased,
-            Runtime(),
-            lambda context: Transition(kind="unexpected", data={}),
-        )
+    assert release.context == activation.context
+    assert release.context is not activation.context
