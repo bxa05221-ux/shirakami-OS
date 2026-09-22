@@ -1,0 +1,142 @@
+matome:
+  title: "白神モデル 第三段階・Protocol自動生成境界"
+  codename: "Shirakami Protocol Generation Boundary"
+  version: "0.1"
+  status: "research-candidate"
+  date: "2026-09-22"
+
+purpose:
+  statement: >
+    Protocol Candidateの自動生成を可能にしつつ、
+    自動生成物が実行権限・承認・昇格を獲得しない境界を定義する。
+  goal:
+    - "Protocol候補生成を自動化する"
+    - "候補と承認済みProtocolを明確に分離する"
+    - "生成結果をHuman Gateへ渡す"
+    - "生成器自身によるauthority獲得を禁止する"
+
+generation:
+  allowed:
+    - "Protocol Candidate generation"
+    - "candidate variation"
+    - "structural normalization"
+    - "candidate quality checks"
+    - "candidate provenance recording"
+  forbidden:
+    - "automatic approval"
+    - "automatic promotion"
+    - "automatic authority expansion"
+    - "automatic execution of unapproved candidate"
+    - "silent replacement of approved protocol"
+
+candidate:
+  required_identity:
+    - "candidate_identity"
+    - "generator_identity"
+    - "generation_context"
+    - "generation_timestamp"
+    - "source_evidence"
+  status:
+    initial: "candidate"
+    executable: false
+    authority: false
+  provenance:
+    immutable: true
+    required: true
+
+human_gate:
+  required: true
+  transition:
+    "Candidate -> Approved Protocol": "human-authorized only"
+  generator_cannot:
+    - "approve itself"
+    - "promote itself"
+    - "select itself for execution"
+    - "expand its own scope"
+
+generation_quality:
+  protocol_prompt_boundary:
+    rule: "Protocol != Prompt"
+  behavior_definition:
+    required: true
+  dead_mans_test:
+    required: true
+    purpose: "detect instructions that do not define executable behavior"
+  observable_not_required:
+    rule: "Observable behavior must not be treated as required behavior without protocol justification"
+  question_behavior:
+    allowed: true
+  missing_information_check:
+    required: true
+  boundary_check:
+    required: true
+  authority_check:
+    required: true
+
+execution_boundary:
+  candidate_to_runtime: false
+  candidate_to_activation: false
+  candidate_to_scheduler: false
+  candidate_to_runner: false
+  required_path:
+    - "Protocol Candidate"
+    - "Structural Validation"
+    - "Human Review"
+    - "Approval Envelope"
+    - "Human Gate"
+    - "Approved Protocol"
+    - "Activation"
+
+evidence:
+  required:
+    - "candidate_identity"
+    - "generator_identity"
+    - "generation_context"
+    - "validation_result"
+    - "human_gate_result"
+  no_silent_mutation: true
+  candidate_history: "traceable"
+
+fail_closed:
+  - "missing_candidate_identity"
+  - "missing_generator_identity"
+  - "missing_provenance"
+  - "structural_validation_failure"
+  - "authority_boundary_violation"
+  - "attempted_automatic_promotion"
+  - "attempted_unapproved_execution"
+
+relationship_to_existing_boundaries:
+  execution_control_boundary_v1_0:
+    rule: "immutable prerequisite"
+  scheduler_boundary_v0_1:
+    rule: "generated candidates cannot enter Scheduler without approval"
+  persistent_background_runner_boundary_v0_1:
+    rule: "generated candidates cannot enter Runner without approval"
+
+scope:
+  included:
+    - "Protocol Candidate generation boundary"
+    - "Candidate provenance"
+    - "Generation quality gates"
+    - "Human Gate handoff"
+    - "Candidate fail-closed behavior"
+  excluded:
+    - "automatic approval"
+    - "automatic promotion"
+    - "automatic execution"
+    - "LLM provider selection"
+    - "API productization"
+    - "AIwitness implementation"
+
+change_control:
+  rule: "一変更一検証"
+  promotion_to_baseline: "Human-authorized only"
+
+handoff:
+  source: "Research"
+  target: "Runtime"
+  artifact: "Matome YAML"
+  semantic_authority: "Research / Matome YAML"
+  implementation_authority: "GitHub Repository"
+  final_authority: "Human"
