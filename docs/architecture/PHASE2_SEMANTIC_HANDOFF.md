@@ -1,6 +1,6 @@
 # Shirakami Phase 2 — Semantic Handoff Boundary
 
-Status: **Phase 2 implementation boundary candidate**
+Status: **Phase 2 implementation boundary — API observe integrated**
 
 ## Purpose
 
@@ -47,3 +47,15 @@ Consumers may derive new context from it, but must not mutate the original hando
 ## Principle
 
 > Context may cross the boundary. Authority may not.
+
+
+## API integration
+
+ShirakamiAPI.observe() now creates a fresh observation_id and returns a semantic_handoff alongside the existing state/evidence response.
+
+The integration is intentionally one-way with respect to authority:
+
+- observation identity is generated at the external semantic boundary;
+- ContextSnapshot fields are copied into the handoff;
+- evidence_ids remains empty until stable Evidence identity is available at this boundary;
+- no approval, Human Gate result, execution authorization, promotion, or scope expansion is added to the handoff.
