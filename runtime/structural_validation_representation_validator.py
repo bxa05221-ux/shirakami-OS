@@ -104,8 +104,9 @@ def validate_structural_validation_representation(
     origin = candidate.get("origin")
     if not isinstance(origin, dict) and not hasattr(origin, "get"):
         errors.append("origin must be a mapping")
-    elif origin.get("observation_identity") != representation.origin_observation_identity:
-        errors.append("origin.observation_identity must preserve provenance")
+    else:
+        if origin.get("observation_identity") != representation.origin_observation_identity:
+            errors.append("origin.observation_identity must preserve provenance")
         if not origin.get("provenance"):
             errors.append("origin.provenance must preserve provenance")
         if not origin.get("uncertainty"):
