@@ -1,8 +1,8 @@
 """Minimal downstream release boundary for authorized Activations.
 
 The Activation Pump releases an already-authorized ActivationResult. It does
-not approve, promote, select, or create execution authority. Scheduling and
-queue management are intentionally outside this implementation.
+not approve, promote, select, or execute a Protocol. Runtime handoff belongs
+to the downstream observable execution cycle.
 """
 
 from __future__ import annotations
@@ -13,10 +13,8 @@ from uuid import uuid4
 
 try:
     from .activation import ActivationResult
-    from .prototype import ExecutionResult, Protocol, Runtime
 except ImportError:
     from activation import ActivationResult
-    from prototype import ExecutionResult, Protocol, Runtime
 
 
 class ActivationPumpError(RuntimeError):
@@ -57,29 +55,6 @@ class ActivationPump:
             context=dict(activation.context),
         )
 
-    def execute(
-        self,
-        release: PumpRelease,
-        runtime: Runtime,
-        protocol: Protocol,
-        input_data: Mapping[str, Any] | None = None,
-    ) -> ExecutionResult:
-        """Hand one released activation to Runtime without expanding its scope."""
-
-        if release.status != "released":
-            raise ActivationPumpError(
-                "Runtime execution requires a released Pump event"
-            )
-
-        if not isinstance(release.protocol_id, str) or not release.protocol_id.strip():
-            raise ActivationPumpError("released protocol_id is required")
-
-        return runtime.execute(
-            release.protocol_id,
-            protocol,
-            input_data if input_data is not None else release.context,
-        )
-
 
 def release_activation(activation: ActivationResult) -> PumpRelease:
     """Functional convenience wrapper around the Activation Pump boundary."""
@@ -87,21 +62,9 @@ def release_activation(activation: ActivationResult) -> PumpRelease:
     return ActivationPump().release(activation)
 
 
-def execute_released(
-    release: PumpRelease,
-    runtime: Runtime,
-    protocol: Protocol,
-    input_data: Mapping[str, Any] | None = None,
-) -> ExecutionResult:
-    """Functional convenience wrapper for Runtime handoff."""
-
-    return ActivationPump().execute(release, runtime, protocol, input_data)
-
-
 __all__ = [
     "ActivationPump",
     "ActivationPumpError",
     "PumpRelease",
     "release_activation",
-    "execute_released",
 ]
