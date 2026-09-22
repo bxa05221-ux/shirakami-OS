@@ -32,6 +32,13 @@ def test_runner_executes_within_budget_and_preserves_identity():
     assert result.activation_identity == "activation-test-001"
     assert result.approval_identity == "human-test"
     assert result.run_identity == "run-test-001"
+    assert len(result.evidence) == len(result.events)
+    assert result.evidence[-1].event == "runner_stopped"
+    assert result.evidence[-1].runner_state == "COMPLETED"
+    assert result.evidence[-1].protocol_identity == result.protocol_identity
+    assert result.evidence[-1].activation_identity == result.activation_identity
+    assert result.evidence[-1].approval_identity == result.approval_identity
+    assert result.evidence[-1].run_identity == result.run_identity
 
 
 def test_runner_stops_on_budget_exhaustion():

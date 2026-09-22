@@ -41,6 +41,7 @@ class RunnerResult:
     iterations: int
     state: RunnerState
     events: tuple[RunnerEvent, ...]
+    evidence: tuple["RunnerEvidence", ...]
 
 
 def run_released_activation(
@@ -111,5 +112,17 @@ def _event(name, activation, run_id, iteration, state):
 
 
 def _result(activation, run_id, iterations, state, events):
-    return RunnerResult(run_id, activation.protocol_id, activation.activation_id,
-                        activation.approval_reviewer, iterations, state, tuple(events))
+    from runtime.background_runner_evidence import RunnerEvidence
+
+    immutable_events = tuple(events)
+    evidence = tuple(RunnerEvidence.from_event(event) for event in immutable_events)
+    return RunnerResult(
+        run_id,
+        activation.protocol_id,
+        activation.activation_id,
+        activation.approval_reviewer,
+        iterations,
+        state,
+        immutable_events,
+        evidence,
+    )
