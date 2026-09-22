@@ -1,0 +1,128 @@
+matome:
+  title: "白神モデル Approval Envelope → Activation 境界"
+  codename: "Approval Envelope Activation Boundary"
+  version: "0.1"
+  status: "research"
+  authority: "meaning"
+
+purpose:
+  statement: >
+    Human-authorized ApprovalEnvelopeからActivationへ、既存の実行権限だけを
+    明示的に引き渡し、Activation自身が権限を生成・拡張しないための意味境界を定義する。
+
+finding:
+  source: "Implementation Finding #393"
+  observation:
+    - "ApprovalEnvelopeはHuman Gateの明示的approveによって生成される"
+    - "ApprovalEnvelopeはimmutableである"
+    - "execution_authorizedは明示的なauthorization状態を表す"
+    - "Activationは既存のapproval authorityを消費する境界である"
+  consequence:
+    - "ApprovalEnvelopeの存在だけではActivationを開始しない"
+    - "Activationはauthorityを生成・拡張してはならない"
+
+principles:
+  - "ApprovalEnvelopeは権限の源泉であり、Activationは権限の生成者ではない"
+  - "execution_authorized=trueが明示されている場合のみexecution activationへ進める"
+  - "protocol identityを保持する"
+  - "provenanceとevidenceはauthorizationそのものではない"
+  - "ApprovalEnvelopeのimmutable性を維持する"
+  - "一変更一検証"
+
+boundary:
+  input:
+    type: "ApprovalEnvelope"
+    requirements:
+      - "candidate_id"
+      - "protocol_id"
+      - "execution_authorized"
+      - "reviewer"
+      - "approval_scope"
+  output:
+    type: "Activation input"
+    authority: "consumed from existing ApprovalEnvelope"
+    new_authority: false
+  rule: >
+    Activation入力へ写像するのは、ApprovalEnvelopeに明示されている
+    identityと既存authorizationのみとする。不在の権限やscopeを補完しない。
+
+authorization:
+  required:
+    - "execution_authorized is true"
+    - "reviewer is explicitly identified"
+    - "approval_scope is explicitly compatible with execution"
+  forbidden:
+    - "envelope existence implies authorization"
+    - "provenance implies authorization"
+    - "evidence implies authorization"
+    - "candidate identity implies authorization"
+    - "runtime confidence creates authorization"
+  activation:
+    rule: "consume existing authorization; never create or expand authority"
+
+identity:
+  candidate_id:
+    role: "approved candidate identity"
+    rule: "preserve"
+  protocol_id:
+    role: "approved protocol identity"
+    rule: "preserve; must not be inferred here"
+  reviewer:
+    role: "human authorization provenance"
+    rule: "preserve"
+  approval_scope:
+    role: "authorization scope"
+    rule: "preserve and validate; do not broaden"
+
+provenance:
+  rule: >
+    provenanceとevidence_idsはActivationのtraceability metadataとして保持可能だが、
+    authorization判定には使用しない。
+  forbidden:
+    - "provenanceからauthorizationを推定"
+    - "evidence_idsからauthorizationを推定"
+    - "provenanceの書き換え"
+
+fail_closed:
+  triggers:
+    - "missing candidate_id"
+    - "missing protocol_id"
+    - "execution_authorized is not true"
+    - "missing reviewer"
+    - "missing or incompatible approval_scope"
+    - "invalid envelope type"
+  action: "no activation; no authority creation"
+
+verification:
+  required:
+    - "valid authorized envelope produces activation input"
+    - "unauthorized envelope fails closed"
+    - "protocol identity is preserved"
+    - "reviewer provenance is preserved"
+    - "scope is not broadened"
+    - "Activation input carries no newly created authority"
+    - "ApprovalEnvelope remains immutable"
+    - "activation does not execute the protocol"
+
+handoff:
+  research_to_runtime:
+    - "このmatome YAMLを意味上の入力としてRuntimeへ渡す"
+    - "RuntimeはApprovalEnvelopeからActivation inputへの明示的mappingを実装する"
+    - "Activationは既存authorityをconsumeするだけとする"
+  runtime_to_research:
+    - "Activation既存実装との表現差異が新たな意味判断を要求する場合はFindingとしてResearchへ返す"
+
+non_goals:
+  - "ApprovalEnvelope redesign"
+  - "Human Gate redesign"
+  - "automatic activation"
+  - "authority expansion"
+  - "Runner changes"
+  - "scheduler changes"
+  - "provider-specific AI invocation"
+
+authority:
+  research: "semantic definition"
+  runtime: "implementation"
+  human: "final authorization"
+  github: "implementation source of truth"
