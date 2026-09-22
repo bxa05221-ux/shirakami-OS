@@ -21,6 +21,7 @@ def test_pump_releases_prepared_activation():
     assert released.activation_id == "activation-test-001"
     assert released.candidate_id == "candidate-test-001"
     assert released.protocol_id == "protocol-test-001"
+    assert released.approval_reviewer == "human-test"
     assert released.lifecycle_event == "activated_execution"
 
 
