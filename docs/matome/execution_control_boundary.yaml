@@ -1,0 +1,42 @@
+matome:
+  title: "白神 第一段階・実行制御境界"
+  status: "first_stage_boundary"
+  lifecycle:
+    - protocol_candidate
+    - structural_validation
+    - human_review
+    - approval_envelope
+    - human_gate
+    - approved_protocol
+    - activation
+    - pump_release
+    - background_runner
+    - runtime
+    - verification
+    - evidence
+    - landscape
+  authority:
+    source: "human_authorized_approval"
+    automation_may_generate: true
+    automation_may_promote: false
+    automation_may_broaden_scope: false
+  boundaries:
+    activation: "authorization_consuming_only"
+    pump: "release_only"
+    runner: "bounded_execution_context_only"
+    runtime: "execution_only"
+    verification: "observable_result_only"
+    evidence: "recording_only"
+  fail_closed:
+    - "invalid_activation"
+    - "invalid_release"
+    - "missing_protocol_identity"
+    - "invalid_iteration_budget"
+    - "verification_mismatch"
+  excluded:
+    - scheduler
+    - worker_pool
+    - persistence_service
+    - automatic_protocol_promotion
+    - provider_specific_execution
+  principle: "Generation may be automated. Promotion remains human-authorized. Execution remains observable."
