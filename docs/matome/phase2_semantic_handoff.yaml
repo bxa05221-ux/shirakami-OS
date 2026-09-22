@@ -1,7 +1,7 @@
 matome:
   title: "白神 Phase 2・Semantic Handoff"
   codename: "Shirakami Semantic Handoff Boundary"
-  status: "phase2_implementation_candidate"
+  status: "phase2_api_observe_integrated"
 
   purpose:
     statement: >
@@ -36,3 +36,9 @@ matome:
     protocol_mutation: false
 
   principle: "Context may cross the boundary. Authority may not."
+
+  api_integration:
+    observe_returns_semantic_handoff: true
+    observation_id_generated_at_boundary: true
+    evidence_ids_populated: false
+    authority_added: false
