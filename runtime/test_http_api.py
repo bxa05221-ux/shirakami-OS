@@ -52,6 +52,13 @@ def test_observe_and_evidence_are_json_transport() -> None:
         item["signals"] == ["CONTEXT_SNAPSHOT"]
         for item in body["evidence"]
     )
+    handoff = body["semantic_handoff"]
+    assert handoff["protocol_id"] == "http.example"
+    assert handoff["runtime_state"] == "EVIDENCE"
+    assert handoff["observation_id"]
+    assert handoff["evidence_ids"] == ()
+    assert "approval" not in handoff
+    assert "execution_authorization" not in handoff
 
     evidence = client.get(
         "/v1/evidence",
