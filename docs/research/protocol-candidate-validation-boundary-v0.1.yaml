@@ -1,0 +1,110 @@
+matome:
+  title: "白神モデル Protocol Candidate → Structural Validation 境界"
+  codename: "Protocol Candidate Validation Boundary"
+  version: "0.1"
+  status: "research"
+  authority: "meaning"
+
+purpose:
+  statement: >
+    Protocol Candidate Artifactを、その意味や妥当性を自動判断せず、
+    構造上検証可能な表現へ明示的に引き渡すための境界を定義する。
+
+principles:
+  - "Candidateは提案でありAuthorizationではない"
+  - "Structural ValidationとSemantic Judgmentを分離する"
+  - "Validation PASSはApprovalを意味しない"
+  - "Human GateをPromotion境界として維持する"
+  - "Observation provenanceとCandidate identityを保持する"
+  - "不足情報を自動補完して意味を変えない"
+  - "一変更一検証"
+
+flow:
+  current:
+    - "Landscape"
+    - "Observation"
+    - "Protocol Candidate Artifact"
+  proposed:
+    - "Protocol Candidate Artifact"
+    - "Structural Validation"
+    - "HUMAN_REVIEW"
+    - "Approval Envelope"
+    - "Activation"
+
+validation:
+  role: "structure inspection only"
+  authority: false
+  executable: false
+  checks:
+    - "candidate identity exists"
+    - "origin observation identity exists"
+    - "candidate status remains CANDIDATE"
+    - "authority is false"
+    - "executable is false"
+    - "required candidate sections are structurally present"
+    - "approval requirement declares HUMAN_REVIEW"
+    - "verification remains separate from execution"
+  must_not:
+    - "domain truthを判定する"
+    - "semantic safetyを自動確定する"
+    - "consentを推定する"
+    - "authorizationを生成する"
+    - "candidateをpromotionする"
+    - "executionを開始する"
+    - "不足情報を勝手に補完する"
+
+adapter:
+  role: "representation handoff"
+  input: "ProtocolCandidateArtifact"
+  output: "structural-validation representation"
+  rule: >
+    Artifactに明示されている情報だけを検証表現へ写像し、
+    意味・権限・実行可能性を追加しない。
+  provenance:
+    preserve:
+      - "candidate_identity"
+      - "origin_observation_identity"
+      - "origin"
+      - "intent"
+  status:
+    input: "CANDIDATE"
+    output: "CANDIDATE"
+  authority:
+    input: false
+    output: false
+  executable:
+    input: false
+    output: false
+
+handoff:
+  research_to_runtime:
+    - "このmatome YAMLを意味上の入力としてRuntimeへ渡す"
+    - "Runtimeは明示的Adapterと構造検証を実装する"
+    - "既存Human Gateの意味を変更しない"
+  runtime_to_research:
+    - "Artifactと既存Validatorの表現差異が新たな意味判断を要求する場合はResearchへ返す"
+
+verification:
+  required:
+    - "valid ArtifactがPASS相当の構造結果になる"
+    - "malformed Artifactがfail-closedになる"
+    - "Artifact自体が変更されない"
+    - "validationがauthorityを生成しない"
+    - "validationがexecutionを開始しない"
+    - "provenanceが失われない"
+  failure:
+    action: "fail_closed"
+
+non_goals:
+  - "Human Gate変更"
+  - "ApprovalEnvelope変更"
+  - "Activation変更"
+  - "自動Promotion"
+  - "Semantic Truth Evaluation"
+  - "Provider-specific AI invocation"
+
+authority:
+  research: "semantic definition"
+  runtime: "implementation"
+  human: "final authorization"
+  github: "implementation source of truth"
