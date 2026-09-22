@@ -1,0 +1,118 @@
+matome:
+  title: "白神モデル Pipeline → Runner / Evidence 境界"
+  codename: "Pipeline Runner Evidence Boundary"
+  version: "0.1"
+  status: "research"
+  authority: "meaning"
+
+purpose:
+  statement: >
+    Approved Protocol Pipelineで明示された実行順序を既存Runnerへ安全に渡し、
+    各Activationの実行結果をPipeline identityとexecution orderを保持したまま
+    観測可能なEvidenceへ接続する意味境界を定義する。
+
+principles:
+  - "PipelineはAuthority Sourceではない"
+  - "PipelineはProtocolを選択しない"
+  - "PipelineはApprovalを生成しない"
+  - "PipelineはActivationを生成しない"
+  - "RunnerはPipelineからauthorityを受け取らない"
+  - "Evidenceは実行結果を観測可能にするがauthorityを生成しない"
+  - "Evidenceの存在だけではLandscape変更を意味しない"
+  - "一変更一検証"
+
+runner_handoff:
+  input:
+    type: "ReleasedActivation"
+    source: "Approved Protocol Pipeline"
+  requirements:
+    - "pipeline_identity"
+    - "execution_order"
+    - "activation_identity"
+    - "protocol_identity"
+    - "approval_identity"
+  rule: >
+    Pipelineが保持している明示的identityと順序をRunner実行コンテキストへ
+    引き渡す。Runnerはそれらを権限として解釈しない。
+  must_not:
+    - "Pipeline identityからauthorityを生成する"
+    - "execution orderからProtocol優先順位を推論する"
+    - "missing identityを推論・補完する"
+    - "scopeを拡張する"
+
+evidence:
+  role: "observable_execution_record"
+  requirements:
+    - "pipeline_identity"
+    - "execution_order"
+    - "activation_identity"
+    - "protocol_identity"
+    - "approval_identity"
+    - "run_identity"
+    - "execution_result"
+  rule: >
+    Pipeline由来の実行結果は、元のActivationとRunner run identityを
+    追跡可能な形で保持する。結果そのものに意味的解釈を追加しない。
+  aggregation:
+    rule: "preserve_order_and_identity"
+    semantics:
+      - "各itemのEvidenceを個別に追跡可能にする"
+      - "Pipeline全体の集約は観測上のコンテナでありauthorityではない"
+      - "Evidenceの順序は実行順序を表すが意味的優先順位を表さない"
+
+failure:
+  default: "fail_closed"
+  stop_conditions:
+    - "missing_pipeline_identity"
+    - "missing_execution_order"
+    - "missing_activation_identity"
+    - "missing_protocol_identity"
+    - "missing_approval_identity"
+    - "runner_identity_mismatch"
+    - "verification_mismatch"
+  rule: >
+    失敗またはmismatchしたitem以降の未実行itemは自動実行しない。
+    失敗を成功として再解釈しない。
+
+landscape:
+  rule: "existing_explicit_transition_projection_only"
+  statement: >
+    Pipeline Evidenceは既存のEvidence → Landscape境界を迂回しない。
+    Runner観測やPipeline集約結果だけではLandscapeを変更しない。
+    明示的transition evidenceのみ既存ルールに従って投影可能である。
+
+verification:
+  required:
+    - "Pipeline order is preserved"
+    - "all identities remain traceable"
+    - "Runner receives no new authority"
+    - "Evidence aggregation does not reinterpret results"
+    - "mismatch stops subsequent execution"
+    - "Landscape projection remains explicit"
+  failure:
+    action: "fail_closed"
+
+non_goals:
+  - "scheduler"
+  - "persistent_background_service"
+  - "automatic_protocol_selection"
+  - "automatic_approval"
+  - "automatic_promotion"
+  - "provider_specific_execution"
+  - "semantic_protocol_ranking"
+  - "Human Gate redesign"
+  - "ApprovalEnvelope redesign"
+  - "Landscape semantic reinterpretation"
+
+handoff:
+  research_to_runtime:
+    - "このmatome YAMLを意味上の入力としてRuntimeへ渡す"
+    - "Runtimeは既存Runner/Evidenceの意味を変更しない"
+    - "必要なrepresentation adapterのみ追加する"
+    - "実装上の未解決点はImplementation FindingとしてResearchへ返す"
+
+authority:
+  research: "semantic definition"
+  runtime: "implementation"
+  human: "final authorization"
+  github: "implementation source of truth"
