@@ -1,0 +1,90 @@
+matome:
+  title: "白神モデル Human Gate Handoff Boundary"
+  codename: "Human Gate Handoff"
+  version: "0.1"
+  status: "implementation-candidate"
+
+purpose:
+  statement: >
+    Structural Validationを通過したProtocol CandidateをHuman Reviewへ安全に引き渡す。
+    Validation PASSをApprovalまたはPromotionと同一視せず、
+    Human Gateを権限昇格の唯一の境界として維持する。
+
+boundary:
+  validation_pass:
+    meaning: "構造的に実行可能候補として受理可能"
+    authority: false
+    promotion: false
+  human_review:
+    meaning: "人間による承認判断待ち"
+    authority: false
+    promotion: false
+  human_gate:
+    meaning: "人間が明示的に承認した場合のみ昇格を許可"
+    authority_source: "human"
+    promotion: true
+  approved_protocol:
+    requires: "human_gate"
+    authority: true
+
+input:
+  source: "structural_validator"
+  required:
+    - "valid == true"
+    - "candidate_identity"
+    - "authority == false"
+    - "executable == false"
+
+handoff:
+  action: "prepare_human_review"
+  creates_approval: false
+  creates_activation: false
+  creates_scheduler: false
+  creates_runner: false
+  preserves_candidate_identity: true
+  preserves_provenance: true
+
+human_gate:
+  required: true
+  automatic: false
+  explicit_decision_required: true
+  allowed_decisions:
+    - "approve"
+    - "reject"
+  approve_effect:
+    - "create_approval_envelope"
+    - "promote_candidate_to_approved_protocol"
+  reject_effect:
+    - "candidate_remains_non_executable"
+    - "no_authority_created"
+
+forbidden_shortcuts:
+  - "Validation PASS -> automatic approval"
+  - "Validation PASS -> automatic activation"
+  - "Validation PASS -> scheduler"
+  - "Validation PASS -> runner"
+  - "Human Review -> implicit approval"
+  - "missing_human_decision -> approval"
+  - "rejection -> retry_as_approval"
+
+fail_closed:
+  - "invalid_validator_result"
+  - "missing_candidate_identity"
+  - "missing_provenance"
+  - "missing_human_decision"
+  - "invalid_decision"
+  - "attempted_automatic_promotion"
+
+verification:
+  required:
+    - "PASS enters Human Review without authority"
+    - "absence of Human decision remains non-executable"
+    - "approve is the only path to Approval Envelope"
+    - "reject creates no authority"
+    - "activation/scheduler/runner remain unavailable before approval"
+    - "candidate identity and provenance are preserved"
+
+authority_rule:
+  statement: >
+    Structural Validationは品質判定であり、権限付与ではない。
+    Human Gateは承認判断であり、自動処理から権限を生成しない。
