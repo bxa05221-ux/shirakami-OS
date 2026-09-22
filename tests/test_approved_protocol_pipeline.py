@@ -26,7 +26,7 @@ def test_pipeline_preserves_explicit_order_and_identity():
         pipeline_identity="pipeline-001",
         activations=(first, second),
         execute=lambda activation, order: seen.append(
-            (activation.activation_identity, order)
+            (activation.activation_id, order)
         ) or "ok",
     )
 
@@ -41,7 +41,7 @@ def test_pipeline_stops_on_failure_and_does_not_run_later_activation():
     seen = []
 
     def execute(activation, order):
-        seen.append(activation.activation_identity)
+        seen.append(activation.activation_id)
         if order == 1:
             raise RuntimeError("verification mismatch")
         return "must-not-run"
@@ -61,7 +61,7 @@ def test_pipeline_rejects_non_released_input():
     try:
         run_approved_pipeline(
             pipeline_identity="pipeline-003",
-            activations=({"activation_identity": "a1"},),
+            activations=({"activation_id": "a1"},),
             execute=lambda activation, order: None,
         )
     except PipelineError:
