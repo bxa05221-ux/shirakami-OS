@@ -51,11 +51,11 @@ def run_approved_pipeline(
     for index, activation in enumerate(items, start=1):
         if not isinstance(activation, ReleasedActivation):
             raise PipelineError("pipeline accepts ReleasedActivation only")
-        if not activation.activation_identity:
+        if not activation.activation_id:
             raise PipelineError("missing activation identity")
-        if not activation.protocol_identity:
+        if not activation.protocol_id:
             raise PipelineError("missing protocol identity")
-        if not activation.approval_identity:
+        if not activation.approval_reviewer:
             raise PipelineError("missing approval identity")
 
         try:
@@ -66,9 +66,9 @@ def run_approved_pipeline(
                 items=tuple(results + [
                     PipelineItemResult(
                         execution_order=index,
-                        activation_identity=activation.activation_identity,
-                        protocol_identity=activation.protocol_identity,
-                        approval_identity=activation.approval_identity,
+                        activation_identity=activation.activation_id,
+                        protocol_identity=activation.protocol_id,
+                        approval_identity=activation.approval_reviewer,
                         result=exc,
                     )
                 ]),
@@ -78,9 +78,9 @@ def run_approved_pipeline(
         results.append(
             PipelineItemResult(
                 execution_order=index,
-                activation_identity=activation.activation_identity,
-                protocol_identity=activation.protocol_identity,
-                approval_identity=activation.approval_identity,
+                activation_identity=activation.activation_id,
+                protocol_identity=activation.protocol_id,
+                approval_identity=activation.approval_reviewer,
                 result=value,
             )
         )
