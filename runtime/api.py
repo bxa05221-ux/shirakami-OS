@@ -7,7 +7,7 @@ this module.
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from uuid import uuid4
 from typing import Any, Callable, Mapping
 
@@ -61,15 +61,19 @@ class ShirakamiAPI:
         self.runtime.observe(observation, context)
 
         # Observation identity belongs to the boundary, not to execution
-        # authority. It lets downstream consumers refer to this observation
-        # without turning the handoff into an approval artifact.
+        # authority. Evidence identity is referenced, never manufactured here.
         observation_id = str(uuid4())
+        evidence_ids = tuple(
+            record.evidence_id
+            for record in self.runtime.store.all()
+            if getattr(record, "evidence_id", "")
+        )
         handoff = SemanticHandoff(
             observation_id=observation_id,
             landscape=context.landscape,
             protocol_id=context.protocol_id,
             runtime_state=self.runtime.loop.state.value,
-            evidence_ids=(),
+            evidence_ids=evidence_ids,
             metadata=context.metadata,
         )
         return {
@@ -196,6 +200,7 @@ class ShirakamiAPI:
     @staticmethod
     def _serialize_evidence(record: Any) -> dict[str, Any]:
         return {
+            "evidence_id": record.evidence_id,
             "protocol_id": record.protocol_id,
             "status": record.status,
             "transition_kind": record.transition_kind,
