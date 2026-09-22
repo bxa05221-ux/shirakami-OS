@@ -172,3 +172,41 @@ def test_observation_is_not_executable_or_authoritative():
 
     assert observation.authority is False
     assert observation.executable is False
+
+
+def test_approved_pipeline_e2e_returns_to_observation_without_landscape_mutation():
+    from runtime.pipeline_runner import run_approved_pipeline_on_runner
+
+    landscape, _observation, released = build_approved_release()
+
+    pipeline_result = run_approved_pipeline_on_runner(
+        pipeline_identity="pipeline-e2e-001",
+        activations=(released,),
+        iteration_budget=1,
+        execute=lambda _activation, _iteration: True,
+        verify=lambda _activation, _iteration: True,
+    )
+
+    assert pipeline_result.stopped is False
+    assert pipeline_result.runner_results[0].state is RunnerState.COMPLETED
+    assert pipeline_result.items
+    assert all(item.pipeline_identity == "pipeline-e2e-001" for item in pipeline_result.items)
+    assert all(item.execution_order == 1 for item in pipeline_result.items)
+    assert all(item.run_identity == "pipeline-e2e-001:run:1" for item in pipeline_result.items)
+
+    assert landscape.snapshot() == {}
+
+    next_observation = LandscapeObservation.from_landscape(
+        landscape,
+        observation_identity="observation-pipeline-002",
+        provenance={
+            "source": "pipeline-e2e-001",
+            "runner_run": "pipeline-e2e-001:run:1",
+        },
+        uncertainty="observed",
+        timestamp_or_run_context={"pipeline": "pipeline-e2e-001"},
+    )
+
+    assert next_observation.observed_state == {}
+    assert next_observation.authority is False
+    assert next_observation.executable is False
