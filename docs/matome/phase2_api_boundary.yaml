@@ -1,0 +1,60 @@
+matome:
+  title: "白神 Phase 2・External API Boundary"
+  codename: "Shirakami API Boundary Freeze"
+  status: "phase2_boundary_candidate"
+  purpose:
+    statement: >
+      既存の観測APIを外部利用可能なSemantic Boundaryとして固定し、
+      APIそのものに承認・昇格・権限付与の責務を持たせない。
+
+  endpoint:
+    method: "POST"
+    path: "/observe"
+    role: "Landscape observation boundary"
+
+  may:
+    - "accept observation"
+    - "preserve explicit protocol_id reference"
+    - "return observable result"
+    - "return provenance"
+    - "return observation_id"
+    - "reject invalid input"
+
+  must_not:
+    - "approve protocol"
+    - "promote protocol candidate"
+    - "create approval envelope"
+    - "grant execution authorization"
+    - "broaden execution scope"
+    - "reinterpret verification mismatch"
+    - "select candidate"
+    - "silently mutate approved protocol"
+    - "invoke provider-specific AI as semantic contract"
+
+  authority:
+    source: "human_authorized_approval"
+    api_creates_authority: false
+    api_consumes_authority: false
+    api_reports_observation: true
+
+  frozen_surface:
+    - "/observe"
+
+  intentionally_excluded:
+    - "/chat"
+    - "/generate"
+    - "generic_agent_endpoint"
+    - "provider_specific_invocation"
+    - "production_authentication"
+    - "persistent_evidence_storage"
+
+  verification:
+    rule: "one_change_one_verification"
+    layers:
+      - "OpenAPI"
+      - "in_process_HTTP"
+      - "process_boundary_HTTP"
+      - "invalid_input"
+      - "authority_boundary"
+
+  principle: "APIは境界であって、権限ではない。"
