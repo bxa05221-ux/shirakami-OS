@@ -41,6 +41,9 @@ def activate_approved_protocol(
     if not approval.get("reviewer"):
         raise ActivationError("approval reviewer is required")
 
+    if approval.get("approval_scope") not in {"execution", "publication"}:
+        raise ActivationError("approval scope is required for activation")
+
     if not activation_id.strip():
         raise ActivationError("activation identity is required")
 

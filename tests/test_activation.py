@@ -9,6 +9,7 @@ def approval():
         "protocol_id": "protocol-test-001",
         "reviewer": "human-test",
         "execution_authorized": True,
+        "approval_scope": "execution",
     }
 
 
@@ -37,6 +38,16 @@ def test_missing_authority_fails_closed(approval_field):
 def test_unapproved_envelope_fails_closed():
     a = approval()
     a["execution_authorized"] = False
+    with pytest.raises(ActivationError):
+        activate_approved_protocol(
+            approval=a,
+            activation_id="activation-test-001",
+        )
+
+
+def test_missing_approval_scope_fails_closed():
+    a = approval()
+    a.pop("approval_scope")
     with pytest.raises(ActivationError):
         activate_approved_protocol(
             approval=a,
