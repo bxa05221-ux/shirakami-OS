@@ -1,13 +1,18 @@
 """Public HTTP boundary tests for SemanticHandoff."""
 
+from pathlib import Path
+import sys
+
 import pytest
 
 pytest.importorskip("fastapi")
 pytest.importorskip("httpx")
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "shbb-api"))
+
 from fastapi.testclient import TestClient
 
-from shbb_api.app import create_app
+from app import create_app
 
 
 def test_handoff_round_trip_is_stable_and_non_authoritative():
