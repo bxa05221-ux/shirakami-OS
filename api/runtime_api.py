@@ -3,6 +3,7 @@
 from typing import Any
 
 from plugins.adapters.github.github_adapter import GitHubAdapter
+from runtime.evidence import EvidenceRecord
 from runtime.oppai_schema import normalize as normalize_oppai, to_dict as oppai_to_dict
 from runtime.protocol_runtime_bridge import execute_protocol
 from runtime.prototype import Transition
@@ -71,11 +72,25 @@ def github_controlled_write(payload: dict[str, Any], adapter: GitHubAdapter | No
     }
 
 
+def _evidence_to_dict(record: EvidenceRecord) -> dict[str, Any]:
+    """Serialize the canonical EvidenceRecord without changing its identity."""
+    return {
+        "evidence_id": record.evidence_id,
+        "protocol_id": record.protocol_id,
+        "status": record.status,
+        "transition_kind": record.transition_kind,
+        "transition_data": dict(record.transition_data),
+        "signals": list(record.signals),
+        "confidence": record.confidence,
+    }
+
+
 def create_app():
     """Create a FastAPI app when FastAPI is installed."""
     from fastapi import FastAPI, HTTPException
 
     app = FastAPI(title="Shirakami Runtime API", version="0.1.0")
+    evidence_registry: dict[str, EvidenceRecord] = {}
 
     @app.get("/health")
     def health() -> dict[str, str]:
@@ -108,5 +123,35 @@ def create_app():
             return github_controlled_write(payload)
         except (PermissionError, ValueError, RuntimeError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.post("/v0.1/evidence", status_code=201)
+    def evidence_create_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
+        """Register one immutable EvidenceRecord and return its stable identity."""
+        required = ("protocol_id", "status", "transition_kind", "transition_data", "signals")
+        if any(key not in payload for key in required):
+            raise HTTPException(status_code=400, detail="protocol_id, status, transition_kind, transition_data and signals are required")
+        if not isinstance(payload["transition_data"], dict) or not isinstance(payload["signals"], list):
+            raise HTTPException(status_code=400, detail="transition_data must be an object and signals must be an array")
+        record = EvidenceRecord(
+            protocol_id=payload["protocol_id"],
+            status=payload["status"],
+            transition_kind=payload["transition_kind"],
+            transition_data=payload["transition_data"],
+            signals=tuple(payload["signals"]),
+            confidence=payload.get("confidence", "observed"),
+        )
+        existing = evidence_registry.get(record.evidence_id)
+        if existing is not None and existing != record:
+            raise HTTPException(status_code=409, detail="evidence_id collision")
+        evidence_registry[record.evidence_id] = record
+        return _evidence_to_dict(record)
+
+    @app.get("/v0.1/evidence/{evidence_id}")
+    def evidence_get_endpoint(evidence_id: str) -> dict[str, Any]:
+        """Retrieve Evidence by its stable identity."""
+        record = evidence_registry.get(evidence_id)
+        if record is None:
+            raise HTTPException(status_code=404, detail="evidence not found")
+        return _evidence_to_dict(record)
 
     return app
