@@ -1,0 +1,63 @@
+matome:
+  title: "Human Gate Non-Blocking Progress Model"
+  codename: "Human-Gate-Progress-Model"
+  version: "0.1"
+  status: "Research Finding"
+
+  context:
+    project: "白神モデルβ版研究"
+    trigger: >
+      PR #455でCI検証後、作成者自身はGitHub上で自分のPRをApproveできないことを確認した。
+      これをHuman Gateの停止条件ではなく、外部検証経路として扱う必要が生じた。
+
+  observation:
+    current_state: >
+      自動実装・自動検証までは作業者単独で継続できる。
+      最終確定に第三者レビューが必要な場合、そのPRだけを保留できる。
+    finding: >
+      Human Gateは開発全体を停止させる一本道の関所ではなく、
+      必要な変更に対して追加される確定・検証経路として扱える。
+
+  model:
+    normal_path:
+      - "Implementation"
+      - "Automated Verification"
+      - "Evidence"
+      - "Continue Research / Implementation"
+    external_review_path:
+      - "Implementation"
+      - "Automated Verification"
+      - "Evidence"
+      - "Human Review"
+      - "Approval"
+      - "Merge / Release"
+    rule: >
+      第三者Reviewerの不在は開発全体の停止条件としない。
+      Reviewerが必要な変更は保留し、他の独立した作業を継続できる。
+
+  human_gate:
+    purpose: "最終確定権限をAIから分離する"
+    non_blocking: true
+    applies_to: "対象変更の確定"
+    does_not_apply_to: "研究・実装全体の継続"
+
+  verification:
+    evidence:
+      - "GitHubがPR作成者自身によるApproveを拒否した"
+      - "#455はCI通過後もレビュー待ちとして保持できる"
+      - "レビュー待ちの間もmainを基準とした別作業を継続可能"
+    unverified:
+      - "第三者Reviewerによる実運用レビュー"
+      - "複数PRを並行してHuman Gate保留できる運用"
+
+  next_step:
+    priority: "medium"
+    task: >
+      第三者Reviewer候補への最小レビュー依頼を試行し、
+      Human Gateを追加検証経路として運用できるか確認する。
+
+  critical_rule:
+    - "Human Gateを開発全体の停止条件にしない"
+    - "未承認PRを承認済みと扱わない"
+    - "AI自身による自己承認でHuman Gateを迂回しない"
+    - "レビュー待ちの変更と独立した作業を分離する"
