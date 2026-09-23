@@ -35,9 +35,10 @@ def test_observe_exposes_evidence_boundary() -> None:
         item["signals"] == ["CONTEXT_SNAPSHOT"]
         for item in result["evidence"]
     )
+    assert all(item["evidence_id"] for item in result["evidence"])
 
 
-def test_observe_returns_immutable_semantic_handoff() -> None:
+def test_observe_returns_semantic_handoff_with_stable_evidence_identity() -> None:
     api = _api()
     result = api.observe({"signal": "hello"}, _context())
 
@@ -46,8 +47,10 @@ def test_observe_returns_immutable_semantic_handoff() -> None:
     assert handoff["runtime_state"] == "EVIDENCE"
     assert handoff["landscape"] == {"topic": "ui-for-ai"}
     assert handoff["metadata"] == {"source": "test"}
-    assert handoff["evidence_ids"] == ()
     assert handoff["observation_id"]
+
+    evidence_ids = tuple(item["evidence_id"] for item in result["evidence"])
+    assert handoff["evidence_ids"] == evidence_ids
 
     assert "approval" not in handoff
     assert "human_gate_result" not in handoff
@@ -101,6 +104,7 @@ def test_execute_and_query_are_provider_neutral() -> None:
     evidence = api.query_evidence(protocol_id="api.example")
     assert evidence
     assert all(item["protocol_id"] == "api.example" for item in evidence)
+    assert all(item["evidence_id"] for item in evidence)
 
 
 def test_mismatch_is_queryable() -> None:
@@ -114,6 +118,7 @@ def test_mismatch_is_queryable() -> None:
     mismatch = api.query_evidence(signal="MISMATCH")
     assert mismatch
     assert mismatch[-1]["signals"] == ["MISMATCH"]
+    assert mismatch[-1]["evidence_id"]
 
 
 def test_execution_handle_is_stable_and_verifiable() -> None:
@@ -146,7 +151,7 @@ def test_execution_handle_mismatch_becomes_evidence() -> None:
     assert api.query_evidence(signal="MISMATCH")
 
 
-def test_execution_handle_is_stable_and_verifiable() -> None:
+def test_execution_handle_is_stable_and_verifiable_again() -> None:
     api = _api()
     api.observe({}, _context())
     api.analyze("api.example", protocol_exists=True)
@@ -162,7 +167,7 @@ def test_execution_handle_is_stable_and_verifiable() -> None:
     assert verification.status == "pass"
 
 
-def test_execution_handle_mismatch_becomes_evidence() -> None:
+def test_execution_handle_mismatch_becomes_evidence_again() -> None:
     api = _api()
     api.observe({}, _context())
     api.analyze("api.example", protocol_exists=True)
