@@ -58,7 +58,10 @@ class ShirakamiAPI:
         observation: Mapping[str, Any],
         context: ContextSnapshot,
     ) -> dict[str, Any]:
+        evidence_before = len(self.runtime.store.all())
         self.runtime.observe(observation, context)
+        evidence_records = self.runtime.store.all()
+        new_evidence = evidence_records[evidence_before:]
 
         # Observation identity belongs to the boundary, not to execution
         # authority. It lets downstream consumers refer to this observation
@@ -69,7 +72,7 @@ class ShirakamiAPI:
             landscape=context.landscape,
             protocol_id=context.protocol_id,
             runtime_state=self.runtime.loop.state.value,
-            evidence_ids=(),
+            evidence_ids=tuple(record.evidence_id for record in new_evidence),
             metadata=context.metadata,
         )
         return {
@@ -196,6 +199,7 @@ class ShirakamiAPI:
     @staticmethod
     def _serialize_evidence(record: Any) -> dict[str, Any]:
         return {
+            "evidence_id": record.evidence_id,
             "protocol_id": record.protocol_id,
             "status": record.status,
             "transition_kind": record.transition_kind,
