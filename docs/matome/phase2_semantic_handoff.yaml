@@ -1,0 +1,34 @@
+matome:
+  title: "白神 Phase 2・Semantic Handoff"
+  codename: "Shirakami Semantic Handoff Boundary"
+  status: "phase2_api_observe_evidence_identity_integrated"
+
+  purpose:
+    statement: >
+      SemanticHandoffはObservation境界を越えてContextを受け渡すための
+      immutable envelopeであり、Authority artifactではない。
+
+  fields:
+    observation_id: "boundary-generated observation identity"
+    landscape: "immutable Landscape context"
+    protocol_id: "explicit Protocol reference when available"
+    runtime_state: "observed Runtime state"
+    evidence_ids: "stable EvidenceRecord.evidence_id references"
+    metadata: "provenance/context metadata"
+
+  authority_boundary:
+    approval: false
+    human_gate_result: false
+    execution_authorization: false
+    promotion: false
+    scope_expansion: false
+    provider_authority: false
+
+  api_integration:
+    observe_returns_semantic_handoff: true
+    observation_id_generated_at_boundary: true
+    evidence_ids_populated: true
+    evidence_identity_source: "EvidenceRecord.evidence_id"
+    authority_added: false
+
+  principle: "Context may cross the boundary. Authority may not."
