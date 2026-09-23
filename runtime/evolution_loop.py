@@ -1,13 +1,20 @@
 """R0100 Evidence-Driven Runtime Loop.
 
-Small, backend-neutral state machine for the Shirakami Evolution Loop.
-It validates declared transitions, records every attempted transition, and
-promotes meaningful failures/mismatches/human decisions to Evidence.
+The legacy state-machine API remains available for existing Runtime tests and
+bridge consumers. The β0.1 backend observation primitive is kept as a small,
+backend-neutral composition at the bottom of this module.
 """
 
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Mapping
+
+try:
+    from .backend import Backend
+    from .evidence_return_backend import evidence_from_backend_response
+except ImportError:  # legacy top-level runtime test imports
+    from backend import Backend
+    from evidence_return_backend import evidence_from_backend_response
 
 
 class LoopState(str, Enum):
@@ -115,10 +122,8 @@ class EvolutionLoop:
         rule = self._rules.get((source, event))
         if rule is None:
             return self._record_rejection(source, event, "unknown transition", context)
-
         if rule.requires_human and not human_approved:
             return self._record_rejection(source, event, "human approval required", context)
-
         self.state = rule.target
         record = TransitionRecord(
             from_state=source,
@@ -132,13 +137,7 @@ class EvolutionLoop:
         self._promote(record)
         return TransitionResult(True, source, self.state, event)
 
-    def _record_rejection(
-        self,
-        source: LoopState,
-        event: str,
-        reason: str,
-        context: Mapping[str, Any],
-    ) -> TransitionResult:
+    def _record_rejection(self, source, event, reason, context) -> TransitionResult:
         record = TransitionRecord(
             from_state=source,
             event=event,
@@ -164,3 +163,14 @@ class EvolutionLoop:
                 payload=dict(record.context),
             )
         )
+
+
+def execute_and_observe(
+    backend: Backend,
+    handoff: Mapping[str, Any],
+    *,
+    protocol_id: str = "evolution-loop.v0.1",
+):
+    """Execute a previously authorized handoff and record only the observed result."""
+    response = backend.execute(handoff)
+    return evidence_from_backend_response(response, protocol_id=protocol_id)
