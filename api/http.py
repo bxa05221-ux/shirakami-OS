@@ -9,15 +9,17 @@ from __future__ import annotations
 from dataclasses import asdict
 from typing import Any, Callable, Mapping
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 try:
     from ..runtime.api import ShirakamiAPI
     from ..runtime.evolution_bridge import ContextSnapshot
+    from .auth import require_api_key
 except ImportError:
     from runtime.api import ShirakamiAPI
     from runtime.evolution_bridge import ContextSnapshot
+    from api.auth import require_api_key
 
 
 class ContextSnapshotInput(BaseModel):
@@ -49,8 +51,6 @@ class ExecuteInput(BaseModel):
 
 
 class VerifyInput(BaseModel):
-    # Optional for handle-based verification: the execution is resolved by path.
-    # Retained for the legacy semantic verification boundary.
     execution: dict[str, Any] = Field(default_factory=dict)
     expected_transition_kind: str | None = None
     diff_ref: str = ""
@@ -63,9 +63,11 @@ class ShirakamiHTTPTransport:
         self,
         api: ShirakamiAPI | None = None,
         protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None,
+        api_key: str | None = None,
     ) -> None:
         self.api = api or ShirakamiAPI()
         self.protocol_registry = dict(protocol_registry or {})
+        self.api_key = api_key
 
     def create_app(self) -> FastAPI:
         app = FastAPI(
@@ -76,12 +78,13 @@ class ShirakamiHTTPTransport:
                 "and the Shirakami Evidence-driven Runtime."
             ),
         )
+        auth = require_api_key(self.api_key)
 
         @app.get("/health")
         def health() -> dict[str, str]:
             return {"status": "ok"}
 
-        @app.post("/v1/observe")
+        @app.post("/v1/observe", dependencies=[Depends(auth)])
         def observe(payload: ObserveInput) -> dict[str, Any]:
             context = ContextSnapshot(
                 protocol_id=payload.context.protocol_id,
@@ -90,7 +93,7 @@ class ShirakamiHTTPTransport:
             )
             return self.api.observe(payload.observation, context)
 
-        @app.post("/v1/analyze")
+        @app.post("/v1/analyze", dependencies=[Depends(auth)])
         def analyze(payload: AnalyzeInput) -> dict[str, Any]:
             result = self.api.analyze(
                 payload.protocol_id,
@@ -99,7 +102,7 @@ class ShirakamiHTTPTransport:
             )
             return asdict(result)
 
-        @app.post("/v1/approve")
+        @app.post("/v1/approve", dependencies=[Depends(auth)])
         def approve(payload: ApproveInput) -> dict[str, Any]:
             return self.api.approve(
                 approved=payload.approved,
@@ -107,7 +110,7 @@ class ShirakamiHTTPTransport:
                 human_authorized=payload.human_authorized,
             )
 
-        @app.post("/v1/execute")
+        @app.post("/v1/execute", dependencies=[Depends(auth)])
         def execute(payload: ExecuteInput) -> dict[str, Any]:
             protocol = self.protocol_registry.get(payload.protocol_id)
             if protocol is None:
@@ -121,14 +124,14 @@ class ShirakamiHTTPTransport:
                 payload.input_data,
             )
 
-        @app.get("/v1/executions/{execution_id}")
+        @app.get("/v1/executions/{execution_id}", dependencies=[Depends(auth)])
         def get_execution(execution_id: str) -> dict[str, Any]:
             result = self.api.get_execution(execution_id)
             if result is None:
                 raise HTTPException(status_code=404, detail="unknown execution_id")
             return result
 
-        @app.post("/v1/executions/{execution_id}/verify")
+        @app.post("/v1/executions/{execution_id}/verify", dependencies=[Depends(auth)])
         def verify_execution(execution_id: str, payload: VerifyInput) -> dict[str, Any]:
             result = self.api.verify_execution(
                 execution_id,
@@ -139,14 +142,14 @@ class ShirakamiHTTPTransport:
                 raise HTTPException(status_code=404, detail="unknown execution_id")
             return asdict(result)
 
-        @app.post("/v1/verify")
+        @app.post("/v1/verify", dependencies=[Depends(auth)])
         def verify(payload: VerifyInput) -> dict[str, Any]:
             raise HTTPException(
                 status_code=400,
                 detail="use /v1/executions/{execution_id}/verify; execution_id is required",
             )
 
-        @app.get("/v1/evidence")
+        @app.get("/v1/evidence", dependencies=[Depends(auth)])
         def evidence(
             protocol_id: str | None = None,
             signal: str | None = None,
@@ -166,6 +169,7 @@ class ShirakamiHTTPTransport:
 def create_app(
     api: ShirakamiAPI | None = None,
     protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None,
+    api_key: str | None = None,
 ) -> FastAPI:
     """Convenience factory for WSGI/ASGI hosts and tests."""
-    return ShirakamiHTTPTransport(api, protocol_registry).create_app()
+    return ShirakamiHTTPTransport(api, protocol_registry, api_key).create_app()
