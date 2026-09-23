@@ -1,7 +1,7 @@
 matome:
   title: "白神 Phase 2・Semantic Handoff"
   codename: "Shirakami Semantic Handoff Boundary"
-  status: "phase2_api_observe_integrated"
+  status: "phase2_api_observe_evidence_identity_integrated"
 
   purpose:
     statement: >
@@ -40,5 +40,6 @@ matome:
   api_integration:
     observe_returns_semantic_handoff: true
     observation_id_generated_at_boundary: true
-    evidence_ids_populated: false
+    evidence_ids_populated: true
+    evidence_identity_source: "EvidenceRecord.evidence_id"
     authority_added: false
