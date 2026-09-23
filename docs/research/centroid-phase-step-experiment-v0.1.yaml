@@ -1,0 +1,110 @@
+matome:
+  title: "3D位相回転アイゼンハワーマトリクス：重心差ベクトル→スモールステップ実験"
+  codename: "Centroid-Vector Small-Step Experiment"
+  version: "0.1"
+  status: "Research Experiment"
+
+  project:
+    name: "白神モデルβ版研究"
+    repository: "bxa05221-ux/shirakami-OS"
+
+  purpose: >
+    タスク群の重心と原点との位相差をベクトルとして観測し、
+    その成分を一度に解決せず、最小移動量のスモールステップへ分解する。
+    開発Landscapeの状態変化を一変更一検証で観測する。
+
+  hypothesis: >
+    重心から原点への差ベクトルを軸成分へ分解すると、
+    現在のLandscapeが次に必要とする変化方向を候補として提示できる。
+    最大成分を一度に全解決するのではなく、1ステップだけ移動して再測定することで、
+    3D位相回転アイゼンハワーマトリクスを優先順位表ではなく状態観測・小ステップ生成器として検証できる。
+
+  coordinate_system:
+    x:
+      name: "緊急度"
+      scale: "experimental"
+    y:
+      name: "重要度"
+      scale: "experimental"
+    z:
+      name: "現在位相からの距離"
+      scale: "experimental"
+
+  origin:
+    meaning: "現在のLandscapeが目指す基準状態"
+    coordinate: [0, 0, 0]
+
+  observed_points:
+    - id: "A"
+      task: "Shared Evidence / Observation-local Evidence の意味確定"
+      coordinate: [5, 5, 0]
+    - id: "B"
+      task: "SemanticHandoffのテスト意味修正"
+      coordinate: [4, 4, 0]
+    - id: "C"
+      task: "API/HTTPへの進行"
+      coordinate: [1, 5, 2]
+
+  centroid:
+    method: "arithmetic mean of observed task coordinates"
+    coordinate: [3.333333, 4.666667, 0.666667]
+    status: "experimental"
+
+  phase_difference:
+    vector_from_origin_to_centroid: [3.333333, 4.666667, 0.666667]
+    correction_vector_to_origin: [-3.333333, -4.666667, -0.666667]
+
+  vector_decomposition:
+    x_component: -3.333333
+    y_component: -4.666667
+    z_component: -0.666667
+    dominant_component: "y"
+
+  small_step_rule:
+    principle: >
+      差ベクトル全体を一度に解消しない。最大成分またはHuman Gateで選択された成分に対して、
+      一回の最小変更だけを実施し、その後に再観測する。
+    step_size: 1
+    sequence:
+      - "centroid measurement"
+      - "origin difference vector calculation"
+      - "axis decomposition"
+      - "one small change"
+      - "verification"
+      - "Evidence capture"
+      - "centroid re-measurement"
+
+  current_experiment:
+    selected_direction: "y"
+    candidate_step: "Shared Evidence / Observation-local Evidence の意味を確定する"
+    reason: "実験上の最大補正成分がy方向であり、現在のCI findingとも一致するため"
+    execution: "not yet performed"
+
+  verification:
+    required:
+      - "同一Landscapeに対して重心計算が再現可能である"
+      - "座標値を変更した場合に重心が対応して変化する"
+      - "ベクトル分解が重心差を正しく再構成する"
+      - "1ステップ実施後に再測定できる"
+      - "スモールステップがCI/Evidenceによって検証可能である"
+      - "座標モデル自体を確定仕様と誤認しない"
+
+  limitations:
+    - "現在の座標値は実験用仮値であり、仕様上の定数ではない"
+    - "x/y/z軸の意味は今後のResearchで再評価する"
+    - "重心だけで次の行動を自動決定しない"
+    - "Human Gateを省略しない"
+    - "この実験結果からRuntime仕様を直接変更しない"
+
+  handoff:
+    owner: "Research"
+    next: >
+      実験対象を一変更一検証で処理し、結果をEvidenceとして記録する。
+      再測定した重心と差ベクトルを比較し、仮説の再現性を評価する。
+
+  critical_rule:
+    - "重心は状態観測値であり、権限ではない"
+    - "ベクトルは候補生成であり、命令ではない"
+    - "Human Gateを維持する"
+    - "一変更一検証"
+    - "実験結果を理論へ逆輸入しない"
