@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
-from .backend import BackendResponse
-from .evidence import EvidenceRecord
+try:
+    from .backend import BackendResponse
+    from .evidence import EvidenceRecord
+except ImportError:
+    from backend import BackendResponse
+    from evidence import EvidenceRecord
 
 
 def evidence_from_backend_response(
