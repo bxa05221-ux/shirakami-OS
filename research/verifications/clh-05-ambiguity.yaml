@@ -1,0 +1,17 @@
+matome:
+  title: "Complex Landscape CLH-05 曖昧意味検証"
+  codename: "CLH-05"
+  version: "0.1"
+  status: "Research Verification"
+  hypothesis: "複数の意味候補が同時に成立する場合、iを保持することでAIが単一解釈を早期確定しなくてよい。"
+  test_case: "同じ出来事に複数のもっともらしい意味が存在し、Evidenceだけでは一意に定まらない。"
+  handling:
+    AI: "候補を並置する"
+    Human: "価値・経験・関係から意味を選択または保留する"
+    i: "一意に射影できない意味を保持する"
+  result: "Conceptually consistent"
+  finding: "曖昧さをエラーではなくLandscape上の保持状態として扱える。"
+  limitation: "候補生成の妥当性は別検証。"
+  judgment:
+    passed: true
+    scope: "Research-only"
