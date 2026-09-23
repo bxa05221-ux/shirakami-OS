@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Any, Mapping
 
 from runtime.backend import Backend
-from runtime.context_bundle import ContextBundle, bundle_payload
+from runtime.context_bundle import ContextBundle, bundle_lineage, bundle_payload
 from runtime.context_routing import route_context
 from runtime.evidence_resolver import resolve_evidence
 from runtime.evolution_loop import execute_and_observe
@@ -35,7 +35,7 @@ def _admit_context(handoff: Mapping[str, Any]) -> Mapping[str, Any]:
 
     admitted = dict(handoff)
     admitted["context_bundle"] = bundle_payload(bundle)
-    admitted["context_lineage"] = bundle_payload(bundle)["request_id"]
+    admitted["context_lineage"] = bundle_lineage(bundle)
     admitted.pop("evidence_store", None)
     return admitted
 
