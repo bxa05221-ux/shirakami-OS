@@ -7,7 +7,7 @@ this module.
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from uuid import uuid4
 from typing import Any, Callable, Mapping
 
@@ -15,10 +15,12 @@ try:
     from .evolution_bridge import ContextSnapshot, VerificationResult
     from .evolution_pipeline import AnalysisResult, EvidenceDrivenRuntime
     from .prototype import ExecutionResult, Transition
+    from .semantic_handoff import SemanticHandoff
 except ImportError:
     from evolution_bridge import ContextSnapshot, VerificationResult
     from evolution_pipeline import AnalysisResult, EvidenceDrivenRuntime
     from prototype import ExecutionResult, Transition
+    from semantic_handoff import SemanticHandoff
 
 
 @dataclass(frozen=True)
@@ -56,55 +58,36 @@ class ShirakamiAPI:
         observation: Mapping[str, Any],
         context: ContextSnapshot,
     ) -> dict[str, Any]:
+        evidence_before = len(self.runtime.store.all())
         self.runtime.observe(observation, context)
+        evidence_records = self.runtime.store.all()
+        new_evidence = evidence_records[evidence_before:]
+
+        observation_id = str(uuid4())
+        handoff = SemanticHandoff(
+            observation_id=observation_id,
+            landscape=context.landscape,
+            protocol_id=context.protocol_id,
+            runtime_state=self.runtime.loop.state.value,
+            evidence_ids=tuple(record.evidence_id for record in new_evidence),
+            metadata=context.metadata,
+        )
         return {
             "state": self.runtime.loop.state.value,
             "evidence": self._evidence(),
+            "semantic_handoff": dict(handoff.as_mapping()),
         }
 
-    def analyze(
-        self,
-        protocol_id: str,
-        *,
-        protocol_exists: bool = True,
-        diff_ref: str = "",
-    ) -> AnalysisResult:
-        return self.runtime.analyze(
-            protocol_id,
-            protocol_exists=protocol_exists,
-            diff_ref=diff_ref,
-        )
+    def analyze(self, protocol_id: str, *, protocol_exists: bool = True, diff_ref: str = "") -> AnalysisResult:
+        return self.runtime.analyze(protocol_id, protocol_exists=protocol_exists, diff_ref=diff_ref)
 
-    def approve(
-        self,
-        *,
-        approved: bool = True,
-        reviewer: str = "human",
-        human_authorized: bool = False,
-    ) -> dict[str, Any]:
-        """Apply an explicit human decision; authorization is never inferred."""
+    def approve(self, *, approved: bool = True, reviewer: str = "human", human_authorized: bool = False) -> dict[str, Any]:
         if not human_authorized:
-            return {
-                "accepted": False,
-                "state": self.runtime.loop.state.value,
-                "reason": "explicit human authorization required",
-            }
+            return {"accepted": False, "state": self.runtime.loop.state.value, "reason": "explicit human authorization required"}
+        accepted = self.runtime.approve(approved=approved, reviewer=reviewer)
+        return {"accepted": accepted, "state": self.runtime.loop.state.value}
 
-        accepted = self.runtime.approve(
-            approved=approved,
-            reviewer=reviewer,
-        )
-        return {
-            "accepted": accepted,
-            "state": self.runtime.loop.state.value,
-        }
-
-    def execute(
-        self,
-        protocol: Callable[[Any], Transition],
-        protocol_id: str,
-        input_data: Mapping[str, Any] | None = None,
-    ) -> dict[str, Any]:
+    def execute(self, protocol: Callable[[Any], Transition], protocol_id: str, input_data: Mapping[str, Any] | None = None) -> dict[str, Any]:
         result = self.runtime.execute(protocol, protocol_id, input_data)
         payload = {
             "status": result.status,
@@ -130,34 +113,16 @@ class ShirakamiAPI:
         payload = handle.result
         transition = payload["transition"]
         execution = ExecutionResult(
-            status=str(payload["status"]),
-            protocol_id=str(payload["protocol_id"]),
+            status=str(payload["status"]), protocol_id=str(payload["protocol_id"]),
             transition=Transition(kind=str(transition["kind"]), data=dict(transition.get("data", {}))),
-            signals=tuple(payload.get("signals", ())),
-            steps=int(payload.get("steps", 0)),
+            signals=tuple(payload.get("signals", ())), steps=int(payload.get("steps", 0)),
         )
         return self.verify(execution, expected_transition_kind=expected_transition_kind, diff_ref=diff_ref)
 
-    def verify(
-        self,
-        execution: ExecutionResult,
-        *,
-        expected_transition_kind: str | None = None,
-        diff_ref: str = "",
-    ) -> VerificationResult:
-        return self.runtime.verify(
-            execution,
-            expected_transition_kind=expected_transition_kind,
-            diff_ref=diff_ref,
-        )
+    def verify(self, execution: ExecutionResult, *, expected_transition_kind: str | None = None, diff_ref: str = "") -> VerificationResult:
+        return self.runtime.verify(execution, expected_transition_kind=expected_transition_kind, diff_ref=diff_ref)
 
-    def query_evidence(
-        self,
-        *,
-        protocol_id: str | None = None,
-        signal: str | None = None,
-        transition_kind: str | None = None,
-    ) -> tuple[Any, ...]:
+    def query_evidence(self, *, protocol_id: str | None = None, signal: str | None = None, transition_kind: str | None = None) -> tuple[Any, ...]:
         if protocol_id is not None:
             records = self.runtime.store.by_protocol(protocol_id)
         elif signal is not None:
@@ -172,14 +137,12 @@ class ShirakamiAPI:
         return [self._serialize_evidence(record) for record in self.runtime.store.all()]
 
     def _evidence_for_protocol(self, protocol_id: str) -> list[dict[str, Any]]:
-        return [
-            self._serialize_evidence(record)
-            for record in self.runtime.store.by_protocol(protocol_id)
-        ]
+        return [self._serialize_evidence(record) for record in self.runtime.store.by_protocol(protocol_id)]
 
     @staticmethod
     def _serialize_evidence(record: Any) -> dict[str, Any]:
         return {
+            "evidence_id": record.evidence_id,
             "protocol_id": record.protocol_id,
             "status": record.status,
             "transition_kind": record.transition_kind,
