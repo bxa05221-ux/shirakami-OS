@@ -4,6 +4,7 @@ from typing import Any
 
 from plugins.adapters.github.github_adapter import GitHubAdapter
 from runtime.evidence import EvidenceRecord
+from runtime.interpretation import InterpretationRecord
 from runtime.oppai_schema import normalize as normalize_oppai, to_dict as oppai_to_dict
 from runtime.protocol_runtime_bridge import execute_protocol
 from runtime.prototype import Transition
@@ -85,12 +86,24 @@ def _evidence_to_dict(record: EvidenceRecord) -> dict[str, Any]:
     }
 
 
+def _interpretation_to_dict(record: InterpretationRecord) -> dict[str, Any]:
+    """Serialize the canonical InterpretationRecord without changing identity."""
+    return {
+        "interpretation_id": record.interpretation_id,
+        "source_evidence": list(record.source_evidence),
+        "actor_id": record.actor_id,
+        "content": dict(record.content),
+        "status": record.status,
+    }
+
+
 def create_app():
     """Create a FastAPI app when FastAPI is installed."""
     from fastapi import FastAPI, HTTPException
 
     app = FastAPI(title="Shirakami Runtime API", version="0.1.0")
     evidence_registry: dict[str, EvidenceRecord] = {}
+    interpretation_registry: dict[str, InterpretationRecord] = {}
 
     @app.get("/health")
     def health() -> dict[str, str]:
@@ -126,7 +139,6 @@ def create_app():
 
     @app.post("/v0.1/evidence", status_code=201)
     def evidence_create_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
-        """Register one immutable EvidenceRecord and return its stable identity."""
         required = ("protocol_id", "status", "transition_kind", "transition_data", "signals")
         if any(key not in payload for key in required):
             raise HTTPException(status_code=400, detail="protocol_id, status, transition_kind, transition_data and signals are required")
@@ -148,10 +160,40 @@ def create_app():
 
     @app.get("/v0.1/evidence/{evidence_id}")
     def evidence_get_endpoint(evidence_id: str) -> dict[str, Any]:
-        """Retrieve Evidence by its stable identity."""
         record = evidence_registry.get(evidence_id)
         if record is None:
             raise HTTPException(status_code=404, detail="evidence not found")
         return _evidence_to_dict(record)
+
+    @app.post("/v0.1/interpretations", status_code=201)
+    def interpretation_create_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
+        required = ("source_evidence", "actor_id", "content")
+        if any(key not in payload for key in required):
+            raise HTTPException(status_code=400, detail="source_evidence, actor_id and content are required")
+        if not isinstance(payload["source_evidence"], list) or not all(isinstance(item, str) for item in payload["source_evidence"]):
+            raise HTTPException(status_code=400, detail="source_evidence must be an array of strings")
+        if not isinstance(payload["actor_id"], str) or not isinstance(payload["content"], dict):
+            raise HTTPException(status_code=400, detail="actor_id must be a string and content must be an object")
+        missing = [evidence_id for evidence_id in payload["source_evidence"] if evidence_id not in evidence_registry]
+        if missing:
+            raise HTTPException(status_code=404, detail={"missing_evidence": missing})
+        record = InterpretationRecord(
+            source_evidence=tuple(payload["source_evidence"]),
+            actor_id=payload["actor_id"],
+            content=payload["content"],
+            status=payload.get("status", "proposed"),
+        )
+        existing = interpretation_registry.get(record.interpretation_id)
+        if existing is not None and existing != record:
+            raise HTTPException(status_code=409, detail="interpretation_id collision")
+        interpretation_registry[record.interpretation_id] = record
+        return _interpretation_to_dict(record)
+
+    @app.get("/v0.1/interpretations/{interpretation_id}")
+    def interpretation_get_endpoint(interpretation_id: str) -> dict[str, Any]:
+        record = interpretation_registry.get(interpretation_id)
+        if record is None:
+            raise HTTPException(status_code=404, detail="interpretation not found")
+        return _interpretation_to_dict(record)
 
     return app
