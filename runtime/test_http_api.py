@@ -52,11 +52,13 @@ def test_observe_and_evidence_are_json_transport() -> None:
         item["signals"] == ["CONTEXT_SNAPSHOT"]
         for item in body["evidence"]
     )
+    assert all(item["evidence_id"] for item in body["evidence"])
+
     handoff = body["semantic_handoff"]
     assert handoff["protocol_id"] == "http.example"
     assert handoff["runtime_state"] == "EVIDENCE"
     assert handoff["observation_id"]
-    assert handoff["evidence_ids"] == []
+    assert handoff["evidence_ids"] == [item["evidence_id"] for item in body["evidence"]]
     assert "approval" not in handoff
     assert "execution_authorization" not in handoff
 
@@ -66,6 +68,7 @@ def test_observe_and_evidence_are_json_transport() -> None:
     )
     assert evidence.status_code == 200
     assert evidence.json()
+    assert evidence.json()[0]["evidence_id"] in handoff["evidence_ids"]
 
 
 def test_approval_cannot_be_inferred_over_http() -> None:
