@@ -1,0 +1,85 @@
+matome:
+  title: "ApprovalEnvelope Semantic Boundary"
+  codename: "Approval-Envelope-Semantics"
+  version: "0.1"
+  status: "Research Finding"
+
+  context:
+    project: "白神モデルβ版研究"
+    related_findings:
+      - "Human Gate Non-Blocking Progress Model"
+      - "Evidence Identity → Semantic Handoff → API"
+    trigger: >
+      PR #455において、GitHubのPR Reviewと白神のHuman Gateを同一視できないことが観測された。
+      そこで、Human Gateを意味側の承認境界として表現するApprovalEnvelopeの意味を定義する。
+
+  principle:
+    statement: >
+      ApprovalEnvelopeは、AIまたはRuntimeが生成した判断材料を、
+      人間が何を承認したのかを明示する意味側の境界である。
+    separation: >
+      ApprovalEnvelopeはGitHub PR Reviewそのものではない。
+      GitHubは実装・履歴・Releaseの確定境界を担い、
+      ApprovalEnvelopeは意味・Evidence・Human Decisionの境界を担う。
+
+  approval_subject:
+    required:
+      - "対象となる変更または操作"
+      - "対象を識別するEvidence"
+      - "承認対象のSemantic scope"
+      - "人間によるDecision"
+    prohibited:
+      - "AI自身による自己承認"
+      - "Evidenceを伴わない暗黙の承認"
+      - "承認範囲を越えた権限の拡張"
+
+  evidence_binding:
+    rule: >
+      ApprovalEnvelopeは、承認対象をEvidence identityへ結び付ける。
+      承認後に対象Evidenceが変更された場合、元のApprovalEnvelopeを
+      変更後の対象への承認として再利用してはならない。
+    identity_source: "EvidenceRecord.evidence_id"
+
+  semantic_scope:
+    rule: >
+      Human Decisionは、対象として明示されたSemantic scopeにのみ適用される。
+      実装側の権限やGitHubのmerge権限をApprovalEnvelopeから自動的に拡張しない。
+
+  flow:
+    - "AI / Runtime"
+    - "Implementation / Operation"
+    - "Verification"
+    - "Evidence"
+    - "Approval Request"
+    - "ApprovalEnvelope"
+    - "Human Decision"
+    - "Implementation Boundary (e.g. GitHub Merge)"
+
+  non_blocking:
+    rule: >
+      ApprovalEnvelopeが未承認であることは、対象変更の確定を保留する条件であるが、
+      独立したResearchまたはImplementation全体を停止させる条件ではない。
+
+  verification_status:
+    confirmed:
+      - "GitHub PR作成者は自分自身のPRをApproveできない"
+      - "#455はCI通過後もレビュー待ちとして保持できる"
+      - "Human GateとImplementation Gateを分離する必要性が観測された"
+    unverified:
+      - "ApprovalEnvelopeの実データ構造"
+      - "署名・認証方式"
+      - "GitHub/API/Operationへの具体的な接続方式"
+      - "第三者Reviewerによる実運用"
+
+  next_step:
+    priority: "medium"
+    task: >
+      ApprovalEnvelopeの最小データ構造を設計し、
+      Evidence identityとの結合を小規模なResearch実験として検証する。
+
+  critical_rule:
+    - "意味の承認と実装のmergeを同一視しない"
+    - "承認対象をEvidence identityに固定する"
+    - "承認範囲を勝手に拡張しない"
+    - "未承認を承認済みとして扱わない"
+    - "ApprovalEnvelopeを実装仕様へ先走って固定しない"
