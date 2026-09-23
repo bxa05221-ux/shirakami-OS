@@ -15,10 +15,12 @@ try:
     from .evolution_bridge import ContextSnapshot, VerificationResult
     from .evolution_pipeline import AnalysisResult, EvidenceDrivenRuntime
     from .prototype import ExecutionResult, Transition
+    from .semantic_handoff import SemanticHandoff
 except ImportError:
     from evolution_bridge import ContextSnapshot, VerificationResult
     from evolution_pipeline import AnalysisResult, EvidenceDrivenRuntime
     from prototype import ExecutionResult, Transition
+    from semantic_handoff import SemanticHandoff
 
 
 @dataclass(frozen=True)
@@ -56,10 +58,24 @@ class ShirakamiAPI:
         observation: Mapping[str, Any],
         context: ContextSnapshot,
     ) -> dict[str, Any]:
+        evidence_before = len(self.runtime.store.all())
         self.runtime.observe(observation, context)
+        evidence_records = self.runtime.store.all()
+        new_evidence = evidence_records[evidence_before:]
+
+        observation_id = str(uuid4())
+        handoff = SemanticHandoff(
+            observation_id=observation_id,
+            landscape=context.landscape,
+            protocol_id=context.protocol_id,
+            runtime_state=self.runtime.loop.state.value,
+            evidence_ids=tuple(record.evidence_id for record in new_evidence),
+            metadata=context.metadata,
+        )
         return {
             "state": self.runtime.loop.state.value,
             "evidence": self._evidence(),
+            "semantic_handoff": dict(handoff.as_mapping()),
         }
 
     def analyze(
@@ -89,52 +105,59 @@ class ShirakamiAPI:
                 "state": self.runtime.loop.state.value,
                 "reason": "explicit human authorization required",
             }
-
-        accepted = self.runtime.approve(
-            approved=approved,
-            reviewer=reviewer,
-        )
+        if not approved:
+            return {
+                "accepted": False,
+                "state": self.runtime.loop.state.value,
+                "reason": "human rejected candidate",
+            }
+        result = self.runtime.approve(reviewer=reviewer)
         return {
-            "accepted": accepted,
+            "accepted": True,
             "state": self.runtime.loop.state.value,
+            "review": asdict(result),
         }
 
     def execute(
         self,
         protocol: Callable[[Any], Transition],
         protocol_id: str,
-        input_data: Mapping[str, Any] | None = None,
+        input_data: Mapping[str, Any],
     ) -> dict[str, Any]:
-        result = self.runtime.execute(protocol, protocol_id, input_data)
+        result = self.runtime.execute(protocol_id, protocol, input_data)
         payload = {
             "status": result.status,
-            "protocol_id": result.protocol_id,
-            "transition": {"kind": result.transition.kind, "data": dict(result.transition.data)},
-            "signals": list(result.signals),
-            "steps": result.steps,
-            "evidence": self._evidence_for_protocol(protocol_id)[-1:],
+            "transition": asdict(result.transition) if result.transition else None,
+            "evidence": self._evidence_for_protocol(protocol_id),
         }
         handle = self.executions.create(protocol_id, payload)
-        return {**payload, "execution_id": handle.execution_id}
+        return {
+            "execution_id": handle.execution_id,
+            "protocol_id": handle.protocol_id,
+            "status": handle.status,
+            "transition": payload["transition"],
+            "evidence": payload["evidence"],
+        }
 
     def get_execution(self, execution_id: str) -> dict[str, Any] | None:
         handle = self.executions.get(execution_id)
         if handle is None:
             return None
-        return {"execution_id": handle.execution_id, "protocol_id": handle.protocol_id, "status": handle.status, "result": dict(handle.result)}
+        return asdict(handle)
 
-    def verify_execution(self, execution_id: str, *, expected_transition_kind: str | None = None, diff_ref: str = "") -> VerificationResult | None:
+    def verify_execution(
+        self,
+        execution_id: str,
+        *,
+        expected_transition_kind: str,
+        diff_ref: str = "",
+    ) -> VerificationResult | None:
         handle = self.executions.get(execution_id)
         if handle is None:
             return None
-        payload = handle.result
-        transition = payload["transition"]
         execution = ExecutionResult(
-            status=str(payload["status"]),
-            protocol_id=str(payload["protocol_id"]),
-            transition=Transition(kind=str(transition["kind"]), data=dict(transition.get("data", {}))),
-            signals=tuple(payload.get("signals", ())),
-            steps=int(payload.get("steps", 0)),
+            status=handle.status,
+            transition=Transition(**handle.result["transition"]) if handle.result["transition"] else None,
         )
         return self.verify(execution, expected_transition_kind=expected_transition_kind, diff_ref=diff_ref)
 
@@ -142,7 +165,7 @@ class ShirakamiAPI:
         self,
         execution: ExecutionResult,
         *,
-        expected_transition_kind: str | None = None,
+        expected_transition_kind: str,
         diff_ref: str = "",
     ) -> VerificationResult:
         return self.runtime.verify(
@@ -157,7 +180,7 @@ class ShirakamiAPI:
         protocol_id: str | None = None,
         signal: str | None = None,
         transition_kind: str | None = None,
-    ) -> tuple[Any, ...]:
+    ) -> tuple[dict[str, Any], ...]:
         if protocol_id is not None:
             records = self.runtime.store.by_protocol(protocol_id)
         elif signal is not None:
@@ -180,6 +203,7 @@ class ShirakamiAPI:
     @staticmethod
     def _serialize_evidence(record: Any) -> dict[str, Any]:
         return {
+            "evidence_id": record.evidence_id,
             "protocol_id": record.protocol_id,
             "status": record.status,
             "transition_kind": record.transition_kind,
