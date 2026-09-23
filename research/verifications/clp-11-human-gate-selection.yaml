@@ -1,0 +1,88 @@
+matome:
+  title: "Complex Landscape CLP-11 Human Gate Interpretation Selection Test"
+  codename: "CLP-11"
+  version: "0.1"
+  status: "Research Verification"
+
+  purpose: >
+    Human Gateが複数Interpretationに対して採用・棄却・保留・統合を行った場合でも、
+    元Evidence identityと各Interpretation identityを保持できるかを検証する。
+
+  source:
+    evidence:
+      - evidence_id: "E0"
+        observation: "出来事Xが発生した"
+    interpretations:
+      - interpretation_id: "I-A"
+        actor: "AI"
+        evidence_link: ["E0"]
+        state: "proposed"
+      - interpretation_id: "I-H"
+        actor: "Human"
+        evidence_link: ["E0"]
+        state: "proposed"
+      - interpretation_id: "I-R"
+        actor: "Renderer"
+        evidence_link: ["E0"]
+        state: "proposed"
+
+  human_gate_actions:
+    - action: "accept"
+      target: "I-A"
+      result: "accepted_by_human"
+    - action: "reject"
+      target: "I-R"
+      result: "rejected_by_human"
+    - action: "hold"
+      target: "I-H"
+      result: "held_for_later_review"
+    - action: "synthesize"
+      targets: ["I-A", "I-H"]
+      result: "new interpretation identity required"
+
+  invariants:
+    - "E0 remains unchanged by every Human Gate action."
+    - "Acceptance does not promote an interpretation into Evidence."
+    - "Rejection does not erase the historical existence of the interpretation."
+    - "Hold preserves the unresolved state."
+    - "Synthesis creates a new interpretation_id and links its source interpretations."
+    - "Human decision is attributed to Human and is not inferred from AI output."
+    - "The decision record is separate from the original interpretation."
+
+  result:
+    status: "Conceptually consistent"
+    finding: >
+      Human Gate actions can operate on Interpretation objects while preserving
+      immutable Evidence identity. Acceptance, rejection, hold, and synthesis
+      are state transitions or new semantic objects rather than mutations of
+      the underlying Evidence.
+
+  semantic_chain:
+    - "Evidence"
+    - "Interpretation"
+    - "Human Gate"
+    - "Decision Record"
+    - "Optional new Interpretation"
+
+  important_consequence: >
+    Human Gate is not merely a permission button. It is a semantic boundary
+    where a Human can change the status of an interpretation without changing
+    the identity of the underlying observation. This preserves auditability,
+    disagreement, and the distinction between observation and judgment.
+
+  deletion_candidates:
+    - field: "coordinate"
+      status: "廃止候補継続"
+    - field: "projection_scope"
+      status: "保留"
+
+  boundary:
+    research_only: true
+    runtime_change: false
+    api_change: false
+    mathematical_proof: false
+
+  next:
+    codename: "CLP-12"
+    title: "Decision Lineage and Reversal Test"
+    purpose: "Human Gate後のDecisionを後から変更・撤回してもEvidence lineageを壊さない条件を検証する"
