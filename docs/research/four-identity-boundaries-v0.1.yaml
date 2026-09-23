@@ -1,0 +1,91 @@
+matome:
+  title: "Evidence Identity / Observation Occurrence / Semantic Reference / Execution Identity"
+  codename: "Four Identity Boundaries"
+  version: "0.1"
+  status: "Research Finding"
+
+  project:
+    name: "白神モデルβ版研究"
+    repository: "bxa05221-ux/shirakami-OS"
+
+  finding:
+    statement: >
+      Evidence、Observation、SemanticHandoff、Executionは、
+      それぞれ異なる意味上のidentityを持つ。これらを単一のID概念として扱うと、
+      Runtime・SemanticHandoff・API境界に意味の混線が生じる。
+
+  identities:
+    evidence:
+      field: "evidence_id"
+      meaning: "Evidence内容そのものの安定したidentity"
+      property:
+        - "同一内容なら同一ID"
+        - "内容が変化すれば異なるID"
+      role: "Evidence identity"
+
+    observation:
+      field: "observation_id"
+      meaning: "一回の観測・受付イベントを識別するidentity"
+      property:
+        - "異なる観測は異なるoccurrence"
+        - "同一Evidenceを参照することを妨げない"
+      role: "Occurrence identity"
+
+    semantic_handoff:
+      field: "evidence_ids"
+      meaning: >
+        SemanticHandoffが参照するEvidenceの集合。Evidenceそのものを再生成せず、
+        stable evidence_idによって参照する。
+      role: "Semantic reference"
+
+    execution:
+      field: "execution_id"
+      meaning: "外部から追跡可能な一回の実行を識別するidentity"
+      role: "Execution identity"
+
+  canonical_relationship:
+    - "Observation → Evidence"
+    - "Observationはoccurrenceを持つ"
+    - "Evidenceはstable identityを持つ"
+    - "SemanticHandoffはEvidenceを参照する"
+    - "Executionは実行単位を識別する"
+
+  boundary_rules:
+    - "evidence_idをobservation_idとして使用しない"
+    - "observation_idをevidence_idとして使用しない"
+    - "SemanticHandoffでEvidenceを再生成しない"
+    - "execution_idをEvidence identityとして使用しない"
+    - "API境界では各identityの意味を保持する"
+
+  implementation_rule:
+    owner: "Research → Runtime"
+    rule: >
+      この意味境界をRuntime実装へ反映する際、実装都合によってidentityの意味を変更しない。
+
+  verification:
+    required:
+      - "同一Evidence → 同一evidence_id"
+      - "異なるObservation → 異なるobservation_id"
+      - "異なるObservationが同一Evidenceを参照可能"
+      - "SemanticHandoffがstable evidence_idを参照"
+      - "Execution identityが独立している"
+      - "API/HTTP境界でidentityの意味が保持される"
+
+  implementation_finding:
+    current_state:
+      - "Evidence stable identityはmainへ確定"
+      - "SemanticHandoff実装はmainとの同期状態を再確認する必要がある"
+      - "API境界にはidentityの意味を明示的に反映する必要がある"
+
+  next_step:
+    priority: "high"
+    action: >
+      このFindingを意味上の基準として確定し、SemanticHandoffとAPI境界の実装を再評価する。
+      その後、一変更一検証でRuntimeへ反映する。
+
+  critical_rule:
+    - "会話を実装上の正本にしない"
+    - "GitHub mainを実装正本とする"
+    - "意味は的目YAMLで固定する"
+    - "理論未確定のままRuntimeへ埋め込まない"
+    - "一変更一検証"
