@@ -37,4 +37,4 @@ def test_evolution_api_admits_only_explicit_context_bundle():
     ]
     assert "e-999" not in str(echoed["context_bundle"])
     assert "evidence_store" not in echoed
-    assert echoed["context_lineage"] == "req-ctx-001"
+    assert echoed["context_lineage"] == {\n        "request_id": "req-ctx-001",\n        "evidence_ids": ["e-002", "e-001"],\n        "protocol_ids": ["p-001"],\n        "runtime_ids": ["r-001"],\n    }
