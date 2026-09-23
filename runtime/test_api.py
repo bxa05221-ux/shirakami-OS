@@ -49,6 +49,18 @@ def test_observe_handoff_references_new_evidence_by_stable_id() -> None:
     assert "execution_authorization" not in handoff
 
 
+def test_observe_handoff_preserves_stable_identity_for_equivalent_evidence() -> None:
+    api = _api()
+    first = api.observe({"signal": "same"}, _context())
+    second = api.observe({"signal": "same"}, _context())
+
+    first_ids = set(first["semantic_handoff"]["evidence_ids"])
+    second_ids = set(second["semantic_handoff"]["evidence_ids"])
+    assert first_ids
+    assert second_ids
+    assert first_ids == second_ids
+
+
 def test_observe_handoff_only_references_evidence_created_by_that_observation() -> None:
     api = _api()
     first = api.observe({"signal": "first"}, _context())
