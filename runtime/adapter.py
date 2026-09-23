@@ -1,15 +1,11 @@
-"""Backend-agnostic Adapter boundaries for Runtime β0.1.
-
-Adapters expose external boundaries without embedding backend-specific
-semantics in the Runtime Kernel.
-"""
+"""Backend-agnostic Adapter boundaries for Runtime β0.1."""
 
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping, Protocol
 
 try:
     from .landscape import LandscapeState
-except ImportError:  # legacy top-level runtime imports
+except ImportError:
     from landscape import LandscapeState
 
 
@@ -18,6 +14,47 @@ class Adapter(Protocol):
 
     def read(self, reference: str) -> Mapping[str, Any]:
         ...
+
+
+class SemanticHandoffAdapter(Protocol):
+    """Vendor-neutral outbound boundary for canonical SemanticHandoff data.
+
+    Implementations may transform and emit a handoff, but must not create a
+    Decision, bypass HumanGate, or infer authority from transport metadata.
+    """
+
+    adapter_id: str
+
+    def emit(self, handoff: Mapping[str, Any]) -> "AdapterResponse":
+        ...
+
+
+@dataclass(frozen=True)
+class AdapterResponse:
+    """Backend response returned without granting authority."""
+
+    adapter_id: str
+    status: str
+    payload: Mapping[str, Any]
+    evidence: Mapping[str, Any]
+
+
+class EchoAdapter:
+    """Deterministic reference adapter for contract and round-trip tests."""
+
+    adapter_id = "echo:v0.1"
+
+    def emit(self, handoff: Mapping[str, Any]) -> AdapterResponse:
+        return AdapterResponse(
+            adapter_id=self.adapter_id,
+            status="completed",
+            payload={"echo": dict(handoff)},
+            evidence={
+                "operation": "adapter.emit",
+                "adapter_id": self.adapter_id,
+                "authority": "not_inferred",
+            },
+        )
 
 
 class MemoryAdapter:
@@ -45,10 +82,8 @@ def adapt_landscape_observation(state: LandscapeState) -> Mapping[str, Any]:
         }
         for evidence in state.evidence
     )
-    return {
-        "snapshot": state.snapshot(),
-        "evidence_lineage": evidence_lineage,
-    }
+    return {"snapshot": state.snapshot(), "evidence_lineage": evidence_lineage}
+
 
 class AdapterExecutionError(ValueError):
     """Raised when a Pipeline step cannot cross the Adapter boundary."""
