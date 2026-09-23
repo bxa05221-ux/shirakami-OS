@@ -1,0 +1,95 @@
+matome:
+  title: "0 Origin Hypothesis"
+  codename: "Origin-0"
+  version: "0.1"
+  status: "Research Hypothesis"
+
+  context:
+    project: "白神モデルβ版研究"
+    trigger: >
+      「鶏が先か、卵が先か」という循環的因果関係に対し、
+      「神が先だ」という発想から、さらに抽象化された
+      「原点0」という仮説へ到達した。
+
+  core_hypothesis:
+    statement: >
+      相互依存する要素だけで構成された系では、
+      系内部の因果関係から絶対的な起点を確定できない。
+      系の内部とは異なる「原点0」を仮定することで、
+      循環する関係を一つのLandscapeとして記述できる可能性がある。
+    origin:
+      symbol: "0"
+      interpretation:
+        - "無"
+        - "有が分化する以前の状態"
+        - "因果循環を観測する基準点"
+        - "意味が固定される以前の可能性"
+      caution: >
+        0を特定の宗教的存在、数学的対象、物理的実体として
+        同一視しない。現段階では構造上の原点を意味する。
+
+  philosophical_entry:
+    theological_expression: "神が先だ"
+    abstraction: "原点0が先だ"
+    shift:
+      from: "内部要素の先後関係"
+      to: "系そのものを成立させる原点"
+
+  structural_examples:
+    chicken_and_egg:
+      relation: "鶏 ↔ 卵"
+      problem: "内部因果だけでは絶対的起点を確定しにくい"
+      test: "原点0を導入することで循環構造を記述できるか"
+
+    human_and_ai:
+      relation: "人間 ↔ AI"
+      problem: "AI出力が人間の次の問いや判断へ影響し、相互作用が循環する"
+      test: "人間またはAIを絶対的原点とせずLandscapeとして記述できるか"
+
+    evidence_and_judgment:
+      relation: "Evidence ↔ 判断"
+      problem: "Evidenceと判断が相互に更新される"
+      test: "どちらか一方を絶対的起点とせず循環を記述できるか"
+
+  shirakami_relation:
+    landscape: >
+      原点0をAI、人間、Evidence、Runtimeのいずれかと同一視せず、
+      それらが分化し相互作用するLandscapeを記述するための抽象的基準点として扱う。
+    human_gate: >
+      Human Gateは0そのものではなく、原点をAI側へ移さないための人間による判断境界として扱う。
+    evidence: >
+      Evidenceは原点0そのものを証明するものではなく、仮説から生じた観測・判断・実装結果を記録する。
+    runtime: "Origin-0をRuntime仕様へ直接埋め込まない"
+
+  conceptual_formula:
+    expression: "0 → 分化 → 相互作用 → 現象 → Evidence → 再観測"
+    interpretation: >
+      0を固定された答えではなく、複数の意味・存在・関係が分化する原点として扱う。
+
+  non_claims:
+    - "0が宇宙の物理的起源であるとは主張しない"
+    - "0が神そのものであるとは主張しない"
+    - "0が数学的に新しい概念であるとは主張しない"
+    - "AIが文字通り無であるとは主張しない"
+    - "Origin-0を白神Runtimeの仕様として確定しない"
+
+  verification:
+    method: "一変更一検証"
+    first_test:
+      target: "鶏 ↔ 卵"
+      purpose: "循環的因果関係の記述に原点0が追加説明力を持つか確認する"
+    next_test:
+      target: "人間 ↔ AI"
+      purpose: "AIを絶対的起点とせずHuman Gateを含むLandscapeとして記述できるか確認する"
+
+  promotion_rule:
+    condition: >
+      複数の独立した構造例への適用で、単なる比喩以上の説明能力がEvidenceによって確認された場合、
+      白神理論への昇格を検討する。
+    failure: >
+      既存モデル以上の説明能力が得られない場合、仮説を保持または棄却する。
+
+  key_phrase:
+    japanese: "一にして全、全にして一。無にして有、有にして無。"
+    operational_translation: >
+      分化した要素だけを起点として捉えず、それらが分化する以前の原点を仮定してLandscapeを観測する。
