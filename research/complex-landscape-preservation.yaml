@@ -1,0 +1,68 @@
+matome:
+  title: "Complex Landscape Preservation Model"
+  codename: "CLP-01"
+  version: "0.1"
+  status: "Research Hypothesis"
+  purpose: >
+    CLH-01〜08およびCLH-ADV-01〜06を俯瞰し、
+    Complex Landscapeが何を保存する構造なのかを定義する。
+  core_question: "Complex Landscapeは何を保存しているのか"
+  answer:
+    statement: >
+      Complex Landscapeは単一の正解を保存するのではなく、
+      Evidence、観測位置、解釈差、未確定性、Human judgment、
+      およびそれらの時間的変化を、相互に消去せず保持する。
+  preservation_objects:
+    evidence:
+      meaning: "観測された事実・記録"
+      rule: "解釈変更によって過去Evidenceを上書きしない"
+    observation_position:
+      meaning: "AI / Origin / Human等の観測位置"
+      rule: "位置を価値順位へ変換しない"
+    interpretation:
+      meaning: "Evidenceに対する主体ごとの意味づけ"
+      rule: "Evidenceと同一視しない"
+    disagreement:
+      meaning: "主体間の解釈差"
+      rule: "勝敗なしで差分として保持できる"
+    uncertainty:
+      symbol: "i"
+      meaning: "現座標系へ射影できない、または未確定な意味"
+      rule: "不明を失敗として強制解消しない"
+    human_judgment:
+      meaning: "価値・信仰・採用等に関するHuman側の最終判断"
+      rule: "AIの解釈から自動生成しない"
+    temporal_change:
+      meaning: "時間経過による解釈・判断の変化"
+      rule: "新しい状態を追加し、過去記録を改変しない"
+    recursion_boundary:
+      meaning: "自己観測を暫定的に停止する観測境界"
+      rule: "停止は真理確定ではなく現在scopeの観測終了"
+  non_preservation:
+    - "単一の絶対的正解"
+    - "AIの権威"
+    - "自動的な神学的結論"
+    - "多数決による自動的正当化"
+    - "不確定性の強制解消"
+  structural_formula: >
+    Evidence + Position + Interpretation + Difference + Uncertainty
+    + Human Judgment + Temporal State
+    -> Shared Landscape
+  relation_to_shirakami:
+    landscape: "差異を消さずに保持する共通空間"
+    evidence: "観測履歴"
+    protocol: "保持・変換・判断境界の規則"
+    runtime: "将来この意味構造を実装する層"
+    human_gate: "最終判断の主体をHuman側に保持する境界"
+  hypothesis:
+    statement: >
+      白神におけるLandscapeの本質は、AIが答えを生成することではなく、
+      AI・Human・未確定性を含む複数の意味状態を、Evidenceを失わずに
+      同一の文脈空間へ保持できることにある。
+  status_note: >
+    これはResearch上の統合仮説であり、数学的証明・Runtime仕様・
+    安全性保証ではない。
+  next_step:
+    codename: "CLP-02"
+    title: "Landscape Conservation Test"
+    purpose: "異なる変換・解釈・時間経過を通しても保存対象が失われないか検証する"
