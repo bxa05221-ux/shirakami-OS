@@ -1,0 +1,26 @@
+matome:
+  title: "Complex Landscape Persistence Test"
+  codename: "CLH-ADV-03"
+  version: "0.1"
+  status: "Research Verification"
+  purpose: "主体の追加・離脱・時間経過後もLandscapeの既存Evidenceと座標分離が維持されるか検証する"
+  sequence:
+    - t: 0
+      state: "AI_1, Human_1, i"
+    - t: 1
+      state: "AI_2 joins with conflicting interpretation"
+    - t: 2
+      state: "Human_2 joins with different value judgment"
+    - t: 3
+      state: "AI_1 interpretation changes after new Evidence"
+    - t: 4
+      state: "Human_1 changes meaning attribution"
+  invariants:
+    - "過去Evidenceを書き換えない"
+    - "新しい解釈は新しい状態として保持する"
+    - "主体の追加が既存主体の判断を上書きしない"
+    - "iは必要なら継続保持される"
+  result:
+    passed: true
+    judgment: "Conceptually consistent"
+  limitation: "Evidence versioning schemaは未形式化"
