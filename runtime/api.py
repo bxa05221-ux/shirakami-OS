@@ -62,7 +62,6 @@ class ShirakamiAPI:
         self.runtime.observe(observation, context)
         evidence_records = self.runtime.store.all()
         new_evidence = evidence_records[evidence_before:]
-
         observation_id = str(uuid4())
         handoff = SemanticHandoff(
             observation_id=observation_id,
@@ -105,59 +104,52 @@ class ShirakamiAPI:
                 "state": self.runtime.loop.state.value,
                 "reason": "explicit human authorization required",
             }
-        if not approved:
-            return {
-                "accepted": False,
-                "state": self.runtime.loop.state.value,
-                "reason": "human rejected candidate",
-            }
-        result = self.runtime.approve(reviewer=reviewer)
+
+        accepted = self.runtime.approve(
+            approved=approved,
+            reviewer=reviewer,
+        )
         return {
-            "accepted": True,
+            "accepted": accepted,
             "state": self.runtime.loop.state.value,
-            "review": asdict(result),
         }
 
     def execute(
         self,
         protocol: Callable[[Any], Transition],
         protocol_id: str,
-        input_data: Mapping[str, Any],
+        input_data: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
-        result = self.runtime.execute(protocol_id, protocol, input_data)
+        result = self.runtime.execute(protocol, protocol_id, input_data)
         payload = {
             "status": result.status,
-            "transition": asdict(result.transition) if result.transition else None,
-            "evidence": self._evidence_for_protocol(protocol_id),
+            "protocol_id": result.protocol_id,
+            "transition": {"kind": result.transition.kind, "data": dict(result.transition.data)},
+            "signals": list(result.signals),
+            "steps": result.steps,
+            "evidence": self._evidence_for_protocol(protocol_id)[-1:],
         }
         handle = self.executions.create(protocol_id, payload)
-        return {
-            "execution_id": handle.execution_id,
-            "protocol_id": handle.protocol_id,
-            "status": handle.status,
-            "transition": payload["transition"],
-            "evidence": payload["evidence"],
-        }
+        return {**payload, "execution_id": handle.execution_id}
 
     def get_execution(self, execution_id: str) -> dict[str, Any] | None:
         handle = self.executions.get(execution_id)
         if handle is None:
             return None
-        return asdict(handle)
+        return {"execution_id": handle.execution_id, "protocol_id": handle.protocol_id, "status": handle.status, "result": dict(handle.result)}
 
-    def verify_execution(
-        self,
-        execution_id: str,
-        *,
-        expected_transition_kind: str,
-        diff_ref: str = "",
-    ) -> VerificationResult | None:
+    def verify_execution(self, execution_id: str, *, expected_transition_kind: str | None = None, diff_ref: str = "") -> VerificationResult | None:
         handle = self.executions.get(execution_id)
         if handle is None:
             return None
+        payload = handle.result
+        transition = payload["transition"]
         execution = ExecutionResult(
-            status=handle.status,
-            transition=Transition(**handle.result["transition"]) if handle.result["transition"] else None,
+            status=str(payload["status"]),
+            protocol_id=str(payload["protocol_id"]),
+            transition=Transition(kind=str(transition["kind"]), data=dict(transition.get("data", {}))),
+            signals=tuple(payload.get("signals", ())),
+            steps=int(payload.get("steps", 0)),
         )
         return self.verify(execution, expected_transition_kind=expected_transition_kind, diff_ref=diff_ref)
 
@@ -165,7 +157,7 @@ class ShirakamiAPI:
         self,
         execution: ExecutionResult,
         *,
-        expected_transition_kind: str,
+        expected_transition_kind: str | None = None,
         diff_ref: str = "",
     ) -> VerificationResult:
         return self.runtime.verify(
@@ -180,7 +172,7 @@ class ShirakamiAPI:
         protocol_id: str | None = None,
         signal: str | None = None,
         transition_kind: str | None = None,
-    ) -> tuple[dict[str, Any], ...]:
+    ) -> tuple[Any, ...]:
         if protocol_id is not None:
             records = self.runtime.store.by_protocol(protocol_id)
         elif signal is not None:
