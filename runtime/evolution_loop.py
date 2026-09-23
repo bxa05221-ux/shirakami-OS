@@ -1,9 +1,10 @@
-"""R0100 Evidence-Driven Runtime Loop.
+"""R0100 Evidence-Driven Runtime Loop plus minimal backend observation composition.
 
-Small, backend-neutral state machine for the Shirakami Evolution Loop.
-It validates declared transitions, records every attempted transition, and
-promotes meaningful failures/mismatches/human decisions to Evidence.
+The state-machine API remains backward compatible while the β0.1 runtime
+primitive records Backend responses strictly as observed Evidence.
 """
+
+from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
@@ -103,51 +104,22 @@ class EvolutionLoop:
         self.evidence: list[EvidenceCandidate] = []
         self._rules = {(r.source, r.event): r for r in rules}
 
-    def dispatch(
-        self,
-        event: str,
-        context: Mapping[str, Any] | None = None,
-        *,
-        human_approved: bool = False,
-    ) -> TransitionResult:
+    def dispatch(self, event: str, context: Mapping[str, Any] | None = None, *, human_approved: bool = False) -> TransitionResult:
         context = dict(context or {})
         source = self.state
         rule = self._rules.get((source, event))
         if rule is None:
             return self._record_rejection(source, event, "unknown transition", context)
-
         if rule.requires_human and not human_approved:
             return self._record_rejection(source, event, "human approval required", context)
-
         self.state = rule.target
-        record = TransitionRecord(
-            from_state=source,
-            event=event,
-            to_state=self.state,
-            accepted=True,
-            evidence_class=rule.evidence_class,
-            context=context,
-        )
+        record = TransitionRecord(source, event, self.state, True, evidence_class=rule.evidence_class, context=context)
         self.records.append(record)
         self._promote(record)
         return TransitionResult(True, source, self.state, event)
 
-    def _record_rejection(
-        self,
-        source: LoopState,
-        event: str,
-        reason: str,
-        context: Mapping[str, Any],
-    ) -> TransitionResult:
-        record = TransitionRecord(
-            from_state=source,
-            event=event,
-            to_state=source,
-            accepted=False,
-            reason=reason,
-            evidence_class=EvidenceClass.FAILURE,
-            context=context,
-        )
+    def _record_rejection(self, source, event, reason, context):
+        record = TransitionRecord(source, event, source, False, reason=reason, evidence_class=EvidenceClass.FAILURE, context=context)
         self.records.append(record)
         self._promote(record)
         return TransitionResult(False, source, source, event, reason)
@@ -155,12 +127,19 @@ class EvolutionLoop:
     def _promote(self, record: TransitionRecord) -> None:
         if record.evidence_class == EvidenceClass.NONE:
             return
-        self.evidence.append(
-            EvidenceCandidate(
-                evidence_class=record.evidence_class,
-                source="transition_record",
-                state=record.to_state.value,
-                event=record.event,
-                payload=dict(record.context),
-            )
-        )
+        self.evidence.append(EvidenceCandidate(record.evidence_class, "transition_record", record.to_state.value, record.event, dict(record.context)))
+
+
+try:
+    from .backend import Backend
+    from .evidence_return_backend import evidence_from_backend_response
+except ImportError:
+    from backend import Backend
+    from evidence_return_backend import evidence_from_backend_response
+
+
+def execute_and_observe(backend: Backend, handoff: Mapping[str, Any], *, protocol_id: str = "evolution-loop.v0.1"):
+    """Execute an authorized handoff and record the observed result with lineage."""
+    response = backend.execute(handoff)
+    lineage = handoff.get("context_lineage")
+    return evidence_from_backend_response(response, protocol_id=protocol_id, context_lineage=lineage)
