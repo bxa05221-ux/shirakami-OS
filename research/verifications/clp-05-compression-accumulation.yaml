@@ -1,0 +1,92 @@
+matome:
+  title: "Complex Landscape CLP-05 Repeated Compression and Semantic Loss Accumulation"
+  codename: "CLP-05"
+  version: "0.1"
+  status: "Research Verification"
+
+  purpose: >
+    同一Landscapeに対して要約・Renderer変換を複数回適用した場合、
+    省略された意味状態が段階的に失われるかを検証する。
+
+  hypothesis: >
+    一回のprojectionで明示的に省略された状態は、次のprojectionでは
+    参照できない可能性がある。そのため、projectionを反復すると
+    Evidence、actor attribution、uncertainty、interpretation difference、
+    temporal stateなどの意味境界が累積的に失われる。
+    ただし、各段階が元Landscapeまたは保存された意味メタデータを参照できるなら、
+    projectionの反復だけで必ず不可逆な損失が発生するとは限らない。
+
+  initial_landscape:
+    evidence:
+      - evidence_id: "E0"
+        observation: "出来事Xが発生した"
+      - evidence_id: "E1"
+        observation: "追加情報Yが得られた"
+    positions:
+      ai: -1
+      origin: 0
+      human: 1
+      i: "Xの最終的意味は未確定"
+    interpretations:
+      ai: "説明A/Bが可能"
+      human: "自分にとって重要"
+    disagreement: "AI説明とHuman意味づけは一致しない"
+    human_judgment: "undecided"
+    temporal_state: ["T0", "T1"]
+
+  compression_chain:
+    - stage: 0
+      representation: "Full Landscape"
+      preservation: "all declared semantic states"
+    - stage: 1
+      representation: "AI-oriented summary"
+      omitted: ["Human interpretation", "i", "some temporal detail"]
+    - stage: 2
+      representation: "natural-language summary of stage 1"
+      risk: ["actor attribution", "Evidence/interpretation boundary"]
+    - stage: 3
+      representation: "short summary of stage 2"
+      risk: ["remaining uncertainty", "historical distinction"]
+
+  checks:
+    - "A later Renderer cannot recover information that was already omitted unless it can access the source Landscape or preserved metadata."
+    - "Repeated projection can accumulate semantic loss."
+    - "Loss of a semantic state must not be interpreted as proof that the state never existed."
+    - "Evidence identity should survive compression when traceability is required."
+    - "Human judgment attribution should survive when the output is used for decision support."
+    - "Unresolved i should survive when its omission would change meaning."
+    - "A Renderer should declare its projection scope where semantic traceability matters."
+
+  test_result:
+    status: "Conceptually consistent"
+    finding: >
+      Semantic loss can accumulate across repeated compression because each
+      projection reduces the available state from which the next projection
+      operates. The loss is not caused by compression alone; it is caused by
+      compressing without retaining the distinctions required by the next
+      semantic operation. Therefore a safe projection chain requires either
+      access to the original Landscape or explicit preservation metadata.
+
+  important_consequence:
+    - "Renderer output should not be used as the sole source for future semantic reconstruction."
+    - "Evidence lineage and semantic preservation metadata are distinct from presentation text."
+    - "A chain of Renderers is a chain of projections, not a chain of truth-preserving transformations."
+
+  failure_mode:
+    name: "projection cascade"
+    description: >
+      A compressed Renderer output becomes the sole input to another Renderer,
+      and omitted states progressively disappear until the final text appears
+      complete despite no longer representing the original Landscape.
+
+  boundary:
+    research_only: true
+    runtime_change: false
+    api_change: false
+    mathematical_proof: false
+    safety_guarantee: false
+
+  next:
+    - "CLP-06 minimum preservation metadata test"
+    - "Test reconstruction from compressed output with and without source Landscape"
+    - "Determine whether Evidence identity alone is sufficient for projection chains"
