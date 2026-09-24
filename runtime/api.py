@@ -15,10 +15,12 @@ try:
     from .evolution_bridge import ContextSnapshot, VerificationResult
     from .evolution_pipeline import AnalysisResult, EvidenceDrivenRuntime
     from .prototype import ExecutionResult, Transition
+    from .semantic_handoff import SemanticHandoff
 except ImportError:
     from evolution_bridge import ContextSnapshot, VerificationResult
     from evolution_pipeline import AnalysisResult, EvidenceDrivenRuntime
     from prototype import ExecutionResult, Transition
+    from semantic_handoff import SemanticHandoff
 
 
 @dataclass(frozen=True)
@@ -56,10 +58,23 @@ class ShirakamiAPI:
         observation: Mapping[str, Any],
         context: ContextSnapshot,
     ) -> dict[str, Any]:
+        evidence_before = len(self.runtime.store.all())
         self.runtime.observe(observation, context)
+        evidence_records = self.runtime.store.all()
+        new_evidence = evidence_records[evidence_before:]
+        observation_id = str(uuid4())
+        handoff = SemanticHandoff(
+            observation_id=observation_id,
+            landscape=context.landscape,
+            protocol_id=context.protocol_id,
+            runtime_state=self.runtime.loop.state.value,
+            evidence_ids=tuple(record.evidence_id for record in new_evidence),
+            metadata=context.metadata,
+        )
         return {
             "state": self.runtime.loop.state.value,
             "evidence": self._evidence(),
+            "semantic_handoff": dict(handoff.as_mapping()),
         }
 
     def analyze(
@@ -180,6 +195,7 @@ class ShirakamiAPI:
     @staticmethod
     def _serialize_evidence(record: Any) -> dict[str, Any]:
         return {
+            "evidence_id": record.evidence_id,
             "protocol_id": record.protocol_id,
             "status": record.status,
             "transition_kind": record.transition_kind,
