@@ -8,7 +8,7 @@ inference.
 
 import pytest
 
-from api.runtime_api import ShirakamiAPI
+from runtime.api import ShirakamiAPI
 from runtime.approval_envelope import ApprovalEnvelope
 from runtime.approval_envelope_activation import to_activation_input
 from runtime.approval_envelope_provenance import enrich_human_gate_input
