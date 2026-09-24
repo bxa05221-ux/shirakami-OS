@@ -1,0 +1,89 @@
+matome:
+  title: "Complex Landscape CLP-08 Cross-Renderer Reconstruction Test"
+  codename: "CLP-08"
+  version: "0.1"
+  status: "Research Verification"
+
+  purpose: >
+    同一Landscapeを異なるRendererへ投影し、それぞれの出力から
+    共通の意味核を再構成できるかを検証する。
+
+  source_landscape:
+    evidence:
+      - evidence_id: "E0"
+        observation: "出来事Xが発生した"
+      - evidence_id: "E1"
+        observation: "追加情報Yが得られた"
+    actors:
+      - "AI"
+      - "Human"
+    interpretations:
+      - actor: "AI"
+        interpretation_id: "I-A"
+        text: "説明Aが可能"
+        evidence_link: ["E0"]
+      - actor: "Human"
+        interpretation_id: "I-H"
+        text: "自分にとって重要な出来事"
+        evidence_link: ["E0", "E1"]
+    uncertainty:
+      - "E0の最終的意味は未確定"
+    human_judgment:
+      state: "undecided"
+    temporal_state: ["T0", "T1"]
+
+  renderers:
+    manga:
+      projection: "scene / dialogue / attribution"
+    radio:
+      projection: "narrative / spoken perspective"
+    threadrpg:
+      projection: "multi-perspective conversation"
+    api:
+      projection: "structured semantic representation"
+
+  reconstruction_kernel:
+    - "evidence_id"
+    - "actor"
+    - "interpretation_link"
+
+  reconstruction_checks:
+    - "All renderer outputs remain traceable to E0/E1 where the source declares them."
+    - "AI and Human interpretations remain attributable."
+    - "Renderer wording may differ without creating a new Evidence identity."
+    - "An omitted field is not reconstructed as a fact unless supported by the source or preservation metadata."
+    - "Human judgment remains distinct from AI interpretation."
+    - "Uncertainty is not converted into certainty merely because one renderer omits it."
+
+  result:
+    status: "Conceptually consistent"
+    finding: >
+      Multiple Renderer forms can be treated as projections of one Landscape
+      when a shared reconstruction kernel preserves Evidence identity,
+      actor attribution, and the link between interpretation and Evidence.
+      Renderer equality is therefore not textual equality; it is semantic
+      traceability to a common source Landscape.
+
+  important_consequence:
+    - "Renderer is replaceable at the presentation layer."
+    - "Landscape remains the semantic reference point."
+    - "Different applications can share one semantic substrate without sharing presentation form."
+    - "A renderer cannot claim authority merely because it is the current representation."
+
+  limitation:
+    - "Conceptual test only."
+    - "No automated semantic equivalence proof."
+    - "No Runtime/API implementation change."
+
+  deletion_candidates:
+    - field: "coordinate"
+      status: "廃止候補継続"
+      reason: "CLP-07で独立必須性が未確認。今回も再構成核には含めていない。"
+    - field: "projection_scope"
+      status: "保留"
+      reason: "Renderer間の意味境界を監査する場合には有用。"
+
+  next:
+    codename: "CLP-09"
+    title: "Semantic Identity Stability Test"
+    purpose: "Rendererを跨いだ後もEvidence/interpretation identityが同一性を保つ条件を検証する"
