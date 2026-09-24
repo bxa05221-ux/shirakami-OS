@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 from runtime.api_semantic_handoff import preserve_protocol_reference, validate_semantic_handoff
 from runtime.landscape import LandscapeState
+from runtime.semantic_handoff import SemanticHandoff
 
 
 class ObservationProvenance(BaseModel):
@@ -57,6 +58,38 @@ def observe(payload: dict[str, Any]) -> dict[str, Any]:
     return ObserveResponse.model_validate(response).model_dump()
 
 
+def semantic_handoff(payload: dict[str, Any]) -> dict[str, Any]:
+    """Create a deterministic semantic handoff without inferring authority."""
+    evidence_ids = payload.get("evidence_ids", [])
+    if not isinstance(evidence_ids, list) or not all(isinstance(item, str) and item for item in evidence_ids):
+        raise ValueError("evidence_ids must be an array of non-empty strings")
+    interpretation_id = payload.get("interpretation_id")
+    decision_id = payload.get("decision_id")
+    gate_id = payload.get("gate_id")
+    for name, value in (("interpretation_id", interpretation_id), ("decision_id", decision_id), ("gate_id", gate_id)):
+        if value is not None and (not isinstance(value, str) or not value):
+            raise ValueError(f"{name} must be a non-empty string when supplied")
+    body = payload.get("payload", {})
+    if not isinstance(body, dict):
+        raise ValueError("payload must be an object")
+    handoff = SemanticHandoff(
+        evidence_ids=tuple(evidence_ids),
+        interpretation_id=interpretation_id,
+        decision_id=decision_id,
+        gate_id=gate_id,
+        payload=body,
+    )
+    return {
+        "handoff_id": handoff.handoff_id,
+        "evidence_ids": list(handoff.evidence_ids),
+        "interpretation_id": handoff.interpretation_id,
+        "decision_id": handoff.decision_id,
+        "gate_id": handoff.gate_id,
+        "payload": dict(handoff.payload),
+        "authority": "not_inferred",
+    }
+
+
 def create_app():
     """Create the public Shirakami API application."""
     from fastapi import FastAPI, HTTPException, Request
@@ -69,15 +102,19 @@ def create_app():
     async def request_validation_exception_handler(
         request: Request, exc: RequestValidationError
     ) -> JSONResponse:
-        return JSONResponse(
-            status_code=400,
-            content={"detail": "request body must be an object"},
-        )
+        return JSONResponse(status_code=400, content={"detail": "request body must be an object"})
 
     @app.post("/observe")
     def observe_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
         try:
             return observe(payload)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.post("/handoff")
+    def semantic_handoff_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
+        try:
+            return semantic_handoff(payload)
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
