@@ -1,7 +1,8 @@
-"""Minimal human Decision boundary for Runtime research handoff v0.1.
+"""Minimal Decision boundary for Runtime research handoff v0.1.
 
-A Decision records an explicit human choice about an Interpretation.
-It does not generate, alter, or promote the Interpretation itself.
+A Decision records an explicit choice about an Interpretation.
+Human authority is validated by the HumanGate boundary rather than inferred
+from actor_id naming conventions.
 """
 
 from __future__ import annotations
@@ -13,7 +14,7 @@ import json
 
 @dataclass(frozen=True)
 class DecisionRecord:
-    """An explicit human decision targeting an InterpretationRecord."""
+    """An immutable decision targeting an InterpretationRecord."""
 
     actor_id: str
     target_interpretation_id: str
@@ -24,8 +25,6 @@ class DecisionRecord:
     def __post_init__(self) -> None:
         if not self.actor_id:
             raise ValueError("actor_id must not be empty")
-        if self.actor_id.startswith("AI-"):
-            raise ValueError("DecisionRecord requires an explicit human actor")
         if not self.target_interpretation_id:
             raise ValueError("target_interpretation_id must not be empty")
         if not self.timestamp:
