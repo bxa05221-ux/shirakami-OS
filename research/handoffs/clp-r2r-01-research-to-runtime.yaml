@@ -1,0 +1,177 @@
+matome:
+  title: "CLP-09〜20 Research-to-Runtime Handoff"
+  codename: "CLP-R2R-01"
+  version: "0.1"
+  status: "Research Finding / Runtime Handoff Candidate"
+
+  project:
+    name: "白神モデルβ版研究"
+    purpose: >
+      CLP-09〜20で得られたSemantic Landscape研究結果を俯瞰し、
+      Research上の仮説とRuntimeへ移行すべき実装要素を分離する。
+      研究探索を無制限に継続せず、開発加速へ接続する。
+
+  decision:
+    statement: >
+      CLP-09〜20を一旦Research探索の区切りとし、その成果をImplementation Findingとして整理する。
+      Runtimeへ移行する要素と、Researchに留める仮説を分離する。
+    principle:
+      - "研究を実装へ直接混入させない"
+      - "理論をRuntime側で勝手に拡張しない"
+      - "実装可能な最小単位へ変換する"
+      - "一変更一検証を維持する"
+      - "未検証仮説を確定仕様として扱わない"
+
+  observed_landscape:
+    core_chain:
+      - "Evidence"
+      - "Interpretation"
+      - "Decision"
+      - "Decision Lineage"
+      - "Human Gate"
+      - "Temporal State"
+      - "Actor"
+      - "Relation"
+      - "Renderer"
+
+    research_findings:
+      evidence:
+        finding: "EvidenceはSemantic Landscapeの安定した基準点として扱える。"
+        implementation_candidate: true
+      interpretation:
+        finding: "AI・Human・Humanoid等のActorはEvidenceから独立したInterpretationを生成できる。"
+        implementation_candidate: true
+      decision:
+        finding: "InterpretationとHuman Decisionを分離することで、AI生成物と人間の判断権を区別できる。"
+        implementation_candidate: true
+      decision_lineage:
+        finding: "Decisionを上書きせず、履歴として保持することで変更・撤回・現在状態を区別できる。"
+        implementation_candidate: true
+      temporal_reconstruction:
+        finding: "Evidence identityとDecision lineageを保持することで、過去時点のSemantic Landscapeを再構成できる可能性がある。"
+        implementation_candidate: true
+        verification_level: "conceptual"
+      renderer_separation:
+        finding: "同一Landscapeを複数Rendererで表現してもcanonical identityを維持する設計が可能。"
+        implementation_candidate: true
+      multi_agent:
+        finding: "複数Actorが同一Evidenceを共有しながら異なるInterpretationを保持できる。"
+        implementation_candidate: true
+      actor_membership:
+        finding: "Actorの参加・離脱・再参加とSemantic identityを分離できる。"
+        implementation_candidate: true
+
+  runtime_candidates:
+    priority_order:
+      - "EvidenceRecord"
+      - "stable evidence_id"
+      - "InterpretationRecord"
+      - "stable interpretation_id"
+      - "DecisionRecord"
+      - "decision_id"
+      - "DecisionLineage"
+      - "timestamp"
+      - "HumanGate / ApprovalEnvelope"
+      - "Actor identity"
+      - "Relation"
+
+    minimum_runtime_model:
+      EvidenceRecord:
+        identity: "stable evidence_id"
+        mutable: false
+      InterpretationRecord:
+        identity: "stable interpretation_id"
+        source_evidence: "evidence_id[]"
+        actor: "actor_id"
+        status:
+          - "proposed"
+          - "accepted"
+          - "rejected"
+          - "superseded"
+      DecisionRecord:
+        identity: "decision_id"
+        actor: "human"
+        target: "interpretation_id"
+        timestamp: "required"
+        supersedes: "optional"
+      HumanGate:
+        role: "meaning-side approval"
+        authority: "human"
+        output: "ApprovalEnvelope"
+      Actor:
+        identity: "stable actor_id"
+        membership: "temporal"
+        authority: "not implied by presence"
+
+  research_only:
+    - item: "AI self-reference"
+      reason: "CLP-21候補。自己参照による創造・自己強化・意味ドリフト等は未検証。"
+      runtime_now: false
+    - item: "Landscape self-organization"
+      reason: "CLP-19で提示された仮説。自律的自己組織化は未検証。"
+      runtime_now: false
+    - item: "Semantic Commons"
+      reason: "複数知性による共有意味空間の研究仮説。"
+      runtime_now: false
+    - item: "Persistent Semantic Habitat"
+      reason: "Actorの非同期参加を説明する研究仮説。"
+      runtime_now: false
+    - item: "Emergent Synthesis"
+      reason: "複数Interpretationからの新規意味創発に関する研究仮説。"
+      runtime_now: false
+
+  boundary:
+    research:
+      owner: "Shirakami Research"
+      responsibility:
+        - "仮説"
+        - "CLP実験"
+        - "未解決問題"
+        - "Implementation Finding"
+    runtime:
+      owner: "Shirakami Runtime"
+      responsibility:
+        - "受領したSemantic modelの実装"
+        - "Schema"
+        - "Registry"
+        - "Loader"
+        - "API"
+        - "Tests"
+    github:
+      role: "implementation_source_of_truth"
+
+  handoff:
+    from: "Shirakami Research"
+    to: "Shirakami Runtime"
+    artifact: "的目YAML"
+    required_before_implementation:
+      - "対象要素の明確化"
+      - "変更範囲の明確化"
+      - "理論的意味の確認"
+      - "検証方法の定義"
+      - "未確認事項の明示"
+
+  development_acceleration:
+    objective: "Research探索をRuntime実装へ変換し、白神モデルの開発速度を上げる。"
+    strategy:
+      - "CLPを無制限に継続しない"
+      - "既存Findingから最小実装単位を抽出する"
+      - "Schemaを先に固定する"
+      - "一変更一検証"
+      - "実装結果をEvidenceとしてResearchへ返す"
+
+  immediate_next:
+    step_1: "EvidenceRecord / InterpretationRecord / DecisionRecordのSchema確認"
+    step_2: "DecisionLineageの最小実装仕様化"
+    step_3: "ApprovalEnvelopeとの接続仕様確認"
+    step_4: "SemanticHandoffとの接続"
+    step_5: "API / HTTP境界への接続"
+    step_6: "Runtime Tests"
+    step_7: "Evidence生成"
+    step_8: "GitHubで確定"
+
+  critical_rule:
+    statement: >
+      CLP-09〜20の研究結果はRuntimeの仕様を直接変更しない。
+      的目YAMLによって意味を引き渡し、Runtime側で実装可能な単位へ変換する。
+      Research仮説は、検証されるまでRuntimeの確定仕様としない。
