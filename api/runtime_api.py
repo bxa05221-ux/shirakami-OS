@@ -3,6 +3,9 @@
 from typing import Any
 
 from plugins.adapters.github.github_adapter import GitHubAdapter
+from runtime.decision import DecisionRecord
+from runtime.evidence import EvidenceRecord
+from runtime.interpretation import InterpretationRecord
 from runtime.oppai_schema import normalize as normalize_oppai, to_dict as oppai_to_dict
 from runtime.protocol_runtime_bridge import execute_protocol
 from runtime.prototype import Transition
@@ -19,11 +22,7 @@ def execute(payload: dict[str, Any]) -> dict[str, Any]:
     def echo_transition(value: Any) -> Transition:
         return Transition(kind="api.echo", data={"output": value})
 
-    execution = execute_protocol(
-        protocol,
-        echo_transition,
-        input_value=payload.get("input"),
-    )
+    execution = execute_protocol(protocol, echo_transition, input_value=payload.get("input"))
     result = execution.result
     return {
         "protocol": {"title": execution.protocol_title, "version": execution.protocol_version},
@@ -59,16 +58,28 @@ def github_controlled_write(payload: dict[str, Any], adapter: GitHubAdapter | No
     if any(not isinstance(payload.get(key), str) for key in required):
         raise ValueError("repository, path, content, message and sha are required")
     github = adapter or GitHubAdapter()
-    result = github.write_file(
-        payload["repository"], payload["path"], payload["content"],
-        payload["message"], payload["sha"], payload.get("branch", "main"),
-    )
-    return {
-        "repository": result.repository, "path": result.path,
-        "sha": result.sha, "content": result.content,
-        "event": "backend.write.readback",
-        "evidence": {"operation": "controlled_write", "read_back": True},
-    }
+    result = github.write_file(payload["repository"], payload["path"], payload["content"],
+                               payload["message"], payload["sha"], payload.get("branch", "main"))
+    return {"repository": result.repository, "path": result.path, "sha": result.sha,
+            "content": result.content, "event": "backend.write.readback",
+            "evidence": {"operation": "controlled_write", "read_back": True}}
+
+
+def _evidence_to_dict(record: EvidenceRecord) -> dict[str, Any]:
+    return {"evidence_id": record.evidence_id, "protocol_id": record.protocol_id,
+            "status": record.status, "transition_kind": record.transition_kind,
+            "transition_data": dict(record.transition_data), "signals": list(record.signals),
+            "confidence": record.confidence}
+
+
+def _interpretation_to_dict(record: InterpretationRecord) -> dict[str, Any]:
+    return {"interpretation_id": record.interpretation_id, "source_evidence": list(record.source_evidence),
+            "actor_id": record.actor_id, "content": dict(record.content), "status": record.status}
+
+
+def _decision_to_dict(record: DecisionRecord) -> dict[str, Any]:
+    return {"decision_id": record.decision_id, "actor_id": record.actor_id, "target": record.target,
+            "content": dict(record.content), "timestamp": record.timestamp, "supersedes": record.supersedes}
 
 
 def create_app():
@@ -76,6 +87,9 @@ def create_app():
     from fastapi import FastAPI, HTTPException
 
     app = FastAPI(title="Shirakami Runtime API", version="0.1.0")
+    evidence_registry: dict[str, EvidenceRecord] = {}
+    interpretation_registry: dict[str, InterpretationRecord] = {}
+    decision_registry: dict[str, DecisionRecord] = {}
 
     @app.get("/health")
     def health() -> dict[str, str]:
@@ -108,5 +122,84 @@ def create_app():
             return github_controlled_write(payload)
         except (PermissionError, ValueError, RuntimeError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.post("/v0.1/evidence", status_code=201)
+    def evidence_create_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
+        required = ("protocol_id", "status", "transition_kind", "transition_data", "signals")
+        if any(key not in payload for key in required):
+            raise HTTPException(status_code=400, detail="protocol_id, status, transition_kind, transition_data and signals are required")
+        if not isinstance(payload["transition_data"], dict) or not isinstance(payload["signals"], list):
+            raise HTTPException(status_code=400, detail="transition_data must be an object and signals must be an array")
+        record = EvidenceRecord(protocol_id=payload["protocol_id"], status=payload["status"],
+                                transition_kind=payload["transition_kind"], transition_data=payload["transition_data"],
+                                signals=tuple(payload["signals"]), confidence=payload.get("confidence", "observed"))
+        existing = evidence_registry.get(record.evidence_id)
+        if existing is not None and existing != record:
+            raise HTTPException(status_code=409, detail="evidence_id collision")
+        evidence_registry[record.evidence_id] = record
+        return _evidence_to_dict(record)
+
+    @app.get("/v0.1/evidence/{evidence_id}")
+    def evidence_get_endpoint(evidence_id: str) -> dict[str, Any]:
+        record = evidence_registry.get(evidence_id)
+        if record is None:
+            raise HTTPException(status_code=404, detail="evidence not found")
+        return _evidence_to_dict(record)
+
+    @app.post("/v0.1/interpretations", status_code=201)
+    def interpretation_create_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
+        required = ("source_evidence", "actor_id", "content")
+        if any(key not in payload for key in required):
+            raise HTTPException(status_code=400, detail="source_evidence, actor_id and content are required")
+        if not isinstance(payload["source_evidence"], list) or not all(isinstance(item, str) for item in payload["source_evidence"]):
+            raise HTTPException(status_code=400, detail="source_evidence must be an array of strings")
+        if not isinstance(payload["actor_id"], str) or not isinstance(payload["content"], dict):
+            raise HTTPException(status_code=400, detail="actor_id must be a string and content must be an object")
+        missing = [eid for eid in payload["source_evidence"] if eid not in evidence_registry]
+        if missing:
+            raise HTTPException(status_code=404, detail={"missing_evidence": missing})
+        record = InterpretationRecord(source_evidence=tuple(payload["source_evidence"]), actor_id=payload["actor_id"],
+                                      content=payload["content"], status=payload.get("status", "proposed"))
+        existing = interpretation_registry.get(record.interpretation_id)
+        if existing is not None and existing != record:
+            raise HTTPException(status_code=409, detail="interpretation_id collision")
+        interpretation_registry[record.interpretation_id] = record
+        return _interpretation_to_dict(record)
+
+    @app.get("/v0.1/interpretations/{interpretation_id}")
+    def interpretation_get_endpoint(interpretation_id: str) -> dict[str, Any]:
+        record = interpretation_registry.get(interpretation_id)
+        if record is None:
+            raise HTTPException(status_code=404, detail="interpretation not found")
+        return _interpretation_to_dict(record)
+
+    @app.post("/v0.1/decisions", status_code=201)
+    def decision_create_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
+        required = ("actor_id", "target", "content", "timestamp")
+        if any(key not in payload for key in required):
+            raise HTTPException(status_code=400, detail="actor_id, target, content and timestamp are required")
+        if not isinstance(payload["actor_id"], str) or payload["actor_id"].strip().lower() in {"", "ai", "system", "assistant"}:
+            raise HTTPException(status_code=403, detail="Decision authority must be explicitly attributed to a human actor")
+        if not isinstance(payload["target"], str) or not isinstance(payload["content"], dict) or not isinstance(payload["timestamp"], str):
+            raise HTTPException(status_code=400, detail="target and timestamp must be strings and content must be an object")
+        if payload["target"] not in interpretation_registry:
+            raise HTTPException(status_code=404, detail="target interpretation not found")
+        supersedes = payload.get("supersedes")
+        if supersedes is not None and supersedes not in decision_registry:
+            raise HTTPException(status_code=404, detail="superseded decision not found")
+        record = DecisionRecord(actor_id=payload["actor_id"], target=payload["target"], content=payload["content"],
+                                timestamp=payload["timestamp"], supersedes=supersedes)
+        existing = decision_registry.get(record.decision_id)
+        if existing is not None and existing != record:
+            raise HTTPException(status_code=409, detail="decision_id collision")
+        decision_registry[record.decision_id] = record
+        return _decision_to_dict(record)
+
+    @app.get("/v0.1/decisions/{decision_id}")
+    def decision_get_endpoint(decision_id: str) -> dict[str, Any]:
+        record = decision_registry.get(decision_id)
+        if record is None:
+            raise HTTPException(status_code=404, detail="decision not found")
+        return _decision_to_dict(record)
 
     return app
