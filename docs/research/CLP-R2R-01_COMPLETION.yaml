@@ -1,0 +1,95 @@
+matome:
+  id: "clp-r2r-01-completion"
+  title: "CLP-09〜20 Research-to-Runtime Completion Evidence"
+  codename: "CLP-R2R-01"
+  version: "1.0"
+  status: "completion-candidate"
+
+scope:
+  research: "CLP-09〜20"
+  purpose: >
+    Research Findingとして確定されたRuntime移行候補について、
+    identity・lineage・Human authority boundaryをRuntime実装へ引き渡したことを記録する。
+  non_scope:
+    - "CLP-21以降のResearch Hypothesis"
+    - "AI self-reference"
+    - "Landscape self-organization"
+    - "Semantic Commons"
+    - "Persistent Semantic Habitat"
+    - "Emergent Synthesis"
+
+runtime_findings:
+  evidence_record:
+    status: "implemented"
+    identity: "stable evidence_id"
+  interpretation_record:
+    status: "implemented"
+    identity: "stable interpretation_id"
+    authority: "none"
+  decision_record:
+    status: "implemented"
+    identity: "decision_id"
+    authority: "human-attributed"
+  decision_lineage:
+    status: "implemented"
+    preserves:
+      - "timestamp"
+      - "supersedes"
+    overwrite_previous_decision: false
+  actor:
+    status: "implemented"
+    authority_not_implied_by_presence: true
+  human_gate:
+    status: "existing-boundary-verified"
+  approval_envelope:
+    status: "existing-boundary-verified"
+
+boundary_verification:
+  semantic_handoff:
+    status: "existing-boundary-verified"
+    rule: "representation/transport does not create or expand authority"
+  evidence_identity:
+    status: "verified"
+  interpretation_identity:
+    status: "verified"
+  decision_identity:
+    status: "verified"
+  authority_separation:
+    status: "verified"
+  runtime_ci:
+    status: "verified"
+
+implementation_history:
+  - "#523 CLP-R2R-01 Research → Runtime Handoff"
+  - "#524 InterpretationRecord boundary"
+  - "#528 DecisionRecord boundary"
+  - "#530 DecisionLineage boundary"
+  - "#453 Evidence → HumanGate identity preservation"
+  - "#454 SemanticHandoff → HumanGate identity preservation"
+
+completion_rule:
+  statement: >
+    CLP-09〜20の研究成果のうちRuntime移行対象として確定された最小構造について、
+    Runtime側のidentity・lineage・Human authority boundaryが実装され、
+    既存SemanticHandoff/HumanGate境界と矛盾しないことをCompletion条件とする。
+  excludes:
+    - "未検証Research Hypothesis"
+    - "Runtime Phase 2の未統合Transport実装"
+
+next_phase:
+  name: "Shirakami Runtime Phase 2"
+  codename: "Transport & Context Boundary"
+  candidates:
+    - "SemanticHandoff HTTP boundary"
+    - "Context Routing"
+    - "Evidence Resolver"
+    - "Context Bundle"
+    - "Adapter"
+    - "Backend"
+    - "Evidence backflow"
+
+critical_rule:
+  - "Research HypothesisをRuntime仕様へ自動昇格させない"
+  - "Transport boundaryをauthority boundaryと混同しない"
+  - "一変更一検証"
+  - "Completionと次Phaseを混ぜない"
