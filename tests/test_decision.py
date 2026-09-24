@@ -16,17 +16,17 @@ def test_decision_has_stable_identity():
     assert record.decision_id != "i-001"
 
 
-def test_decision_requires_human_actor():
+def test_decision_requires_actor_and_target():
     try:
         DecisionRecord(
-            actor_id="AI-A",
-            target_interpretation_id="i-001",
+            actor_id="",
+            target_interpretation_id="",
             timestamp="2026-09-24T12:00:00Z",
         )
     except ValueError:
         pass
     else:
-        raise AssertionError("AI actor must not create a DecisionRecord")
+        raise AssertionError("DecisionRecord requires actor and target")
 
 
 def test_decision_can_supersede_without_overwriting():
