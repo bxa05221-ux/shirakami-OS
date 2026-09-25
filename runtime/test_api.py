@@ -144,3 +144,32 @@ def test_execution_handle_mismatch_becomes_evidence() -> None:
     assert verification is not None
     assert verification.status == "mismatch"
     assert api.query_evidence(signal="MISMATCH")
+
+
+def test_execution_preserves_trace_metadata_without_authority() -> None:
+    api = _api()
+    api.observe({}, _context())
+    api.analyze("api.example", protocol_exists=True)
+
+    result = api.execute(
+        _protocol,
+        "api.example",
+        {},
+        handoff_id="SH-HO-20260925-001",
+        trace_id="TRACE-001",
+        evidence_ids=("AGENT-COORDINATION-001",),
+    )
+
+    assert result["handoff_id"] == "SH-HO-20260925-001"
+    assert result["trace_id"] == "TRACE-001"
+    assert result["evidence_ids"] == ["AGENT-COORDINATION-001"]
+    assert result["execution_authorized"] is False
+    assert result["publish_authorized"] is False
+    assert result["merge_authorized"] is False
+    assert result["human_gate_required"] is True
+
+    stored = api.get_execution(result["execution_id"])
+    assert stored is not None
+    assert stored["handoff_id"] == "SH-HO-20260925-001"
+    assert stored["trace_id"] == "TRACE-001"
+    assert stored["evidence_ids"] == ["AGENT-COORDINATION-001"]
