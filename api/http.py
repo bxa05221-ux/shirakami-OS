@@ -142,13 +142,6 @@ class ShirakamiHTTPTransport:
 
         @app.post("/v1/execute", dependencies=[Depends(auth)])
         def execute(payload: ExecuteInput) -> dict[str, Any]:
-            protocol = self.protocol_registry.get(payload.protocol_id)
-            if protocol is None:
-                raise HTTPException(
-                    status_code=404,
-                    detail="protocol is not registered for HTTP execution",
-                )
-
             boundary = validate_execution_context(payload.boundary_context.model_dump())
             if boundary["handoff_id"] != payload.handoff_id:
                 raise HTTPException(
@@ -164,6 +157,13 @@ class ShirakamiHTTPTransport:
                 raise HTTPException(
                     status_code=422,
                     detail="protocol_id is not declared by boundary context",
+                )
+
+            protocol = self.protocol_registry.get(payload.protocol_id)
+            if protocol is None:
+                raise HTTPException(
+                    status_code=404,
+                    detail="protocol is not registered for HTTP execution",
                 )
 
             return self.api.execute(
