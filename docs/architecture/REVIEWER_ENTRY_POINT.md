@@ -25,14 +25,14 @@ Evidence / Observation
 
 1. **Repository README** — implementation-layer scope and architecture
 2. **Normative Specification** — [shirakami-specification](https://github.com/bxa05221-ux/shirakami-specification)
-3. **Current verified Evolution Loop** — [`Evidence → Route Candidate Bridge α0.4`](../EVIDENCE_ROUTE_CANDIDATE_ALPHA_0_4.md)
-4. **Foundation / implementation boundary** — [`spec/README.md`](../../spec/README.md)
-5. **Architecture baseline** — [`docs/Shirakami_OS_Alpha2.2.md`](../Shirakami_OS_Alpha2.2.md)
-6. **Active / historical RFCs** — [`docs/rfc/`](../rfc/)
-7. **Runtime implementation** — [`runtime/`](../../runtime/)
-8. **Adapters / plugins** — [`plugins/`](../../plugins/)
-9. **Evidence / observation records** — [`docs/observations/`](../observations/)
-10. **Examples / protocol source artifacts** — [`examples/`](../../examples/) and [`protocols/`](../../protocols/)
+3. **Current verified Evolution Loop** — [Evidence → Route Candidate Bridge α0.4](../EVIDENCE_ROUTE_CANDIDATE_ALPHA_0_4.md)
+4. **Foundation / implementation boundary** — [spec/README.md](../../spec/README.md)
+5. **Architecture baseline** — [docs/Shirakami_OS_Alpha2.2.md](../Shirakami_OS_Alpha2.2.md)
+6. **Active / historical RFCs** — [docs/rfc/](../rfc/)
+7. **Runtime implementation** — [runtime/](../../runtime/)
+8. **Adapters / plugins** — [plugins/](../../plugins/)
+9. **Evidence / observation records** — [docs/observations/](../observations/)
+10. **Examples / protocol source artifacts** — [examples/](../../examples/) and [protocols/](../../protocols/)
 
 ## MVP Execution Path
 
@@ -150,35 +150,54 @@ The answer must be derived from the actual Protocol, Evidence, Projection, Lands
 
 Shirakami also supports a reviewer-oriented path in which multiple reviewers can register their own Matome YAML context and submit observations separately.
 
+### Architecture Map
+
+See [Reviewer → AIwitness → Traceability Architecture Map](./REVIEWER_AIWTNESS_TRACEABILITY_MAP.md) for the detailed four-layer boundary.
+
 ```text
 Reviewer A ─┐
-Reviewer B ─┼→ Reviewer Bundle → Comparative Trace → AIwitness
-Reviewer C ─┘                         ↓
-                              Human Gate remains
+Reviewer B ─┼→ Reviewer Bundle → Comparative Trace → AIwitness → Traceability
+Reviewer C ─┘                                      ↓
+                                             Human Gate remains
 ```
+
+The four layers have distinct responsibilities:
+
+| Layer | Primary role | Authority |
+|---|---|---|
+| Reviewer | Observation producer | none |
+| Comparative Trace | Comparison / preservation | none |
+| AIwitness | Provenance / observation boundary | none |
+| Traceability | Continuity validation | none |
 
 The comparative layer preserves:
 
 - reviewer identity;
 - each reviewer's Matome YAML context;
 - submitted observations;
+- proposals;
 - Evidence IDs;
 - shared Evidence;
 - divergent Evidence.
 
-A comparative trace does **not** produce a decision. decision remains null, authority_granted remains false, decision_authorized remains false, and human_gate_required remains true.
+A comparative trace does **not** produce a decision. `decision` remains null, `authority_granted` remains false, `decision_authorized` remains false, and `human_gate_required` remains true.
 
 AIwitness records the resulting provenance and traceability as an observation boundary. It does not convert reviewer agreement, Evidence, verification status, or an AI-generated interpretation into authority.
 
+Traceability validates continuity and rejects authority escalation. It checks the comparative decision/authority boundary and, for execution traces, Evidence, identity, verification, commit, and execution/publish/merge authority continuity.
+
 For the implementation boundary, inspect:
 
-- reviewer/registry.py
-- reviewer/comparative_trace.py
-- reviewer/aiwitness_bridge.py
-- aiwitness/traceability.py
-- aiwitness/AIWITNESS_BOUNDARY_CONTRACT.yaml
+- `reviewer/registry.py`
+- `reviewer/comparative_trace.py`
+- `reviewer/aiwitness_bridge.py`
+- `aiwitness/traceability.py`
+- `reviewer/test_comparative_aiwitness_integration.py`
+- `aiwitness/test_traceability.py`
+- `aiwitness/AIWITNESS_BOUNDARY_CONTRACT.yaml`
+- [Reviewer → AIwitness → Traceability Architecture Map](./REVIEWER_AIWTNESS_TRACEABILITY_MAP.md)
 
-This allows an external reviewer or AI reviewer to contribute evidence without becoming the project's decision-maker.
+This allows an external reviewer or AI reviewer to contribute observations without becoming the project's decision-maker.
 
 ## Evidence Policy
 
@@ -219,6 +238,7 @@ It is intentionally not a certification or production-readiness claim; it define
 - Adapter / plugin navigation: established
 - Observation / Evidence navigation: established
 - MVP execution path: established
+- Multi-Agent Reviewer → AIwitness → Traceability Map: established
 - Event Sourcing / Workflow divergence: pending external review
 - Landscape layer placement: pending verification
 - Rich Protocol Semantics boundary: deferred
