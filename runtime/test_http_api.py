@@ -189,6 +189,38 @@ def test_unknown_execution_handle_fails_closed() -> None:
     assert client.post("/v1/executions/unknown/verify", json={}).status_code == 404
 
 
+def test_http_trace_is_retrievable_after_execution() -> None:
+    client = _client()
+    client.post(
+        "/v1/observe",
+        json={"observation": {}, "context": _context(), "handoff_id": "SH-HO-20260925-001"},
+    )
+    client.post(
+        "/v1/analyze",
+        json={"protocol_id": "http.example", "protocol_exists": True},
+    )
+    executed = client.post("/v1/execute", json=_execute_payload())
+    assert executed.status_code == 200
+    trace_id = executed.json()["trace_id"]
+
+    trace = client.get(f"/v1/traces/{trace_id}")
+    assert trace.status_code == 200
+    body = trace.json()
+    assert body["trace_id"] == trace_id
+    assert body["execution_id"] == executed.json()["execution_id"]
+    assert body["handoff_id"] == "SH-HO-20260925-001"
+    assert body["evidence_ids"] == ["AGENT-COORDINATION-001"]
+    assert body["execution_authorized"] is False
+    assert body["publish_authorized"] is False
+    assert body["merge_authorized"] is False
+    assert body["human_gate_required"] is True
+
+
+def test_unknown_trace_fails_closed() -> None:
+    client = _client()
+    assert client.get("/v1/traces/unknown").status_code == 404
+
+
 def test_http_round_trip_preserves_trace_metadata_without_authority() -> None:
     client = _client()
     client.post(
