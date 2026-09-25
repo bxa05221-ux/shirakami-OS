@@ -239,3 +239,18 @@ def test_execution_generates_trace_when_trace_id_is_absent() -> None:
     assert trace is not None
     assert trace["execution_id"] == result["execution_id"]
     assert api.get_execution(result["execution_id"])["trace_id"] == trace_id
+
+
+def test_generated_evidence_id_is_shared_by_handle_and_trace() -> None:
+    api = _api()
+    api.observe({}, _context())
+    api.analyze("api.example", protocol_exists=True)
+
+    result = api.execute(_protocol, "api.example", {})
+    stored = api.get_execution(result["execution_id"])
+    trace = api.get_trace(result["trace_id"])
+
+    assert stored is not None
+    assert trace is not None
+    assert stored["evidence_ids"] == trace["evidence_ids"]
+    assert stored["evidence_ids"]
