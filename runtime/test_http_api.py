@@ -327,3 +327,32 @@ def test_http_witness_reflects_latest_trace_observation() -> None:
     assert observed["trace_id"] == body["trace_id"]
     assert observed["execution_id"] == body["execution_id"]
     assert observed["evidence_ids"] == body["evidence_ids"]
+
+
+def test_http_witness_history_preserves_verification_revisions() -> None:
+    client = _client()
+    executed = client.post("/v1/execute", json=_execute_payload())
+    assert executed.status_code == 200
+    body = executed.json()
+
+    before = client.get(f"/v1/witnesses/{body['trace_id']}/history")
+    assert before.status_code == 200
+    assert len(before.json()) == 1
+    assert before.json()[0]["verification_status"] == "pending"
+
+    checked = client.post(
+        f"/v1/executions/{body['execution_id']}/verify",
+        json={"expected_transition_kind": "http.example"},
+    )
+    assert checked.status_code == 200
+
+    history = client.get(f"/v1/witnesses/{body['trace_id']}/history")
+    assert history.status_code == 200
+    records = history.json()
+    assert len(records) == 2
+    assert records[0]["verification_status"] == "pending"
+    assert records[1]["verification_status"] == "pass"
+    assert records[0]["trace_id"] == records[1]["trace_id"] == body["trace_id"]
+    assert records[0]["execution_id"] == records[1]["execution_id"] == body["execution_id"]
+    assert records[0]["evidence_ids"] == records[1]["evidence_ids"] == body["evidence_ids"]
+    assert records[0]["witness_id"] != records[1]["witness_id"]
