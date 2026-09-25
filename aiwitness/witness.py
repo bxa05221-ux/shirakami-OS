@@ -13,7 +13,7 @@ from typing import Any, Mapping
 from runtime.trace import ExecutionTrace
 
 
-_ALLOWED_STATUS = {"pending", "pass", "fail"}
+_ALLOWED_STATUS = {"pending", "pass", "fail", "mismatch"}
 
 
 @dataclass(frozen=True)
