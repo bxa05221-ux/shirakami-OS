@@ -144,6 +144,34 @@ class ShirakamiHTTPTransport:
             except ValueError as exc:
                 raise HTTPException(status_code=422, detail=str(exc)) from exc
 
+        @app.post("/v1/reviews/blind", dependencies=[Depends(auth)])
+        def blind_review_http(payload: dict[str, Any]) -> dict[str, Any]:
+            from reviewer.blind_review import ingest_blind_review
+            project_id = str(payload.get("project_id", "")).strip()
+            result = payload.get("result")
+            if not project_id or not isinstance(result, dict):
+                raise HTTPException(status_code=422, detail="project_id and result are required")
+            bundle = self.reviewer_bundles.setdefault(project_id, ReviewerBundle(project_id=project_id))
+            try:
+                return ingest_blind_review(bundle, result)
+            except ValueError as exc:
+                raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+        @app.post("/v1/reviews/blind/comparative/aiwitness", dependencies=[Depends(auth)])
+        def blind_comparative_aiwitness_http(payload: dict[str, Any]) -> dict[str, Any]:
+            from aiwitness.traceability import validate_comparative_traceability
+            from reviewer.blind_review import ingest_and_compare_blind_reviews
+            project_id = str(payload.get("project_id", "")).strip()
+            results = payload.get("results")
+            if not project_id or not isinstance(results, list) or not results:
+                raise HTTPException(status_code=422, detail="project_id and non-empty results are required")
+            bundle = ReviewerBundle(project_id=project_id)
+            try:
+                context = ingest_and_compare_blind_reviews(bundle, results)
+                record = validate_comparative_traceability(context=context)
+            except ValueError as exc:
+                raise HTTPException(status_code=422, detail=str(exc)) from exc
+            return {"valid": True, "aiwitness": context, "traceability": asdict(record)}
         @app.post("/v1/reviews/comparative", dependencies=[Depends(auth)])
         def comparative_review_http(payload: ReviewerComparativeInput) -> dict[str, Any]:
             bundle = self.reviewer_bundles.get(payload.project_id)
