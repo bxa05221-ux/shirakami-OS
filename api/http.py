@@ -3,6 +3,9 @@
 from __future__ import annotations
 from dataclasses import asdict
 from typing import Any, Callable, Mapping
+from reviewer.comparative_trace import as_trace_context, build_comparative_trace
+from reviewer.http import get_reviewers, register_reviewer, submit_review
+from reviewer.registry import ReviewerBundle
 from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 try:
@@ -52,6 +55,19 @@ class ExecuteInput(BaseModel):
     trace_id: str | None = None
     evidence_ids: list[str] = Field(default_factory=list)
     boundary_context: ExecutionBoundaryContext
+class ReviewerRegistrationInput(BaseModel):
+    project_id: str
+    reviewer_id: str
+    matome_yaml: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+class ReviewerSubmissionInput(BaseModel):
+    project_id: str
+    reviewer_id: str
+    observation: dict[str, Any] = Field(default_factory=dict)
+    evidence_ids: list[str] = Field(default_factory=list)
+    proposal: dict[str, Any] = Field(default_factory=dict)
+class ReviewerComparativeInput(BaseModel):
+    project_id: str
 class VerifyInput(BaseModel):
     execution: dict[str, Any] = Field(default_factory=dict)
     expected_transition_kind: str | None = None
@@ -59,7 +75,7 @@ class VerifyInput(BaseModel):
 
 class ShirakamiHTTPTransport:
     def __init__(self, api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None) -> None:
-        self.api = api or ShirakamiAPI(); self.protocol_registry = dict(protocol_registry or {}); self.api_key = api_key
+        self.api = api or ShirakamiAPI(); self.protocol_registry = dict(protocol_registry or {}); self.api_key = api_key; self.reviewer_bundles: dict[str, ReviewerBundle] = {}
     def create_app(self) -> FastAPI:
         app = FastAPI(title="Shirakami UI for AI API", version="alpha-0.1"); auth = require_api_key(self.api_key)
         @app.get("/health")
@@ -80,6 +96,42 @@ class ShirakamiHTTPTransport:
             protocol = self.protocol_registry.get(payload.protocol_id)
             if protocol is None: raise HTTPException(status_code=404, detail="protocol is not registered for HTTP execution")
             return self.api.execute(protocol, payload.protocol_id, payload.input_data, handoff_id=payload.handoff_id, trace_id=payload.trace_id, evidence_ids=tuple(payload.evidence_ids), project=boundary["project"], objective=boundary["objective"], protocol_ids=tuple(boundary["protocol_ids"]), verification_scope=tuple(boundary["verification_scope"]))
+        @app.post("/v1/reviews/register", dependencies=[Depends(auth)])
+        def register_reviewer_http(payload: ReviewerRegistrationInput) -> dict[str, Any]:
+            bundle = self.reviewer_bundles.setdefault(payload.project_id, ReviewerBundle(project_id=payload.project_id))
+            return register_reviewer(bundle, payload.model_dump(exclude={"project_id"}))
+
+        @app.post("/v1/reviews/submit", dependencies=[Depends(auth)])
+        def submit_reviewer_http(payload: ReviewerSubmissionInput) -> dict[str, Any]:
+            bundle = self.reviewer_bundles.get(payload.project_id)
+            if bundle is None:
+                raise HTTPException(status_code=404, detail="unknown reviewer project")
+            try:
+                return submit_review(bundle, payload.model_dump(exclude={"project_id"}))
+            except ValueError as exc:
+                raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+        @app.post("/v1/reviews/comparative", dependencies=[Depends(auth)])
+        def comparative_review_http(payload: ReviewerComparativeInput) -> dict[str, Any]:
+            bundle = self.reviewer_bundles.get(payload.project_id)
+            if bundle is None:
+                raise HTTPException(status_code=404, detail="unknown reviewer project")
+            return as_trace_context(build_comparative_trace(bundle))
+
+        @app.get("/v1/reviews/comparative/{project_id}", dependencies=[Depends(auth)])
+        def get_comparative_review_http(project_id: str) -> dict[str, Any]:
+            bundle = self.reviewer_bundles.get(project_id)
+            if bundle is None:
+                raise HTTPException(status_code=404, detail="unknown reviewer project")
+            return as_trace_context(build_comparative_trace(bundle))
+
+        @app.get("/v1/reviews/{project_id}", dependencies=[Depends(auth)])
+        def get_reviewers_http(project_id: str) -> dict[str, Any]:
+            bundle = self.reviewer_bundles.get(project_id)
+            if bundle is None:
+                raise HTTPException(status_code=404, detail="unknown reviewer project")
+            return get_reviewers(bundle)
+
         @app.get("/v1/executions/{execution_id}", dependencies=[Depends(auth)])
         def get_execution(execution_id: str) -> dict[str, Any]:
             result = self.api.get_execution(execution_id)
