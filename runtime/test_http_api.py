@@ -281,3 +281,27 @@ def test_http_rejects_undeclared_protocol_at_boundary() -> None:
     response = client.post("/v1/execute", json=payload)
     assert response.status_code == 422
     assert "protocol_id is not declared" in response.json()["detail"]
+
+
+def test_http_witness_is_retrievable_after_execution() -> None:
+    client = _client()
+    executed = client.post("/v1/execute", json=_execute_payload())
+    assert executed.status_code == 200
+    body = executed.json()
+
+    witness = client.get(f"/v1/witnesses/{body['trace_id']}")
+    assert witness.status_code == 200
+    observed = witness.json()
+    assert observed["trace_id"] == body["trace_id"]
+    assert observed["execution_id"] == body["execution_id"]
+    assert observed["handoff_id"] == body["handoff_id"]
+    assert observed["evidence_ids"] == body["evidence_ids"]
+    assert observed["execution_authorized"] is False
+    assert observed["publish_authorized"] is False
+    assert observed["merge_authorized"] is False
+    assert observed["human_gate_required"] is True
+
+
+def test_unknown_witness_fails_closed() -> None:
+    client = _client()
+    assert client.get("/v1/witnesses/unknown").status_code == 404
