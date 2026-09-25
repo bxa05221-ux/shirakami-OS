@@ -25,6 +25,9 @@ class WitnessStore:
                 return witness
         return None
 
+    def history(self, trace_id: str) -> tuple[WitnessRecord, ...]:
+        return tuple(self._records.get(trace_id, ()))
+
     def all(self) -> tuple[WitnessRecord, ...]:
         return tuple(
             witness
