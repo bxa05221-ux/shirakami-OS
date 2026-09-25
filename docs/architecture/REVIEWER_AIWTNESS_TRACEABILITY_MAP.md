@@ -157,7 +157,7 @@ This architecture map describes the implementation present on the `phase3-api-bo
 The latest boundary-test commits are:
 
 - `31c30f92f35a5a316500e80c1df9f98d19109b66` — reviewer proposals remain proposals through AIwitness.
-- `6a475e40e3ec216a2c193f4bd646d5b8d7f8d15932` — comparative traceability rejects decision/authority escalation and Evidence overlap.
+- `6a475e40e3ec216a2c193f4bd646d5b8d7f15932` — comparative traceability rejects decision/authority escalation and Evidence overlap.
 
 CI status must be verified separately for these commits; a commit existing in GitHub is not itself evidence that its tests passed.
 
