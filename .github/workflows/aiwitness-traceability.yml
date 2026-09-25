@@ -35,4 +35,4 @@ jobs:
       - name: Verify stable Evidence retrieval
         run: pytest -q aiwitness/test_evidence_endpoint.py
       - name: Verify multi-agent reviewer boundary
-        run: pytest -q reviewer/test_registry.py reviewer/test_http.py reviewer/test_aiwitness_bridge.py
+        run: pytest -q reviewer/test_registry.py reviewer/test_http.py reviewer/test_aiwitness_bridge.py reviewer/test_comparative_trace.py
