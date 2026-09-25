@@ -121,16 +121,17 @@ class ShirakamiAPI:
             "human_gate_required": True,
         }
         provisional_trace_id = trace_id or f"TRACE-{uuid4()}"
-        handle = self.executions.create(
-            protocol_id, payload, handoff_id=handoff_id, trace_id=provisional_trace_id,
-            evidence_ids=evidence_ids, project=project, objective=objective,
-            protocol_ids=protocol_ids, verification_scope=verification_scope,
-        )
-        resolved_trace_id = provisional_trace_id
         if evidence and not evidence_ids:
             linked_evidence_ids = tuple(item["evidence_id"] for item in evidence)
         else:
             linked_evidence_ids = tuple(evidence_ids)
+        payload["evidence_ids"] = list(linked_evidence_ids)
+        handle = self.executions.create(
+            protocol_id, payload, handoff_id=handoff_id, trace_id=provisional_trace_id,
+            evidence_ids=linked_evidence_ids, project=project, objective=objective,
+            protocol_ids=protocol_ids, verification_scope=verification_scope,
+        )
+        resolved_trace_id = provisional_trace_id
         self.traces.create(ExecutionTrace(
             trace_id=resolved_trace_id,
             execution_id=handle.execution_id,
