@@ -113,6 +113,7 @@ def test_comparative_trace_http_aiwitness_boundary() -> None:
     assert body["traceability"]["shared_evidence_ids"] == ["E1"]
     assert body["traceability"]["divergent_evidence_ids"] == ["E2", "E3"]
 
+
 def test_blind_review_http_comparative_aiwitness_boundary() -> None:
     from api.http import create_app
 
@@ -140,7 +141,7 @@ def test_blind_review_http_comparative_aiwitness_boundary() -> None:
         "project_id": "http-blind-traceability",
         "results": [first, second],
     })
-    assert response.status_code == 200
+    assert response.status_code == 200, response.text
     body = response.json()
     assert body["valid"] is True
     assert body["aiwitness"]["shared_evidence_ids"] == ["E1"]
