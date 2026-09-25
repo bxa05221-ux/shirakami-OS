@@ -262,6 +262,32 @@ The HTTP route does not grant execution, publication, merge, or decision authori
 
 For implementation inspection, see `api/http.py`, `reviewer/blind_review.py`, `scripts/validate_blind_review_result.py`, and `reviewer/test_comparative_aiwitness_integration.py`.
 
+## External Review → Evidence Promotion Boundary
+
+Blind review output remains an external observation after HTTP ingestion, comparison, AIwitness recording, and traceability validation.
+
+The promotion path is intentionally one-way and human-gated:
+
+```text
+External Review
+      ↓
+Observed Result
+      ↓
+Candidate Evidence
+      ↓
+Repository / Test Verification
+      ↓
+Human Gate
+      ↓
+Accepted Evidence
+```
+
+No reviewer result, Evidence ID reference, passing validation, comparative agreement, or AIwitness record may by itself promote an observation into accepted Evidence.
+
+This distinction is important because `evidence_ids` in a blind-review result are references supplied by the reviewer; they are not Evidence acceptance commands. The current implementation therefore records `evidence_accepted: false` at the ingestion boundary.
+
+A future Evidence-promotion implementation must preserve this boundary rather than adding automatic acceptance as a side effect of review ingestion.
+
 ## Current Review Status
 
 - Repository entry point: established
