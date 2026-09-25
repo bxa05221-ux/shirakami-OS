@@ -4,9 +4,13 @@ on:
   push:
     paths:
       - "aiwitness/**"
+      - "api/**"
+      - "runtime/**"
   pull_request:
     paths:
       - "aiwitness/**"
+      - "api/**"
+      - "runtime/**"
 
 jobs:
   traceability:
@@ -24,3 +28,5 @@ jobs:
         run: pytest -q aiwitness/test_traceability_runtime.py
       - name: Verify HTTP provenance chain
         run: pytest -q aiwitness/test_traceability_http.py
+      - name: Verify public traceability endpoint
+        run: pytest -q aiwitness/test_traceability_endpoint.py
