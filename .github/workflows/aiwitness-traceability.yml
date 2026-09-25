@@ -1,0 +1,38 @@
+name: AIwitness Traceability Verification
+
+on:
+  push:
+    paths:
+      - "aiwitness/**"
+      - "api/**"
+      - "runtime/**"
+      - "reviewer/**"
+  pull_request:
+    paths:
+      - "aiwitness/**"
+      - "api/**"
+      - "runtime/**"
+      - "reviewer/**"
+
+jobs:
+  traceability:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        run: python -m pip install pytest pyyaml fastapi httpx
+      - name: Verify AIwitness unit boundary
+        run: pytest -q aiwitness/test_witness.py aiwitness/test_store.py aiwitness/test_traceability.py
+      - name: Verify runtime provenance chain
+        run: pytest -q aiwitness/test_traceability_runtime.py
+      - name: Verify HTTP provenance chain
+        run: pytest -q aiwitness/test_traceability_http.py
+      - name: Verify public traceability endpoint
+        run: pytest -q aiwitness/test_traceability_endpoint.py
+      - name: Verify stable Evidence retrieval
+        run: pytest -q aiwitness/test_evidence_endpoint.py
+      - name: Verify multi-agent reviewer boundary
+        run: pytest -q reviewer/test_registry.py reviewer/test_http.py reviewer/test_aiwitness_bridge.py reviewer/test_comparative_trace.py reviewer/test_comparative_aiwitness_integration.py

@@ -320,13 +320,22 @@ Please open issues for proposed changes to the Foundation. For patches or docume
 
 ## License
 
-Shirakami OS now uses a **layered licensing model**:
+The current repository licensing is:
 
 - **Source code and executable implementation artifacts** → MIT License (`LICENSE`)
 - **Specifications, protocols, schemas, architecture documents, and documentation** → CC BY 4.0 (`LICENSE-SPECIFICATION.md`)
 - **Shirakami OS name, logos, and project marks** → not granted as trademark or official-brand rights by either license
 - **Official certification, endorsement, commercial branding, and Enterprise offerings** → may be governed by separate terms or agreements
 
-This separation is intentional. The implementation is open for use and adaptation, while the specification and documentation remain reusable with attribution, and the project's identity and official status remain separately governed.
+This is the **current licensing state**. A separate layered licensing architecture for Protocol, commercial vendor integration, and conformance is being evaluated; it does not replace the current licenses at this stage.
+
+The transition design separates:
+
+- implementation / research code;
+- normative protocol material;
+- commercial vendor integration;
+- name, branding, and conformance claims.
+
+The transition architecture is a **draft for review**. No new Protocol License, vendor agreement, certification program, or top-level license replacement has been adopted. Any future transition will be subject to compatibility review, legal review, and explicit Human Gate approval.
 
 See [`LICENSE`](LICENSE) and [`LICENSE-SPECIFICATION.md`](LICENSE-SPECIFICATION.md).

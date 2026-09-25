@@ -1,199 +1,66 @@
 # Shirakami OS — Reviewer Entry Point
 
+## Evidence Promotion Boundary
+
+Blind review output is an external observation until independently verified and explicitly accepted through a Human Gate. Reviewer-supplied Evidence IDs are references only.
+
+```text
+External Review
+      ↓
+Observed Result
+      ↓
+Candidate Evidence IDs
+      ↓
+Repository / Test Verification
+      ↓
+Human Gate: approved
+      ↓
+Existing immutable EvidenceRecord(s) accepted for the reviewed purpose
+```
+
+The promotion boundary does not create new EvidenceRecords and does not mutate the EvidenceStore. It only resolves reviewer references against already-recorded immutable EvidenceRecords after explicit approval. Pending or rejected review cannot promote Evidence, and unknown Evidence IDs are rejected.
+
 ## Purpose
 
 This is the shortest evidence-backed route for an external reviewer or AI system to inspect Shirakami OS without relying on prior knowledge.
 
 The repository is one implementation layer within a larger Shirakami Landscape. Stable normative specifications are maintained in `shirakami-specification`; this repository contains Runtime, adapters, plugins, tests, and executable artifacts.
 
-## Repository Roles
+## Multi-Agent Review Boundary
+
+Multiple reviewers can register their own Matome YAML context and submit observations separately. Use the [Blind External Review Protocol](./BLIND_EXTERNAL_REVIEW_PROTOCOL.md) and follow the HTTP route advertised by `GET /v1/capabilities`.
 
 ```text
-shirakami-model
-    ↓ conceptual foundation
-shirakami-research
-    ↓ observation / experiment
-shirakami-specification
-    ↓ normative contract
-shirakami-OS
-    ↓ runtime / implementation
-Evidence / Observation
-    ↺ research
+Reviewer A ─┐
+Reviewer B ─┼→ Reviewer Bundle → Comparative Trace → AIwitness → Traceability
+Reviewer C ─┘                                      ↓
+                                             Human Gate remains
 ```
 
-## Recommended Reading Order
+The reviewer, comparative, AIwitness, and traceability layers have no decision authority. `decision` remains null, `authority_granted` remains false, `decision_authorized` remains false, and `human_gate_required` remains true throughout the review path.
 
-1. **Repository README** — implementation-layer scope and architecture
-2. **Normative Specification** — [shirakami-specification](https://github.com/bxa05221-ux/shirakami-specification)
-3. **Current verified Evolution Loop** — [`Evidence → Route Candidate Bridge α0.4`](../EVIDENCE_ROUTE_CANDIDATE_ALPHA_0_4.md)
-4. **Foundation / implementation boundary** — [`spec/README.md`](../../spec/README.md)
-5. **Architecture baseline** — [`docs/Shirakami_OS_Alpha2.2.md`](../Shirakami_OS_Alpha2.2.md)
-6. **Active / historical RFCs** — [`docs/rfc/`](../rfc/)
-7. **Runtime implementation** — [`runtime/`](../../runtime/)
-8. **Adapters / plugins** — [`plugins/`](../../plugins/)
-9. **Evidence / observation records** — [`docs/observations/`](../observations/)
-10. **Examples / protocol source artifacts** — [`examples/`](../../examples/) and [`protocols/`](../../protocols/)
-
-## MVP Execution Path
-
-For a quick implementation check, follow this concrete path:
+## External Review API Route
 
 ```text
-Protocol Source
-      ↓
-Protocol Loader
-      ↓
-Current Selection
-      ↓
-MTM Compatibility
-      ↓
-Runtime Execution
-      ↓
-Inspectable Result
+Reviewer Entry Point
+        ↓
+Blind Review Matome YAML
+        ↓ POST /v1/reviews/blind
+Validator
+        ↓
+ReviewerBundle
+        ↓ POST /v1/reviews/blind/comparative/aiwitness
+Comparative Trace
+        ↓
+AIwitness Context
+        ↓
+Comparative Traceability
+        ↓
+Human Gate
 ```
 
-The minimum executable entry point is `runtime/execute.py`. It deliberately stops at a prepared Runtime result; AI-provider invocation is outside the current MVP boundary.
-
-The corresponding execution test is `tests/test_execute.py`.
-
-Run the verification suite with:
-
-```bash
-python -m pytest runtime tests -q
-```
-
-The MVP boundary is considered healthy when this suite is green.
-
-## Specification Boundary
-
-The canonical home for stable normative contracts is `shirakami-specification`.
-
-The `docs/rfc/` directory in this repository is now an RFC history and active-design area. RFC-0001 through RFC-0005 have promoted specifications; RFC-0006 remains Draft.
-
-Do not treat implementation-side documents as normative merely because they are present in this repository.
-
-## Kernel Boundary
-
-The current implementation should be reviewed around these boundaries:
-
-```text
-Human Landscape
-      ↓
-Matome / Protocol Source
-      ↓
-Protocol IR
-      ↓
-Runtime
-      ↓
-Execution Result
-      ↓
-Evidence
-      ↓
-Projection
-      ↓
-Landscape State
-      ↓
-Replay / Restore
-```
-
-The following are Kernel concerns:
-
-- Landscape State
-- Protocol / Protocol IR
-- Transition execution
-- Evidence preservation
-- Projection boundary
-- Replay / determinism boundary
-- Adapter boundary
-
-The following remain outside the Runtime Kernel:
-
-- Domain-specific meaning
-- LLM-specific control flow
-- UI rendering
-- Backend-specific storage semantics
-- Research hypotheses not accepted as Foundation contracts
-
-## Architecture Review Questions
-
-An external review should answer these questions from repository evidence rather than from the project name or README alone.
-
-### Protocol / Runtime
-
-- Does the Runtime execute generic Protocol structure without hard-coded domain meaning?
-- Does Protocol define allowed transitions rather than merely encode a workflow sequence?
-- Where does semantic authority reside when richer semantics are introduced?
-
-### Evidence
-
-- Is Evidence immutable?
-- Can an execution result be traced to the Protocol that produced it?
-- Is Evidence distinct from an ordinary operational log?
-
-### Projection / Landscape
-
-- Is Evidence separated from its projection into Landscape State?
-- Is Landscape State the state/context used by subsequent Protocol evaluation?
-- Is Landscape a runtime state model rather than merely an audit-log read model?
-
-### Comparison with Existing Systems
-
-Do not begin by asking whether Shirakami resembles Event Sourcing, Workflow Engines, Policy Engines, or Agent Frameworks.
-
-Instead ask:
-
-> If the system were reduced to ordinary Event Sourcing plus Workflow execution, which current Kernel responsibilities would be lost?
-
-The answer must be derived from the actual Protocol, Evidence, Projection, Landscape, and Replay boundaries in the repository.
-
-## Evidence Policy
-
-External AI observations are **observations**, not authoritative facts.
-
-Repository code, tests, immutable Evidence, and accepted specifications are the primary evidence sources.
-
-When external reviews disagree:
-
-```text
-External Observation
-       ↓
-Candidate Question
-       ↓
-Repository / Test Verification
-       ↓
-Accepted Evidence
-```
-
-Do not silently reconcile contradictory external interpretations.
-
-## 30-Minute Review Route
-
-For a timed first-pass external review, use the [30-Minute External Review Guide](../EXTERNAL_REVIEW_GUIDE_30MIN.md). It follows the same evidence boundary as this entry point and the Public Verification Pack.
-
-## Public Verification
-
-For a compact, reproducible external review route, use [Public Verification Pack](../PUBLIC_VERIFICATION_PACK.md).
-
-It is intentionally not a certification or production-readiness claim; it defines the current public verification boundary.
-
-## Current Review Status
-
-- Repository entry point: established
-- Repository role boundary: established
-- Normative specification navigation: established
-- Runtime implementation navigation: established
-- Adapter / plugin navigation: established
-- Observation / Evidence navigation: established
-- MVP execution path: established
-- Event Sourcing / Workflow divergence: pending external review
-- Landscape layer placement: pending verification
-- Rich Protocol Semantics boundary: deferred
-- Evidence → structural Route Candidate proposal: implemented (α0.4)
-- Route Candidate → Human Gate → One-Stroke Runtime → Verification: implemented (α0.3)
-- Migration policy: pending explicit contract
+The API capability surface advertises `blind_review_ingestion` and `blind_review_aiwitness_traceability`. Invalid blind-review payloads are rejected before ingestion. A successful traceability response demonstrates boundary validation for that request; it does not certify the architecture as a whole.
 
 ## Review Rule
 
-Do not infer the project's intended meaning from the name `Shirakami OS`.
-
-Read the normative specification, follow the implementation path, inspect the tests and observations, and only then classify the architecture.
+Do not infer the project's intended meaning from the name `Shirakami OS`. Read the normative specification, follow the implementation path, inspect the tests and observations, and only then classify the architecture.

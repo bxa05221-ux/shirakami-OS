@@ -454,7 +454,27 @@ Repository間で迷った場合は、[Repository Map](docs/architecture/REPOSITO
 
 ## License
 
-Repositoryのライセンスについては、ルートの `LICENSE` を参照してください。
+現在のRepositoryのライセンスは、次のとおりです。
+
+- **ソースコード・実行可能な実装** → MIT License（`LICENSE`）
+- **仕様・Protocol・Schema・Architecture文書・Documentation** → CC BY 4.0（`LICENSE-SPECIFICATION.md`）
+- **Shirakami OSの名称・ロゴ・Project Mark** → 各ライセンスによって商標権・公式ブランド権が付与されるものではありません
+- **公式認証・承認・商用ブランディング・Enterprise提供** → 別途の条件・契約で定められる場合があります
+
+これは**現在のライセンス状態**です。
+
+Protocol、商用Vendor Integration、Conformanceなどを分離した将来のライセンス体系を検討していますが、現時点では現在のライセンスを置き換えていません。
+
+将来の移行構想では、次の層を分離します。
+
+- 実装・Research Code
+- Normative Protocol
+- Commercial Vendor Integration
+- Name / Branding / Conformance
+
+この移行構想は**レビュー中のDraft**です。新しいProtocol License、Vendor Agreement、Certification Program、またはルートLicenseの置換は、まだ採用されていません。将来の変更には、互換性確認、法的検討、および明示的なHuman Gateによる承認を必要とします。
+
+[LICENSE](LICENSE) と [LICENSE-SPECIFICATION.md](LICENSE-SPECIFICATION.md) を参照してください。
 
 ---
 
