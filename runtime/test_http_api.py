@@ -129,6 +129,7 @@ def test_execute_requires_registered_protocol() -> None:
             "protocol_id": "unknown",
             "input_data": {},
             "handoff_id": "SH-HO-20260925-001",
+            "evidence_ids": ["AGENT-COORDINATION-001"],
             "boundary_context": {
                 **_boundary_context(),
                 "protocol_ids": ["unknown"],
