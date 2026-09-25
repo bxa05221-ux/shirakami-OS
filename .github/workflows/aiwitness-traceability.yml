@@ -6,11 +6,13 @@ on:
       - "aiwitness/**"
       - "api/**"
       - "runtime/**"
+      - "reviewer/**"
   pull_request:
     paths:
       - "aiwitness/**"
       - "api/**"
       - "runtime/**"
+      - "reviewer/**"
 
 jobs:
   traceability:
@@ -32,3 +34,5 @@ jobs:
         run: pytest -q aiwitness/test_traceability_endpoint.py
       - name: Verify stable Evidence retrieval
         run: pytest -q aiwitness/test_evidence_endpoint.py
+      - name: Verify multi-agent reviewer boundary
+        run: pytest -q reviewer/test_registry.py
