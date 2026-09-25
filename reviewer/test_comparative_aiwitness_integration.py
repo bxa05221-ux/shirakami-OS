@@ -1,3 +1,5 @@
+from fastapi.testclient import TestClient
+
 from reviewer.aiwitness_bridge import as_comparative_trace_context, as_trace_context as reviewer_trace_context, build_comparative_trace_metadata, build_trace_metadata
 from reviewer.comparative_trace import as_trace_context, build_comparative_trace
 from reviewer.registry import ReviewSubmission, Reviewer, ReviewerBundle
@@ -49,3 +51,52 @@ def test_comparative_trace_can_be_issued_as_aiwitness_context() -> None:
     assert witness_context["decision_authorized"] is False
     assert witness_context["human_gate_required"] is True
 
+
+
+def test_comparative_trace_http_aiwitness_boundary() -> None:
+    from api.http import create_app
+
+    client = TestClient(create_app(api_key=None))
+    client.post(
+        "/v1/reviews/register",
+        json={
+            "project_id": "project-http-aiwitness",
+            "reviewer_id": "reviewer-a",
+            "matome_yaml": "matome: a",
+        },
+    )
+    client.post(
+        "/v1/reviews/register",
+        json={
+            "project_id": "project-http-aiwitness",
+            "reviewer_id": "reviewer-b",
+            "matome_yaml": "matome: b",
+        },
+    )
+    for reviewer_id, evidence_ids in (
+        ("reviewer-a", ["E1", "E2"]),
+        ("reviewer-b", ["E1", "E3"]),
+    ):
+        response = client.post(
+            "/v1/reviews/submit",
+            json={
+                "project_id": "project-http-aiwitness",
+                "reviewer_id": reviewer_id,
+                "observation": {"finding": reviewer_id},
+                "evidence_ids": evidence_ids,
+            },
+        )
+        assert response.status_code == 200
+
+    response = client.post(
+        "/v1/reviews/comparative/aiwitness",
+        json={"project_id": "project-http-aiwitness"},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["shared_evidence_ids"] == ["E1"]
+    assert body["divergent_evidence_ids"] == ["E2", "E3"]
+    assert body["decision"] is None
+    assert body["authority_granted"] is False
+    assert body["decision_authorized"] is False
+    assert body["human_gate_required"] is True
