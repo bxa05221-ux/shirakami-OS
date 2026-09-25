@@ -193,6 +193,10 @@ class ShirakamiHTTPTransport:
                 raise HTTPException(status_code=404, detail="unknown trace_id")
             return result
 
+        @app.get("/v1/witnesses/{trace_id}/history", dependencies=[Depends(auth)])
+        def get_witness_history(trace_id: str) -> list[dict[str, Any]]:
+            return self.api.get_witness_history(trace_id)
+
         @app.get("/v1/witnesses/{trace_id}", dependencies=[Depends(auth)])
         def get_witness(trace_id: str) -> dict[str, Any]:
             result = self.api.get_witness(trace_id)
