@@ -254,3 +254,39 @@ def test_generated_evidence_id_is_shared_by_handle_and_trace() -> None:
     assert trace is not None
     assert stored["evidence_ids"] == trace["evidence_ids"]
     assert stored["evidence_ids"]
+
+
+def test_execution_records_aiwitness_observation() -> None:
+    api = _api()
+
+    def protocol(_: Any) -> Transition:
+        return Transition(kind="api.witness", data={"changed": True})
+
+    result = api.execute(
+        protocol,
+        "api.witness",
+        {"input": "test"},
+        handoff_id="SH-HO-20260925-001",
+        project="Shirakami",
+        objective="record witness",
+        protocol_ids=("api.witness",),
+        verification_scope=("execution",),
+    )
+
+    witness = api.get_witness(result["trace_id"])
+
+    assert witness is not None
+    assert witness["trace_id"] == result["trace_id"]
+    assert witness["execution_id"] == result["execution_id"]
+    assert witness["handoff_id"] == result["handoff_id"]
+    assert witness["evidence_ids"] == result["evidence_ids"]
+    assert witness["execution_authorized"] is False
+    assert witness["publish_authorized"] is False
+    assert witness["merge_authorized"] is False
+    assert witness["human_gate_required"] is True
+
+
+def test_unknown_aiwitness_fails_closed() -> None:
+    api = _api()
+
+    assert api.get_witness("TRACE-UNKNOWN") is None
