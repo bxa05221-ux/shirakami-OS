@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import asdict
 from typing import Any, Callable, Mapping
 from reviewer.comparative_trace import as_trace_context, build_comparative_trace
+from reviewer.aiwitness_bridge import as_comparative_trace_context, build_comparative_trace_metadata
 from reviewer.http import get_reviewers, register_reviewer, submit_review
 from reviewer.registry import ReviewerBundle
 from fastapi import Depends, FastAPI, HTTPException
@@ -120,6 +121,15 @@ class ShirakamiHTTPTransport:
             if bundle is None:
                 raise HTTPException(status_code=404, detail="unknown reviewer project")
             return as_trace_context(build_comparative_trace(bundle))
+
+        @app.post("/v1/reviews/comparative/aiwitness", dependencies=[Depends(auth)])
+        def comparative_aiwitness_http(payload: ReviewerComparativeInput) -> dict[str, Any]:
+            bundle = self.reviewer_bundles.get(payload.project_id)
+            if bundle is None:
+                raise HTTPException(status_code=404, detail="unknown reviewer project")
+            comparative = build_comparative_trace(bundle)
+            metadata = build_comparative_trace_metadata(comparative)
+            return as_comparative_trace_context(metadata)
 
         @app.get("/v1/reviews/comparative/{project_id}", dependencies=[Depends(auth)])
         def get_comparative_review_http(project_id: str) -> dict[str, Any]:
