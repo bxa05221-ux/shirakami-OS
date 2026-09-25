@@ -170,6 +170,13 @@ class ShirakamiHTTPTransport:
         def evidence(protocol_id: str | None = None, signal: str | None = None, transition_kind: str | None = None) -> list[dict[str, Any]]:
             return list(self.api.query_evidence(protocol_id=protocol_id, signal=signal, transition_kind=transition_kind))
 
+        @app.get("/v1/evidence/{evidence_id}", dependencies=[Depends(auth)])
+        def evidence_by_id(evidence_id: str) -> dict[str, Any]:
+            result = self.api.get_evidence(evidence_id)
+            if result is None:
+                raise HTTPException(status_code=404, detail="unknown evidence_id")
+            return result
+
         return app
 
 
