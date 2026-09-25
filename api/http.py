@@ -96,6 +96,8 @@ class ShirakamiHTTPTransport:
                     "aiwitness": True,
                     "multi_agent_review": True,
                     "comparative_traceability": True,
+                    "blind_review_ingestion": True,
+                    "blind_review_aiwitness_traceability": True,
                 },
                 "boundaries": {
                     "execution_authorized": False,
