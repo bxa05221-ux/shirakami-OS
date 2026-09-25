@@ -43,7 +43,7 @@ def test_one_stroke_route_executes_as_one_runtime_handle() -> None:
         route_id,
         [("a", _step), ("b", _step), ("c", _step)],
     )
-    result = api.execute(route, route_id, {"value": 0})
+    result = api.execute(route, route_id, {"value": 0}, handoff_id="SH-HO-ROUTE-001")
 
     assert result["status"] == "completed"
     assert result["transition"]["kind"] == f"route.{route_id}"
