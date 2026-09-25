@@ -105,7 +105,7 @@ def test_execute_requires_registered_protocol() -> None:
 
     client.post(
         "/v1/observe",
-        json={"observation": {}, "context": _context()},
+        json={"observation": {}, "context": _context(), "handoff_id": "SH-HO-20260925-001"},
     )
     client.post(
         "/v1/analyze",
@@ -113,7 +113,7 @@ def test_execute_requires_registered_protocol() -> None:
     )
     executed = client.post(
         "/v1/execute",
-        json={"protocol_id": "http.example", "input_data": {"x": 1}},
+        json={"protocol_id": "http.example", "input_data": {"x": 1}, "handoff_id": "SH-HO-20260925-001"},
     )
     assert executed.status_code == 200
     assert executed.json()["status"] == "completed"
