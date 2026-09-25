@@ -9,6 +9,7 @@ import yaml
 
 REQUIRED_FIELDS = (
     "reviewer_id",
+    "matome_yaml",
     "objective",
     "observations",
     "evidence_ids",
@@ -31,6 +32,8 @@ def validate_blind_review_result(result: dict[str, Any]) -> dict[str, Any]:
 
     if not str(result["reviewer_id"]).strip():
         raise ValueError("reviewer_id is required")
+    if not isinstance(result["matome_yaml"], str) or not result["matome_yaml"].strip():
+        raise ValueError("matome_yaml is required")
     if not str(result["objective"]).strip():
         raise ValueError("objective is required")
 
