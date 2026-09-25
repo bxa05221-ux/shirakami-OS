@@ -7,6 +7,7 @@ trace or introducing execution, publication, merge, or human-gate authority.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from uuid import uuid4
 from typing import Any, Mapping
 
 from runtime.trace import ExecutionTrace
@@ -17,6 +18,7 @@ _ALLOWED_STATUS = {"pending", "pass", "fail"}
 
 @dataclass(frozen=True)
 class WitnessRecord:
+    witness_id: str
     trace_id: str
     execution_id: str
     handoff_id: str
@@ -31,7 +33,7 @@ class WitnessRecord:
     human_gate_required: bool = True
 
     def __post_init__(self) -> None:
-        if not self.trace_id or not self.execution_id or not self.handoff_id:
+        if not self.witness_id or not self.trace_id or not self.execution_id or not self.handoff_id:
             raise ValueError("witness identity must be non-empty")
         if self.verification_status not in _ALLOWED_STATUS:
             raise ValueError("unsupported verification status")
@@ -55,6 +57,7 @@ class AIwitness:
             raise ValueError("AIwitness requires handoff_id")
 
         return WitnessRecord(
+            witness_id=f"WITNESS-{uuid4()}",
             trace_id=trace.trace_id,
             execution_id=trace.execution_id,
             handoff_id=trace.handoff_id,
