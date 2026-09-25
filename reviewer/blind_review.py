@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from scripts.validate_blind_review_result import validate_blind_review_result
+
 from .registry import ReviewSubmission, Reviewer, ReviewerBundle
 
 
@@ -13,14 +15,10 @@ def ingest_blind_review(
     *,
     metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Import a validated blind-review result without granting authority.
-
-    The caller is responsible for validating the result with
-    validate_blind_review_result before calling this adapter.
-    Evidence IDs remain references and the review decision remains pending.
-    """
-    reviewer_id = str(result["reviewer_id"])
-    matome_yaml = result.get("matome_yaml")
+    """Validate and import a blind-review result without granting authority."""
+    validated = validate_blind_review_result(result)
+    reviewer_id = str(validated["reviewer_id"])
+    matome_yaml = validated.get("matome_yaml")
 
     if not isinstance(matome_yaml, str) or not matome_yaml.strip():
         raise ValueError("validated blind review must provide matome_yaml")
@@ -34,18 +32,18 @@ def ingest_blind_review(
     )
 
     observation = {
-        "observations": list(result["observations"]),
-        "resolved_questions": list(result["resolved_questions"]),
-        "unresolved_questions": list(result["unresolved_questions"]),
-        "falsifiable_points": list(result["falsifiable_points"]),
-        "interpretation": list(result["interpretation"]),
+        "observations": list(validated["observations"]),
+        "resolved_questions": list(validated["resolved_questions"]),
+        "unresolved_questions": list(validated["unresolved_questions"]),
+        "falsifiable_points": list(validated["falsifiable_points"]),
+        "interpretation": list(validated["interpretation"]),
     }
 
     submission = ReviewSubmission(
         reviewer_id=reviewer_id,
         observation=observation,
-        evidence_ids=tuple(result["evidence_ids"]),
-        proposal={"items": list(result["proposals"])},
+        evidence_ids=tuple(validated["evidence_ids"]),
+        proposal={"items": list(validated["proposals"])},
     )
     bundle.submit(submission)
 
