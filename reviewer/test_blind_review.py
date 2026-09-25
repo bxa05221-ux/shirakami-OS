@@ -56,3 +56,34 @@ def test_ingest_blind_review_preserves_questions_and_interpretation_as_observati
     assert observation["unresolved_questions"] == ["Q1"]
     assert observation["falsifiable_points"] == ["F1"]
     assert observation["interpretation"] == ["I1"]
+
+
+def test_blind_reviews_flow_into_comparative_context_without_authority():
+    from reviewer.blind_review import ingest_and_compare_blind_reviews
+
+    first = valid_result()
+    second = valid_result()
+    first["reviewer_id"] = "reviewer-a"
+    first["matome_yaml"] = "matome:\n  reviewer_id: reviewer-a\n"
+    first["evidence_ids"] = ["E1", "E2"]
+    first["proposals"] = ["P1"]
+    second["reviewer_id"] = "reviewer-b"
+    second["matome_yaml"] = "matome:\n  reviewer_id: reviewer-b\n"
+    second["evidence_ids"] = ["E1", "E3"]
+    second["proposals"] = ["P2"]
+
+    context = ingest_and_compare_blind_reviews(
+        ReviewerBundle(project_id="blind-review-project"),
+        [first, second],
+    )
+
+    assert context["shared_evidence_ids"] == ["E1"]
+    assert context["divergent_evidence_ids"] == ["E2", "E3"]
+    assert context["decision"] is None
+    assert context["authority_granted"] is False
+    assert context["decision_authorized"] is False
+    assert context["human_gate_required"] is True
+    assert [item["proposal"] for item in context["observations"]] == [
+        {"items": ["P1"]},
+        {"items": ["P2"]},
+    ]
