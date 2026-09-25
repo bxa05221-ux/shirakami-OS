@@ -25,6 +25,7 @@ def test_aiwitness_preserves_trace_identity_and_evidence():
     witness = AIwitness.observe(trace)
 
     assert isinstance(witness, WitnessRecord)
+    assert witness.witness_id.startswith("WITNESS-")
     assert witness.trace_id == trace.trace_id
     assert witness.execution_id == trace.execution_id
     assert witness.handoff_id == trace.handoff_id
