@@ -53,3 +53,14 @@ def test_rejects_decision():
         assert "decision" in str(exc)
     else:
         raise AssertionError("review result must not create a decision")
+
+
+def test_rejects_missing_matome_yaml():
+    result = valid_result()
+    result.pop("matome_yaml")
+    try:
+        validate_blind_review_result(result)
+    except ValueError as exc:
+        assert "matome_yaml" in str(exc)
+    else:
+        raise AssertionError("missing matome_yaml must be rejected")
