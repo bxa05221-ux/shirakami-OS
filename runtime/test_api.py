@@ -290,3 +290,23 @@ def test_unknown_aiwitness_fails_closed() -> None:
     api = _api()
 
     assert api.get_witness("TRACE-UNKNOWN") is None
+
+
+def test_execution_witness_has_stable_identity() -> None:
+    api = _api()
+
+    def protocol(_: Any) -> Transition:
+        return Transition(kind="api.witness.identity", data={"changed": True})
+
+    result = api.execute(
+        protocol,
+        "api.witness.identity",
+        handoff_id="SH-HO-20260925-001",
+        project="Shirakami",
+        objective="verify witness identity",
+        protocol_ids=("api.witness.identity",),
+    )
+
+    witness = api.get_witness(result["trace_id"])
+    assert witness is not None
+    assert witness["witness_id"].startswith("WITNESS-")
