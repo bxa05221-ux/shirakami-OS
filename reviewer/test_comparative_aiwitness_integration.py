@@ -112,3 +112,41 @@ def test_comparative_trace_http_aiwitness_boundary() -> None:
     assert body["traceability"]["project_id"] == "project-http-aiwitness"
     assert body["traceability"]["shared_evidence_ids"] == ["E1"]
     assert body["traceability"]["divergent_evidence_ids"] == ["E2", "E3"]
+
+def test_blind_review_http_comparative_aiwitness_boundary() -> None:
+    from api.http import create_app
+
+    client = TestClient(create_app(api_key=None))
+    first = {
+        "reviewer_id": "reviewer-http-a",
+        "matome_yaml": "matome:\n  reviewer_id: reviewer-http-a\n",
+        "objective": "independent observation",
+        "observations": ["A"],
+        "evidence_ids": ["E1", "E2"],
+        "resolved_questions": [],
+        "unresolved_questions": ["Q1"],
+        "falsifiable_points": ["F1"],
+        "proposals": ["P1"],
+        "interpretation": ["I1"],
+        "human_gate": {"required": True, "decision": "pending"},
+    }
+    second = dict(first)
+    second["reviewer_id"] = "reviewer-http-b"
+    second["matome_yaml"] = "matome:\n  reviewer_id: reviewer-http-b\n"
+    second["evidence_ids"] = ["E1", "E3"]
+    second["proposals"] = ["P2"]
+
+    response = client.post("/v1/reviews/blind/comparative/aiwitness", json={
+        "project_id": "http-blind-traceability",
+        "results": [first, second],
+    })
+    assert response.status_code == 200
+    body = response.json()
+    assert body["valid"] is True
+    assert body["aiwitness"]["shared_evidence_ids"] == ["E1"]
+    assert body["aiwitness"]["divergent_evidence_ids"] == ["E2", "E3"]
+    assert body["aiwitness"]["decision"] is None
+    assert body["aiwitness"]["authority_granted"] is False
+    assert body["aiwitness"]["decision_authorized"] is False
+    assert body["aiwitness"]["human_gate_required"] is True
+    assert body["traceability"]["project_id"] == "http-blind-traceability"
