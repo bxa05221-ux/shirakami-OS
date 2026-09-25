@@ -330,3 +330,16 @@ Shirakami OS now uses a **layered licensing model**:
 This separation is intentional. The implementation is open for use and adaptation, while the specification and documentation remain reusable with attribution, and the project's identity and official status remain separately governed.
 
 See [`LICENSE`](LICENSE) and [`LICENSE-SPECIFICATION.md`](LICENSE-SPECIFICATION.md).
+
+### Licensing transition note
+
+The current repository licensing is **not being replaced by the draft Protocol License**. A future protocol/commercial licensing structure is being evaluated separately from the existing implementation and specification licenses.
+
+The current transition design separates:
+
+- implementation / research code;
+- normative protocol material;
+- commercial vendor integration;
+- name, branding, and conformance claims.
+
+This architecture is a **draft for review**. No new Protocol License, vendor agreement, certification program, or top-level license replacement is adopted by this note. Any future transition will be subject to compatibility review, legal review, and explicit Human Gate approval.
