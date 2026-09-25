@@ -33,6 +33,20 @@ def test_ingest_blind_review_preserves_observation_boundary():
     assert view["submissions"][0]["proposal"] == {"items": ["P1"]}
 
 
+def test_ingest_blind_review_rejects_invalid_result_before_ingestion():
+    bundle = ReviewerBundle(project_id="blind-review-project")
+    result = valid_result()
+    result.pop("observations")
+    try:
+        ingest_blind_review(bundle, result)
+    except ValueError as exc:
+        assert "observations" in str(exc)
+    else:
+        raise AssertionError("invalid blind review must be rejected before ingestion")
+    assert bundle.reviewers == {}
+    assert bundle.submissions == []
+
+
 def test_ingest_blind_review_preserves_questions_and_interpretation_as_observation():
     bundle = ReviewerBundle(project_id="blind-review-project")
     ingest_blind_review(bundle, valid_result())
