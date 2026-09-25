@@ -87,3 +87,38 @@ def test_blind_reviews_flow_into_comparative_context_without_authority():
         {"items": ["P1"]},
         {"items": ["P2"]},
     ]
+
+
+def test_blind_review_comparative_context_passes_aiwitness_traceability():
+    from aiwitness.traceability import validate_comparative_traceability
+    from reviewer.blind_review import ingest_and_compare_blind_reviews
+
+    first = valid_result()
+    second = valid_result()
+    first.update({
+        "reviewer_id": "reviewer-a",
+        "matome_yaml": "matome:\n  reviewer_id: reviewer-a\n",
+        "evidence_ids": ["E1", "E2"],
+        "proposals": ["P1"],
+    })
+    second.update({
+        "reviewer_id": "reviewer-b",
+        "matome_yaml": "matome:\n  reviewer_id: reviewer-b\n",
+        "evidence_ids": ["E1", "E3"],
+        "proposals": ["P2"],
+    })
+
+    context = ingest_and_compare_blind_reviews(
+        ReviewerBundle(project_id="blind-review-traceability"),
+        [first, second],
+    )
+    record = validate_comparative_traceability(context=context)
+
+    assert record.project_id == "blind-review-traceability"
+    assert record.reviewer_ids == ("reviewer-a", "reviewer-b")
+    assert record.shared_evidence_ids == ("E1",)
+    assert record.divergent_evidence_ids == ("E2", "E3")
+    assert record.decision is None
+    assert record.authority_granted is False
+    assert record.decision_authorized is False
+    assert record.human_gate_required is True
