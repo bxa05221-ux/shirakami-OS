@@ -81,6 +81,35 @@ class ShirakamiHTTPTransport:
         app = FastAPI(title="Shirakami UI for AI API", version="alpha-0.1"); auth = require_api_key(self.api_key)
         @app.get("/health")
         def health() -> dict[str, str]: return {"status": "ok"}
+        @app.get("/v1/capabilities", dependencies=[Depends(auth)])
+        def capabilities() -> dict[str, Any]:
+            return {
+                "api": {"name": "Shirakami UI for AI API", "version": "alpha-0.1"},
+                "supports": {
+                    "observe": True,
+                    "analyze": True,
+                    "approve": True,
+                    "execute": True,
+                    "evidence_query": True,
+                    "evidence_retrieval": True,
+                    "trace_retrieval": True,
+                    "aiwitness": True,
+                    "multi_agent_review": True,
+                    "comparative_traceability": True,
+                },
+                "boundaries": {
+                    "execution_authorized": False,
+                    "publish_authorized": False,
+                    "merge_authorized": False,
+                    "human_gate_required": True,
+                    "decision_authority": False,
+                },
+                "reviewer": {
+                    "matome_yaml": "context_only",
+                    "comparative_decision": None,
+                    "reviewer_perspectives_preserved": True,
+                },
+            }
         @app.post("/v1/observe", dependencies=[Depends(auth)])
         def observe(payload: ObserveInput) -> dict[str, Any]:
             context = ContextSnapshot(protocol_id=payload.context.protocol_id, landscape=payload.context.landscape, metadata=payload.context.metadata)
