@@ -173,6 +173,10 @@ class ShirakamiHTTPTransport:
                 handoff_id=payload.handoff_id,
                 trace_id=payload.trace_id,
                 evidence_ids=tuple(payload.evidence_ids),
+                project=boundary["project"],
+                objective=boundary["objective"],
+                protocol_ids=tuple(boundary["protocol_ids"]),
+                verification_scope=tuple(boundary["verification_scope"]),
             )
 
         @app.get("/v1/executions/{execution_id}", dependencies=[Depends(auth)])
