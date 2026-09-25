@@ -231,6 +231,37 @@ For a compact, reproducible external review route, use [Public Verification Pack
 
 It is intentionally not a certification or production-readiness claim; it defines the current public verification boundary.
 
+## External Review API Route
+
+For reviewers using the HTTP boundary, the shortest executable route is:
+
+```text
+Reviewer Entry Point
+        ↓
+Blind Review Matome YAML
+        ↓ POST /v1/reviews/blind
+Validator
+        ↓
+ReviewerBundle
+        ↓ POST /v1/reviews/blind/comparative/aiwitness
+Comparative Trace
+        ↓
+AIwitness Context
+        ↓
+Comparative Traceability
+        ↓
+Human Gate
+```
+
+The API capability surface advertises this route through `GET /v1/capabilities`:
+
+- `blind_review_ingestion`
+- `blind_review_aiwitness_traceability`
+
+The HTTP route does not grant execution, publication, merge, or decision authority. Invalid blind-review payloads are rejected before they enter the Reviewer Bundle. A successful traceability response demonstrates boundary validation for that request; it does not certify the architecture as a whole.
+
+For implementation inspection, see `api/http.py`, `reviewer/blind_review.py`, `scripts/validate_blind_review_result.py`, and `reviewer/test_comparative_aiwitness_integration.py`.
+
 ## Current Review Status
 
 - Repository entry point: established
