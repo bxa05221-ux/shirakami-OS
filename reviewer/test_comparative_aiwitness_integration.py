@@ -100,3 +100,7 @@ def test_comparative_trace_http_aiwitness_boundary() -> None:
     assert body["authority_granted"] is False
     assert body["decision_authorized"] is False
     assert body["human_gate_required"] is True
+    assert body["valid"] is True
+    assert body["traceability"]["project_id"] == "project-http-aiwitness"
+    assert body["traceability"]["shared_evidence_ids"] == ["E1"]
+    assert body["traceability"]["divergent_evidence_ids"] == ["E2", "E3"]
