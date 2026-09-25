@@ -1,8 +1,4 @@
-"""HTTP transport for the provider-neutral UI for AI API alpha 0.1.
-
-The semantic boundary remains in :mod:`runtime.api`.  This module only
-translates JSON/HTTP requests into semantic API calls and back.
-"""
+"""HTTP transport for the provider-neutral UI for AI API alpha 0.1."""
 
 from __future__ import annotations
 
@@ -81,25 +77,13 @@ class VerifyInput(BaseModel):
 class ShirakamiHTTPTransport:
     """Build a transport adapter without coupling Runtime to HTTP."""
 
-    def __init__(
-        self,
-        api: ShirakamiAPI | None = None,
-        protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None,
-        api_key: str | None = None,
-    ) -> None:
+    def __init__(self, api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None) -> None:
         self.api = api or ShirakamiAPI()
         self.protocol_registry = dict(protocol_registry or {})
         self.api_key = api_key
 
     def create_app(self) -> FastAPI:
-        app = FastAPI(
-            title="Shirakami UI for AI API",
-            version="alpha-0.1",
-            description=(
-                "Bidirectional transport boundary between external UI systems "
-                "and the Shirakami Evidence-driven Runtime."
-            ),
-        )
+        app = FastAPI(title="Shirakami UI for AI API", version="alpha-0.1")
         auth = require_api_key(self.api_key)
 
         @app.get("/health")
@@ -108,76 +92,30 @@ class ShirakamiHTTPTransport:
 
         @app.post("/v1/observe", dependencies=[Depends(auth)])
         def observe(payload: ObserveInput) -> dict[str, Any]:
-            context = ContextSnapshot(
-                protocol_id=payload.context.protocol_id,
-                landscape=payload.context.landscape,
-                metadata=payload.context.metadata,
-            )
+            context = ContextSnapshot(protocol_id=payload.context.protocol_id, landscape=payload.context.landscape, metadata=payload.context.metadata)
             result = self.api.observe(payload.observation, context)
-            result["handoff_id"] = payload.handoff_id
-            result["trace_id"] = payload.trace_id
-            result["evidence_ids"] = list(payload.evidence_ids)
-            result["execution_authorized"] = False
-            result["publish_authorized"] = False
-            result["merge_authorized"] = False
-            result["human_gate_required"] = True
+            result.update({"handoff_id": payload.handoff_id, "trace_id": payload.trace_id, "evidence_ids": list(payload.evidence_ids), "execution_authorized": False, "publish_authorized": False, "merge_authorized": False, "human_gate_required": True})
             return result
 
         @app.post("/v1/analyze", dependencies=[Depends(auth)])
         def analyze(payload: AnalyzeInput) -> dict[str, Any]:
-            result = self.api.analyze(
-                payload.protocol_id,
-                protocol_exists=payload.protocol_exists,
-                diff_ref=payload.diff_ref,
-            )
-            return asdict(result)
+            return asdict(self.api.analyze(payload.protocol_id, protocol_exists=payload.protocol_exists, diff_ref=payload.diff_ref))
 
         @app.post("/v1/approve", dependencies=[Depends(auth)])
         def approve(payload: ApproveInput) -> dict[str, Any]:
-            return self.api.approve(
-                approved=payload.approved,
-                reviewer=payload.reviewer,
-                human_authorized=payload.human_authorized,
-            )
+            return self.api.approve(approved=payload.approved, reviewer=payload.reviewer, human_authorized=payload.human_authorized)
 
         @app.post("/v1/execute", dependencies=[Depends(auth)])
         def execute(payload: ExecuteInput) -> dict[str, Any]:
             boundary = validate_execution_context(payload.boundary_context.model_dump())
-            if boundary["handoff_id"] != payload.handoff_id:
-                raise HTTPException(
-                    status_code=422,
-                    detail="handoff_id mismatch between transport and boundary context",
-                )
-            if boundary["evidence_ids"] != payload.evidence_ids:
-                raise HTTPException(
-                    status_code=422,
-                    detail="evidence_ids mismatch between transport and boundary context",
-                )
+            if boundary["handoff_id"] != payload.handoff_id or boundary["evidence_ids"] != payload.evidence_ids:
+                raise HTTPException(status_code=422, detail="transport and boundary context mismatch")
             if payload.protocol_id not in boundary["protocol_ids"]:
-                raise HTTPException(
-                    status_code=422,
-                    detail="protocol_id is not declared by boundary context",
-                )
-
+                raise HTTPException(status_code=422, detail="protocol_id is not declared by boundary context")
             protocol = self.protocol_registry.get(payload.protocol_id)
             if protocol is None:
-                raise HTTPException(
-                    status_code=404,
-                    detail="protocol is not registered for HTTP execution",
-                )
-
-            return self.api.execute(
-                protocol,
-                payload.protocol_id,
-                payload.input_data,
-                handoff_id=payload.handoff_id,
-                trace_id=payload.trace_id,
-                evidence_ids=tuple(payload.evidence_ids),
-                project=boundary["project"],
-                objective=boundary["objective"],
-                protocol_ids=tuple(boundary["protocol_ids"]),
-                verification_scope=tuple(boundary["verification_scope"]),
-            )
+                raise HTTPException(status_code=404, detail="protocol is not registered for HTTP execution")
+            return self.api.execute(protocol, payload.protocol_id, payload.input_data, handoff_id=payload.handoff_id, trace_id=payload.trace_id, evidence_ids=tuple(payload.evidence_ids), project=boundary["project"], objective=boundary["objective"], protocol_ids=tuple(boundary["protocol_ids"]), verification_scope=tuple(boundary["verification_scope"]))
 
         @app.get("/v1/executions/{execution_id}", dependencies=[Depends(auth)])
         def get_execution(execution_id: str) -> dict[str, Any]:
@@ -204,45 +142,36 @@ class ShirakamiHTTPTransport:
                 raise HTTPException(status_code=404, detail="unknown trace_id")
             return result
 
+        @app.get("/v1/traceability/{trace_id}", dependencies=[Depends(auth)])
+        def get_traceability(trace_id: str) -> dict[str, Any]:
+            trace = self.api.get_trace(trace_id)
+            witness = self.api.get_witness(trace_id)
+            if trace is None or witness is None:
+                raise HTTPException(status_code=404, detail="unknown trace_id")
+            execution_id = trace.get("execution_id")
+            execution = self.api.get_execution(execution_id) if execution_id else None
+            if execution is None:
+                raise HTTPException(status_code=404, detail="execution for trace is unavailable")
+            from aiwitness.traceability import validate_traceability
+            try:
+                record = validate_traceability(trace=trace, witness=witness, execution=execution, evidence_ids=trace.get("evidence_ids", []))
+            except ValueError as exc:
+                raise HTTPException(status_code=409, detail=str(exc)) from exc
+            return {"valid": True, "traceability": asdict(record)}
+
         @app.post("/v1/executions/{execution_id}/verify", dependencies=[Depends(auth)])
         def verify_execution(execution_id: str, payload: VerifyInput) -> dict[str, Any]:
-            result = self.api.verify_execution(
-                execution_id,
-                expected_transition_kind=payload.expected_transition_kind,
-                diff_ref=payload.diff_ref,
-            )
+            result = self.api.verify_execution(execution_id, expected_transition_kind=payload.expected_transition_kind, diff_ref=payload.diff_ref)
             if result is None:
                 raise HTTPException(status_code=404, detail="unknown execution_id")
             return asdict(result)
 
-        @app.post("/v1/verify", dependencies=[Depends(auth)])
-        def verify(payload: VerifyInput) -> dict[str, Any]:
-            raise HTTPException(
-                status_code=400,
-                detail="use /v1/executions/{execution_id}/verify; execution_id is required",
-            )
-
         @app.get("/v1/evidence", dependencies=[Depends(auth)])
-        def evidence(
-            protocol_id: str | None = None,
-            signal: str | None = None,
-            transition_kind: str | None = None,
-        ) -> list[dict[str, Any]]:
-            return list(
-                self.api.query_evidence(
-                    protocol_id=protocol_id,
-                    signal=signal,
-                    transition_kind=transition_kind,
-                )
-            )
+        def evidence(protocol_id: str | None = None, signal: str | None = None, transition_kind: str | None = None) -> list[dict[str, Any]]:
+            return list(self.api.query_evidence(protocol_id=protocol_id, signal=signal, transition_kind=transition_kind))
 
         return app
 
 
-def create_app(
-    api: ShirakamiAPI | None = None,
-    protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None,
-    api_key: str | None = None,
-) -> FastAPI:
-    """Convenience factory for WSGI/ASGI hosts and tests."""
+def create_app(api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None) -> FastAPI:
     return ShirakamiHTTPTransport(api, protocol_registry, api_key).create_app()
