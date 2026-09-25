@@ -154,6 +154,8 @@ Shirakami also supports a reviewer-oriented path in which multiple reviewers can
 
 See [Reviewer → AIwitness → Traceability Architecture Map](./REVIEWER_AIWTNESS_TRACEABILITY_MAP.md) for the detailed four-layer boundary.
 
+For independent re-review, use the [Blind External Review Protocol](./BLIND_EXTERNAL_REVIEW_PROTOCOL.md). It requires the reviewer to begin from this entry point without being given the expected conclusion or prior review result.
+
 ```text
 Reviewer A ─┐
 Reviewer B ─┼→ Reviewer Bundle → Comparative Trace → AIwitness → Traceability
