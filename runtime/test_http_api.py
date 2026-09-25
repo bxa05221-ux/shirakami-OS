@@ -44,6 +44,19 @@ def _boundary_context() -> dict[str, Any]:
     }
 
 
+def _ready_client() -> TestClient:
+    client = _client()
+    client.post(
+        "/v1/observe",
+        json={"observation": {}, "context": _context(), "handoff_id": "SH-HO-20260925-001"},
+    )
+    client.post(
+        "/v1/analyze",
+        json={"protocol_id": "http.example", "protocol_exists": True},
+    )
+    return client
+
+
 def _execute_payload(**overrides: Any) -> dict[str, Any]:
     payload = {
         "protocol_id": "http.example",
@@ -284,7 +297,7 @@ def test_http_rejects_undeclared_protocol_at_boundary() -> None:
 
 
 def test_http_witness_is_retrievable_after_execution() -> None:
-    client = _client()
+    client = _ready_client()
     executed = client.post("/v1/execute", json=_execute_payload())
     assert executed.status_code == 200
     body = executed.json()
@@ -309,7 +322,7 @@ def test_unknown_witness_fails_closed() -> None:
 
 
 def test_http_witness_reflects_latest_trace_observation() -> None:
-    client = _client()
+    client = _ready_client()
     executed = client.post("/v1/execute", json=_execute_payload())
     assert executed.status_code == 200
     body = executed.json()
@@ -330,7 +343,7 @@ def test_http_witness_reflects_latest_trace_observation() -> None:
 
 
 def test_http_witness_history_preserves_verification_revisions() -> None:
-    client = _client()
+    client = _ready_client()
     executed = client.post("/v1/execute", json=_execute_payload())
     assert executed.status_code == 200
     body = executed.json()
