@@ -58,3 +58,22 @@ def ingest_blind_review(
         "decision_authorized": False,
         "evidence_accepted": False,
     }
+
+
+def ingest_and_compare_blind_reviews(
+    bundle: ReviewerBundle,
+    results: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Validate and ingest multiple blind reviews, then build a comparison context."""
+    for result in results:
+        ingest_blind_review(bundle, result)
+
+    from .aiwitness_bridge import (
+        as_comparative_trace_context,
+        build_comparative_trace_metadata,
+    )
+    from .comparative_trace import build_comparative_trace
+
+    comparative = build_comparative_trace(bundle)
+    metadata = build_comparative_trace_metadata(comparative)
+    return as_comparative_trace_context(metadata)
