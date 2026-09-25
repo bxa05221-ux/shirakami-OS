@@ -158,6 +158,10 @@ def test_execution_preserves_trace_metadata_without_authority() -> None:
         handoff_id="SH-HO-20260925-001",
         trace_id="TRACE-001",
         evidence_ids=("AGENT-COORDINATION-001",),
+        project="Shirakami Project",
+        objective="API provenance",
+        protocol_ids=("api.example",),
+        verification_scope=("runtime handle",),
     )
 
     assert result["handoff_id"] == "SH-HO-20260925-001"
@@ -173,3 +177,7 @@ def test_execution_preserves_trace_metadata_without_authority() -> None:
     assert stored["handoff_id"] == "SH-HO-20260925-001"
     assert stored["trace_id"] == "TRACE-001"
     assert stored["evidence_ids"] == ["AGENT-COORDINATION-001"]
+    assert stored["project"] == "Shirakami Project"
+    assert stored["objective"] == "API provenance"
+    assert stored["protocol_ids"] == ["api.example"]
+    assert stored["verification_scope"] == ["runtime handle"]
