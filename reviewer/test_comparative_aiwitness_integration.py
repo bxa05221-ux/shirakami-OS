@@ -30,6 +30,10 @@ def test_comparative_trace_can_be_issued_as_aiwitness_context() -> None:
     assert context["divergent_evidence_ids"] == ["E2", "E3"]
     assert context["decision"] is None
     assert context["human_gate_required"] is True
+    assert [item["proposal"] for item in context["observations"]] == [
+        {"proposal": "A"},
+        {"proposal": "B"},
+    ]
 
     metadata = build_trace_metadata(bundle, submission_a)
     trace_context = reviewer_trace_context(metadata)
@@ -50,6 +54,10 @@ def test_comparative_trace_can_be_issued_as_aiwitness_context() -> None:
     assert witness_context["authority_granted"] is False
     assert witness_context["decision_authorized"] is False
     assert witness_context["human_gate_required"] is True
+    assert [item["proposal"] for item in witness_context["observations"]] == [
+        {"proposal": "A"},
+        {"proposal": "B"},
+    ]
 
 
 def test_comparative_trace_http_aiwitness_boundary() -> None:
