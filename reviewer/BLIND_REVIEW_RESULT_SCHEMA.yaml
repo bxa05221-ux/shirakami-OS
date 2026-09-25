@@ -1,0 +1,58 @@
+blind_review_result:
+  version: "0.1"
+  purpose: >
+    Machine-readable boundary for an independent external review.
+    The result records observations and questions; it does not grant
+    authority or create a project decision.
+  required:
+    - reviewer_id
+    - objective
+    - observations
+    - evidence_ids
+    - resolved_questions
+    - unresolved_questions
+    - falsifiable_points
+    - proposals
+    - interpretation
+    - human_gate
+  fields:
+    reviewer_id:
+      type: string
+      non_empty: true
+    objective:
+      type: string
+      non_empty: true
+    observations:
+      type: list
+    evidence_ids:
+      type: list
+      semantic_role: evidence_references_only
+    resolved_questions:
+      type: list
+    unresolved_questions:
+      type: list
+    falsifiable_points:
+      type: list
+    proposals:
+      type: list
+      semantic_role: proposal_only
+    interpretation:
+      type: list
+      semantic_role: interpretation_only
+    human_gate:
+      type: mapping
+      required:
+        - required
+        - decision
+      invariants:
+        required: true
+        decision: pending
+  authority:
+    reviewer_has_decision_authority: false
+    review_result_grants_authority: false
+    review_result_is_accepted_evidence: false
+  rules:
+    - "External review output is an observation until independently verified."
+    - "Evidence IDs in the result are references, not automatic Evidence acceptance."
+    - "A proposal must not be converted into a decision."
+    - "Human Gate is mandatory."
