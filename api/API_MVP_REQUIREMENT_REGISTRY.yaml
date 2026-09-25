@@ -1,0 +1,111 @@
+mvp:
+  name: "Shirakami API MVP"
+  version: "0.1"
+  goal_freeze: true
+  definition_of_done: >
+    An external HTTP client can invoke the provider-neutral Shirakami API,
+    pass Protocol/Context/Evidence lineage through the runtime, obtain a
+    RuntimeResult with traceability, and preserve Human Gate authority
+    boundaries. Real-model E2E must be demonstrated before MVP release.
+  completion_method: "verified_requirements / total_release_requirements"
+  ai_self_assessment: false
+  completion_percent: 60
+
+requirements:
+  - id: API-MVP-001
+    name: "HTTP API entry"
+    status: verified
+    evidence:
+      - "api/http.py: FastAPI transport and protected /v1 endpoints"
+    verification: "source_inspection"
+
+  - id: API-MVP-002
+    name: "Protocol reception"
+    status: verified
+    evidence:
+      - "api/http.py: ObserveInput / AnalyzeInput / ExecuteInput"
+      - "api/runtime_api.py: protocol object validation"
+    verification: "source_inspection"
+
+  - id: API-MVP-003
+    name: "Context handoff"
+    status: verified
+    evidence:
+      - "api/http.py: ContextSnapshotInput and ExecutionBoundaryContext"
+    verification: "source_inspection"
+
+  - id: API-MVP-004
+    name: "Evidence and trace identifiers"
+    status: verified
+    evidence:
+      - "api/http.py: evidence_ids and trace_id accepted and exposed"
+      - "api/http.py: /v1/evidence and /v1/traces retrieval endpoints"
+    verification: "source_inspection"
+
+  - id: API-MVP-005
+    name: "Runtime execution boundary"
+    status: verified
+    evidence:
+      - "api/http.py: /v1/execute validates boundary context before execution"
+      - "api/runtime_api.py: execute_protocol integration"
+    verification: "source_inspection"
+
+  - id: API-MVP-006
+    name: "API-key authentication boundary"
+    status: verified
+    evidence:
+      - "api/auth.py: X-API-Key validation"
+      - "api/http.py: protected endpoints use authentication dependency"
+    verification: "source_inspection"
+
+  - id: API-MVP-007
+    name: "Human Gate / authority preservation"
+    status: verified
+    evidence:
+      - "api/boundary.py: execution_authorized, publish_authorized and merge_authorized must remain false"
+      - "api/http.py: human_gate_required=true and decision_authority=false"
+    verification: "source_inspection"
+
+  - id: API-MVP-008
+    name: "RuntimeResult -> Evidence/Trace E2E"
+    status: partial
+    evidence:
+      - "API exposes execution, trace, witness and evidence retrieval endpoints"
+    missing:
+      - "A completed external HTTP run demonstrating the complete lineage"
+    verification: "source_inspection_only"
+
+  - id: API-MVP-009
+    name: "Real provider/model execution"
+    status: partial
+    evidence:
+      - "experiment/real-model-adapter-001 contains real-model observation workflow"
+    missing:
+      - "Completed GitHub Actions run with verified real model output"
+    verification: "workflow_execution_required"
+
+  - id: API-MVP-010
+    name: "External HTTP -> real model -> Evidence release test"
+    status: unverified
+    evidence: []
+    missing:
+      - "Single end-to-end release test"
+      - "Run/job/log evidence"
+      - "model_output traceability evidence"
+    verification: "release_test_required"
+
+release_gate:
+  required_status: "verified"
+  blocking_requirements:
+    - "API-MVP-008"
+    - "API-MVP-009"
+    - "API-MVP-010"
+  human_gate_required: true
+  execution_authorized: false
+  publish_authorized: false
+  merge_authorized: false
+
+notes:
+  - "60% is a registry-derived strict completion value, not an AI estimate."
+  - "Partial requirements do not count toward the strict release percentage."
+  - "The denominator is frozen for API MVP 0.1. New discoveries belong to a later milestone."
