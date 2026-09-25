@@ -43,7 +43,7 @@ def test_observe_and_evidence_are_json_transport() -> None:
     client = _client()
     response = client.post(
         "/v1/observe",
-        json={"observation": {"signal": "hello"}, "context": _context()},
+        json={"observation": {"signal": "hello"}, "context": _context(), "handoff_id": "SH-HO-20260925-001"},
     )
     assert response.status_code == 200
     body = response.json()
@@ -65,7 +65,7 @@ def test_approval_cannot_be_inferred_over_http() -> None:
     client = _client()
     client.post(
         "/v1/observe",
-        json={"observation": {}, "context": _context()},
+        json={"observation": {}, "context": _context(), "handoff_id": "SH-HO-20260925-001"},
     )
     client.post(
         "/v1/analyze",
@@ -99,7 +99,7 @@ def test_execute_requires_registered_protocol() -> None:
     client = _client()
     missing = client.post(
         "/v1/execute",
-        json={"protocol_id": "unknown", "input_data": {}},
+        json={"protocol_id": "unknown", "input_data": {}, "handoff_id": "SH-HO-20260925-001"},
     )
     assert missing.status_code == 404
 
@@ -123,7 +123,7 @@ def test_execution_handle_round_trip_and_verify() -> None:
     client = _client()
     client.post("/v1/observe", json={"observation": {}, "context": _context()})
     client.post("/v1/analyze", json={"protocol_id": "http.example", "protocol_exists": True})
-    executed = client.post("/v1/execute", json={"protocol_id": "http.example", "input_data": {"x": 1}})
+    executed = client.post("/v1/execute", json={"protocol_id": "http.example", "input_data": {"x": 1}, "handoff_id": "SH-HO-20260925-001"})
     assert executed.status_code == 200
     execution_id = executed.json()["execution_id"]
     status = client.get(f"/v1/executions/{execution_id}")
