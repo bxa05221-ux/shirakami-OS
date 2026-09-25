@@ -156,6 +156,24 @@ Human judgment
 
 No step before the Human Gate may create decision authority.
 
+## Optional HTTP Submission Route
+
+When an HTTP interface is available, a reviewer may submit the structured result through the repository's blind-review boundary rather than registering and submitting each observation separately.
+
+```text
+Matome YAML
+    ↓
+POST /v1/reviews/blind
+    ↓
+validation + ReviewerBundle ingestion
+    ↓
+POST /v1/reviews/blind/comparative/aiwitness
+    ↓
+comparative traceability validation
+```
+
+This route is an implementation convenience, not an authority channel. The API must preserve `decision = null`, `authority_granted = false`, `decision_authorized = false`, and `human_gate_required = true`. A successful HTTP response is evidence about that request path only; it is not a certification of the wider architecture.
+
 ## Success condition
 
 The purpose of this protocol is not to make independent reviewers reach the same conclusion.
