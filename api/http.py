@@ -16,10 +16,12 @@ try:
     from ..runtime.api import ShirakamiAPI
     from ..runtime.evolution_bridge import ContextSnapshot
     from .auth import require_api_key
+    from .boundary import validate_execution_context
 except ImportError:
     from runtime.api import ShirakamiAPI
     from runtime.evolution_bridge import ContextSnapshot
     from api.auth import require_api_key
+    from api.boundary import validate_execution_context
 
 
 class ContextSnapshotInput(BaseModel):
@@ -48,12 +50,26 @@ class ApproveInput(BaseModel):
     human_authorized: bool = False
 
 
+class ExecutionBoundaryContext(BaseModel):
+    handoff_id: str
+    project: str
+    objective: str
+    protocol_ids: list[str]
+    evidence_ids: list[str] = Field(default_factory=list)
+    verification_scope: list[Any] = Field(default_factory=list)
+    execution_authorized: bool = False
+    publish_authorized: bool = False
+    merge_authorized: bool = False
+    human_gate_required: bool = True
+
+
 class ExecuteInput(BaseModel):
     protocol_id: str
     input_data: dict[str, Any] = Field(default_factory=dict)
     handoff_id: str
     trace_id: str | None = None
     evidence_ids: list[str] = Field(default_factory=list)
+    boundary_context: ExecutionBoundaryContext
 
 
 class VerifyInput(BaseModel):
@@ -132,6 +148,24 @@ class ShirakamiHTTPTransport:
                     status_code=404,
                     detail="protocol is not registered for HTTP execution",
                 )
+
+            boundary = validate_execution_context(payload.boundary_context.model_dump())
+            if boundary["handoff_id"] != payload.handoff_id:
+                raise HTTPException(
+                    status_code=422,
+                    detail="handoff_id mismatch between transport and boundary context",
+                )
+            if boundary["evidence_ids"] != payload.evidence_ids:
+                raise HTTPException(
+                    status_code=422,
+                    detail="evidence_ids mismatch between transport and boundary context",
+                )
+            if payload.protocol_id not in boundary["protocol_ids"]:
+                raise HTTPException(
+                    status_code=422,
+                    detail="protocol_id is not declared by boundary context",
+                )
+
             return self.api.execute(
                 protocol,
                 payload.protocol_id,
