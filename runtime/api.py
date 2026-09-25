@@ -163,6 +163,10 @@ class ShirakamiAPI:
             "evidence_ids": list(handle.evidence_ids), "project": handle.project,
             "objective": handle.objective, "protocol_ids": list(handle.protocol_ids),
             "verification_scope": list(handle.verification_scope),
+            "execution_authorized": False,
+            "publish_authorized": False,
+            "merge_authorized": False,
+            "human_gate_required": True,
         }
 
     def get_trace(self, trace_id: str) -> dict[str, Any] | None:
