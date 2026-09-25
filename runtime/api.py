@@ -11,11 +11,15 @@ try:
     from .evolution_pipeline import AnalysisResult, EvidenceDrivenRuntime
     from .prototype import ExecutionResult, Transition
     from .trace import ExecutionTrace, ExecutionTraceStore
+    from ..aiwitness.store import WitnessStore
+    from ..aiwitness.witness import AIwitness
 except ImportError:
     from evolution_bridge import ContextSnapshot, VerificationResult
     from evolution_pipeline import AnalysisResult, EvidenceDrivenRuntime
     from prototype import ExecutionResult, Transition
     from trace import ExecutionTrace, ExecutionTraceStore
+    from aiwitness.store import WitnessStore
+    from aiwitness.witness import AIwitness
 
 
 @dataclass(frozen=True)
@@ -67,10 +71,12 @@ class ShirakamiAPI:
         runtime: EvidenceDrivenRuntime | None = None,
         executions: ExecutionHandleStore | None = None,
         traces: ExecutionTraceStore | None = None,
+        witnesses: WitnessStore | None = None,
     ) -> None:
         self.runtime = runtime or EvidenceDrivenRuntime()
         self.executions = executions or ExecutionHandleStore()
         self.traces = traces or ExecutionTraceStore()
+        self.witnesses = witnesses or WitnessStore()
 
     def observe(self, observation: Mapping[str, Any], context: ContextSnapshot) -> dict[str, Any]:
         self.runtime.observe(observation, context)
@@ -132,7 +138,7 @@ class ShirakamiAPI:
             protocol_ids=protocol_ids, verification_scope=verification_scope,
         )
         resolved_trace_id = provisional_trace_id
-        self.traces.create(ExecutionTrace(
+        trace = self.traces.create(ExecutionTrace(
             trace_id=resolved_trace_id,
             execution_id=handle.execution_id,
             handoff_id=handoff_id,
@@ -142,6 +148,7 @@ class ShirakamiAPI:
             protocol_ids=tuple(protocol_ids),
             verification_scope=tuple(verification_scope),
         ))
+        self.witnesses.record(AIwitness.observe(trace))
         payload["trace_id"] = resolved_trace_id
         return {**payload, "execution_id": handle.execution_id, "trace_id": resolved_trace_id}
 
@@ -175,6 +182,25 @@ class ShirakamiAPI:
             "verification_uncertainty": trace.verification_uncertainty,
             "verification_observed": dict(trace.verification_observed),
             "commit": trace.commit,
+            "execution_authorized": False,
+            "publish_authorized": False,
+            "merge_authorized": False,
+            "human_gate_required": True,
+        }
+
+    def get_witness(self, trace_id: str) -> dict[str, Any] | None:
+        witness = self.witnesses.get(trace_id)
+        if witness is None:
+            return None
+        return {
+            "trace_id": witness.trace_id,
+            "execution_id": witness.execution_id,
+            "handoff_id": witness.handoff_id,
+            "evidence_ids": list(witness.evidence_ids),
+            "verification_status": witness.verification_status,
+            "commit": witness.commit,
+            "verification_uncertainty": witness.verification_uncertainty,
+            "verification_observed": dict(witness.verification_observed),
             "execution_authorized": False,
             "publish_authorized": False,
             "merge_authorized": False,
