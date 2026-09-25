@@ -186,6 +186,13 @@ class ShirakamiHTTPTransport:
                 raise HTTPException(status_code=404, detail="unknown execution_id")
             return result
 
+        @app.get("/v1/traces/{trace_id}", dependencies=[Depends(auth)])
+        def get_trace(trace_id: str) -> dict[str, Any]:
+            result = self.api.get_trace(trace_id)
+            if result is None:
+                raise HTTPException(status_code=404, detail="unknown trace_id")
+            return result
+
         @app.post("/v1/executions/{execution_id}/verify", dependencies=[Depends(auth)])
         def verify_execution(execution_id: str, payload: VerifyInput) -> dict[str, Any]:
             result = self.api.verify_execution(
