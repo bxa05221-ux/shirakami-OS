@@ -19,6 +19,12 @@ class WitnessStore:
         records = self._records.get(trace_id)
         return records[-1] if records else None
 
+    def get_by_witness_id(self, witness_id: str) -> WitnessRecord | None:
+        for witness in self.all():
+            if witness.witness_id == witness_id:
+                return witness
+        return None
+
     def all(self) -> tuple[WitnessRecord, ...]:
         return tuple(
             witness
