@@ -1,13 +1,8 @@
-"""Provider-neutral UI for AI API boundary α0.1.
-
-This module exposes the semantic API around the R0100 Evidence-driven Runtime.
-Transport concerns (HTTP, CLI, desktop UI, robot controller, etc.) remain outside
-this module.
-"""
+"""Provider-neutral UI for AI API boundary α0.1."""
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from uuid import uuid4
 from typing import Any, Callable, Mapping
 
@@ -31,10 +26,15 @@ class ExecutionHandle:
     handoff_id: str | None = None
     trace_id: str | None = None
     evidence_ids: tuple[str, ...] = ()
+    project: str | None = None
+    objective: str | None = None
+    protocol_ids: tuple[str, ...] = ()
+    verification_scope: tuple[Any, ...] = ()
 
 
 class ExecutionHandleStore:
     """Append-only in-memory execution-handle boundary for alpha 0.2."""
+
     def __init__(self) -> None:
         self._records: dict[str, ExecutionHandle] = {}
 
@@ -46,6 +46,10 @@ class ExecutionHandleStore:
         handoff_id: str | None = None,
         trace_id: str | None = None,
         evidence_ids: tuple[str, ...] = (),
+        project: str | None = None,
+        objective: str | None = None,
+        protocol_ids: tuple[str, ...] = (),
+        verification_scope: tuple[Any, ...] = (),
     ) -> ExecutionHandle:
         handle = ExecutionHandle(
             str(uuid4()),
@@ -55,6 +59,10 @@ class ExecutionHandleStore:
             handoff_id,
             trace_id,
             tuple(evidence_ids),
+            project,
+            objective,
+            tuple(protocol_ids),
+            tuple(verification_scope),
         )
         self._records[handle.execution_id] = handle
         return handle
@@ -66,20 +74,17 @@ class ExecutionHandleStore:
 class ShirakamiAPI:
     """Bidirectional semantic boundary between UI/external systems and Runtime."""
 
-    def __init__(self, runtime: EvidenceDrivenRuntime | None = None, executions: ExecutionHandleStore | None = None) -> None:
+    def __init__(
+        self,
+        runtime: EvidenceDrivenRuntime | None = None,
+        executions: ExecutionHandleStore | None = None,
+    ) -> None:
         self.runtime = runtime or EvidenceDrivenRuntime()
         self.executions = executions or ExecutionHandleStore()
 
-    def observe(
-        self,
-        observation: Mapping[str, Any],
-        context: ContextSnapshot,
-    ) -> dict[str, Any]:
+    def observe(self, observation: Mapping[str, Any], context: ContextSnapshot) -> dict[str, Any]:
         self.runtime.observe(observation, context)
-        return {
-            "state": self.runtime.loop.state.value,
-            "evidence": self._evidence(),
-        }
+        return {"state": self.runtime.loop.state.value, "evidence": self._evidence()}
 
     def analyze(
         self,
@@ -108,15 +113,8 @@ class ShirakamiAPI:
                 "state": self.runtime.loop.state.value,
                 "reason": "explicit human authorization required",
             }
-
-        accepted = self.runtime.approve(
-            approved=approved,
-            reviewer=reviewer,
-        )
-        return {
-            "accepted": accepted,
-            "state": self.runtime.loop.state.value,
-        }
+        accepted = self.runtime.approve(approved=approved, reviewer=reviewer)
+        return {"accepted": accepted, "state": self.runtime.loop.state.value}
 
     def execute(
         self,
@@ -127,6 +125,10 @@ class ShirakamiAPI:
         handoff_id: str | None = None,
         trace_id: str | None = None,
         evidence_ids: tuple[str, ...] = (),
+        project: str | None = None,
+        objective: str | None = None,
+        protocol_ids: tuple[str, ...] = (),
+        verification_scope: tuple[Any, ...] = (),
     ) -> dict[str, Any]:
         result = self.runtime.execute(protocol, protocol_id, input_data)
         payload = {
@@ -139,6 +141,10 @@ class ShirakamiAPI:
             "handoff_id": handoff_id,
             "trace_id": trace_id,
             "evidence_ids": list(evidence_ids),
+            "project": project,
+            "objective": objective,
+            "protocol_ids": list(protocol_ids),
+            "verification_scope": list(verification_scope),
             "execution_authorized": False,
             "publish_authorized": False,
             "merge_authorized": False,
@@ -150,6 +156,10 @@ class ShirakamiAPI:
             handoff_id=handoff_id,
             trace_id=trace_id,
             evidence_ids=evidence_ids,
+            project=project,
+            objective=objective,
+            protocol_ids=protocol_ids,
+            verification_scope=verification_scope,
         )
         return {**payload, "execution_id": handle.execution_id}
 
@@ -165,9 +175,19 @@ class ShirakamiAPI:
             "handoff_id": handle.handoff_id,
             "trace_id": handle.trace_id,
             "evidence_ids": list(handle.evidence_ids),
+            "project": handle.project,
+            "objective": handle.objective,
+            "protocol_ids": list(handle.protocol_ids),
+            "verification_scope": list(handle.verification_scope),
         }
 
-    def verify_execution(self, execution_id: str, *, expected_transition_kind: str | None = None, diff_ref: str = "") -> VerificationResult | None:
+    def verify_execution(
+        self,
+        execution_id: str,
+        *,
+        expected_transition_kind: str | None = None,
+        diff_ref: str = "",
+    ) -> VerificationResult | None:
         handle = self.executions.get(execution_id)
         if handle is None:
             return None
@@ -216,10 +236,7 @@ class ShirakamiAPI:
         return [self._serialize_evidence(record) for record in self.runtime.store.all()]
 
     def _evidence_for_protocol(self, protocol_id: str) -> list[dict[str, Any]]:
-        return [
-            self._serialize_evidence(record)
-            for record in self.runtime.store.by_protocol(protocol_id)
-        ]
+        return [self._serialize_evidence(record) for record in self.runtime.store.by_protocol(protocol_id)]
 
     @staticmethod
     def _serialize_evidence(record: Any) -> dict[str, Any]:
