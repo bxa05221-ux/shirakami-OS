@@ -188,6 +188,26 @@ class ShirakamiAPI:
             "human_gate_required": True,
         }
 
+    def get_witness_history(self, trace_id: str) -> list[dict[str, Any]]:
+        return [
+            {
+                "witness_id": witness.witness_id,
+                "trace_id": witness.trace_id,
+                "execution_id": witness.execution_id,
+                "handoff_id": witness.handoff_id,
+                "evidence_ids": list(witness.evidence_ids),
+                "verification_status": witness.verification_status,
+                "commit": witness.commit,
+                "verification_uncertainty": witness.verification_uncertainty,
+                "verification_observed": dict(witness.verification_observed),
+                "execution_authorized": False,
+                "publish_authorized": False,
+                "merge_authorized": False,
+                "human_gate_required": True,
+            }
+            for witness in self.witnesses.history(trace_id)
+        ]
+
     def get_witness(self, trace_id: str) -> dict[str, Any] | None:
         witness = self.witnesses.get(trace_id)
         if witness is None:
