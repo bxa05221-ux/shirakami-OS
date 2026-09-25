@@ -224,12 +224,14 @@ class ShirakamiAPI:
         )
         verification = self.verify(execution, expected_transition_kind=expected_transition_kind, diff_ref=diff_ref)
         if handle.trace_id is not None:
-            self.traces.attach_verification(
+            updated_trace = self.traces.attach_verification(
                 handle.trace_id,
                 status=verification.status,
                 uncertainty=verification.uncertainty,
                 observed=verification.observed,
             )
+            if updated_trace is not None:
+                self.witnesses.record(AIwitness.observe(updated_trace))
         return verification
 
     def verify(
