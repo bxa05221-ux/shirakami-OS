@@ -306,3 +306,24 @@ def test_http_witness_is_retrievable_after_execution() -> None:
 def test_unknown_witness_fails_closed() -> None:
     client = _client()
     assert client.get("/v1/witnesses/unknown").status_code == 404
+
+
+def test_http_witness_reflects_latest_trace_observation() -> None:
+    client = _client()
+    executed = client.post("/v1/execute", json=_execute_payload())
+    assert executed.status_code == 200
+    body = executed.json()
+
+    checked = client.post(
+        f"/v1/executions/{body['execution_id']}/verify",
+        json={"expected_transition_kind": "http.example"},
+    )
+    assert checked.status_code == 200
+
+    witness = client.get(f"/v1/witnesses/{body['trace_id']}")
+    assert witness.status_code == 200
+    observed = witness.json()
+    assert observed["verification_status"] == "pass"
+    assert observed["trace_id"] == body["trace_id"]
+    assert observed["execution_id"] == body["execution_id"]
+    assert observed["evidence_ids"] == body["evidence_ids"]
