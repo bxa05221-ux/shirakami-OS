@@ -75,3 +75,50 @@ def validate_traceability(
         verification_status=str(trace["verification_status"]),
         commit=trace.get("commit"),
     )
+
+
+
+@dataclass(frozen=True)
+class ComparativeTraceabilityRecord:
+    project_id: str
+    reviewer_ids: tuple[str, ...]
+    shared_evidence_ids: tuple[str, ...]
+    divergent_evidence_ids: tuple[str, ...]
+    decision: None = None
+    human_gate_required: bool = True
+    authority_granted: bool = False
+    decision_authorized: bool = False
+
+
+def validate_comparative_traceability(
+    *,
+    context: dict,
+) -> ComparativeTraceabilityRecord:
+    """Validate reviewer provenance without converting comparison into a decision."""
+    if context.get("decision") is not None:
+        raise ValueError("comparative trace cannot contain a decision")
+    if context.get("authority_granted") is not False:
+        raise ValueError("comparative trace cannot grant authority")
+    if context.get("decision_authorized") is not False:
+        raise ValueError("comparative trace cannot authorize decisions")
+    if context.get("human_gate_required") is not True:
+        raise ValueError("comparative trace must require human gate")
+
+    reviewer_ids = tuple(context.get("reviewer_ids", ()))
+    shared = tuple(context.get("shared_evidence_ids", ()))
+    divergent = tuple(context.get("divergent_evidence_ids", ()))
+    if not context.get("project_id"):
+        raise ValueError("comparative trace requires project_id")
+    if not reviewer_ids:
+        raise ValueError("comparative trace requires reviewer identity")
+
+    overlap = set(shared) & set(divergent)
+    if overlap:
+        raise ValueError("shared and divergent evidence cannot overlap")
+
+    return ComparativeTraceabilityRecord(
+        project_id=str(context["project_id"]),
+        reviewer_ids=reviewer_ids,
+        shared_evidence_ids=shared,
+        divergent_evidence_ids=divergent,
+    )
