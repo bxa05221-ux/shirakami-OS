@@ -1,4 +1,4 @@
-from reviewer.aiwitness_bridge import build_trace_metadata
+from reviewer.aiwitness_bridge import as_trace_context as reviewer_trace_context, build_trace_metadata
 from reviewer.comparative_trace import as_trace_context, build_comparative_trace
 from reviewer.registry import ReviewSubmission, Reviewer, ReviewerBundle
 
@@ -30,7 +30,7 @@ def test_comparative_trace_can_be_issued_as_aiwitness_context() -> None:
     assert context["human_gate_required"] is True
 
     metadata = build_trace_metadata(bundle, submission_a)
-    trace_context = metadata.as_trace_context()
+    trace_context = reviewer_trace_context(metadata)
     assert trace_context["reviewer_id"] == "reviewer-a"
     assert trace_context["evidence_ids"] == ["E1", "E2"]
     assert trace_context["authority_granted"] is False
