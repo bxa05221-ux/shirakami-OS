@@ -31,6 +31,9 @@ class ContextSnapshotInput(BaseModel):
 class ObserveInput(BaseModel):
     observation: dict[str, Any] = Field(default_factory=dict)
     context: ContextSnapshotInput
+    handoff_id: str
+    trace_id: str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
 
 
 class AnalyzeInput(BaseModel):
@@ -48,6 +51,9 @@ class ApproveInput(BaseModel):
 class ExecuteInput(BaseModel):
     protocol_id: str
     input_data: dict[str, Any] = Field(default_factory=dict)
+    handoff_id: str
+    trace_id: str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
 
 
 class VerifyInput(BaseModel):
@@ -91,7 +97,15 @@ class ShirakamiHTTPTransport:
                 landscape=payload.context.landscape,
                 metadata=payload.context.metadata,
             )
-            return self.api.observe(payload.observation, context)
+            result = self.api.observe(payload.observation, context)
+            result["handoff_id"] = payload.handoff_id
+            result["trace_id"] = payload.trace_id
+            result["evidence_ids"] = list(payload.evidence_ids)
+            result["execution_authorized"] = False
+            result["publish_authorized"] = False
+            result["merge_authorized"] = False
+            result["human_gate_required"] = True
+            return result
 
         @app.post("/v1/analyze", dependencies=[Depends(auth)])
         def analyze(payload: AnalyzeInput) -> dict[str, Any]:
@@ -122,6 +136,9 @@ class ShirakamiHTTPTransport:
                 protocol,
                 payload.protocol_id,
                 payload.input_data,
+                handoff_id=payload.handoff_id,
+                trace_id=payload.trace_id,
+                evidence_ids=tuple(payload.evidence_ids),
             )
 
         @app.get("/v1/executions/{execution_id}", dependencies=[Depends(auth)])
