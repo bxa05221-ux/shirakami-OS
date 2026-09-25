@@ -292,6 +292,7 @@ def test_http_witness_is_retrievable_after_execution() -> None:
     witness = client.get(f"/v1/witnesses/{body['trace_id']}")
     assert witness.status_code == 200
     observed = witness.json()
+    assert observed["witness_id"].startswith("WITNESS-")
     assert observed["trace_id"] == body["trace_id"]
     assert observed["execution_id"] == body["execution_id"]
     assert observed["handoff_id"] == body["handoff_id"]
