@@ -26,21 +26,6 @@ This is the shortest evidence-backed route for an external reviewer or AI system
 
 The repository is one implementation layer within a larger Shirakami Landscape. Stable normative specifications are maintained in `shirakami-specification`; this repository contains Runtime, adapters, plugins, tests, and executable artifacts.
 
-## Repository Roles
-
-```text
-shirakami-model
-    ↓ conceptual foundation
-shirakami-research
-    ↓ observation / experiment
-shirakami-specification
-    ↓ normative contract
-shirakami-OS
-    ↓ runtime / implementation
-Evidence / Observation
-    ↺ research
-```
-
 ## Multi-Agent Review Boundary
 
 Multiple reviewers can register their own Matome YAML context and submit observations separately. Use the [Blind External Review Protocol](./BLIND_EXTERNAL_REVIEW_PROTOCOL.md) and follow the HTTP route advertised by `GET /v1/capabilities`.
