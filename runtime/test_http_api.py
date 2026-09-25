@@ -138,3 +138,30 @@ def test_unknown_execution_handle_fails_closed() -> None:
     client = _client()
     assert client.get("/v1/executions/unknown").status_code == 404
     assert client.post("/v1/executions/unknown/verify", json={}).status_code == 404
+
+
+def test_http_round_trip_preserves_trace_metadata_without_authority() -> None:
+    client = _client()
+    payload = {
+        "protocol_id": "http.example",
+        "input_data": {"x": 1},
+        "handoff_id": "SH-HO-20260925-001",
+        "trace_id": "TRACE-HTTP-001",
+        "evidence_ids": ["AGENT-COORDINATION-001"],
+    }
+    executed = client.post("/v1/execute", json=payload)
+    assert executed.status_code == 200
+    body = executed.json()
+    assert body["handoff_id"] == payload["handoff_id"]
+    assert body["trace_id"] == payload["trace_id"]
+    assert body["evidence_ids"] == payload["evidence_ids"]
+    assert body["execution_authorized"] is False
+    assert body["publish_authorized"] is False
+    assert body["merge_authorized"] is False
+    assert body["human_gate_required"] is True
+
+    stored = client.get(f"/v1/executions/{body['execution_id']}")
+    assert stored.status_code == 200
+    assert stored.json()["handoff_id"] == payload["handoff_id"]
+    assert stored.json()["trace_id"] == payload["trace_id"]
+    assert stored.json()["evidence_ids"] == payload["evidence_ids"]
