@@ -9,7 +9,7 @@ mvp:
     boundaries. Real-model E2E must be demonstrated before MVP release.
   completion_method: "verified_requirements / total_release_requirements"
   ai_self_assessment: false
-  completion_percent: 60
+  completion_percent: 70
 
 requirements:
   - id: API-MVP-001
@@ -106,6 +106,6 @@ release_gate:
   merge_authorized: false
 
 notes:
-  - "60% is a registry-derived strict completion value, not an AI estimate."
+  - "70% is a registry-derived strict completion value, not an AI estimate."
   - "Partial requirements do not count toward the strict release percentage."
   - "The denominator is frozen for API MVP 0.1. New discoveries belong to a later milestone."
