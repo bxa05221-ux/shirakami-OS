@@ -190,6 +190,18 @@ def test_unknown_execution_handle_fails_closed() -> None:
 
 def test_http_round_trip_preserves_trace_metadata_without_authority() -> None:
     client = _client()
+    client.post(
+        "/v1/observe",
+        json={
+            "observation": {},
+            "context": _context(),
+            "handoff_id": "SH-HO-20260925-001",
+        },
+    )
+    client.post(
+        "/v1/analyze",
+        json={"protocol_id": "http.example", "protocol_exists": True},
+    )
     executed = client.post("/v1/execute", json=_execute_payload())
     assert executed.status_code == 200
     body = executed.json()
