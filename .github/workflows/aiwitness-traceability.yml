@@ -30,3 +30,5 @@ jobs:
         run: pytest -q aiwitness/test_traceability_http.py
       - name: Verify public traceability endpoint
         run: pytest -q aiwitness/test_traceability_endpoint.py
+      - name: Verify stable Evidence retrieval
+        run: pytest -q aiwitness/test_evidence_endpoint.py
