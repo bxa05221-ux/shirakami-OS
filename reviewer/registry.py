@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Mapping
 
+import yaml
+
 
 @dataclass(frozen=True)
 class Reviewer:
@@ -30,6 +32,14 @@ class ReviewerBundle:
     def register(self, reviewer: Reviewer) -> None:
         if not reviewer.reviewer_id.strip():
             raise ValueError("reviewer_id is required")
+        if not reviewer.matome_yaml.strip():
+            raise ValueError("matome_yaml is required")
+        try:
+            parsed = yaml.safe_load(reviewer.matome_yaml)
+        except yaml.YAMLError as exc:
+            raise ValueError("matome_yaml must be valid YAML") from exc
+        if not isinstance(parsed, dict):
+            raise ValueError("matome_yaml must contain a YAML mapping")
         if reviewer.reviewer_id in self.reviewers:
             raise ValueError(f"reviewer already registered: {reviewer.reviewer_id}")
         self.reviewers[reviewer.reviewer_id] = reviewer
