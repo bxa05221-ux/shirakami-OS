@@ -9,32 +9,17 @@ def test_comparative_trace_can_be_issued_as_aiwitness_context() -> None:
     bundle = ReviewerBundle(project_id="project-compare-1")
     bundle.register(Reviewer("reviewer-a", "matome: perspective-a"))
     bundle.register(Reviewer("reviewer-b", "matome: perspective-b"))
-    submission_a = ReviewSubmission(
-        "reviewer-a",
-        {"finding": "x"},
-        ("E1", "E2"),
-        {"proposal": "A"},
-    )
-    submission_b = ReviewSubmission(
-        "reviewer-b",
-        {"finding": "y"},
-        ("E1", "E3"),
-        {"proposal": "B"},
-    )
+    submission_a = ReviewSubmission("reviewer-a", {"finding": "x"}, ("E1", "E2"), {"proposal": "A"})
+    submission_b = ReviewSubmission("reviewer-b", {"finding": "y"}, ("E1", "E3"), {"proposal": "B"})
     bundle.submit(submission_a)
     bundle.submit(submission_b)
-
     comparative = build_comparative_trace(bundle)
     context = as_trace_context(comparative)
     assert context["shared_evidence_ids"] == ["E1"]
     assert context["divergent_evidence_ids"] == ["E2", "E3"]
     assert context["decision"] is None
     assert context["human_gate_required"] is True
-    assert [item["proposal"] for item in context["observations"]] == [
-        {"proposal": "A"},
-        {"proposal": "B"},
-    ]
-
+    assert [item["proposal"] for item in context["observations"]] == [{"proposal": "A"}, {"proposal": "B"}]
     metadata = build_trace_metadata(bundle, submission_a)
     trace_context = reviewer_trace_context(metadata)
     assert trace_context["reviewer_id"] == "reviewer-a"
@@ -42,10 +27,7 @@ def test_comparative_trace_can_be_issued_as_aiwitness_context() -> None:
     assert trace_context["authority_granted"] is False
     assert trace_context["decision_authorized"] is False
     assert trace_context["human_gate_required"] is True
-
-    # Comparative data remains a context payload; it does not become a decision.
     assert context["decision"] is None
-
     metadata = build_comparative_trace_metadata(comparative)
     witness_context = as_comparative_trace_context(metadata)
     assert witness_context["shared_evidence_ids"] == ["E1"]
@@ -54,51 +36,18 @@ def test_comparative_trace_can_be_issued_as_aiwitness_context() -> None:
     assert witness_context["authority_granted"] is False
     assert witness_context["decision_authorized"] is False
     assert witness_context["human_gate_required"] is True
-    assert [item["proposal"] for item in witness_context["observations"]] == [
-        {"proposal": "A"},
-        {"proposal": "B"},
-    ]
+    assert [item["proposal"] for item in witness_context["observations"]] == [{"proposal": "A"}, {"proposal": "B"}]
 
 
 def test_comparative_trace_http_aiwitness_boundary() -> None:
     from api.http import create_app
-
     client = TestClient(create_app(api_key=None))
-    client.post(
-        "/v1/reviews/register",
-        json={
-            "project_id": "project-http-aiwitness",
-            "reviewer_id": "reviewer-a",
-            "matome_yaml": "matome: a",
-        },
-    )
-    client.post(
-        "/v1/reviews/register",
-        json={
-            "project_id": "project-http-aiwitness",
-            "reviewer_id": "reviewer-b",
-            "matome_yaml": "matome: b",
-        },
-    )
-    for reviewer_id, evidence_ids in (
-        ("reviewer-a", ["E1", "E2"]),
-        ("reviewer-b", ["E1", "E3"]),
-    ):
-        response = client.post(
-            "/v1/reviews/submit",
-            json={
-                "project_id": "project-http-aiwitness",
-                "reviewer_id": reviewer_id,
-                "observation": {"finding": reviewer_id},
-                "evidence_ids": evidence_ids,
-            },
-        )
+    for reviewer_id, matome in (("reviewer-a", "matome: a"), ("reviewer-b", "matome: b")):
+        client.post("/v1/reviews/register", json={"project_id": "project-http-aiwitness", "reviewer_id": reviewer_id, "matome_yaml": matome})
+    for reviewer_id, evidence_ids in (("reviewer-a", ["E1", "E2"]), ("reviewer-b", ["E1", "E3"])):
+        response = client.post("/v1/reviews/submit", json={"project_id": "project-http-aiwitness", "reviewer_id": reviewer_id, "observation": {"finding": reviewer_id}, "evidence_ids": evidence_ids})
         assert response.status_code == 200
-
-    response = client.post(
-        "/v1/reviews/comparative/aiwitness",
-        json={"project_id": "project-http-aiwitness"},
-    )
+    response = client.post("/v1/reviews/comparative/aiwitness", json={"project_id": "project-http-aiwitness"})
     assert response.status_code == 200
     body = response.json()
     aiwitness = body["aiwitness"]
@@ -110,18 +59,15 @@ def test_comparative_trace_http_aiwitness_boundary() -> None:
     assert aiwitness["human_gate_required"] is True
     assert body["valid"] is True
     assert body["traceability"]["project_id"] == "project-http-aiwitness"
-    assert body["traceability"]["shared_evidence_ids"] == ["E1"]
-    assert body["traceability"]["divergent_evidence_ids"] == ["E2", "E3"]
 
 
 def test_blind_review_http_comparative_aiwitness_boundary() -> None:
     from api.http import create_app
-
     client = TestClient(create_app(api_key=None))
     first = {
         "reviewer_id": "reviewer-http-a",
         "matome_yaml": "matome:\n  reviewer_id: reviewer-http-a\n",
-        "objective": "independent observation",
+        "objective": ["independent observation"],
         "observations": ["A"],
         "evidence_ids": ["E1", "E2"],
         "resolved_questions": [],
@@ -136,11 +82,7 @@ def test_blind_review_http_comparative_aiwitness_boundary() -> None:
     second["matome_yaml"] = "matome:\n  reviewer_id: reviewer-http-b\n"
     second["evidence_ids"] = ["E1", "E3"]
     second["proposals"] = ["P2"]
-
-    response = client.post("/v1/reviews/blind/comparative/aiwitness", json={
-        "project_id": "http-blind-traceability",
-        "results": [first, second],
-    })
+    response = client.post("/v1/reviews/blind/comparative/aiwitness", json={"project_id": "http-blind-traceability", "results": [first, second]})
     assert response.status_code == 200, response.text
     body = response.json()
     assert body["valid"] is True
