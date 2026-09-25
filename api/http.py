@@ -91,7 +91,10 @@ class ShirakamiHTTPTransport:
         @app.post("/v1/execute", dependencies=[Depends(auth)])
         def execute(payload: ExecuteInput) -> dict[str, Any]:
             boundary = validate_execution_context(payload.boundary_context.model_dump())
-            if boundary["handoff_id"] != payload.handoff_id or boundary["evidence_ids"] != payload.evidence_ids: raise HTTPException(status_code=422, detail="transport and boundary context mismatch")
+            if boundary["handoff_id"] != payload.handoff_id:
+                raise HTTPException(status_code=422, detail="handoff_id mismatch between transport and boundary context")
+            if boundary["evidence_ids"] != payload.evidence_ids:
+                raise HTTPException(status_code=422, detail="evidence_ids mismatch between transport and boundary context")
             if payload.protocol_id not in boundary["protocol_ids"]: raise HTTPException(status_code=422, detail="protocol_id is not declared by boundary context")
             protocol = self.protocol_registry.get(payload.protocol_id)
             if protocol is None: raise HTTPException(status_code=404, detail="protocol is not registered for HTTP execution")
