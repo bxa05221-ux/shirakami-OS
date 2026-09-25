@@ -193,6 +193,7 @@ class ShirakamiAPI:
         if witness is None:
             return None
         return {
+            "witness_id": witness.witness_id,
             "trace_id": witness.trace_id,
             "execution_id": witness.execution_id,
             "handoff_id": witness.handoff_id,
