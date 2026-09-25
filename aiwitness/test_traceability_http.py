@@ -2,9 +2,21 @@
 
 from __future__ import annotations
 
+import sys
+import types
+from pathlib import Path
 from typing import Any
 
 from fastapi.testclient import TestClient
+
+# The repository contains a legacy top-level ``api.py`` alongside the newer
+# ``api/`` transport directory. During pytest collection, the legacy module
+# can shadow the transport namespace package. Install the transport package
+# explicitly for this integration test without changing the runtime boundary.
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+_api_package = types.ModuleType("api")
+_api_package.__path__ = [str(_REPO_ROOT / "api")]
+sys.modules["api"] = _api_package
 
 from api.http import create_app
 from runtime.api import ShirakamiAPI
