@@ -136,6 +136,24 @@ Accepted Evidence
 
 The external reviewer therefore cannot establish its own authority merely by producing a structured review.
 
+## Evidence Promotion Boundary
+
+The review protocol ends at an observation boundary. If an observation is later considered for Evidence, it must pass an independent verification step and a Human Gate.
+
+```text
+review result
+   ↓
+candidate evidence
+   ↓
+independent verification
+   ↓
+Human Gate
+   ↓
+accepted Evidence
+```
+
+The blind-review protocol does not define automatic Evidence acceptance. In particular, reviewer-supplied `evidence_ids` remain references, and successful comparative traceability does not change their status.
+
 ## Human Gate
 
 The Human Gate remains outside the reviewer pipeline.
