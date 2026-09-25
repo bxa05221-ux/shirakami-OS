@@ -52,7 +52,6 @@ def test_comparative_trace_can_be_issued_as_aiwitness_context() -> None:
     assert witness_context["human_gate_required"] is True
 
 
-
 def test_comparative_trace_http_aiwitness_boundary() -> None:
     from api.http import create_app
 
@@ -94,12 +93,13 @@ def test_comparative_trace_http_aiwitness_boundary() -> None:
     )
     assert response.status_code == 200
     body = response.json()
-    assert body["shared_evidence_ids"] == ["E1"]
-    assert body["divergent_evidence_ids"] == ["E2", "E3"]
-    assert body["decision"] is None
-    assert body["authority_granted"] is False
-    assert body["decision_authorized"] is False
-    assert body["human_gate_required"] is True
+    aiwitness = body["aiwitness"]
+    assert aiwitness["shared_evidence_ids"] == ["E1"]
+    assert aiwitness["divergent_evidence_ids"] == ["E2", "E3"]
+    assert aiwitness["decision"] is None
+    assert aiwitness["authority_granted"] is False
+    assert aiwitness["decision_authorized"] is False
+    assert aiwitness["human_gate_required"] is True
     assert body["valid"] is True
     assert body["traceability"]["project_id"] == "project-http-aiwitness"
     assert body["traceability"]["shared_evidence_ids"] == ["E1"]
