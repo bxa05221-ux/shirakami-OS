@@ -146,6 +146,40 @@ Instead ask:
 
 The answer must be derived from the actual Protocol, Evidence, Projection, Landscape, and Replay boundaries in the repository.
 
+## Multi-Agent Review Boundary
+
+Shirakami also supports a reviewer-oriented path in which multiple reviewers can register their own Matome YAML context and submit observations separately.
+
+```text
+Reviewer A ─┐
+Reviewer B ─┼→ Reviewer Bundle → Comparative Trace → AIwitness
+Reviewer C ─┘                         ↓
+                              Human Gate remains
+```
+
+The comparative layer preserves:
+
+- reviewer identity;
+- each reviewer's Matome YAML context;
+- submitted observations;
+- Evidence IDs;
+- shared Evidence;
+- divergent Evidence.
+
+A comparative trace does **not** produce a decision. decision remains null, authority_granted remains false, decision_authorized remains false, and human_gate_required remains true.
+
+AIwitness records the resulting provenance and traceability as an observation boundary. It does not convert reviewer agreement, Evidence, verification status, or an AI-generated interpretation into authority.
+
+For the implementation boundary, inspect:
+
+- reviewer/registry.py
+- reviewer/comparative_trace.py
+- reviewer/aiwitness_bridge.py
+- aiwitness/traceability.py
+- aiwitness/AIWITNESS_BOUNDARY_CONTRACT.yaml
+
+This allows an external reviewer or AI reviewer to contribute evidence without becoming the project's decision-maker.
+
 ## Evidence Policy
 
 External AI observations are **observations**, not authoritative facts.
