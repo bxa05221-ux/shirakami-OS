@@ -129,7 +129,13 @@ class ShirakamiHTTPTransport:
                 raise HTTPException(status_code=404, detail="unknown reviewer project")
             comparative = build_comparative_trace(bundle)
             metadata = build_comparative_trace_metadata(comparative)
-            return as_comparative_trace_context(metadata)
+            context = as_comparative_trace_context(metadata)
+            from aiwitness.traceability import validate_comparative_traceability
+            try:
+                record = validate_comparative_traceability(context=context)
+            except ValueError as exc:
+                raise HTTPException(status_code=409, detail=str(exc)) from exc
+            return {"valid": True, "aiwitness": context, "traceability": asdict(record)}
 
         @app.get("/v1/reviews/comparative/{project_id}", dependencies=[Depends(auth)])
         def get_comparative_review_http(project_id: str) -> dict[str, Any]:
