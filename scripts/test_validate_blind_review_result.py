@@ -4,6 +4,7 @@ from scripts.validate_blind_review_result import validate_blind_review_result
 def valid_result():
     return {
         "reviewer_id": "reviewer-alpha",
+        "matome_yaml": "matome:\n  reviewer_id: reviewer-alpha\n",
         "objective": "independent observation",
         "observations": ["fact"],
         "evidence_ids": ["E1"],
