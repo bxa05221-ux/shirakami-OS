@@ -6,6 +6,7 @@ blind_review_result:
     authority or create a project decision.
   required:
     - reviewer_id
+    - matome_yaml
     - objective
     - observations
     - evidence_ids
@@ -19,6 +20,10 @@ blind_review_result:
     reviewer_id:
       type: string
       non_empty: true
+    matome_yaml:
+      type: string
+      non_empty: true
+      semantic_role: reviewer_context
     objective:
       type: string
       non_empty: true
