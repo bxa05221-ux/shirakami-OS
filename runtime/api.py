@@ -120,12 +120,13 @@ class ShirakamiAPI:
             "merge_authorized": False,
             "human_gate_required": True,
         }
+        provisional_trace_id = trace_id or f"TRACE-{uuid4()}"
         handle = self.executions.create(
-            protocol_id, payload, handoff_id=handoff_id, trace_id=trace_id,
+            protocol_id, payload, handoff_id=handoff_id, trace_id=provisional_trace_id,
             evidence_ids=evidence_ids, project=project, objective=objective,
             protocol_ids=protocol_ids, verification_scope=verification_scope,
         )
-        resolved_trace_id = trace_id or f"TRACE-{handle.execution_id}"
+        resolved_trace_id = provisional_trace_id
         if evidence and not evidence_ids:
             linked_evidence_ids = tuple(item["evidence_id"] for item in evidence)
         else:
@@ -140,8 +141,7 @@ class ShirakamiAPI:
             protocol_ids=tuple(protocol_ids),
             verification_scope=tuple(verification_scope),
         ))
-        if trace_id is None:
-            payload["trace_id"] = resolved_trace_id
+        payload["trace_id"] = resolved_trace_id
         return {**payload, "execution_id": handle.execution_id, "trace_id": resolved_trace_id}
 
     def get_execution(self, execution_id: str) -> dict[str, Any] | None:
