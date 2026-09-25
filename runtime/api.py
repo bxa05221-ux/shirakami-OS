@@ -28,6 +28,9 @@ class ExecutionHandle:
     protocol_id: str
     status: str
     result: dict[str, Any]
+    handoff_id: str | None = None
+    trace_id: str | None = None
+    evidence_ids: tuple[str, ...] = ()
 
 
 class ExecutionHandleStore:
@@ -35,8 +38,24 @@ class ExecutionHandleStore:
     def __init__(self) -> None:
         self._records: dict[str, ExecutionHandle] = {}
 
-    def create(self, protocol_id: str, result: dict[str, Any]) -> ExecutionHandle:
-        handle = ExecutionHandle(str(uuid4()), protocol_id, result.get("status", "unknown"), dict(result))
+    def create(
+        self,
+        protocol_id: str,
+        result: dict[str, Any],
+        *,
+        handoff_id: str | None = None,
+        trace_id: str | None = None,
+        evidence_ids: tuple[str, ...] = (),
+    ) -> ExecutionHandle:
+        handle = ExecutionHandle(
+            str(uuid4()),
+            protocol_id,
+            result.get("status", "unknown"),
+            dict(result),
+            handoff_id,
+            trace_id,
+            tuple(evidence_ids),
+        )
         self._records[handle.execution_id] = handle
         return handle
 
@@ -104,6 +123,10 @@ class ShirakamiAPI:
         protocol: Callable[[Any], Transition],
         protocol_id: str,
         input_data: Mapping[str, Any] | None = None,
+        *,
+        handoff_id: str | None = None,
+        trace_id: str | None = None,
+        evidence_ids: tuple[str, ...] = (),
     ) -> dict[str, Any]:
         result = self.runtime.execute(protocol, protocol_id, input_data)
         payload = {
@@ -113,15 +136,36 @@ class ShirakamiAPI:
             "signals": list(result.signals),
             "steps": result.steps,
             "evidence": self._evidence_for_protocol(protocol_id)[-1:],
+            "handoff_id": handoff_id,
+            "trace_id": trace_id,
+            "evidence_ids": list(evidence_ids),
+            "execution_authorized": False,
+            "publish_authorized": False,
+            "merge_authorized": False,
+            "human_gate_required": True,
         }
-        handle = self.executions.create(protocol_id, payload)
+        handle = self.executions.create(
+            protocol_id,
+            payload,
+            handoff_id=handoff_id,
+            trace_id=trace_id,
+            evidence_ids=evidence_ids,
+        )
         return {**payload, "execution_id": handle.execution_id}
 
     def get_execution(self, execution_id: str) -> dict[str, Any] | None:
         handle = self.executions.get(execution_id)
         if handle is None:
             return None
-        return {"execution_id": handle.execution_id, "protocol_id": handle.protocol_id, "status": handle.status, "result": dict(handle.result)}
+        return {
+            "execution_id": handle.execution_id,
+            "protocol_id": handle.protocol_id,
+            "status": handle.status,
+            "result": dict(handle.result),
+            "handoff_id": handle.handoff_id,
+            "trace_id": handle.trace_id,
+            "evidence_ids": list(handle.evidence_ids),
+        }
 
     def verify_execution(self, execution_id: str, *, expected_transition_kind: str | None = None, diff_ref: str = "") -> VerificationResult | None:
         handle = self.executions.get(execution_id)
