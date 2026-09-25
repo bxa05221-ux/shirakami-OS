@@ -181,3 +181,61 @@ def test_execution_preserves_trace_metadata_without_authority() -> None:
     assert stored["objective"] == "API provenance"
     assert stored["protocol_ids"] == ["api.example"]
     assert stored["verification_scope"] == ["runtime handle"]
+
+
+def test_execution_creates_and_verifies_evidence_trace() -> None:
+    api = _api()
+    api.observe({}, _context())
+    api.analyze("api.example", protocol_exists=True)
+
+    result = api.execute(
+        _protocol,
+        "api.example",
+        {},
+        handoff_id="SH-HO-20260925-001",
+        trace_id="TRACE-001",
+        evidence_ids=("AGENT-COORDINATION-001",),
+        project="Shirakami Project",
+        objective="Execution trace",
+        protocol_ids=("api.example",),
+        verification_scope=("runtime handle",),
+    )
+
+    trace = api.get_trace("TRACE-001")
+    assert trace is not None
+    assert trace["execution_id"] == result["execution_id"]
+    assert trace["handoff_id"] == "SH-HO-20260925-001"
+    assert trace["evidence_ids"] == ["AGENT-COORDINATION-001"]
+    assert trace["verification_status"] == "pending"
+    assert trace["execution_authorized"] is False
+    assert trace["publish_authorized"] is False
+    assert trace["merge_authorized"] is False
+    assert trace["human_gate_required"] is True
+
+    verification = api.verify_execution(
+        result["execution_id"],
+        expected_transition_kind="api.example",
+    )
+    assert verification is not None
+    assert verification.status == "pass"
+
+    verified_trace = api.get_trace("TRACE-001")
+    assert verified_trace is not None
+    assert verified_trace["verification_status"] == "pass"
+    assert verified_trace["verification_observed"]["transition_kind"] == "api.example"
+    assert verified_trace["execution_authorized"] is False
+
+
+def test_execution_generates_trace_when_trace_id_is_absent() -> None:
+    api = _api()
+    api.observe({}, _context())
+    api.analyze("api.example", protocol_exists=True)
+
+    result = api.execute(_protocol, "api.example", {})
+    trace_id = result["trace_id"]
+
+    assert trace_id.startswith("TRACE-")
+    trace = api.get_trace(trace_id)
+    assert trace is not None
+    assert trace["execution_id"] == result["execution_id"]
+    assert api.get_execution(result["execution_id"])["trace_id"] == trace_id
