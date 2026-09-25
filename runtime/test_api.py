@@ -310,3 +310,38 @@ def test_execution_witness_has_stable_identity() -> None:
     witness = api.get_witness(result["trace_id"])
     assert witness is not None
     assert witness["witness_id"].startswith("WITNESS-")
+
+
+def test_witness_refreshes_after_verify() -> None:
+    api = _api()
+
+    def protocol(_: Any) -> Transition:
+        return Transition(kind="api.witness.refresh", data={"changed": True})
+
+    result = api.execute(
+        protocol,
+        "api.witness.refresh",
+        handoff_id="SH-HO-20260925-001",
+        project="Shirakami",
+        objective="refresh witness",
+        protocol_ids=("api.witness.refresh",),
+    )
+
+    before = api.get_witness(result["trace_id"])
+    assert before is not None
+    assert before["verification_status"] == "pending"
+
+    checked = api.verify_execution(
+        result["execution_id"],
+        expected_transition_kind="api.witness.refresh",
+    )
+    assert checked is not None
+    assert checked.status == "pass"
+
+    after = api.get_witness(result["trace_id"])
+    assert after is not None
+    assert after["verification_status"] == "pass"
+    assert after["trace_id"] == before["trace_id"]
+    assert after["execution_id"] == before["execution_id"]
+    assert after["evidence_ids"] == before["evidence_ids"]
+    assert after["witness_id"] != before["witness_id"]
