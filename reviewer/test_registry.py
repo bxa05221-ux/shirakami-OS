@@ -1,3 +1,5 @@
+import pytest
+
 from reviewer.registry import ReviewSubmission, Reviewer, ReviewerBundle
 
 
@@ -24,3 +26,21 @@ def test_unregistered_reviewer_cannot_submit() -> None:
         assert "registered" in str(exc)
     else:
         raise AssertionError("unregistered reviewer submission must be rejected")
+
+
+def test_invalid_matome_yaml_is_rejected() -> None:
+    bundle = ReviewerBundle(project_id="project-1")
+    with pytest.raises(ValueError, match="valid YAML"):
+        bundle.register(Reviewer("reviewer-a", "matome: ["))
+
+
+def test_matome_yaml_must_be_a_mapping() -> None:
+    bundle = ReviewerBundle(project_id="project-1")
+    with pytest.raises(ValueError, match="YAML mapping"):
+        bundle.register(Reviewer("reviewer-a", "- not-a-mapping"))
+
+
+def test_empty_matome_yaml_is_rejected() -> None:
+    bundle = ReviewerBundle(project_id="project-1")
+    with pytest.raises(ValueError, match="matome_yaml is required"):
+        bundle.register(Reviewer("reviewer-a", ""))
