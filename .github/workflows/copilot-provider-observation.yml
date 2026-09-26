@@ -1,0 +1,33 @@
+name: Copilot provider observation
+
+on:
+  workflow_dispatch:
+
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/api-mvp-real-provider-harness-001
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install optional Copilot SDK
+        run: python -m pip install --upgrade pip github-copilot-sdk
+      - name: Verify provider transport import
+        run: python -c "from runtime.copilot_sdk_transport import CopilotSDKProviderTransport; print('provider transport import: ok')"
+      - name: Verify structural async boundary
+        run: python -m pytest -q api/test_http_async_provider_boundary.py
+      - name: Real provider observation
+        if: ${{ secrets.COPILOT_GITHUB_TOKEN != '' }}
+        env:
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+        run: python experiments/copilot_provider_observation.py
+      - name: Explain skipped live observation
+        if: ${{ secrets.COPILOT_GITHUB_TOKEN == '' }}
+        run: echo "Live Copilot observation skipped: COPILOT_GITHUB_TOKEN is not configured. Structural verification still ran."
