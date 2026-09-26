@@ -1,6 +1,7 @@
 name: API MVP Keyless E2E
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "api/**"
