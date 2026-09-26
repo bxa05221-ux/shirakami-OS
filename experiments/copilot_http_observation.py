@@ -9,7 +9,6 @@ from __future__ import annotations
 import asyncio
 import os
 
-from copilot import CopilotClient
 from fastapi.testclient import TestClient
 
 from api.http import ShirakamiHTTPTransport
@@ -35,12 +34,16 @@ async def main() -> None:
         print("reason=provider credential not configured")
         return
 
+    from copilot import CopilotClient
+
     copilot = CopilotClient()
     await copilot.start()
     try:
         session = await copilot.create_session()
         try:
-            response = await session.send_and_wait({"prompt": "Return exactly: SHIRAKAMI_LIVE_PROVIDER_OBSERVATION"})
+            response = await session.send_and_wait(
+                {"prompt": "Return exactly: SHIRAKAMI_LIVE_PROVIDER_OBSERVATION"}
+            )
             content = getattr(getattr(response, "data", None), "content", None)
             if content is None:
                 raise RuntimeError("Copilot SDK returned no assistant content")
@@ -56,7 +59,10 @@ async def main() -> None:
             http = TestClient(transport.create_app())
             payload = {
                 "protocol_id": PROTOCOL_ID,
-                "input_data": {"text": "live copilot observation", "provider_output": content},
+                "input_data": {
+                    "text": "live copilot observation",
+                    "provider_output": content,
+                },
                 "handoff_id": HANDOFF_ID,
                 "trace_id": TRACE_ID,
                 "evidence_ids": [],
@@ -66,20 +72,40 @@ async def main() -> None:
                     "objective": "Observe real Copilot output through the Shirakami evidence boundary",
                     "protocol_ids": [PROTOCOL_ID],
                     "evidence_ids": [],
-                    "verification_scope": ["Copilot", "HTTP", "Runtime", "Evidence", "Trace", "AIwitness"],
+                    "verification_scope": [
+                        "Copilot",
+                        "HTTP",
+                        "Runtime",
+                        "Evidence",
+                        "Trace",
+                        "AIwitness",
+                    ],
                     "execution_authorized": False,
                     "publish_authorized": False,
                     "merge_authorized": False,
                     "human_gate_required": True,
                 },
             }
-            result = http.post("/v1/execute", json=payload, headers={"X-API-Key": API_KEY})
+            result = http.post(
+                "/v1/execute",
+                json=payload,
+                headers={"X-API-Key": API_KEY},
+            )
             result.raise_for_status()
             body = result.json()
             evidence_id = body["evidence_ids"][0]
-            evidence = http.get(f"/v1/evidence/{evidence_id}", headers={"X-API-Key": API_KEY})
-            trace = http.get(f"/v1/traces/{TRACE_ID}", headers={"X-API-Key": API_KEY})
-            witness = http.get(f"/v1/witnesses/{TRACE_ID}", headers={"X-API-Key": API_KEY})
+            evidence = http.get(
+                f"/v1/evidence/{evidence_id}",
+                headers={"X-API-Key": API_KEY},
+            )
+            trace = http.get(
+                f"/v1/traces/{TRACE_ID}",
+                headers={"X-API-Key": API_KEY},
+            )
+            witness = http.get(
+                f"/v1/witnesses/{TRACE_ID}",
+                headers={"X-API-Key": API_KEY},
+            )
             print("LIVE_PROVIDER_OBSERVED=true")
             print(f"EVIDENCE_ID={evidence_id}")
             print(f"TRACE_ID={body['trace_id']}")
