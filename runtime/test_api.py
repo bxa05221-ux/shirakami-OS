@@ -221,3 +221,40 @@ def test_witness_refreshes_after_verify() -> None:
     assert after["execution_id"] == before["execution_id"]
     assert after["evidence_ids"] == before["evidence_ids"]
     assert after["witness_id"] != before["witness_id"]
+
+
+
+def test_real_model_output_is_bound_to_evidence_trace_and_aiwitness() -> None:
+    api = _ready_api()
+    result = api.execute(
+        _protocol,
+        "api.example",
+        {"text": "external model observation"},
+        handoff_id="SH-HO-REALMODEL-001",
+        project="Shirakami",
+        objective="real model provenance",
+        protocol_ids=("api.example",),
+        ai_adapter=lambda prompt, protocol_id: {
+            "output": "provider-neutral-model-response",
+            "prompt": prompt,
+            "protocol_id": protocol_id,
+        },
+    )
+
+    assert result["model_output"]["output"] == "provider-neutral-model-response"
+    evidence = api.get_evidence(result["evidence_ids"][0])
+    assert evidence is not None
+    assert evidence["model_output"]["output"] == "provider-neutral-model-response"
+
+    trace = api.get_trace(result["trace_id"])
+    assert trace is not None
+    assert result["evidence_ids"] == trace["evidence_ids"]
+
+    witness = api.get_witness(result["trace_id"])
+    assert witness is not None
+    assert witness["evidence_ids"] == trace["evidence_ids"]
+    assert witness["execution_id"] == result["execution_id"]
+    assert witness["execution_authorized"] is False
+    assert witness["publish_authorized"] is False
+    assert witness["merge_authorized"] is False
+    assert witness["human_gate_required"] is True
