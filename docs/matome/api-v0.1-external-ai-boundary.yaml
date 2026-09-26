@@ -1,0 +1,279 @@
+matome:
+  title: "白神モデル API v0.1 到達点・実AI接続直前"
+  codename: "Shirakami API v0.1 External AI Boundary"
+  version: "0.1"
+  status: "External AI Live Smoke Test Pending"
+  date: "2026-09-24"
+
+  purpose:
+    - "白神Runtimeの研究・実装過程におけるAPI v0.1到達点を固定する"
+    - "実AI Backend接続直前の構造と意味境界を保存する"
+    - "次回作業時にContextを再構築せず、このYAMLをHandoff基点として利用する"
+
+  core_principle:
+    statement: >
+      白神RuntimeはAIそのものではなく、AIを交換可能なBackendとして扱う。
+      Backendの出力はDecisionではなくEvidenceとしてRuntimeへ戻す。
+    human_authority:
+      final_decision: "Human"
+      backend_authority: false
+      ai_authority: false
+
+  development_progress:
+    research:
+      status: "completed"
+      result:
+        - "Research → Runtime Handoff"
+        - "CLP-09〜20"
+        - "Runtime意味境界の固定"
+
+    runtime:
+      status: "completed"
+      components:
+        - "EvidenceRecord"
+        - "stable evidence_id"
+        - "InterpretationRecord"
+        - "stable interpretation_id"
+        - "DecisionRecord"
+        - "decision_id / lineage"
+        - "HumanGate"
+        - "ApprovalEnvelope"
+        - "SemanticHandoff"
+
+    http:
+      status: "completed"
+      components:
+        - "HTTP /handoff"
+        - "Context Routing"
+        - "Evidence Resolver"
+        - "Context Bundle"
+        - "Context Lineage E2E"
+
+    backend:
+      status: "completed"
+      components:
+        - "Backend Contract"
+        - "BackendResponse"
+        - "EchoBackend"
+        - "Adapter → Backend"
+        - "Backend → Evidence"
+
+    evolution_loop:
+      status: "completed"
+      entrypoint: "execute_and_observe()"
+      path:
+        - "SemanticHandoff"
+        - "Backend"
+        - "BackendResponse"
+        - "EvidenceRecord"
+      invariant:
+        - "BackendはDecisionを生成しない"
+        - "Backend出力はEvidenceとして観測される"
+
+  api_v0_1:
+    status: "frozen"
+    freeze_pr: 513
+    freeze_commit: "f6382932de1b159c2d65d40b4fe985ec4bda5ee0"
+    semantic_boundary:
+      external_request:
+        - "SemanticHandoff"
+      processing:
+        - "Context Routing"
+        - "Evidence Resolution"
+        - "Runtime"
+        - "HumanGate"
+        - "Adapter"
+        - "Backend"
+      output:
+        - "BackendResponse"
+        - "EvidenceRecord"
+    explicit_non_goals:
+      - "BackendによるDecision生成"
+      - "AIへのsemantic authority付与"
+      - "Implicit Context Retrieval"
+      - "Provider-specific semanticsをRuntime Coreへ混入"
+      - "特定AIベンダーへのLock-in"
+
+  authentication:
+    status: "merged"
+    pr: 516
+    merge_commit: "649b28978027ace7a25d05bef1a8290347502fdf"
+    contract:
+      purpose: "API利用資格の認証"
+      authority:
+        semantic_authority: false
+        decision_authority: false
+      behavior:
+        missing_api_key: "401"
+        invalid_api_key: "401"
+        valid_api_key: "existing API v0.1 Runtimeへ通過"
+        health_endpoint: "public"
+      invariants:
+        - "AuthenticationはSemantic Contextを変更しない"
+        - "request_idを変更しない"
+        - "context lineageを変更しない"
+        - "Authentication identityをsemantic authorityに変換しない"
+
+  external_ai_adapter:
+    status: "merged"
+    pr: 519
+    merge_commit: "0caa51b60fd6bb25d517826c0fdb2fb95b273bb9"
+    provider:
+      type: "OpenAI"
+      interface: "Responses API"
+      role: "External Backend"
+    architecture:
+      core_runtime:
+        provider_specific_code: false
+      adapter:
+        role: "Provider request/response translation"
+        location: "Runtime Core外部"
+      path:
+        - "SemanticHandoff"
+        - "OpenAI Adapter"
+        - "OpenAI"
+        - "BackendResponse"
+        - "EvidenceRecord"
+    invariants:
+      - "Provider output is observed data"
+      - "Provider output becomes Evidence"
+      - "Provider output does not become Decision"
+      - "request_id is preserved"
+      - "context lineage is preserved"
+      - "HumanGate is not bypassed"
+      - "No implicit context retrieval"
+      - "API authentication remains separate from semantic authority"
+    testing:
+      deterministic_tests: true
+      live_api_in_ci: false
+      api_key_in_repository: false
+
+  live_smoke_test:
+    status: "pending"
+    issue: 520
+    objective: >
+      実APIキーを用いた単一の制御された呼び出しを行い、
+      外部AIの出力がBackendResponseを経てEvidenceRecordとして
+      白神Runtimeへ戻ることを実証する。
+    required_path:
+      - "Authenticated API Request"
+      - "SemanticHandoff"
+      - "OpenAI Adapter"
+      - "External Model"
+      - "BackendResponse"
+      - "EvidenceRecord"
+    credential_policy:
+      source: "runtime environment"
+      repository_storage: false
+      chat_storage: false
+      ci_live_call: false
+    success_condition:
+      - "実API呼び出し成功"
+      - "BackendResponse生成"
+      - "EvidenceRecord生成"
+      - "request_id保持"
+      - "Evidence lineage確認"
+      - "Runtime semantic boundary不変"
+    failure_condition:
+      behavior:
+        - "失敗をEvidenceとして捕捉可能にする"
+        - "原因分析"
+        - "修正"
+        - "再検証"
+      semantic_change_allowed: false
+
+  current_architecture:
+    diagram: |
+      Client
+        ↓
+      API Key Authentication
+        ↓
+      SemanticHandoff
+        ↓
+      Context Routing
+        ↓
+      Evidence Resolver / Context Bundle
+        ↓
+      Shirakami Runtime
+        ↓
+      Backend Contract
+        ↓
+      External AI Adapter
+        ↓
+      OpenAI
+        ↓
+      BackendResponse
+        ↓
+      EvidenceRecord
+        ↓
+      Evolution Loop
+
+  provider_independence:
+    principle: >
+      白神Runtime CoreはAI Providerを知らない。
+      ProviderはBackend Contractに適合するAdapterとして外側から接続する。
+    future_backends:
+      - "OpenAI"
+      - "Local LLM"
+      - "Other External AI"
+      - "Other Backend"
+
+  verification:
+    completed:
+      - "Runtime β0.1 Verification"
+      - "R0024"
+      - "R0025"
+      - "R0026"
+      - "R0027"
+      - "R0028"
+      - "OPPAI Runtime"
+      - "Context Lineage E2E"
+      - "API Key Authentication deterministic tests"
+      - "External AI Adapter deterministic tests"
+    pending:
+      - "実API Live Smoke Test"
+      - "External AI → BackendResponse → Evidence E2E"
+      - "Live call後のEvidence lineage確認"
+
+  git_state:
+    repository: "bxa05221-ux/shirakami-OS"
+    important_prs:
+      - number: 511
+        role: "Context Bundle / API Context Admission"
+        status: "merged"
+      - number: 512
+        role: "Context Lineage E2E"
+        status: "merged"
+      - number: 513
+        role: "API v0.1 Freeze"
+        status: "merged"
+      - number: 516
+        role: "API Key Authentication Boundary"
+        status: "merged"
+      - number: 519
+        role: "External AI Backend Adapter"
+        status: "merged"
+    next_issue:
+      number: 520
+      role: "Live External AI Smoke Test"
+      status: "open"
+
+  next_action:
+    immediate:
+      - "ユーザー環境でAPIキーをruntime environmentへ設定"
+      - "Issue #520のcontrolled live smoke testを実行"
+      - "request_idを取得"
+      - "BackendResponseを確認"
+      - "EvidenceRecordを確認"
+      - "lineageを確認"
+    after_success:
+      - "Live E2E Evidenceを保存"
+      - "実AI接続をEvidenceとして記録"
+      - "API v0.1 External AI接続実証完了"
+      - "次段階として複数Backend / Renderer / Clientを検討"
+
+  handoff_rule:
+    statement: >
+      次回作業はこのYAMLを起点とし、
+      API v0.1 Freeze以前の研究・実装経緯を再構築することなく、
+      live smoke test pending地点から再開する。
