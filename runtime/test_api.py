@@ -299,3 +299,34 @@ def test_serialized_model_output_matches_retrieved_evidence() -> None:
     evidence = api.get_evidence(result["evidence_ids"][0])
     assert evidence is not None
     assert result["model_output"] == evidence["model_output"] == model_output
+
+
+def test_real_model_adapter_output_crosses_api_to_evidence_trace_and_witness() -> None:
+    from runtime.real_model_adapter import RealModelAdapter, fixture_transport
+
+    api = _ready_api()
+    adapter = RealModelAdapter(fixture_transport)
+
+    result = api.execute(
+        _protocol,
+        "api.example",
+        {"text": "provider-neutral real model boundary"},
+        handoff_id="SH-HO-REAL-MODEL-001",
+        trace_id="TRACE-REAL-MODEL-001",
+        ai_adapter=adapter,
+    )
+
+    evidence_id = result["evidence_ids"][0]
+    evidence = api.get_evidence(evidence_id)
+    trace = api.get_trace(result["trace_id"])
+    witness = api.get_witness(result["trace_id"])
+
+    assert result["model_output"]["provider"] == "fixture"
+    assert evidence is not None
+    assert evidence["model_output"] == result["model_output"]
+    assert trace is not None
+    assert trace["evidence_ids"] == [evidence_id]
+    assert witness is not None
+    assert witness["evidence_ids"] == [evidence_id]
+    assert result["execution_authorized"] is False
+    assert result["human_gate_required"] is True
