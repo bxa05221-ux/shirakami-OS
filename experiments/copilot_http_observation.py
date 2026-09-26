@@ -13,6 +13,8 @@ import os
 from fastapi.testclient import TestClient
 
 from api.http import ShirakamiHTTPTransport
+from runtime.api import ShirakamiAPI
+from runtime.evolution_bridge import ContextSnapshot
 from runtime.prototype import Transition
 
 API_KEY = "local-observation-key"
@@ -29,7 +31,10 @@ def protocol(context):
 
 
 def observe_output(content: str, provider: str) -> None:
-    transport = ShirakamiHTTPTransport(
+    api = ShirakamiAPI()
+    api.observe({"signal": "execute"}, ContextSnapshot(protocol_id=PROTOCOL_ID, landscape={}, metadata={"source": "copilot-observation"}))
+    api.analyze(PROTOCOL_ID, protocol_exists=True)
+    transport = ShirakamiHTTPTransport(api=api,
         protocol_registry={PROTOCOL_ID: protocol},
         api_key=API_KEY,
         model_adapter=lambda _prompt, _protocol_id: {
