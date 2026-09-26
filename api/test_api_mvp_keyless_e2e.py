@@ -81,3 +81,37 @@ def test_keyless_provider_neutral_api_executes_and_preserves_evidence_boundary()
     assert execution.json()["evidence_ids"] == [evidence_id]
     assert evidence.json()["evidence_id"] == evidence_id
     assert traceability.json()["valid"] is True
+
+
+def test_keyless_api_requires_authentication():
+    client = TestClient(
+        create_app(
+            protocol_registry={"fixture.echo": echo_protocol},
+            api_key=API_KEY,
+        )
+    )
+
+    response = client.post(
+        "/v1/execute",
+        json={
+            "protocol_id": "fixture.echo",
+            "input_data": {"message": "unauthenticated"},
+            "handoff_id": "SH-HO-AUTH-001",
+            "trace_id": "TRACE-AUTH-001",
+            "evidence_ids": [],
+            "boundary_context": {
+                "handoff_id": "SH-HO-AUTH-001",
+                "project": "Shirakami API MVP",
+                "objective": "Verify API authentication boundary",
+                "protocol_ids": ["fixture.echo"],
+                "evidence_ids": [],
+                "verification_scope": ["authentication"],
+                "execution_authorized": False,
+                "publish_authorized": False,
+                "merge_authorized": False,
+                "human_gate_required": True,
+            },
+        },
+    )
+
+    assert response.status_code in (401, 403)
