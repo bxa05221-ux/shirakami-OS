@@ -56,3 +56,11 @@ The current Runtime intentionally stops before provider-specific AI invocation. 
 ## MVP status
 
 The MVP is an implementation proof, not a claim that the complete Shirakami architecture is finished.
+
+## API MVP verification boundary
+
+The Runtime also exposes a provider-neutral API/Model Adapter boundary. The current implementation verifies the HTTP → RealModelAdapter → Runtime → Evidence / Trace path without requiring an external provider credential.
+
+This does **not** mean the fixed API MVP denominator is complete. Under the project's fixed ten-item definition, items 9–10 remain pending until an external AI provider is actually executed through the HTTP path and the resulting model output is verified through Evidence / Trace.
+
+See [API MVP Verification Status](../api/API_MVP_VERIFICATION_STATUS.md).
