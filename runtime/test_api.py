@@ -265,7 +265,7 @@ def test_model_output_changes_evidence_id() -> None:
         {"output": "response-b"},
     ]
     results = [
-        _ready_api().execute(_protocol, "api.example", {"text": "same observation"}, ai_adapter=lambda _p, _i, value=value: value)
+        _ready_api().execute(_protocol, "api.example", {"text": "same observation"}, handoff_id="SH-HO-EVIDENCE-ID", ai_adapter=lambda _p, _i, value=value: value)
         for value in outputs
     ]
     assert results[0]["evidence_ids"][0] != results[1]["evidence_ids"][0]
@@ -278,6 +278,7 @@ def test_same_model_output_is_deterministically_bound_to_evidence_id() -> None:
             _protocol,
             "api.example",
             {"text": "same observation"},
+            handoff_id="SH-HO-EVIDENCE-DETERMINISTIC",
             ai_adapter=lambda _p, _i: {"output": "same-response"},
         )
         return result["evidence_ids"][0]
@@ -292,6 +293,7 @@ def test_serialized_model_output_matches_retrieved_evidence() -> None:
         _protocol,
         "api.example",
         {"text": "serialization"},
+        handoff_id="SH-HO-EVIDENCE-SERIALIZATION",
         ai_adapter=lambda _p, _i: model_output,
     )
     evidence = api.get_evidence(result["evidence_ids"][0])
