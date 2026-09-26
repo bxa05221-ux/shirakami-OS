@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
 from api.http import create_app
-from runtime.prototype import Transition
+from runtime.api import Transition
 
 
 API_KEY = "test-shirakami-key"
@@ -139,3 +139,4 @@ def test_keyless_api_requires_authentication():
     )
 
     assert response.status_code in (401, 403)
+}
