@@ -65,7 +65,7 @@ class ShirakamiAPI:
         accepted = self.runtime.approve(approved=approved, reviewer=reviewer)
         return {"accepted": accepted, "state": self.runtime.loop.state.value}
     def execute(self, protocol: Callable[[Any], Transition], protocol_id: str, input_data: Mapping[str, Any] | None = None, *, handoff_id: str | None = None, trace_id: str | None = None, evidence_ids: tuple[str, ...] = (), project: str | None = None, objective: str | None = None, protocol_ids: tuple[str, ...] = (), verification_scope: tuple[Any, ...] = ()) -> dict[str, Any]:
-        result = self.runtime.execute(protocol, protocol_id, input_data)
+        result = self.runtime.execute(protocol_id, protocol, input_data)
         evidence = self._evidence_for_protocol(protocol_id)[-1:]
         payload = {"status": result.status, "protocol_id": result.protocol_id, "transition": {"kind": result.transition.kind, "data": dict(result.transition.data)}, "signals": list(result.signals), "steps": result.steps, "evidence": evidence, "handoff_id": handoff_id, "trace_id": trace_id, "evidence_ids": list(evidence_ids), "project": project, "objective": objective, "protocol_ids": list(protocol_ids), "verification_scope": list(verification_scope), "execution_authorized": False, "publish_authorized": False, "merge_authorized": False, "human_gate_required": True}
         provisional_trace_id = trace_id or f"TRACE-{uuid4()}"
