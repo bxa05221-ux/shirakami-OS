@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from aiwitness.witness import AIwitness, WitnessRecord
 from .agent_activity import AgentActivity
 from .agent_activity_evidence import AgentActivityEvidencePromoter, EvidencePromotion
 from .agent_activity_verification import ActivityVerification
-from .aiwitness.witness import AIwitness, WitnessRecord
 from .evidence_store import EvidenceStore
 from .trace import ExecutionTraceStore
 
@@ -56,14 +56,22 @@ class AgentActivityEvidenceCloser:
                 "evidence_id": record.evidence_id,
                 "activity_id": activity.activity_id,
                 "human_gate_confirmed": True,
+                "external_verification_status": verification.status,
             },
         )
         if updated is None:
             raise ValueError("trace disappeared during evidence attachment")
 
-        witness = AIwitness.observe(updated)
+        # AIwitness has a finite verification vocabulary. "verified" is the
+        # activity-level state; "pass" is the trace/witness verification state.
+        verified_trace = updated.with_verification(
+            status="pass",
+            uncertainty=verification.uncertainty,
+            observed=updated.verification_observed,
+        )
+        witness = AIwitness.observe(verified_trace)
         return AgentActivityEvidenceClosure(
             promotion=promotion,
-            trace_id=updated.trace_id,
+            trace_id=verified_trace.trace_id,
             witness=witness,
         )
