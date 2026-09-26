@@ -98,9 +98,19 @@ def observe_output(content: str, provider: str) -> None:
     witness.raise_for_status()
     traceability.raise_for_status()
 
-    stored_output = evidence.json().get("model_output")
+    evidence_body = evidence.json()
+    trace_body = trace.json()
+    witness_body = witness.json()
+    traceability_body = traceability.json()
+    stored_output = evidence_body.get("model_output")
     if stored_output != {"output": content, "provider": provider}:
         raise AssertionError("provider output was not preserved exactly in Evidence")
+    if trace_body.get("evidence_ids") != [evidence_id]:
+        raise AssertionError("Trace does not reference the stored Evidence ID")
+    if witness_body.get("evidence_ids") != [evidence_id]:
+        raise AssertionError("AIwitness does not reference the stored Evidence ID")
+    if traceability_body.get("valid") is not True:
+        raise AssertionError("traceability validation did not succeed")
 
     if body["execution_authorized"] is not False:
         raise AssertionError("execution authority boundary changed")
