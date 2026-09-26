@@ -1,6 +1,6 @@
 """Minimal immutable Evidence boundary for Runtime β0.1."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Any, Mapping
 
@@ -20,21 +20,36 @@ class EvidenceRecord:
     transition_data: Mapping[str, Any]
     signals: tuple[str, ...]
     confidence: str = "observed"
-    model_output: Any | None = None
+    _model_output: Any | None = field(default=None, init=False, repr=False)
+
+    @property
+    def model_output(self) -> Any | None:
+        """Return model output without changing the public record constructor shape."""
+        return self._model_output
 
     @classmethod
-    def from_result(cls, result: ExecutionResult, *, model_output: Any | None = None) -> "EvidenceRecord":
-        return cls(
+    def from_result(
+        cls,
+        result: ExecutionResult,
+        *,
+        model_output: Any | None = None,
+    ) -> "EvidenceRecord":
+        record = cls(
             protocol_id=result.protocol_id,
             status=result.status,
             transition_kind=result.transition.kind,
             transition_data=MappingProxyType(dict(result.transition.data)),
             signals=tuple(result.signals),
-            model_output=model_output,
         )
+        object.__setattr__(record, "_model_output", model_output)
+        return record
 
 
-def capture_evidence(result: ExecutionResult, *, model_output: Any | None = None) -> EvidenceRecord:
+def capture_evidence(
+    result: ExecutionResult,
+    *,
+    model_output: Any | None = None,
+) -> EvidenceRecord:
     return EvidenceRecord.from_result(result, model_output=model_output)
 
 
