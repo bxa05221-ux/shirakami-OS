@@ -23,11 +23,14 @@ jobs:
         run: python -c "from runtime.copilot_sdk_transport import CopilotSDKProviderTransport; print('provider transport import: ok')"
       - name: Verify structural async boundary
         run: python -m pytest -q api/test_http_async_provider_boundary.py
-      - name: Real provider observation
-        if: ${{ secrets.COPILOT_GITHUB_TOKEN != '' }}
+      - name: Live provider gate
+        run: |
+          if [ -z "$COPILOT_GITHUB_TOKEN" ]; then
+            echo "Live Copilot observation not enabled; no provider credential is configured."
+            echo "This is intentional. Structural verification remains active."
+            exit 0
+          fi
+          echo "A live provider credential is configured; execute the dedicated live observation harness before claiming MVP verification."
+          exit 1
         env:
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
-        run: python experiments/copilot_provider_observation.py
-      - name: Explain skipped live observation
-        if: ${{ secrets.COPILOT_GITHUB_TOKEN == '' }}
-        run: echo "Live Copilot observation skipped: COPILOT_GITHUB_TOKEN is not configured. Structural verification still ran."
