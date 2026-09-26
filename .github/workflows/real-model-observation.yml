@@ -2,9 +2,16 @@ name: Real model observation
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - experiment/real-model-adapter-001
+    paths:
+      - "runtime/**"
+      - "experiments/**"
+      - ".github/workflows/real-model-observation.yml"
 
 jobs:
-  boundary:
+  provider-boundary:
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: .
@@ -21,18 +28,17 @@ jobs:
           from runtime.real_model_adapter import ModelRequest, RealModelAdapter
           seen = {}
           def fake_transport(request: ModelRequest):
-              seen['request'] = request
-              return {'output': 'fixture-model-output'}
-          result = RealModelAdapter(fake_transport)('Observe this input.', 'fixture.real-model')
-          assert result == {'output': 'fixture-model-output'}
-          assert seen['request'].canonical_prompt == 'Observe this input.'
-          assert seen['request'].context == {'protocol_id': 'fixture.real-model'}
-          print('provider boundary: PASS')
+              seen["request"] = request
+              return {"output": "fixture-model-output"}
+          result = RealModelAdapter(fake_transport)("Observe this input.", "fixture.real-model")
+          assert result == {"output": "fixture-model-output"}
+          assert seen["request"].canonical_prompt == "Observe this input."
+          assert seen["request"].context == {"protocol_id": "fixture.real-model"}
+          print("provider boundary: PASS")
           PY
 
   real-model:
-    if: ${{ secrets.OPENAI_API_KEY != '' && secrets.OPENAI_MODEL != '' }}
-    needs: boundary
+    needs: provider-boundary
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: .
@@ -45,5 +51,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Run one-shot real model observation
-        run: python experiments/real_model_observation.py
+      - name: Run real model observation when credentials exist
+        run: |
+          if [ -z "$OPENAI_API_KEY" ] || [ -z "$OPENAI_MODEL" ]; then
+            echo "Real model execution skipped: provider credentials are not configured."
+            exit 0
+          fi
+          python experiments/real_model_observation.py
