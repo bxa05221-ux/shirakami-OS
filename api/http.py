@@ -11,13 +11,11 @@ from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 try:
     from ..runtime.api import ShirakamiAPI
-    from ..runtime.real_model_adapter import RealModelAdapter
     from ..runtime.evolution_bridge import ContextSnapshot
     from .auth import require_api_key
     from .boundary import validate_execution_context
 except ImportError:
     from runtime.api import ShirakamiAPI
-    from runtime.real_model_adapter import RealModelAdapter
     from runtime.evolution_bridge import ContextSnapshot
     from api.auth import require_api_key
     from api.boundary import validate_execution_context
