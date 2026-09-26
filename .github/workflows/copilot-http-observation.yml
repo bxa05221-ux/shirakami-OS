@@ -15,8 +15,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install dependencies
-        run: python -m pip install -r requirements.txt github-copilot-sdk
+      - name: Install runtime dependencies
+        run: python -m pip install fastapi pydantic httpx pytest
       - name: Run live harness in safe mode
         run: python experiments/copilot_http_observation.py
 
@@ -35,8 +35,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install dependencies
-        run: python -m pip install -r requirements.txt github-copilot-sdk
+      - name: Install runtime and provider dependencies
+        run: python -m pip install fastapi pydantic httpx pytest github-copilot-sdk
       - name: Observe real provider through Shirakami
         run: python experiments/copilot_http_observation.py
 
