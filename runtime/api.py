@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from uuid import uuid4
-from typing import Any, Callable, Mapping
+from typing import Any, Awaitable, Callable, Mapping
 
 try:
     from .evolution_bridge import ContextSnapshot, VerificationResult
@@ -80,6 +80,24 @@ class ShirakamiAPI:
         self.witnesses.record(AIwitness.observe(trace))
         payload["trace_id"] = provisional_trace_id
         return {**payload, "execution_id": handle.execution_id, "trace_id": provisional_trace_id}
+    async def execute_async(self, protocol: Callable[[Any], Transition], protocol_id: str, input_data: Mapping[str, Any] | None = None, *, handoff_id: str | None = None, trace_id: str | None = None, evidence_ids: tuple[str, ...] = (), project: str | None = None, objective: str | None = None, protocol_ids: tuple[str, ...] = (), verification_scope: tuple[Any, ...] = (), ai_adapter: Callable[[str, str], Awaitable[Any]] | None = None) -> dict[str, Any]:
+        """Execute after awaiting an external provider, then use the normal Runtime path."""
+        model_output = None
+        if ai_adapter is not None:
+            canonical_input = str((input_data or {}).get("text", (input_data or {}).get("input", "")))
+            model_output = await ai_adapter(canonical_input, protocol_id)
+        result = self.runtime.execute(protocol, protocol_id, input_data, model_output=model_output)
+        evidence = self._evidence_for_protocol(protocol_id)[-1:]
+        payload = {"status": result.status, "protocol_id": result.protocol_id, "transition": {"kind": result.transition.kind, "data": dict(result.transition.data)}, "signals": list(result.signals), "steps": result.steps, "evidence": evidence, "handoff_id": handoff_id, "trace_id": trace_id, "evidence_ids": list(evidence_ids), "project": project, "objective": objective, "protocol_ids": list(protocol_ids), "verification_scope": list(verification_scope), "model_output": model_output, "execution_authorized": False, "publish_authorized": False, "merge_authorized": False, "human_gate_required": True}
+        provisional_trace_id = trace_id or f"TRACE-{uuid4()}"
+        linked_evidence_ids = tuple(item["evidence_id"] for item in evidence) if evidence and not evidence_ids else tuple(evidence_ids)
+        payload["evidence_ids"] = list(linked_evidence_ids)
+        handle = self.executions.create(protocol_id, payload, handoff_id=handoff_id, trace_id=provisional_trace_id, evidence_ids=linked_evidence_ids, project=project, objective=objective, protocol_ids=protocol_ids, verification_scope=verification_scope)
+        trace = self.traces.create(ExecutionTrace(trace_id=provisional_trace_id, execution_id=handle.execution_id, handoff_id=handoff_id, evidence_ids=linked_evidence_ids, project=project, objective=objective, protocol_ids=tuple(protocol_ids), verification_scope=tuple(verification_scope)))
+        self.witnesses.record(AIwitness.observe(trace))
+        payload["trace_id"] = provisional_trace_id
+        return {**payload, "execution_id": handle.execution_id, "trace_id": provisional_trace_id}
+
     def get_execution(self, execution_id: str) -> dict[str, Any] | None:
         handle = self.executions.get(execution_id)
         if handle is None: return None
