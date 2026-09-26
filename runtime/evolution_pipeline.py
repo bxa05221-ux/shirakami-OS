@@ -199,6 +199,7 @@ class EvidenceDrivenRuntime:
         protocol: Callable[[Any], Transition],
         protocol_id: str,
         input_data: Mapping[str, Any] | None = None,
+        model_output: Any | None = None,
     ) -> ExecutionResult:
         if self.loop.state is LoopState.READY:
             gate = self.loop.dispatch(
@@ -214,7 +215,7 @@ class EvidenceDrivenRuntime:
             )
 
         result = self.runtime.execute(protocol_id, protocol, input_data)
-        self.store = self.store.append(capture_evidence(result))
+        self.store = self.store.append(capture_evidence(result, model_output=model_output))
 
         gate = self.loop.dispatch("verify", {"status": result.status})
         if not gate.accepted:

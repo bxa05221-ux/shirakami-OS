@@ -64,10 +64,14 @@ class ShirakamiAPI:
             return {"accepted": False, "state": self.runtime.loop.state.value, "reason": "explicit human authorization required"}
         accepted = self.runtime.approve(approved=approved, reviewer=reviewer)
         return {"accepted": accepted, "state": self.runtime.loop.state.value}
-    def execute(self, protocol: Callable[[Any], Transition], protocol_id: str, input_data: Mapping[str, Any] | None = None, *, handoff_id: str | None = None, trace_id: str | None = None, evidence_ids: tuple[str, ...] = (), project: str | None = None, objective: str | None = None, protocol_ids: tuple[str, ...] = (), verification_scope: tuple[Any, ...] = ()) -> dict[str, Any]:
-        result = self.runtime.execute(protocol, protocol_id, input_data)
+    def execute(self, protocol: Callable[[Any], Transition], protocol_id: str, input_data: Mapping[str, Any] | None = None, *, handoff_id: str | None = None, trace_id: str | None = None, evidence_ids: tuple[str, ...] = (), project: str | None = None, objective: str | None = None, protocol_ids: tuple[str, ...] = (), verification_scope: tuple[Any, ...] = (), ai_adapter: Callable[[str, str], Any] | None = None) -> dict[str, Any]:
+        model_output = None
+        if ai_adapter is not None:
+            canonical_input = str((input_data or {}).get("text", (input_data or {}).get("input", "")))
+            model_output = ai_adapter(canonical_input, protocol_id)
+        result = self.runtime.execute(protocol, protocol_id, input_data, model_output=model_output)
         evidence = self._evidence_for_protocol(protocol_id)[-1:]
-        payload = {"status": result.status, "protocol_id": result.protocol_id, "transition": {"kind": result.transition.kind, "data": dict(result.transition.data)}, "signals": list(result.signals), "steps": result.steps, "evidence": evidence, "handoff_id": handoff_id, "trace_id": trace_id, "evidence_ids": list(evidence_ids), "project": project, "objective": objective, "protocol_ids": list(protocol_ids), "verification_scope": list(verification_scope), "execution_authorized": False, "publish_authorized": False, "merge_authorized": False, "human_gate_required": True}
+        payload = {"status": result.status, "protocol_id": result.protocol_id, "transition": {"kind": result.transition.kind, "data": dict(result.transition.data)}, "signals": list(result.signals), "steps": result.steps, "evidence": evidence, "handoff_id": handoff_id, "trace_id": trace_id, "evidence_ids": list(evidence_ids), "project": project, "objective": objective, "protocol_ids": list(protocol_ids), "verification_scope": list(verification_scope), "model_output": model_output, "execution_authorized": False, "publish_authorized": False, "merge_authorized": False, "human_gate_required": True}
         provisional_trace_id = trace_id or f"TRACE-{uuid4()}"
         linked_evidence_ids = tuple(item["evidence_id"] for item in evidence) if evidence and not evidence_ids else tuple(evidence_ids)
         payload["evidence_ids"] = list(linked_evidence_ids)
@@ -121,4 +125,4 @@ class ShirakamiAPI:
         return [self._serialize_evidence(record) for record in self.runtime.store.by_protocol(protocol_id)]
     @staticmethod
     def _serialize_evidence(record: EvidenceRecord) -> dict[str, Any]:
-        return {"evidence_id": record.evidence_id, "protocol_id": record.protocol_id, "status": record.status, "transition_kind": record.transition_kind, "transition_data": dict(record.transition_data), "signals": list(record.signals), "confidence": record.confidence}
+        return {"evidence_id": record.evidence_id, "protocol_id": record.protocol_id, "status": record.status, "transition_kind": record.transition_kind, "transition_data": dict(record.transition_data), "signals": list(record.signals), "confidence": record.confidence, "model_output": record.model_output}
