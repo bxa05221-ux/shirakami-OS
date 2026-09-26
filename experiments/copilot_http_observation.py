@@ -1,11 +1,12 @@
-"""Minimal live-provider observation harness.
+"""Copilot provider observation harness.
 
-The harness is intentionally small: it obtains one provider response and
-routes that output through the existing Shirakami HTTP execution boundary.
-Credentials are read from the environment and never persisted.
+Fixture mode verifies the Shirakami HTTP -> Runtime -> Evidence -> Trace ->
+AIwitness boundary without credentials. Live mode obtains one real Copilot
+response and routes that opaque output through the same boundary.
 """
 from __future__ import annotations
 
+import argparse
 import asyncio
 import os
 
@@ -27,7 +28,108 @@ def protocol(context):
     )
 
 
+def observe_output(content: str, provider: str) -> None:
+    transport = ShirakamiHTTPTransport(
+        protocol_registry={PROTOCOL_ID: protocol},
+        api_key=API_KEY,
+        model_adapter=lambda _prompt, _protocol_id: {
+            "output": content,
+            "provider": provider,
+        },
+    )
+    http = TestClient(transport.create_app())
+    payload = {
+        "protocol_id": PROTOCOL_ID,
+        "input_data": {
+            "text": "Copilot provider observation",
+            "provider_output": content,
+        },
+        "handoff_id": HANDOFF_ID,
+        "trace_id": TRACE_ID,
+        "evidence_ids": [],
+        "boundary_context": {
+            "handoff_id": HANDOFF_ID,
+            "project": "Shirakami API MVP",
+            "objective": "Observe provider output through the Shirakami evidence boundary",
+            "protocol_ids": [PROTOCOL_ID],
+            "evidence_ids": [],
+            "verification_scope": [
+                "Copilot",
+                "HTTP",
+                "Runtime",
+                "Evidence",
+                "Trace",
+                "AIwitness",
+            ],
+            "execution_authorized": False,
+            "publish_authorized": False,
+            "merge_authorized": False,
+            "human_gate_required": True,
+        },
+    }
+    result = http.post(
+        "/v1/execute",
+        json=payload,
+        headers={"X-API-Key": API_KEY},
+    )
+    result.raise_for_status()
+    body = result.json()
+
+    evidence_id = body["evidence_ids"][0]
+    evidence = http.get(
+        f"/v1/evidence/{evidence_id}",
+        headers={"X-API-Key": API_KEY},
+    )
+    trace = http.get(
+        f"/v1/traces/{TRACE_ID}",
+        headers={"X-API-Key": API_KEY},
+    )
+    witness = http.get(
+        f"/v1/witnesses/{TRACE_ID}",
+        headers={"X-API-Key": API_KEY},
+    )
+    traceability = http.get(
+        f"/v1/traceability/{TRACE_ID}",
+        headers={"X-API-Key": API_KEY},
+    )
+
+    evidence.raise_for_status()
+    trace.raise_for_status()
+    witness.raise_for_status()
+    traceability.raise_for_status()
+
+    stored_output = evidence.json().get("model_output")
+    if stored_output != {"output": content, "provider": provider}:
+        raise AssertionError("provider output was not preserved exactly in Evidence")
+
+    if body["execution_authorized"] is not False:
+        raise AssertionError("execution authority boundary changed")
+    if body["human_gate_required"] is not True:
+        raise AssertionError("Human Gate boundary changed")
+
+    print("BOUNDARY_OBSERVED=true")
+    print(f"PROVIDER={provider}")
+    print(f"EVIDENCE_ID={evidence_id}")
+    print(f"TRACE_ID={body['trace_id']}")
+    print(f"EVIDENCE_STATUS={evidence.status_code}")
+    print(f"TRACE_STATUS={trace.status_code}")
+    print(f"WITNESS_STATUS={witness.status_code}")
+    print(f"TRACEABILITY_STATUS={traceability.status_code}")
+    print("AUTHORITY=human_gate_required")
+
+
 async def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--fixture", action="store_true")
+    args = parser.parse_args()
+
+    if args.fixture:
+        observe_output(
+            "SHIRAKAMI_FIXTURE_PROVIDER_OBSERVATION",
+            "fixture",
+        )
+        return
+
     token = os.getenv("COPILOT_GITHUB_TOKEN") or os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN")
     if not token:
         print("LIVE_PROVIDER_OBSERVED=false")
@@ -47,72 +149,8 @@ async def main() -> None:
             content = getattr(getattr(response, "data", None), "content", None)
             if content is None:
                 raise RuntimeError("Copilot SDK returned no assistant content")
-
-            transport = ShirakamiHTTPTransport(
-                protocol_registry={PROTOCOL_ID: protocol},
-                api_key=API_KEY,
-                model_adapter=lambda _prompt, _protocol_id: {
-                    "output": content,
-                    "provider": "github-copilot-sdk",
-                },
-            )
-            http = TestClient(transport.create_app())
-            payload = {
-                "protocol_id": PROTOCOL_ID,
-                "input_data": {
-                    "text": "live copilot observation",
-                    "provider_output": content,
-                },
-                "handoff_id": HANDOFF_ID,
-                "trace_id": TRACE_ID,
-                "evidence_ids": [],
-                "boundary_context": {
-                    "handoff_id": HANDOFF_ID,
-                    "project": "Shirakami API MVP",
-                    "objective": "Observe real Copilot output through the Shirakami evidence boundary",
-                    "protocol_ids": [PROTOCOL_ID],
-                    "evidence_ids": [],
-                    "verification_scope": [
-                        "Copilot",
-                        "HTTP",
-                        "Runtime",
-                        "Evidence",
-                        "Trace",
-                        "AIwitness",
-                    ],
-                    "execution_authorized": False,
-                    "publish_authorized": False,
-                    "merge_authorized": False,
-                    "human_gate_required": True,
-                },
-            }
-            result = http.post(
-                "/v1/execute",
-                json=payload,
-                headers={"X-API-Key": API_KEY},
-            )
-            result.raise_for_status()
-            body = result.json()
-            evidence_id = body["evidence_ids"][0]
-            evidence = http.get(
-                f"/v1/evidence/{evidence_id}",
-                headers={"X-API-Key": API_KEY},
-            )
-            trace = http.get(
-                f"/v1/traces/{TRACE_ID}",
-                headers={"X-API-Key": API_KEY},
-            )
-            witness = http.get(
-                f"/v1/witnesses/{TRACE_ID}",
-                headers={"X-API-Key": API_KEY},
-            )
+            observe_output(content, "github-copilot-sdk")
             print("LIVE_PROVIDER_OBSERVED=true")
-            print(f"EVIDENCE_ID={evidence_id}")
-            print(f"TRACE_ID={body['trace_id']}")
-            print(f"EVIDENCE_STATUS={evidence.status_code}")
-            print(f"TRACE_STATUS={trace.status_code}")
-            print(f"WITNESS_STATUS={witness.status_code}")
-            print("AUTHORITY=human_gate_required")
         finally:
             await session.destroy()
     finally:
