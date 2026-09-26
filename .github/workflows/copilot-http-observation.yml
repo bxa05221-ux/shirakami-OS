@@ -1,0 +1,36 @@
+name: Copilot HTTP observation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/copilot-provider-observation-live6
+
+jobs:
+  observation:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      PYTHONPATH: .
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/copilot-provider-observation-live6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime dependencies
+        run: python -m pip install --upgrade pip fastapi pydantic httpx pytest pyyaml
+      - name: Verify provider-neutral HTTP boundary
+        run: python experiments/copilot_http_observation.py --fixture
+      - name: Install Copilot SDK
+        if: ${{ env.COPILOT_GITHUB_TOKEN != '' }}
+        run: python -m pip install --upgrade github-copilot-sdk
+      - name: Observe real provider through Shirakami
+        if: ${{ env.COPILOT_GITHUB_TOKEN != '' }}
+        run: python experiments/copilot_http_observation.py
+      - name: Record intentional live skip
+        if: ${{ env.COPILOT_GITHUB_TOKEN == '' }}
+        run: echo "Live provider skipped intentionally; COPILOT_GITHUB_TOKEN is not configured."
