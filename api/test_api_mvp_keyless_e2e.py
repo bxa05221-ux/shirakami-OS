@@ -10,7 +10,7 @@ API_KEY = "test-shirakami-key"
 def echo_protocol(input_data):
     return Transition(
         kind="api.mvp.fixture",
-        data={"output": dict(input_data or {})},
+        data={"output": dict(input_data.input)},
     )
 
 
