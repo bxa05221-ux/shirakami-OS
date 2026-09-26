@@ -62,13 +62,15 @@ class AgentActivityEvidenceCloser:
         if updated is None:
             raise ValueError("trace disappeared during evidence attachment")
 
-        # AIwitness has a finite verification vocabulary. "verified" is the
-        # activity-level state; "pass" is the trace/witness verification state.
-        verified_trace = updated.with_verification(
+        verified_trace = self.traces.attach_verification(
+            trace_id,
             status="pass",
             uncertainty=verification.uncertainty,
             observed=updated.verification_observed,
         )
+        if verified_trace is None:
+            raise ValueError("trace disappeared during verification attachment")
+
         witness = AIwitness.observe(verified_trace)
         return AgentActivityEvidenceClosure(
             promotion=promotion,
