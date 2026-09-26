@@ -1,0 +1,97 @@
+matome:
+  title: "CLP-R2R-01 Runtime Minimum Semantic Schema"
+  codename: "R2R-SCHEMA-01"
+  version: "0.1"
+  status: "Research-defined / Implementation Candidate"
+
+  basis:
+    handoff: "CLP-R2R-01"
+    evidence_runtime: "runtime/evidence.py"
+    context_lineage: "runtime/context_bundle.py"
+    api_boundary: "docs/research/api-semantic-handoff-boundary-v0.1.yaml"
+
+  finding:
+    evidence: >
+      EvidenceRecord already exists as an immutable Runtime record with a stable
+      evidence_id derived from canonical content. Existing ContextBundle also
+      preserves selected evidence_ids and request lineage.
+    interpretation: >
+      No canonical InterpretationRecord was found in the current repository search.
+      This is therefore an implementation gap, not permission to alter EvidenceRecord.
+    decision: >
+      No canonical DecisionRecord was found in the current repository search.
+      Human authority must remain separate from Observation and Evidence.
+
+  minimum_model:
+    EvidenceRecord:
+      identity: "stable evidence_id"
+      authority: "observation reference"
+      mutable: false
+      existing: true
+
+    InterpretationRecord:
+      identity: "stable interpretation_id"
+      actor_id: "required"
+      source_evidence_ids: "evidence_id[]"
+      content: "opaque semantic payload"
+      status: "proposed | accepted | rejected | superseded"
+      created_at: "required"
+      existing: false
+      implementation_candidate: true
+
+    DecisionRecord:
+      identity: "stable decision_id"
+      actor_id: "human actor identity"
+      target_interpretation_ids: "interpretation_id[]"
+      decision: "opaque human decision payload"
+      created_at: "required"
+      supersedes: "optional decision_id"
+      existing: false
+      implementation_candidate: true
+
+    Actor:
+      identity: "stable actor_id"
+      kind: "human | ai | humanoid | system | renderer"
+      membership: "temporal property"
+      authority: "not implied by presence"
+      implementation_candidate: true
+
+    Lineage:
+      evidence_ids: "evidence_id[]"
+      interpretation_ids: "interpretation_id[]"
+      decision_ids: "decision_id[]"
+      actor_ids: "actor_id[]"
+      implementation_candidate: true
+
+  invariants:
+    - "EvidenceRecord remains immutable."
+    - "Interpretation never becomes Evidence by serialization or storage alone."
+    - "Decision is not inferred from Interpretation."
+    - "Actor presence does not imply authority."
+    - "Human Gate is not created by /observe."
+    - "Stable identities are never silently reassigned."
+    - "API transport does not manufacture semantic authority."
+    - "New semantic meaning not covered by this schema becomes an Implementation Finding."
+
+  implementation_order:
+    - "formalize InterpretationRecord without changing EvidenceRecord"
+    - "formalize Actor identity"
+    - "formalize DecisionRecord and lineage"
+    - "connect ApprovalEnvelope at Human Gate boundary"
+    - "connect SemanticHandoff"
+    - "extend API only after Runtime schema verification"
+
+  verification:
+    required:
+      - "existing Evidence tests remain green"
+      - "Interpretation can reference Evidence without mutating it"
+      - "Decision can reference Interpretation without being inferred"
+      - "Actor identity remains attributable across records"
+      - "lineage is reconstructable"
+      - "Human Gate remains outside observational API semantics"
+    rule: "one change / one verification"
+
+  boundary:
+    research_only: true
+    runtime_change_in_this_artifact: false
+    api_change_in_this_artifact: false
