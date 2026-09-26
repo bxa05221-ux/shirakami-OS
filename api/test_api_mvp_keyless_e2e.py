@@ -42,6 +42,30 @@ def test_keyless_provider_neutral_api_executes_and_preserves_evidence_boundary()
         },
     }
 
+    observe = client.post(
+        "/v1/observe",
+        json={
+            "observation": {"message": "keyless API MVP"},
+            "context": {
+                "protocol_id": "fixture.echo",
+                "landscape": {},
+                "metadata": {"source": "api-mvp-keyless-e2e"},
+            },
+            "handoff_id": "SH-HO-API-MVP-001",
+            "trace_id": "TRACE-API-MVP-001",
+            "evidence_ids": [],
+        },
+        headers={"X-API-Key": API_KEY},
+    )
+    assert observe.status_code == 200
+
+    analyze = client.post(
+        "/v1/analyze",
+        json={"protocol_id": "fixture.echo", "protocol_exists": True},
+        headers={"X-API-Key": API_KEY},
+    )
+    assert analyze.status_code == 200
+
     response = client.post(
         "/v1/execute",
         json=payload,
