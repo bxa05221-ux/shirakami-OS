@@ -140,4 +140,14 @@ The API is successful when the caller can think and speak naturally while the Ru
 
 ## 11. Implementation status
 
+The implementation is currently verified through the provider-neutral Model Adapter boundary.
+
+The fixed API MVP denominator contains ten items. Items 1–8 are verified. Items 9–10 have a verified provider-neutral boundary using a deterministic fixture transport, but are **not counted as complete until an external AI provider is actually executed through the HTTP path and its output is verified through Runtime → Evidence / Trace**.
+
+See [API MVP Verification Status](API_MVP_VERIFICATION_STATUS.md).
+
+Provider selection, credentials, billing, and production transport remain separate integration decisions and are not required to preserve the Runtime/Evidence/Human Gate contract.
+
+
+
 This specification is intended to be implemented against the existing Shirakami Runtime and Model Adapter boundary. It is deliberately minimal so that real usage can determine which additional contracts are actually necessary.
