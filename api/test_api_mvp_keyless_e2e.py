@@ -74,7 +74,7 @@ def test_keyless_provider_neutral_api_executes_and_preserves_evidence_boundary()
 
     assert response.status_code == 200
     body = response.json()
-    assert body["status"] == "completed"
+    assert body["status"] == "completed", body
     assert body["execution_authorized"] is False
     assert body["publish_authorized"] is False
     assert body["merge_authorized"] is False
