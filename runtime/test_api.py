@@ -260,13 +260,12 @@ def test_real_model_output_is_bound_to_evidence_trace_and_aiwitness() -> None:
 
 
 def test_model_output_changes_evidence_id() -> None:
-    api = _ready_api()
     outputs = [
         {"output": "response-a"},
         {"output": "response-b"},
     ]
     results = [
-        api.execute(_protocol, "api.example", {"text": "same observation"}, ai_adapter=lambda _p, _i, value=value: value)
+        _ready_api().execute(_protocol, "api.example", {"text": "same observation"}, ai_adapter=lambda _p, _i, value=value: value)
         for value in outputs
     ]
     assert results[0]["evidence_ids"][0] != results[1]["evidence_ids"][0]
