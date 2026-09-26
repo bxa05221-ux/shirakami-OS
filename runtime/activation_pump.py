@@ -56,8 +56,11 @@ def activate(
         transition,
         input_value=request.input,
     )
-    evidence = capture_evidence(runtime_execution.result)
     ai_output = ai_adapter(prepared.input_for_runtime, request.protocol_id)
+    evidence = capture_evidence(
+        runtime_execution.result,
+        model_output=ai_output,
+    )
     return ActivationResult(
         protocol_id=request.protocol_id,
         protocol_version=request.version,
