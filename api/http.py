@@ -11,11 +11,13 @@ from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 try:
     from ..runtime.api import ShirakamiAPI
+    from ..runtime.real_model_adapter import RealModelAdapter
     from ..runtime.evolution_bridge import ContextSnapshot
     from .auth import require_api_key
     from .boundary import validate_execution_context
 except ImportError:
     from runtime.api import ShirakamiAPI
+    from runtime.real_model_adapter import RealModelAdapter
     from runtime.evolution_bridge import ContextSnapshot
     from api.auth import require_api_key
     from api.boundary import validate_execution_context
@@ -75,8 +77,8 @@ class VerifyInput(BaseModel):
     diff_ref: str = ""
 
 class ShirakamiHTTPTransport:
-    def __init__(self, api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None) -> None:
-        self.api = api or ShirakamiAPI(); self.protocol_registry = dict(protocol_registry or {}); self.api_key = api_key; self.reviewer_bundles: dict[str, ReviewerBundle] = {}
+    def __init__(self, api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None, model_adapter: Callable[[str, str], Any] | None = None) -> None:
+        self.api = api or ShirakamiAPI(); self.protocol_registry = dict(protocol_registry or {}); self.api_key = api_key; self.model_adapter = model_adapter; self.reviewer_bundles: dict[str, ReviewerBundle] = {}
     def create_app(self) -> FastAPI:
         app = FastAPI(title="Shirakami UI for AI API", version="alpha-0.1"); auth = require_api_key(self.api_key)
         @app.get("/health")
@@ -130,7 +132,7 @@ class ShirakamiHTTPTransport:
             if payload.protocol_id not in boundary["protocol_ids"]: raise HTTPException(status_code=422, detail="protocol_id is not declared by boundary context")
             protocol = self.protocol_registry.get(payload.protocol_id)
             if protocol is None: raise HTTPException(status_code=404, detail="protocol is not registered for HTTP execution")
-            return self.api.execute(protocol, payload.protocol_id, payload.input_data, handoff_id=payload.handoff_id, trace_id=payload.trace_id, evidence_ids=tuple(payload.evidence_ids), project=boundary["project"], objective=boundary["objective"], protocol_ids=tuple(boundary["protocol_ids"]), verification_scope=tuple(boundary["verification_scope"]))
+            return self.api.execute(protocol, payload.protocol_id, payload.input_data, handoff_id=payload.handoff_id, trace_id=payload.trace_id, evidence_ids=tuple(payload.evidence_ids), project=boundary["project"], objective=boundary["objective"], protocol_ids=tuple(boundary["protocol_ids"]), verification_scope=tuple(boundary["verification_scope"]), ai_adapter=self.model_adapter)
         @app.post("/v1/reviews/register", dependencies=[Depends(auth)])
         def register_reviewer_http(payload: ReviewerRegistrationInput) -> dict[str, Any]:
             bundle = self.reviewer_bundles.setdefault(payload.project_id, ReviewerBundle(project_id=payload.project_id))
@@ -251,5 +253,5 @@ class ShirakamiHTTPTransport:
             return result
         return app
 
-def create_app(api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None) -> FastAPI:
-    return ShirakamiHTTPTransport(api, protocol_registry, api_key).create_app()
+def create_app(api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None, model_adapter: Callable[[str, str], Any] | None = None) -> FastAPI:
+    return ShirakamiHTTPTransport(api, protocol_registry, api_key, model_adapter).create_app()
