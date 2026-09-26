@@ -1,3 +1,4 @@
+from runtime.provider_transport import ProviderRequest
 from runtime.real_model_adapter import RealModelAdapter, fixture_transport
 
 
@@ -26,3 +27,17 @@ def test_real_model_adapter_is_replaceable_without_runtime_semantics():
     assert output == {"output": "provider-result"}
     assert seen[0].canonical_prompt == "canonical prompt"
     assert seen[0].context == {"protocol_id": "protocol.example"}
+
+
+def test_real_model_adapter_uses_provider_request_contract():
+    seen = []
+
+    def transport(request):
+        seen.append(request)
+        return {"opaque": "provider-output"}
+
+    adapter = RealModelAdapter(transport)
+    output = adapter("canonical", "protocol.contract")
+
+    assert output == {"opaque": "provider-output"}
+    assert isinstance(seen[0], ProviderRequest)
