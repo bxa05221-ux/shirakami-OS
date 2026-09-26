@@ -139,4 +139,3 @@ def test_keyless_api_requires_authentication():
     )
 
     assert response.status_code in (401, 403)
-}
