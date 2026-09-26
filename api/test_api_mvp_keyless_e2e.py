@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
 from api.http import create_app
-from runtime.api import Transition
+from runtime.prototype import Transition
 
 
 API_KEY = "test-shirakami-key"
