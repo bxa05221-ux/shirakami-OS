@@ -15,11 +15,11 @@ try:
     from ..aiwitness.store import WitnessStore
     from ..aiwitness.witness import AIwitness
 except ImportError:
-    from evolution_bridge import ContextSnapshot, VerificationResult
-    from evolution_pipeline import AnalysisResult, EvidenceDrivenRuntime
-    from prototype import ExecutionResult, Transition
-    from trace import ExecutionTrace, ExecutionTraceStore
-    from evidence import EvidenceRecord
+    from runtime.evolution_bridge import ContextSnapshot, VerificationResult
+    from runtime.evolution_pipeline import AnalysisResult, EvidenceDrivenRuntime
+    from runtime.prototype import ExecutionResult, Transition
+    from runtime.trace import ExecutionTrace, ExecutionTraceStore
+    from runtime.evidence import EvidenceRecord
     from aiwitness.store import WitnessStore
     from aiwitness.witness import AIwitness
 

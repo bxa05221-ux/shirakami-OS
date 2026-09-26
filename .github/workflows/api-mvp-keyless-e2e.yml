@@ -1,0 +1,26 @@
+name: API MVP Keyless E2E
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - feat/api-mvp-keyless-e2e
+    paths:
+      - "api/**"
+      - "runtime/**"
+      - "aiwitness/**"
+      - ".github/workflows/api-mvp-keyless-e2e.yml"
+
+jobs:
+  keyless-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        run: python -m pip install --upgrade pip fastapi pytest httpx pyyaml
+      - name: Run provider-neutral API MVP E2E
+        run: PYTHONPATH=. pytest -q api/test_api_mvp_keyless_e2e.py
