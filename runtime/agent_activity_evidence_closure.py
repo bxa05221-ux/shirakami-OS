@@ -55,7 +55,7 @@ class AgentActivityEvidenceCloser:
                 "evidence_registered": True,
                 "evidence_id": record.evidence_id,
                 "activity_id": activity.activity_id,
-                "human_gate_confirmed": True,
+                "human_gate_confirmed": human_gate_confirmed,
                 "external_verification_status": verification.status,
             },
         )
