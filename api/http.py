@@ -93,6 +93,7 @@ class ShirakamiHTTPTransport:
                     "evidence_query": True,
                     "evidence_retrieval": True,
                     "trace_retrieval": True,
+                    "semantic_handoff": True,
                     "aiwitness": True,
                     "multi_agent_review": True,
                     "comparative_traceability": True,
