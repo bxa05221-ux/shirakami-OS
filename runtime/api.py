@@ -12,6 +12,7 @@ try:
     from .prototype import ExecutionResult, Transition
     from .trace import ExecutionTrace, ExecutionTraceStore
     from .evidence import EvidenceRecord
+    from .semantic_handoff import SemanticHandoff
     from ..aiwitness.store import WitnessStore
     from ..aiwitness.witness import AIwitness
 except ImportError:
@@ -20,6 +21,7 @@ except ImportError:
     from runtime.prototype import ExecutionResult, Transition
     from runtime.trace import ExecutionTrace, ExecutionTraceStore
     from runtime.evidence import EvidenceRecord
+    from runtime.semantic_handoff import SemanticHandoff
     from aiwitness.store import WitnessStore
     from aiwitness.witness import AIwitness
 
@@ -84,6 +86,12 @@ class ShirakamiAPI:
         handle = self.executions.get(execution_id)
         if handle is None: return None
         return {"execution_id": handle.execution_id, "protocol_id": handle.protocol_id, "status": handle.status, "result": dict(handle.result), "handoff_id": handle.handoff_id, "trace_id": handle.trace_id, "evidence_ids": list(handle.evidence_ids), "project": handle.project, "objective": handle.objective, "protocol_ids": list(handle.protocol_ids), "verification_scope": list(handle.verification_scope), "execution_authorized": False, "publish_authorized": False, "merge_authorized": False, "human_gate_required": True}
+    def get_semantic_handoff(self, trace_id: str) -> dict[str, Any] | None:
+        trace = self.traces.get(trace_id)
+        if trace is None:
+            return None
+        handoff = SemanticHandoff.from_trace(trace)
+        return {"handoff_id": handoff.handoff_id, "trace_id": handoff.trace_id, "execution_id": handoff.execution_id, "activity_id": handoff.activity_id, "evidence_ids": list(handoff.evidence_ids), "project": handoff.project, "objective": handoff.objective, "protocol_ids": list(handoff.protocol_ids), "verification_scope": list(handoff.verification_scope), "verification_status": handoff.verification_status, "human_gate_required": True, "execution_authorized": False, "publish_authorized": False, "merge_authorized": False}
     def get_trace(self, trace_id: str) -> dict[str, Any] | None:
         trace = self.traces.get(trace_id)
         if trace is None: return None
