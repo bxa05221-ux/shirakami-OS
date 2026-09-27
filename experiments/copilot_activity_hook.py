@@ -2,15 +2,45 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
-import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-_SECRET_KEY = re.compile(r"(token|secret|password|api[_-]?key|authorization|credential)", re.IGNORECASE)
+_LOG_PATH = Path(".github/hooks/logs/agent-activity.jsonl")
+
+
+def _digest(value: Any) -> str:
+    canonical = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _summary(value: Any) -> dict[str, Any]:
+    if value is None:
+        return {"present": False}
+    if isinstance(value, str):
+        return {"present": True, "type": "string", "length": len(value), "sha256": _digest(value)}
+    if isinstance(value, dict):
+        return {"present": True, "type": "object", "keys": sorted(str(k) for k in value), "sha256": _digest(value)}
+    if isinstance(value, list):
+        return {"present": True, "type": "array", "length": len(value), "sha256": _digest(value)}
+    return {"present": True, "type": type(value).__name__, "sha256": _digest(value)}
+
+"""Capture Copilot CLI hook events as unverified Shirakami Agent Activity."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
 _LOG_PATH = Path(".github/hooks/logs/agent-activity.jsonl")
 
 
@@ -40,12 +70,12 @@ def normalize_hook_event(payload: dict[str, Any]) -> dict[str, Any]:
     target = payload.get("cwd")
 
     if event in {"preToolUse", "PreToolUse", "postToolUse", "PostToolUse"}:
-        operation_type, result = "tool_call", tool_result
+        operation_type, result = "tool_call", ({"result": _summary(tool_result)} if tool_result is not None else None)
     elif event in {"postToolUseFailure", "PostToolUseFailure"}:
-        operation_type, result = "tool_call", {"error": payload.get("error")}
+        operation_type, result = "tool_call", {"error": _summary(payload.get("error"))}
     elif event in {"userPromptSubmitted", "UserPromptSubmit"}:
         operation_type, result = "prompt_submission", None
-        tool_input = payload.get("prompt")
+        tool_input = {"prompt": _summary(payload.get("prompt"))}
     elif event in {"sessionStart", "SessionStart"}:
         operation_type, result = "session_start", None
     elif event in {"sessionEnd", "SessionEnd"}:
@@ -59,7 +89,10 @@ def normalize_hook_event(payload: dict[str, Any]) -> dict[str, Any]:
     else:
         operation_type, result = "copilot_hook_event", None
 
-    activity_input = tool_input if tool_name is None else {"tool_name": tool_name, "tool_input": tool_input}
+    if tool_name is None:
+        activity_input = {"value": _summary(tool_input)} if tool_input is not None else None
+    else:
+        activity_input = {"tool_name": tool_name, "tool_input": _summary(tool_input)}
 
     return {
         "agent_id": "github-copilot-cli",
@@ -81,7 +114,7 @@ def normalize_hook_event(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def capture(payload: dict[str, Any], log_path: Path = _LOG_PATH) -> dict[str, Any]:
-    activity = normalize_hook_event(_redact(payload))
+    activity = normalize_hook_event(payload)
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with log_path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(activity, ensure_ascii=False, sort_keys=True))
@@ -91,8 +124,11 @@ def capture(payload: dict[str, Any], log_path: Path = _LOG_PATH) -> dict[str, An
 
 def main() -> None:
     raw = sys.stdin.read().strip()
-    if raw:
-        capture(json.loads(raw))
+    try:
+        if raw:
+            capture(json.loads(raw))
+    except Exception:
+        pass
 
 
 if __name__ == "__main__":
