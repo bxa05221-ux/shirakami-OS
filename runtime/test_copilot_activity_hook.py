@@ -9,6 +9,7 @@ from experiments.copilot_activity_hook import capture, normalize_hook_event
 
 def test_post_tool_use_becomes_unverified_tool_activity() -> None:
     activity = normalize_hook_event({
+        "hook_event_name": "postToolUse",
         "sessionId": "session-1",
         "timestamp": 1769472000000,
         "cwd": "C:/repo",
