@@ -215,6 +215,11 @@ class ShirakamiHTTPTransport:
             result = self.api.get_execution(execution_id)
             if result is None: raise HTTPException(status_code=404, detail="unknown execution_id")
             return result
+        @app.get("/v1/semantic-handoff/{trace_id}", dependencies=[Depends(auth)])
+        def get_semantic_handoff(trace_id: str) -> dict[str, Any]:
+            result = self.api.get_semantic_handoff(trace_id)
+            if result is None: raise HTTPException(status_code=404, detail="unknown trace_id")
+            return result
         @app.get("/v1/traces/{trace_id}", dependencies=[Depends(auth)])
         def get_trace(trace_id: str) -> dict[str, Any]:
             result = self.api.get_trace(trace_id)
