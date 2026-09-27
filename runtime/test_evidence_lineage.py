@@ -44,6 +44,7 @@ def test_activity_and_runtime_evidence_share_one_trace_lineage() -> None:
 def test_lineage_rejects_authority_and_mismatched_activity() -> None:
     activity = ingest_agent_activity(
         agent_id="github-copilot-cli",
+        session_id="session-2",
         source="github-copilot-cli-hook",
         operation_type="tool_call",
         self_reported=False,
@@ -59,6 +60,7 @@ def test_lineage_rejects_authority_and_mismatched_activity() -> None:
 
     with pytest.raises(ValueError, match="lineage cannot grant authority"):
         from runtime.evidence_lineage import EvidenceLineage
+
         EvidenceLineage(
             trace_id="t",
             execution_id="e",
@@ -73,6 +75,7 @@ def test_lineage_rejects_authority_and_mismatched_activity() -> None:
 def test_require_evidence_is_exact() -> None:
     activity = ingest_agent_activity(
         agent_id="agent",
+        session_id="session-3",
         source="test",
         operation_type="tool_call",
     )
