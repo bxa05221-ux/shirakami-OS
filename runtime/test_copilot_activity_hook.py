@@ -7,7 +7,7 @@ import json
 from experiments.copilot_activity_hook import capture, normalize_hook_event
 
 
-def test_pre_tool_use_becomes_unverified_tool_activity() -> None:
+def test_post_tool_use_becomes_unverified_tool_activity() -> None:
     activity = normalize_hook_event({
         "sessionId": "session-1",
         "timestamp": 1769472000000,
@@ -20,6 +20,8 @@ def test_pre_tool_use_becomes_unverified_tool_activity() -> None:
     assert activity["self_reported"] is False
     assert activity["verification_status"] == "unverified"
     assert activity["input"]["tool_name"] == "bash"
+    assert activity["input"]["tool_input"]["sha256"]
+    assert "content" not in json.dumps(activity)
 
 
 def test_post_tool_use_captures_result_without_authority() -> None:
@@ -33,7 +35,7 @@ def test_post_tool_use_captures_result_without_authority() -> None:
         "toolResult": {"resultType": "success", "textResultForLlm": "content"},
     })
     assert activity["operation_type"] == "tool_call"
-    assert activity["result"]["resultType"] == "success"
+    assert activity["result"]["result"]["type"] == "object"
     assert activity["verification_status"] == "unverified"
     assert "execution_authorized" not in activity
     assert "publish_authorized" not in activity
@@ -55,8 +57,8 @@ def test_capture_writes_jsonl_and_redacts_credentials(tmp_path) -> None:
         },
     }, path)
     record = json.loads(path.read_text(encoding="utf-8"))
-    assert record["input"]["tool_input"]["Authorization"] == "[REDACTED]"
-    assert record["input"]["tool_input"]["api_key"] == "[REDACTED]"
+    assert record["input"]["tool_input"]["sha256"]
+    assert "super-secret" not in json.dumps(record)
     assert record["verification_status"] == "unverified"
 
 
