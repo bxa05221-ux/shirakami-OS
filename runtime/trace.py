@@ -59,6 +59,28 @@ class ExecutionTrace:
             commit=self.commit,
         )
 
+    def with_evidence(self, evidence_id: str, observed: Mapping[str, Any] | None = None) -> "ExecutionTrace":
+        if not evidence_id:
+            raise ValueError("evidence_id must be non-empty")
+        updated_observed = dict(self.verification_observed)
+        if observed:
+            updated_observed.update(observed)
+        evidence_ids = self.evidence_ids if evidence_id in self.evidence_ids else (*self.evidence_ids, evidence_id)
+        return ExecutionTrace(
+            trace_id=self.trace_id,
+            execution_id=self.execution_id,
+            handoff_id=self.handoff_id,
+            evidence_ids=evidence_ids,
+            project=self.project,
+            objective=self.objective,
+            protocol_ids=self.protocol_ids,
+            verification_scope=self.verification_scope,
+            verification_status=self.verification_status,
+            verification_uncertainty=self.verification_uncertainty,
+            verification_observed=updated_observed,
+            commit=self.commit,
+        )
+
 
 class ExecutionTraceStore:
     """In-memory append-only trace history."""
@@ -86,5 +108,19 @@ class ExecutionTraceStore:
         if current is None:
             return None
         updated = current.with_verification(status, uncertainty, observed)
+        self._records[trace_id].append(updated)
+        return updated
+
+    def attach_evidence(
+        self,
+        trace_id: str,
+        evidence_id: str,
+        *,
+        observed: Mapping[str, Any] | None = None,
+    ) -> ExecutionTrace | None:
+        current = self.get(trace_id)
+        if current is None:
+            return None
+        updated = current.with_evidence(evidence_id, observed)
         self._records[trace_id].append(updated)
         return updated

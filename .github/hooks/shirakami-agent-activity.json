@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [{"type":"command","command":"python experiments/copilot_activity_hook.py","cwd":".","timeoutSec":10}],
+    "sessionEnd": [{"type":"command","command":"python experiments/copilot_activity_hook.py","cwd":".","timeoutSec":10}],
+    "postToolUse": [{"type":"command","command":"python experiments/copilot_activity_hook.py","cwd":".","timeoutSec":10}],
+    "postToolUseFailure": [{"type":"command","command":"python experiments/copilot_activity_hook.py","cwd":".","timeoutSec":10}],
+    "userPromptSubmitted": [{"type":"command","command":"python experiments/copilot_activity_hook.py","cwd":".","timeoutSec":10}],
+    "agentStop": [{"type":"command","command":"python experiments/copilot_activity_hook.py","cwd":".","timeoutSec":10}],
+    "subagentStart": [{"type":"command","command":"python experiments/copilot_activity_hook.py","cwd":".","timeoutSec":10}],
+    "subagentStop": [{"type":"command","command":"python experiments/copilot_activity_hook.py","cwd":".","timeoutSec":10}]
+  }
+}
