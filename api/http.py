@@ -75,8 +75,8 @@ class VerifyInput(BaseModel):
     diff_ref: str = ""
 
 class ShirakamiHTTPTransport:
-    def __init__(self, api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None, model_adapter: Callable[[str, str], Any] | None = None) -> None:
-        self.api = api or ShirakamiAPI(); self.protocol_registry = dict(protocol_registry or {}); self.api_key = api_key; self.model_adapter = model_adapter; self.reviewer_bundles: dict[str, ReviewerBundle] = {}
+    def __init__(self, api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None, model_adapter: Callable[[str, str], Any] | None = None, async_model_adapter: Callable[[str, str], Any] | None = None) -> None:
+        self.api = api or ShirakamiAPI(); self.protocol_registry = dict(protocol_registry or {}); self.api_key = api_key; self.model_adapter = model_adapter; self.async_model_adapter = async_model_adapter; self.reviewer_bundles: dict[str, ReviewerBundle] = {}
     def create_app(self) -> FastAPI:
         app = FastAPI(title="Shirakami UI for AI API", version="alpha-0.1"); auth = require_api_key(self.api_key)
         @app.get("/health")
@@ -121,7 +121,7 @@ class ShirakamiHTTPTransport:
         @app.post("/v1/approve", dependencies=[Depends(auth)])
         def approve(payload: ApproveInput) -> dict[str, Any]: return self.api.approve(approved=payload.approved, reviewer=payload.reviewer, human_authorized=payload.human_authorized)
         @app.post("/v1/execute", dependencies=[Depends(auth)])
-        def execute(payload: ExecuteInput) -> dict[str, Any]:
+        async def execute(payload: ExecuteInput) -> dict[str, Any]:
             boundary = validate_execution_context(payload.boundary_context.model_dump())
             if boundary["handoff_id"] != payload.handoff_id:
                 raise HTTPException(status_code=422, detail="handoff_id mismatch between transport and boundary context")
@@ -130,6 +130,8 @@ class ShirakamiHTTPTransport:
             if payload.protocol_id not in boundary["protocol_ids"]: raise HTTPException(status_code=422, detail="protocol_id is not declared by boundary context")
             protocol = self.protocol_registry.get(payload.protocol_id)
             if protocol is None: raise HTTPException(status_code=404, detail="protocol is not registered for HTTP execution")
+            if self.async_model_adapter is not None:
+                return await self.api.execute_async(protocol, payload.protocol_id, payload.input_data, handoff_id=payload.handoff_id, trace_id=payload.trace_id, evidence_ids=tuple(payload.evidence_ids), project=boundary["project"], objective=boundary["objective"], protocol_ids=tuple(boundary["protocol_ids"]), verification_scope=tuple(boundary["verification_scope"]), ai_adapter=self.async_model_adapter)
             return self.api.execute(protocol, payload.protocol_id, payload.input_data, handoff_id=payload.handoff_id, trace_id=payload.trace_id, evidence_ids=tuple(payload.evidence_ids), project=boundary["project"], objective=boundary["objective"], protocol_ids=tuple(boundary["protocol_ids"]), verification_scope=tuple(boundary["verification_scope"]), ai_adapter=self.model_adapter)
         @app.post("/v1/reviews/register", dependencies=[Depends(auth)])
         def register_reviewer_http(payload: ReviewerRegistrationInput) -> dict[str, Any]:
@@ -251,5 +253,5 @@ class ShirakamiHTTPTransport:
             return result
         return app
 
-def create_app(api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None, model_adapter: Callable[[str, str], Any] | None = None) -> FastAPI:
-    return ShirakamiHTTPTransport(api, protocol_registry, api_key, model_adapter).create_app()
+def create_app(api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None, model_adapter: Callable[[str, str], Any] | None = None, async_model_adapter: Callable[[str, str], Any] | None = None) -> FastAPI:
+    return ShirakamiHTTPTransport(api, protocol_registry, api_key, model_adapter, async_model_adapter).create_app()
