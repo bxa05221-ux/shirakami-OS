@@ -137,13 +137,36 @@ class ThreadRPG:
     def disable_rainwater_mode(self) -> None:
         self.rainwater_mode = False
 
+    def rainwater_targets(self) -> tuple[str, ...]:
+        """Return unresolved questions that rainwater mode puts back into circulation."""
+        if not self.rainwater_mode:
+            return ()
+        return tuple(
+            question.question_id
+            for question in self.unresolved_questions
+            if not question.resolved
+        )
+
+    def observation_connections(self, question_id: str) -> tuple[str, ...]:
+        """Return observations connected to a held question without resolving it."""
+        question = self._get_question(question_id)
+        return tuple(
+            observation.observation_id
+            for observation in self.observations
+            if observation.observation_id == question.source_observation_id
+            or observation.revisit_of == question.source_observation_id
+        )
+
     def declare_catch(
         self,
         declaration: str,
         *,
         question_id: str | None = None,
         observation_ids: tuple[str, ...] | list[str] = (),
+        authority: str = "human",
     ) -> HumanCatch:
+        if authority != "human":
+            raise PermissionError("Catch authority is human-only")
         if not isinstance(declaration, str) or not declaration.strip():
             raise ValueError("declaration must be a non-empty string")
         known = {item.observation_id for item in self.observations}
