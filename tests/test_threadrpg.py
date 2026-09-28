@@ -71,3 +71,39 @@ def test_catch_is_explicitly_human():
 
     assert catch.authority == "human"
     assert len(rpg.catches) == 1
+
+
+def test_rainwater_mode_recirculates_unresolved_questions_and_connections():
+    rpg = ThreadRPG()
+    first = rpg.observe(1, "uncertain")
+    question = rpg.hold_question("Still unclear", source_observation_id=first.observation_id)
+    revisited = rpg.revisit(
+        question.question_id,
+        viewpoint=4,
+        content="new context",
+    )
+
+    assert rpg.rainwater_targets() == ()
+    rpg.enable_rainwater_mode()
+    assert rpg.rainwater_targets() == (question.question_id,)
+    assert rpg.observation_connections(question.question_id) == (
+        first.observation_id,
+        revisited.observation_id,
+    )
+    assert question.resolved is False
+
+
+def test_non_human_catch_authority_is_rejected():
+    rpg = ThreadRPG()
+    observation = rpg.observe(1, "pattern")
+
+    try:
+        rpg.declare_catch(
+            "system decision",
+            observation_ids=[observation.observation_id],
+            authority="runtime",
+        )
+    except PermissionError:
+        pass
+    else:
+        raise AssertionError("non-human Catch authority must be rejected")
