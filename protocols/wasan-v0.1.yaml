@@ -1,45 +1,77 @@
-title: 和算Protocol
-subtitle:
-  - Wasan Protocol
-version: 0.1
-status: candidate
+protocol:
+  id: wasan
+  name: 和算Protocol
+  version: "0.1"
+  status: candidate
 
-purpose: >
-  和算を題材とした問題・計算・検証を、Shirakami Runtime上で
-  Protocolとして扱うための最小候補定義。
-  和算そのものの歴史的・数学的意味を再定義しない。
+  purpose: >
+    和算を題材とした問題・計算・検証を、Shirakami Runtime上で
+    Protocolとして扱うための最小候補定義。
+    和算そのものの歴史的・数学的意味を再定義しない。
 
-input:
-  problem: ""
-  known: []
-  unknown: []
-  constraints: []
-
-execution:
-  mode: problem_solving
-  calculation_backend: replaceable
-  preserve_intermediate_steps: true
-
-output:
-  interpretation: ""
-  steps: []
-  result: ""
-  verification: ""
-
-observation:
-  record:
-    problem: ""
-    assumptions: []
-    steps: []
-    result: ""
-    verification: ""
-
-constraints:
-  - no_theory_extension
+principles:
+  - problem_structure_preserved
+  - preserve_intermediate_steps
   - no_result_without_traceable_steps
   - backend_replaceable
   - human_final_judgment
   - evidence_preservation
+
+participants:
+  human:
+    role: final_judge
+  calculation_backend:
+    role: replaceable_executor
+
+learning_cycle:
+  phase_1:
+    name: problem_definition
+    objective:
+      - record_problem
+      - record_known_values
+      - record_unknown_values
+  phase_2:
+    name: calculation
+    objective:
+      - preserve_intermediate_steps
+      - produce_candidate_result
+  phase_3:
+    name: verification
+    objective:
+      - check_result
+      - preserve_verification
+  phase_4:
+    name: observation
+    objective:
+      - preserve_problem
+      - preserve_steps
+      - preserve_result
+      - preserve_verification
+
+evidence:
+  distinction:
+    problem:
+      description: "入力された問題"
+    steps:
+      description: "計算・推論の追跡可能な中間過程"
+    result:
+      description: "実行で得られた結果"
+    verification:
+      description: "結果を確認するための観測"
+  rules:
+    - preserve_original_problem
+    - preserve_intermediate_steps
+    - distinguish_result_from_verification
+    - mathematical_result_requires_verification
+
+execution:
+  mode: problem_solving
+  calculation_backend: replaceable
+
+boundary:
+  protocol_defines_problem_structure: true
+  runtime_owns_domain_truth: false
+  mathematical_result_requires_verification: true
 
 promotion:
   current_state: candidate
@@ -47,8 +79,3 @@ promotion:
     - schema_validation
     - runtime_test
     - execution_evidence
-
-boundary:
-  protocol_defines_problem_structure: true
-  runtime_owns_domain_truth: false
-  mathematical_result_requires_verification: true
