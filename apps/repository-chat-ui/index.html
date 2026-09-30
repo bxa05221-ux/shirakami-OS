@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Repository Chat Explorer</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:24px;line-height:1.5}
+input,button{font:inherit;padding:10px 12px}input{width:min(700px,80%)}button{cursor:pointer}
+.search{display:flex;gap:8px;margin:20px 0}.results{display:grid;gap:10px}
+.card,.repo{border:1px solid #ddd;border-radius:10px;padding:14px}.chat{margin-top:24px;border-top:1px solid #ddd;padding-top:20px}
+.messages{display:grid;gap:12px;max-height:55vh;overflow:auto}.msg{padding:12px;border-radius:10px;white-space:pre-wrap}
+.user{background:#eee}.muted,.evidence{color:#666}.evidence{font-size:.9em;margin-top:8px}
+.evidence a{margin-right:10px}
+</style>
+</head>
+<body>
+<h1>Repository Chat Explorer</h1>
+<p class="muted">Search → Select → Ask the repository</p>
+<div class="search">
+<input id="q" placeholder="例: context ai protocol"><button onclick="search()">検索</button>
+</div>
+<div id="results" class="results"></div>
+<section id="chat" class="chat" hidden>
+<h2 id="repo"></h2>
+<div id="messages" class="messages"></div>
+<form onsubmit="ask(event)" class="search">
+<input id="question" placeholder="お前は何者？"><button>送信</button>
+</form>
+</section>
+<script>
+let selected="";
+async function api(path,body){
+  const r=await fetch(path,{method:body?"POST":"GET",headers:body?{"Content-Type":"application/json"}:{},body:body?JSON.stringify(body):undefined});
+  if(!r.ok){let d=await r.text();try{d=JSON.parse(d).error||d}catch{}throw Error(d)}
+  return r.json();
+}
+async function search(){
+  const q=document.querySelector("#q").value.trim(),box=document.querySelector("#results");
+  if(!q)return;
+  box.textContent="検索中…";
+  try{
+    const d=await api("/api/search?q="+encodeURIComponent(q));
+    box.innerHTML=d.items.map(x=>'<div class="card"><h3>'+esc(x.full_name)+'</h3><div>'+esc(x.description||"説明なし")+
+      '</div><div class="muted">★ '+x.stargazers_count+' · '+esc(x.language||"unknown")+
+      '</div><button onclick="selectRepo(this.dataset.repo)" data-repo="'+esc(x.full_name)+'">このリポジトリと話す</button></div>').join("")||"見つかりませんでした。";
+  }catch(e){box.textContent="エラー: "+e.message}
+}
+function selectRepo(n){
+  selected=n;document.querySelector("#chat").hidden=false;document.querySelector("#repo").textContent=n;
+  document.querySelector("#messages").innerHTML="";
+  add("repo","Repository Chat を開始しました。まず「お前は何者？」と聞いてみてください。");
+  document.querySelector("#question").focus();
+}
+async function ask(e){
+  e.preventDefault();
+  const q=document.querySelector("#question").value.trim();
+  if(!q||!selected)return;
+  document.querySelector("#question").value="";
+  add("user",q);add("repo","考え中…","thinking");
+  try{
+    const d=await api("/api/chat",{repo:selected,question:q});
+    document.querySelector("#thinking")?.remove();
+    add("repo",d.answer,d.evidence);
+  }catch(x){
+    document.querySelector("#thinking")?.remove();
+    add("repo","エラー: "+x.message);
+  }
+}
+function add(role,text,evidence){
+  const d=document.createElement("div");d.className="msg "+role;
+  if(evidence==="thinking")d.id="thinking";
+  d.append(document.createTextNode(text));
+  if(Array.isArray(evidence)&&evidence.length){
+    const e=document.createElement("div");e.className="evidence";e.append("Evidence: ");
+    evidence.forEach(item=>{
+      const a=document.createElement("a");a.href=item.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=item.label;e.append(a);
+    });
+    d.append(e);
+  }
+  document.querySelector("#messages").appendChild(d);d.scrollIntoView();
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+</script>
+</body>
+</html>
