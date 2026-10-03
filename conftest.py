@@ -9,6 +9,7 @@ from pathlib import Path
 _ROOT = Path(__file__).resolve().parent
 _API_DIR = _ROOT / "api"
 _API_INIT = _API_DIR / "__init__.py"
+_AIWITNESS_DIR = _ROOT / "aiwitness"
 _RUNTIME_DIR = _ROOT / "runtime"
 
 # Keep the repository root authoritative so runtime/api.py cannot shadow
@@ -21,6 +22,21 @@ if str(_ROOT) not in sys.path:
 # without allowing runtime/api.py to shadow api/.
 if str(_RUNTIME_DIR) not in sys.path:
     sys.path.append(str(_RUNTIME_DIR))
+
+
+def _ensure_root_aiwitness_package() -> None:
+    """Reserve the repository-level aiwitness namespace before runtime imports."""
+    current = sys.modules.get("aiwitness")
+    if current is not None and hasattr(current, "__path__"):
+        return
+
+    spec = importlib.util.spec_from_loader("aiwitness", loader=None, is_package=True)
+    if spec is None:
+        raise ImportError("could not initialize repository aiwitness package")
+
+    module = importlib.util.module_from_spec(spec)
+    module.__path__ = [str(_AIWITNESS_DIR)]
+    sys.modules["aiwitness"] = module
 
 
 def _ensure_root_api_package() -> None:
@@ -41,4 +57,5 @@ def _ensure_root_api_package() -> None:
     spec.loader.exec_module(module)
 
 
+_ensure_root_aiwitness_package()
 _ensure_root_api_package()
