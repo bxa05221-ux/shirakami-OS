@@ -1,4 +1,4 @@
-from runtime.aiwitness import record_simulation_witness
+from runtime.witness_runtime import record_simulation_witness
 from runtime.operation import HumanDecision, authorize_operation
 from runtime.prompt import PromptSpec
 from runtime.reconstruction import reconstruct_trace
