@@ -16,6 +16,7 @@ def run_example():
     context = {
         "version": "demo-1.0",
         "evidence": ("TEMP-2026-09-19-001", "STOCK-2026-09-19-001"),
+        "uncertainty": ("Sensor reading is abnormal; cause is not established.",),
         "matrix": {"priority": 2, "phase": 1, "relation": 3},
     }
 
@@ -32,7 +33,6 @@ def run_example():
         version="1.0",
         routing_result=routing,
         context=context,
-        uncertainty=("Sensor reading is abnormal; cause is not established.",),
     )
 
     simulation = execute_simulation(
