@@ -1,4 +1,4 @@
-from runtime.aiwitness import record_simulation_witness
+from runtime.witness_runtime import record_simulation_witness
 from runtime.prompt import PromptSpec
 from runtime.simulation import execute_simulation
 
