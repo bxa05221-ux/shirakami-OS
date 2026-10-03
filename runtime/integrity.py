@@ -99,6 +99,14 @@ def classify_trace_integrity(
                     "HumanDecision and Operation identifiers differ",
                 )
             )
+        if operation.simulation_id != decision.simulation_id:
+            findings.append(
+                IntegrityFinding(
+                    "DECISION_OPERATION_MISMATCH",
+                    "error",
+                    "HumanDecision and Operation reference different Simulation identifiers",
+                )
+            )
 
     if witness is not None and expected_context_version is not None:
         if witness.context_version != expected_context_version:
