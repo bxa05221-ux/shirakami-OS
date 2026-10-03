@@ -9,12 +9,18 @@ from pathlib import Path
 _ROOT = Path(__file__).resolve().parent
 _API_DIR = _ROOT / "api"
 _API_INIT = _API_DIR / "__init__.py"
+_RUNTIME_DIR = _ROOT / "runtime"
 
-# The legacy suite used to prepend runtime/ to sys.path. That makes
-# runtime/api.py shadow the repository-level api/ package. Keep the
-# repository root authoritative instead.
+# Keep the repository root authoritative so runtime/api.py cannot shadow
+# the repository-level api/ package.
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
+
+# Legacy runtime modules still use top-level imports (e.g. `from evidence import ...`).
+# Append runtime after the repository root so those imports remain available
+# without allowing runtime/api.py to shadow api/.
+if str(_RUNTIME_DIR) not in sys.path:
+    sys.path.append(str(_RUNTIME_DIR))
 
 
 def _ensure_root_api_package() -> None:
