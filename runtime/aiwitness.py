@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Any, Mapping
 
-from .simulation import SimulationResult
+from runtime.simulation import SimulationResult
 
 
 @dataclass(frozen=True)
