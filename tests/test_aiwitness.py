@@ -3,7 +3,7 @@
 from runtime.prompt import assemble_prompt
 from runtime.routing import route_protocol
 from runtime.simulation import execute_simulation
-from runtime.aiwitness import record_simulation_witness
+from runtime.witness_runtime import record_simulation_witness
 
 
 def test_witness_links_prompt_protocol_simulation_and_evidence():
