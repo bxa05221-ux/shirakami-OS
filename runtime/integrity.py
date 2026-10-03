@@ -119,15 +119,14 @@ def classify_trace_integrity(
             )
         )
 
-    if trace is not None:
-        if trace.reality_changed and not trace.resulting_evidence_refs:
-            findings.append(
-                IntegrityFinding(
-                    "RESULT_EVIDENCE_MISSING",
-                    "error",
-                    "trace reports Reality change without resulting Evidence reference",
-                )
+    if trace is not None and trace.reality_changed and not trace.resulting_evidence_refs:
+        findings.append(
+            IntegrityFinding(
+                "RESULT_EVIDENCE_MISSING",
+                "error",
+                "trace reports Reality change without resulting Evidence reference",
             )
+        )
 
     return tuple(findings)
 
@@ -145,4 +144,3 @@ def findings_as_evidence(findings: tuple[IntegrityFinding, ...]) -> Mapping[str,
             for item in findings
         ),
     }
-}
