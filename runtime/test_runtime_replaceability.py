@@ -2,7 +2,7 @@ from typing import Any, Mapping
 
 from evolution_bridge import ContextSnapshot, ProtocolCandidate
 from evolution_pipeline import EvidenceDrivenRuntime
-from prototype import ExecutionContext, Runtime, Transition
+from prototype import ExecutionContext, ExecutionResult, Runtime, Transition
 
 
 class AlternateRuntime:
@@ -16,13 +16,13 @@ class AlternateRuntime:
     ):
         context = ExecutionContext(protocol_id=protocol_id, input=dict(input_data or {}))
         transition = protocol(context)
-        return type("AlternateExecutionResult", (), {
-            "status": "completed",
-            "protocol_id": protocol_id,
-            "transition": transition,
-            "signals": ("transition.observed",),
-            "steps": 1,
-        })()
+        return ExecutionResult(
+            status="completed",
+            protocol_id=protocol_id,
+            transition=transition,
+            signals=("transition.observed",),
+            steps=1,
+        )
 
 
 def _protocol(context: ExecutionContext) -> Transition:
@@ -67,3 +67,25 @@ def test_evidence_driven_runtime_accepts_replaceable_runtime_boundary():
     # The composition boundary accepts a Runtime implementation as a dependency.
     assert type(default.runtime) is Runtime
     assert type(alternate.runtime) is AlternateRuntime
+
+
+def test_evidence_driven_pipeline_executes_through_alternate_runtime():
+    app = EvidenceDrivenRuntime(runtime=AlternateRuntime())
+    app.observe(
+        {"input": "replaceable"},
+        ContextSnapshot(landscape={"place": "test"}, protocol_id="P-PIPE"),
+    )
+    analysis = app.analyze("P-PIPE")
+    assert analysis.protocol_id == "P-PIPE"
+
+    result = app.execute(_protocol, "P-PIPE", {"input": "replaceable"})
+    verification = app.verify(
+        result,
+        expected_transition_kind="test.transition",
+    )
+
+    assert result.status == "completed"
+    assert verification.status == "pass"
+    assert app.loop.state.value == "ACCEPTED"
+    assert not getattr(result, "authority_granted", False)
+    assert not getattr(result, "decision_authorized", False)
