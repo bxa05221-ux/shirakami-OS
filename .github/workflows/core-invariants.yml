@@ -1,0 +1,26 @@
+name: Core Invariant Verification
+
+on:
+  push:
+    paths:
+      - "runtime/**"
+      - ".github/workflows/core-invariants.yml"
+  pull_request:
+    paths:
+      - "runtime/**"
+      - ".github/workflows/core-invariants.yml"
+
+jobs:
+  core-invariants:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pytest
+        run: python -m pip install pytest
+      - name: Run core invariant tests
+        run: python -m pytest runtime/test_core_invariants.py runtime/test_runtime_replaceability.py -q
