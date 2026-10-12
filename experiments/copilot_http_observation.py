@@ -65,6 +65,10 @@ def assert_boundary(client: TestClient, body: dict[str, Any], trace_id: str) -> 
         raise AssertionError("Trace does not reference the exact Evidence ID")
     if witness.get("evidence_ids") != [evidence_id]:
         raise AssertionError("AIwitness does not reference the exact Evidence ID")
+    if trace.get("verification_status") != "pass":
+        raise AssertionError("Trace does not preserve the passing verification result")
+    if witness.get("verification_status") != "pass":
+        raise AssertionError("AIwitness does not preserve the passing verification result")
     if traceability.get("valid") is not True:
         raise AssertionError("traceability verification did not return valid=true")
 
