@@ -65,6 +65,9 @@ The current API MVP status records items 1–8 as verified, while items 9–10 r
 - [ ] Choose one provider/model only for the demo; do not make the kernel provider-specific.
 - [ ] Supply credentials through environment/configuration outside source control.
 - [ ] Run the real provider through the HTTP/API → adapter → runtime → Evidence/Trace path.
+- [ ] Exercise the API as a stateful sequence: `/v1/observe` → `/v1/analyze` → explicit `/v1/approve` with `human_authorized=true` → `/v1/execute` → `/v1/executions/{id}/verify`.
+- [ ] Confirm an execution attempt before approval is rejected, and a rejected approval does not permit execution.
+- [ ] Confirm response metadata continues to report `execution_authorized=false`, `publish_authorized=false`, `merge_authorized=false`, and `human_gate_required=true`; do not confuse a completed Runtime operation with transfer of decision authority.
 - [ ] Save a redacted run record with commit, command, outcome, and verification evidence.
 - [ ] Verify that model output does not itself grant authority.
 - [ ] Never commit API keys, personal data, or sensitive request/response content.
