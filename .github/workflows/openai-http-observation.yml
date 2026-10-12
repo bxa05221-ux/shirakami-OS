@@ -1,0 +1,38 @@
+name: OpenAI HTTP provider observation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/api-mvp-openai-http-observation-001
+    paths:
+      - "experiments/openai_http_observation.py"
+      - ".github/workflows/openai-http-observation.yml"
+      - "api/**"
+      - "runtime/**"
+      - "aiwitness/**"
+
+jobs:
+  observation:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      PYTHONPATH: .
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate live-provider configuration without printing secrets
+        run: |
+          test -n "$OPENAI_API_KEY"
+          test -n "$OPENAI_MODEL"
+          echo "OPENAI_API_KEY_PRESENT=true"
+          echo "OPENAI_MODEL_PRESENT=true"
+      - name: Install HTTP runtime dependencies
+        run: python -m pip install --upgrade pip fastapi pydantic httpx pyyaml
+      - name: Run live OpenAI HTTP observation
+        run: python experiments/openai_http_observation.py

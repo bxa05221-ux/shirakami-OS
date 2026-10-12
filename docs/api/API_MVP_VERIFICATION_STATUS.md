@@ -1,6 +1,6 @@
 # Shirakami API MVP Verification Status
 
-Status: provider-neutral boundary verified / external provider execution pending
+Status: live OpenAI HTTP harness observed; production deployment remains out of scope
 
 ## Fixed MVP denominator
 
@@ -19,20 +19,36 @@ The API MVP is considered **100% complete only when all ten fixed verification i
 
 ## Current verification
 
-### Verified
+### Items 1–8: verified
 
-Items **1–8** are verified through the keyless API MVP E2E boundary.
+Items **1–8** are verified through the provider-neutral API MVP E2E boundary and existing Runtime/AIwitness verification.
 
-Items **9–10** now have a verified **provider-neutral execution boundary**:
+### Items 9–10: live-provider HTTP harness passed
+
+The OpenAI HTTP observation harness now exercises a real OpenAI Responses API request inside the Shirakami `/v1/execute` async provider boundary and then verifies the result through the HTTP API.
+
+Verification record:
+
+- Workflow: [OpenAI HTTP provider observation](https://github.com/bxa05221-ux/shirakami-OS/actions/runs/38228522882)
+- Tested commit: `4a803ebaf3cce4202ff7c39679d31fdcafc60603`
+- Required output markers observed:
+  - `LIVE_PROVIDER_OBSERVED=true`
+  - `BOUNDARY_OBSERVED=true`
+  - `TRACEABILITY_VALID=true`
+  - `VERIFICATION_STATUS=pass`
+  - `MODEL_OUTPUT_NONEMPTY=true`
+  - `UNAPPROVED_EXECUTION_BLOCKED=true`
+
+The run retrieved Evidence, Trace, and AIwitness via HTTP and confirmed that the same Evidence ID is linked, verification is passing, and the authority flags remain false while `human_gate_required=true`.
+
+The provider-neutral route remains replaceable:
 
 ```text
-External HTTP
+HTTP /v1/execute
     ↓
-Shirakami API
+async OpenAI provider adapter
     ↓
-RealModelAdapter
-    ↓
-Runtime
+OpenAI Responses API
     ↓
 RuntimeResult
     ↓
@@ -41,58 +57,26 @@ Evidence
 Trace
     ↓
 AIwitness
+    ↓
+HTTP verification / traceability
 ```
 
-The adapter boundary has been verified with a deterministic fixture transport. The fixture is used only to verify the contract and traceability; it is not an external AI provider.
+### Scope limitation
 
-### Not yet verified
-
-Items **9–10 are not yet counted as complete** because no external AI provider has been selected and no provider credential is currently required or configured.
-
-This is intentional.
-
-The current implementation keeps the downstream model replaceable and provider-neutral. Selecting a provider, credential, model, billing arrangement, and production transport is a separate integration decision.
+This is a successful **live-provider HTTP harness run using FastAPI's in-process TestClient**. It proves the endpoint/adapter/runtime/evidence/trace path exercised by this harness. It does **not** prove deployment behind a publicly reachable server, production operator identity verification, multi-user isolation, or durable external persistence. Those are separate production-hardening tasks and are not silently claimed as complete.
 
 ## Important distinction
 
-The following statements are different:
-
 - **Provider-neutral RealModel boundary verified** — yes.
-- **External HTTP can carry model output into Evidence / Trace** — yes, with the verified adapter contract.
-- **A real external AI provider has executed through the public HTTP path** — not yet verified.
-- **API MVP is 100% complete under the fixed ten-item denominator** — not yet.
-
-No provider-specific dependency should be introduced merely to make the denominator appear complete.
-
-## Next gate
-
-The next verification gate is deliberately narrow:
-
-```text
-select provider
-    ↓
-configure credential outside source control
-    ↓
-implement transport only
-    ↓
-External HTTP
-    ↓
-Real provider
-    ↓
-Runtime
-    ↓
-Evidence / Trace / AIwitness
-    ↓
-verify 9 + 10
-```
-
-The Runtime, Evidence, Trace, and Human Gate semantics should not change when this gate is crossed.
+- **Live OpenAI response received through the Shirakami HTTP execution path** — yes, in the harness run linked above.
+- **Evidence / Trace / AIwitness linkage and verification checked after the live call** — yes, in the harness run linked above.
+- **Unapproved execution rejected with HTTP 409 in the tested Human Gate path** — yes.
+- **Production deployment / interactive operator approval / durable external persistence** — not verified by this run.
 
 ## Authority boundary
 
-The real-model path does not grant execution authority to the model.
+The real-model path does not grant execution authority to the model. The harness first confirms that unapproved execution is rejected, then makes a separate explicit approval request to exercise the approved path. That harness approval is not production identity verification or an interactive approval UI.
 
-The existing invariant remains:
+The invariant remains:
 
 > **AI can execute through the Runtime boundary; decision authority remains with the Human Gate.**
-
