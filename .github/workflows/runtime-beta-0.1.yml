@@ -50,6 +50,9 @@ jobs:
 
       - name: Run Runtime and boundary tests
         run: python -m pytest runtime tests -q
+
+      - name: Run HTTP Human Gate end-to-end test
+        run: python -m pytest api/test_human_gate_http_e2e.py -q
       - name: Smoke-run minimal OS entry point
         run: python shirakami_os.py
 
