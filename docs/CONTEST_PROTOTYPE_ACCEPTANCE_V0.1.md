@@ -60,19 +60,19 @@ The demo must run from a clean checkout without provider credentials. It demonst
 
 ### D. External AI provider path
 
-The current API MVP status records items 1–8 as verified, while items 9–10 remain pending until a real external provider executes through the HTTP path and the resulting output is verified through Evidence/Trace.
+**Updated evidence:** the live OpenAI HTTP observation passed in workflow run [38228522882](https://github.com/bxa05221-ux/shirakami-OS/actions/runs/38228522882), tested commit `4a803ebaf3cce4202ff7c39679d31fdcafc60603`. It emitted `LIVE_PROVIDER_OBSERVED=true`, `BOUNDARY_OBSERVED=true`, `TRACEABILITY_VALID=true`, and `VERIFICATION_STATUS=pass`. The harness used FastAPI TestClient; this is HTTP-boundary evidence, not proof of a deployed public server.
 
-- [ ] Choose one provider/model only for the demo; do not make the kernel provider-specific.
-- [ ] Supply credentials through environment/configuration outside source control.
-- [ ] Run the real provider through the HTTP/API → adapter → runtime → Evidence/Trace path.
-- [ ] Exercise the API as a stateful sequence: `/v1/observe` → `/v1/analyze` → explicit `/v1/approve` with `human_authorized=true` → `/v1/execute` → `/v1/executions/{id}/verify`.
-- [ ] Confirm an execution attempt before approval is rejected, and a rejected approval does not permit execution.
-- [ ] Confirm response metadata continues to report `execution_authorized=false`, `publish_authorized=false`, `merge_authorized=false`, and `human_gate_required=true`; do not confuse a completed Runtime operation with transfer of decision authority.
-- [ ] Save a redacted run record with commit, command, outcome, and verification evidence.
-- [ ] Verify that model output does not itself grant authority.
-- [ ] Never commit API keys, personal data, or sensitive request/response content.
+- [x] Select one provider for the demonstration: OpenAI Responses API.
+- [x] Supply credentials through repository Actions secrets, outside source control.
+- [x] Run the real provider through the HTTP/API → adapter → runtime → Evidence/Trace path.
+- [x] Exercise `/v1/observe` → `/v1/analyze` → explicit `/v1/approve` → `/v1/execute` → `/v1/executions/{id}/verify`.
+- [x] Confirm an execution attempt before approval is rejected with HTTP 409.
+- [x] Confirm `execution_authorized=false`, `publish_authorized=false`, `merge_authorized=false`, and `human_gate_required=true` remain in the response.
+- [x] Save a redacted run record: [workflow run 38228522882](https://github.com/bxa05221-ux/shirakami-OS/actions/runs/38228522882), tested commit `4a803ebaf3cce4202ff7c39679d31fdcafc60603`.
+- [x] Verify that model output does not itself grant authority.
+- [x] Keep API keys and sensitive provider payloads out of source control and logs.
 
-This is the strongest contest demonstration, but it must not block preparing the deterministic baseline and its evidence.
+**Scope note:** the harness approval is a test action, not production operator identity verification or an interactive approval UI. The successful run uses FastAPI TestClient and does not claim public-server deployment.
 
 ## 4. Submission package
 
@@ -81,7 +81,7 @@ The prototype is ready for contest packaging when:
 - [ ] One canonical commit is selected.
 - [ ] The baseline demo and required test suite pass on that commit.
 - [ ] At least one invalid/rejected authority path is shown.
-- [ ] Real-provider HTTP E2E is either verified, or explicitly identified as a limitation if the target contest permits a provider-neutral prototype.
+- [x] Live-provider HTTP harness is verified; production deployment and interactive operator identity assurance remain explicit limitations.
 - [ ] A reviewer can reproduce the demonstration using the documented commands.
 - [ ] The submission states what is implemented, what was tested, what remains unverified, and the exact environment.
 - [ ] A short architecture diagram and a 2–3 minute demo script use only claims supported by evidence.
@@ -100,7 +100,7 @@ Do not require the following to package this prototype:
 
 ## 6. Delivery gate
 
-The prototype is considered **contest-demonstrable** when sections 2, 3A, 3B, 3C, and the submission package have evidence on one fixed commit. The real-provider path in 3D is a preferred strengthening gate; if not completed, the submission must describe the limitation accurately.
+The prototype is considered **contest-demonstrable** when sections 2, 3A, 3B, 3C, and the submission package have evidence on one fixed commit. The live-provider HTTP harness gate in 3D has passed. The submission must still describe the in-process TestClient scope and avoid claiming production deployment or operator identity assurance.
 
 No percentage is used as a substitute for this checklist. Once the gate is met, stop expanding scope and prepare the actual contest application.
 
@@ -108,5 +108,5 @@ No percentage is used as a substitute for this checklist. Once the gate is met, 
 
 - An existing deterministic five-minute demo is present at `examples/evidence_route_demo.py`.
 - An MVP quickstart is present at `docs/architecture/MVP_QUICKSTART.md`.
-- `docs/api/API_MVP_VERIFICATION_STATUS.md` explicitly distinguishes the verified provider-neutral boundary from pending real-provider execution through the HTTP path.
-- These source files establish a starting point, not a claim that all acceptance checks have been rerun on this branch.
+- `docs/api/API_MVP_VERIFICATION_STATUS.md` records the live OpenAI HTTP harness result and its limits.
+- The live-provider result is recorded at [workflow run 38228522882](https://github.com/bxa05221-ux/shirakami-OS/actions/runs/38228522882). The deterministic baseline and full submission package must still be checked against one final candidate commit.
