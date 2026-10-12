@@ -13,6 +13,25 @@ def test_async_http_provider_output_crosses_evidence_trace_and_authority_boundar
         return {"output": f"external:{prompt}", "provider": "async-fixture", "protocol_id": protocol_id}
 
     client = TestClient(create_app(protocol_registry={"fixture.async-provider": echo_protocol}, api_key=API_KEY, async_model_adapter=provider))
+    headers = {"X-API-Key": API_KEY}
+    observe = client.post(
+        "/v1/observe",
+        json={
+            "observation": {"signal": "execute"},
+            "context": {"protocol_id": "fixture.async-provider", "landscape": {}, "metadata": {}},
+            "handoff_id": "SH-HO-ASYNC-001",
+            "trace_id": "TRACE-ASYNC-001",
+            "evidence_ids": [],
+        },
+        headers=headers,
+    )
+    assert observe.status_code == 200, observe.text
+    analyze = client.post(
+        "/v1/analyze",
+        json={"protocol_id": "fixture.async-provider", "protocol_exists": True},
+        headers=headers,
+    )
+    assert analyze.status_code == 200, analyze.text
     payload = {
         "protocol_id": "fixture.async-provider",
         "input_data": {"text": "async external provider"},
@@ -32,7 +51,18 @@ def test_async_http_provider_output_crosses_evidence_trace_and_authority_boundar
             "human_gate_required": True,
         },
     }
-    response = client.post("/v1/execute", json=payload, headers={"X-API-Key": API_KEY})
+    blocked = client.post("/v1/execute", json=payload, headers=headers)
+    assert blocked.status_code == 409, blocked.text
+    assert blocked.json()["detail"] == "Human Gate approval required before execution"
+
+    approval = client.post(
+        "/v1/approve",
+        json={"approved": True, "reviewer": "test-human", "human_authorized": True},
+        headers=headers,
+    )
+    assert approval.status_code == 200, approval.text
+
+    response = client.post("/v1/execute", json=payload, headers=headers)
     assert response.status_code == 200, response.text
     body = response.json()
     assert body["model_output"]["output"] == "external:async external provider"
