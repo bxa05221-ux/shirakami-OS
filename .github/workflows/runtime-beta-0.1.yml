@@ -1,5 +1,6 @@
 name: Runtime β0.1 Verification
 
+# Repository-level documentation changes are included so the required runtime check remains the verification gate during rollout.
 on:
   push:
     paths:
@@ -10,7 +11,9 @@ on:
       - "shbb-api/**"
       - "protocols/**"
       - "experiments/**"
+      - "examples/**"
       - "docs/**"
+      - "shirakami_os.py"
       - "CHECKLIST.md"
       - ".github/workflows/runtime-beta-0.1.yml"
       - ".github/workflows/copilot-provider-observation.yml"
@@ -27,7 +30,9 @@ on:
       - "shbb-api/**"
       - "protocols/**"
       - "experiments/**"
+      - "examples/**"
       - "docs/**"
+      - "shirakami_os.py"
       - "CHECKLIST.md"
       - ".github/workflows/runtime-beta-0.1.yml"
       - ".github/workflows/copilot-provider-observation.yml"
@@ -58,6 +63,15 @@ jobs:
         env:
           REQUIRE_LIVE_PROVIDER: "false"
         run: python experiments/copilot_http_observation.py
+
+      - name: Run HTTP Human Gate end-to-end test
+        run: python -m pytest api/test_human_gate_http_e2e.py -q
+
+      - name: Smoke-run minimal OS entry point
+        run: python shirakami_os.py
+
+      - name: Smoke-run five-minute Human Gate demo
+        run: python examples/evidence_route_demo.py
 
       - name: Compile manga renderer
         run: python -m py_compile runtime/manga_manual.py
