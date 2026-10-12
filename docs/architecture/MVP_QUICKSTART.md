@@ -44,7 +44,7 @@ Runtime
 Inspectable Result
 ```
 
-The current Runtime intentionally stops before provider-specific AI invocation. This keeps the MVP boundary small and makes the implementation inspectable.
+The deterministic Runtime demonstration keeps the core execution path inspectable and does not depend on an external provider.
 
 ## 5. What to inspect next
 
@@ -59,8 +59,12 @@ The MVP is an implementation proof, not a claim that the complete Shirakami arch
 
 ## API MVP verification boundary
 
-The Runtime also exposes a provider-neutral API/Model Adapter boundary. The current implementation verifies the HTTP → RealModelAdapter → Runtime → Evidence / Trace path without requiring an external provider credential.
+The provider-neutral HTTP → Model Adapter → Runtime → Evidence / Trace path is covered by the keyless API verification workflow.
 
-This does **not** mean the fixed API MVP denominator is complete. Under the project's fixed ten-item definition, items 9–10 remain pending until an external AI provider is actually executed through the HTTP path and the resulting model output is verified through Evidence / Trace.
+In addition, the live OpenAI Responses API has been exercised through the Shirakami HTTP boundary using FastAPI TestClient. The recorded run emitted `LIVE_PROVIDER_OBSERVED=true`, `BOUNDARY_OBSERVED=true`, `TRACEABILITY_VALID=true`, and `VERIFICATION_STATUS=pass`:
 
-See [API MVP Verification Status](../api/API_MVP_VERIFICATION_STATUS.md).
+- [Live OpenAI HTTP observation — workflow run 38228522882](https://github.com/bxa05221-ux/shirakami-OS/actions/runs/38228522882)
+- [API MVP verification status](../api/API_MVP_VERIFICATION_STATUS.md)
+- [Contest prototype acceptance contract](../CONTEST_PROTOTYPE_ACCEPTANCE_V0.1.md)
+
+**Scope limit:** this live-provider evidence is from an in-process HTTP test harness. It does not prove public-server deployment, multi-user isolation, durable external persistence, or production operator identity assurance. The deterministic demo and live-provider harness prove different parts of the prototype and should not be conflated.
