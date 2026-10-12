@@ -1,6 +1,5 @@
 name: Runtime β0.1 Verification
 
-# Repository-level documentation changes are included so the required runtime check remains the verification gate during rollout.
 on:
   push:
     paths:
@@ -14,6 +13,7 @@ on:
       - "docs/**"
       - "CHECKLIST.md"
       - ".github/workflows/runtime-beta-0.1.yml"
+      - ".github/workflows/copilot-provider-observation.yml"
       - "README.md"
       - "README.ja.md"
       - "VERSION"
@@ -26,9 +26,11 @@ on:
       - "reviewer/**"
       - "shbb-api/**"
       - "protocols/**"
+      - "experiments/**"
       - "docs/**"
       - "CHECKLIST.md"
       - ".github/workflows/runtime-beta-0.1.yml"
+      - ".github/workflows/copilot-provider-observation.yml"
       - "README.md"
       - "README.ja.md"
       - "VERSION"
