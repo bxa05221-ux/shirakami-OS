@@ -3,7 +3,19 @@ name: Contest prototype acceptance
 on:
   push:
     branches:
+      - main
       - feat/contest-prototype-acceptance-v0.1
+    paths:
+      - ".github/workflows/contest-prototype-acceptance.yml"
+      - "shirakami_os.py"
+      - "examples/evidence_route_demo.py"
+      - "runtime/**"
+      - "tests/**"
+      - "protocols/**"
+      - "spec/**"
+  pull_request:
+    branches:
+      - main
     paths:
       - ".github/workflows/contest-prototype-acceptance.yml"
       - "shirakami_os.py"
