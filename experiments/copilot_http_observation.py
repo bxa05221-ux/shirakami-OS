@@ -110,16 +110,6 @@ async def main() -> None:
             }
 
     api = ShirakamiAPI()
-    api.observe(
-        {"signal": "execute"},
-        ContextSnapshot(
-            protocol_id=PROTOCOL_ID,
-            landscape={},
-            metadata={"source": "copilot-http-observation"},
-        ),
-    )
-    api.analyze(PROTOCOL_ID, protocol_exists=True)
-
     transport = ShirakamiHTTPTransport(
         api=api,
         protocol_registry={PROTOCOL_ID: observation_protocol},
@@ -127,6 +117,42 @@ async def main() -> None:
         async_model_adapter=provider_adapter,
     )
     client = TestClient(transport.create_app())
+    headers = {"X-API-Key": API_KEY}
+
+    # Exercise the public HTTP state sequence, including an explicit human approval.
+    observe_response = client.post(
+        "/v1/observe",
+        json={
+            "observation": {"signal": "execute"},
+            "context": {
+                "protocol_id": PROTOCOL_ID,
+                "landscape": {},
+                "metadata": {"source": "copilot-http-observation"},
+            },
+            "handoff_id": HANDOFF_ID,
+            "trace_id": trace_id,
+            "evidence_ids": [],
+        },
+        headers=headers,
+    )
+    observe_response.raise_for_status()
+    analyze_response = client.post(
+        "/v1/analyze",
+        json={"protocol_id": PROTOCOL_ID, "protocol_exists": True},
+        headers=headers,
+    )
+    analyze_response.raise_for_status()
+    approve_response = client.post(
+        "/v1/approve",
+        json={
+            "approved": True,
+            "reviewer": "contest-observation-human",
+            "human_authorized": True,
+        },
+        headers=headers,
+    )
+    approve_response.raise_for_status()
+
     payload = {
         "protocol_id": PROTOCOL_ID,
         "input_data": {"text": "Observe provider output through Shirakami HTTP"},
@@ -149,7 +175,7 @@ async def main() -> None:
     response = client.post(
         "/v1/execute",
         json=payload,
-        headers={"X-API-Key": API_KEY},
+        headers=headers,
     )
     response.raise_for_status()
     body = response.json()
