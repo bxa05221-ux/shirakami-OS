@@ -23,8 +23,8 @@ jobs:
       REQUIRE_LIVE_PROVIDER: ${{ inputs.require_live_provider || 'false' }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: feat/api-mvp-real-provider-harness-001
+        # Respect the ref selected for workflow_dispatch (main by default).
+        # Push events naturally check out the triggering branch.
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
