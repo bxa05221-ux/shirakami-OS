@@ -81,6 +81,12 @@ def assert_boundary(client: TestClient, body: dict[str, Any], trace_id: str) -> 
 async def main() -> None:
     token = os.getenv("COPILOT_GITHUB_TOKEN") or os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN")
     live = bool(token)
+    require_live = os.getenv("REQUIRE_LIVE_PROVIDER", "").strip().lower() in {"1", "true", "yes"}
+    if require_live and not live:
+        raise SystemExit(
+            "REQUIRE_LIVE_PROVIDER=true but no Copilot credential is configured; "
+            "refusing to report fixture mode as a live-provider test"
+        )
     trace_id = f"TRACE-COPILOT-HTTP-{uuid.uuid4().hex[:12]}"
 
     if live:
