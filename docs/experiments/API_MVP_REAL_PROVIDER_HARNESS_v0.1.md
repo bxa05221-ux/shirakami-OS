@@ -36,7 +36,7 @@ keeping the SDK optional.
 
 ## Running the observation workflow
 
-The workflow is `.github/workflows/copilot-provider-observation.yml`.
+The workflow is `.github/workflows/copilot-provider-observation.yml`. On manual dispatch, set `require_live_provider=true` for the strict live test.
 
 - Without a provider credential, it runs the fixture path and must report `LIVE_PROVIDER_OBSERVED=false`.
 - With a valid GitHub Copilot SDK credential, it calls the real SDK from inside the async HTTP adapter and must report `LIVE_PROVIDER_OBSERVED=true`.
