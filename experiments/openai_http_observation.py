@@ -110,8 +110,26 @@ async def main() -> None:
     })
     observe.raise_for_status()
     analyze = client.post("/v1/analyze", headers=headers,
-                          json={"protocol_id": PROTOCOL_ID, "protocol_exists": True})
+                          json={"protocol_id": PROTOCOL_ID, "protocol_exists": False})
     analyze.raise_for_status()
+    # A new-protocol candidate must be blocked before explicit approval.
+    gate_probe = client.post("/v1/execute", headers=headers, json={
+        "protocol_id": PROTOCOL_ID, "input_data": {"text": "gate probe"},
+        "handoff_id": HANDOFF_ID, "trace_id": trace_id, "evidence_ids": [],
+        "boundary_context": {
+            "handoff_id": HANDOFF_ID, "project": "Shirakami API MVP",
+            "objective": "Verify Human Gate blocks unapproved execution",
+            "protocol_ids": [PROTOCOL_ID], "evidence_ids": [],
+            "verification_scope": ["Human Gate"],
+            "execution_authorized": False, "publish_authorized": False,
+            "merge_authorized": False, "human_gate_required": True,
+        },
+    })
+    if gate_probe.status_code != 409:
+        raise AssertionError(
+            f"unapproved execution must return HTTP 409, got {gate_probe.status_code}: {gate_probe.text}"
+        )
+    print("UNAPPROVED_EXECUTION_BLOCKED=true")
     # Harness approval exercises the explicit approval endpoint; this is not
     # production operator identity verification or an interactive approval UI.
     approve = client.post("/v1/approve", headers=headers, json={
