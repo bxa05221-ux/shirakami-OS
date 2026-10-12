@@ -6,6 +6,7 @@ Evidence, Trace, or AIwitness state.
 """
 from __future__ import annotations
 
+import os
 from typing import Any
 
 from .provider_transport import ProviderRequest
@@ -26,10 +27,21 @@ class CopilotSDKProviderTransport:
                 "in the provider runtime before enabling this transport"
             ) from exc
 
-        # Authentication is intentionally delegated to the SDK. In CI it can
-        # consume COPILOT_GITHUB_TOKEN / GH_TOKEN / GITHUB_TOKEN; locally it can
-        # use the signed-in Copilot CLI credentials.
-        client = CopilotClient()
+        # Explicit token auth for CI; otherwise allow the SDK's local signed-in
+        # CLI flow. The token is never copied into ProviderRequest or evidence.
+        token = (
+            os.getenv("COPILOT_GITHUB_TOKEN")
+            or os.getenv("GH_TOKEN")
+            or os.getenv("GITHUB_TOKEN")
+        )
+        client = (
+            CopilotClient({
+                "github_token": token,
+                "use_logged_in_user": False,
+            })
+            if token
+            else CopilotClient()
+        )
         await client.start()
         try:
             session = await client.create_session(model=self.model)
