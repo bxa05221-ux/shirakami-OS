@@ -32,3 +32,16 @@ AIwitness over HTTP.
 GitHub’s current Copilot SDK Python examples use `CopilotClient`, an async
 session, and `send_and_wait`; this transport follows that boundary while
 keeping the SDK optional.
+
+
+## Running the observation workflow
+
+The workflow is `.github/workflows/copilot-provider-observation.yml`.
+
+- Without a provider credential, it runs the fixture path and must report `LIVE_PROVIDER_OBSERVED=false`.
+- With a valid GitHub Copilot SDK credential, it calls the real SDK from inside the async HTTP adapter and must report `LIVE_PROVIDER_OBSERVED=true`.
+- A successful fixture workflow is not evidence of a live model call.
+
+To enable the live path, configure a repository Actions secret named `COPILOT_GITHUB_TOKEN` containing a credential supported by the GitHub Copilot SDK and authorized for model access. Do not paste the credential into source, workflow inputs, issues, or chat. Then run **Copilot HTTP provider observation** using GitHub Actions' manual workflow dispatch.
+
+The live gate is accepted only if the workflow shows `LIVE_PROVIDER_OBSERVED=true` and the output also confirms `BOUNDARY_OBSERVED=true` and `TRACEABILITY_VALID=true`. If the secret is absent, the workflow deliberately verifies only the fixture path and leaves API MVP items 009/010 pending.
