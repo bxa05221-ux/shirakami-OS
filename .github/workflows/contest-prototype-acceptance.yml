@@ -1,0 +1,44 @@
+name: Contest prototype acceptance
+
+on:
+  push:
+    branches:
+      - feat/contest-prototype-acceptance-v0.1
+    paths:
+      - ".github/workflows/contest-prototype-acceptance.yml"
+      - "shirakami_os.py"
+      - "examples/evidence_route_demo.py"
+      - "runtime/**"
+      - "tests/**"
+      - "protocols/**"
+      - "spec/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install verification dependency
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest pyyaml fastapi pydantic httpx
+
+      - name: Run minimal executable entry point
+        run: python shirakami_os.py
+
+      - name: Run deterministic Evidence-to-Route demo
+        run: python examples/evidence_route_demo.py
+
+      - name: Run fixed Runtime and test suite
+        run: python -m pytest runtime tests -q
