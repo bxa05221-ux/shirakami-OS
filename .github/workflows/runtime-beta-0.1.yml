@@ -1,6 +1,6 @@
 name: Runtime β0.1 Verification
 
-# Repository-level documentation changes are included so the required runtime check remains the verification gate during rollout.
+# Repository-level documentation and acceptance-workflow changes remain covered by the required runtime verification gate.
 on:
   push:
     paths:
@@ -17,6 +17,7 @@ on:
       - "CHECKLIST.md"
       - ".github/workflows/runtime-beta-0.1.yml"
       - ".github/workflows/copilot-provider-observation.yml"
+      - ".github/workflows/contest-prototype-acceptance.yml"
       - "README.md"
       - "README.ja.md"
       - "VERSION"
@@ -36,6 +37,7 @@ on:
       - "CHECKLIST.md"
       - ".github/workflows/runtime-beta-0.1.yml"
       - ".github/workflows/copilot-provider-observation.yml"
+      - ".github/workflows/contest-prototype-acceptance.yml"
       - "README.md"
       - "README.ja.md"
       - "VERSION"
