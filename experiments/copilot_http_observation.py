@@ -8,8 +8,16 @@ from __future__ import annotations
 
 import asyncio
 import os
+import sys
 import uuid
+from pathlib import Path
 from typing import Any
+
+# Make direct invocation from a clean checkout work without requiring callers
+# to remember a PYTHONPATH setting.
+REPOSITORY_ROOT = str(Path(__file__).resolve().parents[1])
+if REPOSITORY_ROOT not in sys.path:
+    sys.path.insert(0, REPOSITORY_ROOT)
 
 from fastapi.testclient import TestClient
 
