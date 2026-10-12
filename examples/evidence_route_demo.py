@@ -10,8 +10,14 @@ explicit human approval in code and executes the selected route.
 """
 from __future__ import annotations
 
+import sys
 import tempfile
 from pathlib import Path
+
+# Make the documented direct invocation work from a clean repository checkout.
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+if str(REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPOSITORY_ROOT))
 
 from runtime.evidence import EvidenceRecord
 from runtime.one_stroke_route_pipeline import OneStrokeRoutePipeline
