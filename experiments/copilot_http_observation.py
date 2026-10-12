@@ -15,6 +15,8 @@ from fastapi.testclient import TestClient
 
 from api.http import ShirakamiHTTPTransport
 from runtime.prototype import Transition
+from runtime.provider_transport import ProviderRequest
+from runtime.copilot_sdk_transport import CopilotSDKProviderTransport
 
 API_KEY = "local-observation-key"
 PROTOCOL_ID = "copilot.http.observation"
@@ -80,33 +82,17 @@ async def main() -> None:
     trace_id = f"TRACE-COPILOT-HTTP-{uuid.uuid4().hex[:12]}"
 
     if live:
-        from copilot import CopilotClient
+        provider_transport = CopilotSDKProviderTransport(model="gpt-5.4")
 
-        async def provider_adapter(prompt: str, protocol_id: str) -> dict[str, str]:
-            # The token is supplied only to the SDK client; it is never added
-            # to request context, Runtime output, Evidence, Trace, or logs.
-            client = CopilotClient({
-                "github_token": token,
-                "use_logged_in_user": False,
-            })
-            await client.start()
-            try:
-                session = await client.create_session(model="gpt-5.4")
-                response = await session.send_and_wait(
-                    "For a Shirakami boundary smoke test, reply with a short "
-                    "plain-text acknowledgement. Do not call tools.\n\n"
-                    f"Protocol: {protocol_id}\nRequest: {prompt}"
+        async def provider_adapter(prompt: str, protocol_id: str) -> dict[str, Any]:
+            # The SDK call occurs inside the HTTP request's async adapter.
+            # Its response, not a pre-injected fixture value, enters Runtime.
+            return await provider_transport(
+                ProviderRequest(
+                    canonical_prompt=prompt,
+                    context={"protocol_id": protocol_id},
                 )
-                content = getattr(getattr(response, "data", None), "content", None)
-                if not isinstance(content, str) or not content.strip():
-                    raise RuntimeError("Copilot SDK returned no non-empty assistant content")
-                return {
-                    "output": content,
-                    "provider": "github-copilot-sdk",
-                    "model": "gpt-5.4",
-                }
-            finally:
-                await client.stop()
+            )
     else:
         async def provider_adapter(prompt: str, protocol_id: str) -> dict[str, str]:
             return {
