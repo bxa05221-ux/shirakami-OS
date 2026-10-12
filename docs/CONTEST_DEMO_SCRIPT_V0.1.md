@@ -34,7 +34,7 @@ Point to the selected route, result, verification status, and retained Evidence 
 
 **1:55–2:25 — What is and is not proven**
 
-“The deterministic demo and CI tests verify the prototype's tested control-flow and traceability boundaries. A fixture-based provider run is not a real model call. Live external-provider HTTP execution is a separate gate and must be reported as unverified unless the run explicitly records `LIVE_PROVIDER_OBSERVED=true` together with valid boundary and traceability results.”
+“The deterministic demo and CI tests verify the prototype's tested control-flow and traceability boundaries. In addition, the live OpenAI HTTP harness passed: [workflow run 38228522882](https://github.com/bxa05221-ux/shirakami-OS/actions/runs/38228522882) recorded `LIVE_PROVIDER_OBSERVED=true`, `BOUNDARY_OBSERVED=true`, `TRACEABILITY_VALID=true`, and `VERIFICATION_STATUS=pass`. This uses FastAPI TestClient; it does not claim a deployed public server or production operator identity verification.”
 
 **2:25–2:45 — Close**
 
@@ -46,7 +46,7 @@ Point to the selected route, result, verification status, and retained Evidence 
 - Terminal output from the three commands above.
 - CI links and outcomes tied to the same commit.
 - A screenshot or short recording showing `HUMAN_REVIEW`, explicit approval, execution result, verification status, and retained Evidence.
-- If live provider execution is not completed, include this limitation plainly; never relabel fixture mode as a live model run.
+- Include the live OpenAI HTTP workflow result and its exact commit in the evidence pack. State plainly that this is an in-process HTTP harness, not a deployed public server; never relabel fixture mode as a live model run.
 
 ## Submission guardrails
 
