@@ -19,7 +19,7 @@ RESPONSES_URL = os.getenv("OPENAI_RESPONSES_URL", "https://api.openai.com/v1/res
 
 def observation_protocol(context: Any) -> Transition:
     return Transition(kind=PROTOCOL_ID, data={
-        "provider_output_received": context.input.get("provider_output") is not None,
+        "input_received": bool(context.input),
     })
 
 async def openai_provider_adapter(prompt: str, protocol_id: str) -> dict[str, Any]:
