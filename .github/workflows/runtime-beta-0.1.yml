@@ -50,6 +50,11 @@ jobs:
 
       - name: Run Runtime and boundary tests
         run: python -m pytest runtime tests -q
+      - name: Smoke-run minimal OS entry point
+        run: python shirakami_os.py
+
+      - name: Smoke-run five-minute Human Gate demo
+        run: python examples/evidence_route_demo.py
 
       - name: Compile manga renderer
         run: python -m py_compile runtime/manga_manual.py
