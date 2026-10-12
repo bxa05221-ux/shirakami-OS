@@ -182,7 +182,24 @@ async def main() -> None:
     if not isinstance(output, dict) or not isinstance(output.get("output"), str) or not output["output"].strip():
         raise AssertionError("HTTP execution did not return non-empty provider output")
 
+    execution_id = body.get("execution_id")
+    if not isinstance(execution_id, str) or not execution_id:
+        raise AssertionError("HTTP execution did not return an execution_id")
+
+    # Verification must be performed through the HTTP API, not inferred from
+    # a successful execute response. This also updates the trace and AIwitness.
+    verification_response = client.post(
+        f"/v1/executions/{execution_id}/verify",
+        json={"expected_transition_kind": PROTOCOL_ID},
+        headers=headers,
+    )
+    verification_response.raise_for_status()
+    verification = verification_response.json()
+    if verification.get("status") != "pass":
+        raise AssertionError(f"HTTP execution verification did not pass: {verification!r}")
+
     assert_boundary(client, body, trace_id)
+    print("VERIFICATION_STATUS=pass")
     print(f"LIVE_PROVIDER_OBSERVED={'true' if live else 'false'}")
     if not live:
         print("reason=no provider credential configured; fixture path only")
