@@ -14,6 +14,8 @@ from typing import Any
 from fastapi.testclient import TestClient
 
 from api.http import ShirakamiHTTPTransport
+from runtime.api import ShirakamiAPI
+from runtime.evolution_bridge import ContextSnapshot
 from runtime.prototype import Transition
 from runtime.provider_transport import ProviderRequest
 from runtime.copilot_sdk_transport import CopilotSDKProviderTransport
@@ -101,7 +103,19 @@ async def main() -> None:
                 "protocol_id": protocol_id,
             }
 
+    api = ShirakamiAPI()
+    api.observe(
+        {"signal": "execute"},
+        ContextSnapshot(
+            protocol_id=PROTOCOL_ID,
+            landscape={},
+            metadata={"source": "copilot-http-observation"},
+        ),
+    )
+    api.analyze(PROTOCOL_ID, protocol_exists=True)
+
     transport = ShirakamiHTTPTransport(
+        api=api,
         protocol_registry={PROTOCOL_ID: observation_protocol},
         api_key=API_KEY,
         async_model_adapter=provider_adapter,
