@@ -15,7 +15,6 @@ from fastapi.testclient import TestClient
 
 from api.http import ShirakamiHTTPTransport
 from runtime.api import ShirakamiAPI
-from runtime.evolution_bridge import ContextSnapshot
 from runtime.prototype import Transition
 from runtime.provider_transport import ProviderRequest
 from runtime.copilot_sdk_transport import CopilotSDKProviderTransport
