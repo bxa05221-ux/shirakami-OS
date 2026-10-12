@@ -10,6 +10,7 @@ on:
       - "reviewer/**"
       - "shbb-api/**"
       - "protocols/**"
+      - "experiments/**"
       - "docs/**"
       - "CHECKLIST.md"
       - ".github/workflows/runtime-beta-0.1.yml"
@@ -50,6 +51,11 @@ jobs:
 
       - name: Run Runtime and boundary tests
         run: python -m pytest runtime tests -q
+
+      - name: Run provider HTTP observation in explicit fixture mode
+        env:
+          REQUIRE_LIVE_PROVIDER: "false"
+        run: python experiments/copilot_http_observation.py
 
       - name: Compile manga renderer
         run: python -m py_compile runtime/manga_manual.py

@@ -1,0 +1,38 @@
+name: Copilot HTTP provider observation
+
+on:
+  workflow_dispatch:
+    inputs:
+      require_live_provider:
+        description: "Fail unless a real Copilot model call succeeds"
+        required: true
+        type: boolean
+        default: false
+  push:
+    branches:
+      - feat/api-mvp-real-provider-harness-001
+
+jobs:
+  observation:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      PYTHONPATH: .
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+      REQUIRE_LIVE_PROVIDER: ${{ inputs.require_live_provider || 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/api-mvp-real-provider-harness-001
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install runtime and optional provider dependencies
+        run: python -m pip install --upgrade pip fastapi pydantic httpx pyyaml github-copilot-sdk
+      - name: Observe provider-neutral fixture path or live Copilot path through HTTP
+        run: python experiments/copilot_http_observation.py
+      - name: State acceptance boundary
+        run: |
+          echo "A fixture run verifies only the structural boundary."
+          echo "API MVP provider gate is satisfied only when LIVE_PROVIDER_OBSERVED=true."
