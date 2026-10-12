@@ -2,6 +2,12 @@ name: Copilot HTTP provider observation
 
 on:
   workflow_dispatch:
+    inputs:
+      require_live_provider:
+        description: "Fail unless a real Copilot model call succeeds"
+        required: true
+        type: boolean
+        default: false
   push:
     branches:
       - feat/api-mvp-real-provider-harness-001
@@ -14,6 +20,7 @@ jobs:
     env:
       PYTHONPATH: .
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+      REQUIRE_LIVE_PROVIDER: ${{ inputs.require_live_provider || 'false' }}
     steps:
       - uses: actions/checkout@v4
         with:
