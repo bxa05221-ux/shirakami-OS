@@ -122,6 +122,13 @@ class ShirakamiHTTPTransport:
         def approve(payload: ApproveInput) -> dict[str, Any]: return self.api.approve(approved=payload.approved, reviewer=payload.reviewer, human_authorized=payload.human_authorized)
         @app.post("/v1/execute", dependencies=[Depends(auth)])
         def execute(payload: ExecuteInput) -> dict[str, Any]:
+            # A candidate awaiting Human Review must fail closed at the HTTP
+            # boundary with a clear conflict response, not an uncaught RuntimeError.
+            if self.api.runtime.loop.state.value == "HUMAN_REVIEW":
+                raise HTTPException(
+                    status_code=409,
+                    detail="Human Gate approval required before execution",
+                )
             boundary = validate_execution_context(payload.boundary_context.model_dump())
             if boundary["handoff_id"] != payload.handoff_id:
                 raise HTTPException(status_code=422, detail="handoff_id mismatch between transport and boundary context")
