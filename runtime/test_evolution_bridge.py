@@ -72,3 +72,28 @@ def test_mismatch_evidence_preserves_expected_observed_boundary():
     assert evidence.transition_data["observed"] == "actual.transition"
     assert evidence.transition_data["uncertainty"] == "medium"
     assert evidence.transition_data["diff_ref"] == "D001"
+
+
+def test_verification_uncertainty_cannot_be_dropped_from_mapping():
+    verification = VerificationResult(
+        status="mismatch",
+        uncertainty="high",
+        observed={"actual": "B", "expected": "A"},
+    )
+    mapped = verification.as_mapping()
+    assert mapped["status"] == "mismatch"
+    assert mapped["uncertainty"] == "high"
+    assert mapped["observed"]["actual"] == "B"
+
+
+def test_uncertainty_is_not_rewritten_as_authority_or_truth():
+    verification = VerificationResult(
+        status="mismatch",
+        uncertainty="unresolved",
+        observed={"claim": "candidate interpretation"},
+    )
+    mapped = verification.as_mapping()
+    assert mapped["uncertainty"] == "unresolved"
+    assert "authority_granted" not in mapped
+    assert "decision_authorized" not in mapped
+    assert mapped["observed"]["claim"] == "candidate interpretation"
