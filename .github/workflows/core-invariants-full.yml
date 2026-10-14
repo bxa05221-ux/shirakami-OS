@@ -1,0 +1,40 @@
+name: Core Invariant Full Audit
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  core-invariants-full:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest
+      - name: Run C-01..C-10 invariant evidence tests
+        run: |
+          python -m pytest \
+            api/test_boundary.py::test_human_gate_cannot_be_disabled \
+            runtime/test_evolution_loop.py::test_human_gate_blocks_without_approval \
+            runtime/test_api.py::test_human_gate_requires_explicit_authorization \
+            runtime/test_evidence.py \
+            runtime/test_execution_evidence_projection.py \
+            runtime/test_evidence_landscape_boundary.py \
+            reviewer/test_evidence_promotion.py \
+            tests/test_observation_candidate.py::test_candidate_is_not_authorized_or_executable \
+            tests/test_oppai_candidate_discovery.py::test_candidate_discovery_does_not_activate_a_protocol \
+            tests/test_approval_envelope_provenance.py \
+            tests/test_structural_validation_human_gate.py \
+            tests/test_pipeline_runner.py \
+            runtime/test_agent_activity_verification.py::test_verification_updates_trace_without_granting_authority \
+            runtime/test_trace.py::test_verification_creates_new_immutable_trace_revision \
+            runtime/test_landscape_replay_determinism.py::test_evidence_replay_reconstructs_identical_landscape \
+            runtime/test_runtime_replaceability.py \
+            runtime/test_evolution_bridge.py \
+            runtime/test_core_invariants.py -q
