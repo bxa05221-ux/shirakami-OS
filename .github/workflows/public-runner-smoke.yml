@@ -1,0 +1,32 @@
+name: Public Runner Smoke Test
+
+on:
+  push:
+    paths:
+      - ".github/workflows/public-runner-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Verify public GitHub-hosted runner
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Confirm runner started
+        run: |
+          echo "PUBLIC_RUNNER_STARTED=true"
+          echo "Runner OS: $RUNNER_OS"
+          echo "Runner architecture: $RUNNER_ARCH"
+      - name: Verify Python and basic assertions
+        run: |
+          python - <<'PY'
+          import platform
+          assert platform.system() == "Linux", platform.system()
+          assert 1 + 1 == 2
+          print("SMOKE_TEST=PASS")
+          print("Python:", platform.python_version())
+          print("OS:", platform.platform())
+          PY
