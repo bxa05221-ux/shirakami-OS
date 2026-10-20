@@ -1,0 +1,46 @@
+threadrpg:
+  id: "threadrpg"
+  version: "1.0"
+  status: "reference_form"
+  origin: "白神高校ブラスバンド部"
+
+  landscape:
+    shared: true
+    role: "central_object"
+
+  observation:
+    priority: "first"
+    answer_priority: false
+
+  viewpoints:
+    count: 7
+    fixed_roles: false
+    meaning: "observation positions, not authorities"
+
+  thread:
+    unit: "observation"
+    preserve_history: true
+    temporal_connection: true
+
+  dark_layer:
+    unresolved_question_holding: true
+    forced_resolution: false
+
+  revisit:
+    creates_new_observation: true
+    preserves_previous_observation: true
+    triggers:
+      - "time"
+      - "new_context"
+
+  rainwater_mode:
+    increases_revisit: true
+    encourages_connection: true
+    forced_resolution: false
+
+  catch:
+    authority: "human"
+    system_must_not_declare: true
+
+  provider:
+    required: false
