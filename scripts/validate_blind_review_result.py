@@ -37,7 +37,7 @@ def validate_blind_review_result(result: dict[str, Any]) -> dict[str, Any]:
     if not str(result["objective"]).strip():
         raise ValueError("objective is required")
 
-    for field in REQUIRED_FIELDS[2:-1]:
+    for field in REQUIRED_FIELDS[3:-1]:
         if not isinstance(result[field], list):
             raise ValueError(f"{field} must be a list")
 

@@ -6,7 +6,8 @@ def valid_result():
     return {
         "reviewer_id": "copilot-independent-alpha",
         "matome_yaml": "matome:\n  reviewer_id: copilot-independent-alpha\n",
-"human_gate": {"required": True, "decision": "pending"},
+        "objective": "independent observation",
+        "human_gate": {"required": True, "decision": "pending"},
         "observations": ["observed boundary"],
         "evidence_ids": ["E1"],
         "resolved_questions": [],
