@@ -10,8 +10,12 @@ from typing import Any
 from fastapi.testclient import TestClient
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
+
+import runtime.api as _runtime_api
+
 _api_package = types.ModuleType("api")
 _api_package.__path__ = [str(_REPO_ROOT / "api")]
+_api_package.ShirakamiAPI = _runtime_api.ShirakamiAPI
 sys.modules["api"] = _api_package
 
 from api.http import create_app
