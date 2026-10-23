@@ -1,0 +1,72 @@
+matome:
+  title: "ThreadRPG Protocol v0.1"
+  codename: "thread-rpg"
+  status: "specification"
+
+  protocol:
+    version: "0.1"
+    layer: "application_protocol"
+    conformance_level: 0
+
+  purpose:
+    summary: >
+      会話を複数の視点から再構成し、隠れた視点、対立、
+      未確認事項を可視化する。
+    decision_authority: false
+
+  input:
+    landscape: true
+    context: true
+    conversation: true
+    evidence: true
+    protocol_parameters: true
+
+  perspective:
+    default_count:
+      minimum: 3
+      maximum: 7
+    authority: false
+    provenance_required: true
+    generated_persona_is_fact: false
+
+  output:
+    observation: true
+    evidence_candidate: true
+    candidate: true
+    decision: false
+    approval: false
+    execution: false
+    publication: false
+    merge: false
+
+  evidence:
+    existing_identity_preserved: true
+    provenance_preserved: true
+    independent_verification_required: true
+    generated_interpretation_is_verified_fact: false
+
+  human_gate:
+    required: true
+    autonomous_approval: false
+
+  semantic_handoff:
+    enabled: true
+    authority_transfer: false
+    preserve:
+      - handoff_id
+      - trace_id
+      - execution_id
+      - activity_id
+      - evidence_ids
+
+  verification:
+    required_for_verified_status:
+      - specification
+      - runtime
+      - evidence_boundary
+      - human_gate
+      - semantic_handoff
+
+  implementation:
+    status: "not_implemented"
+    next_conformance_level: 1
