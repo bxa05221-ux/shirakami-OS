@@ -10,6 +10,14 @@ from reviewer.registry import ReviewerBundle
 from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 try:
+    from ..runtime.evidence import EvidenceRecord
+except ImportError:
+    from runtime.evidence import EvidenceRecord
+try:
+    from ..runtime.thread_rpg_execution import execute_thread_rpg
+except ImportError:
+    from runtime.thread_rpg_execution import execute_thread_rpg
+try:
     from ..runtime.api import ShirakamiAPI
     from ..runtime.evolution_bridge import ContextSnapshot
     from .auth import require_api_key
@@ -56,6 +64,14 @@ class ExecuteInput(BaseModel):
     trace_id: str | None = None
     evidence_ids: list[str] = Field(default_factory=list)
     boundary_context: ExecutionBoundaryContext
+class ThreadRPGExecuteInput(BaseModel):
+    task: dict[str, Any]
+    perspectives: list[dict[str, Any]]
+    context: dict[str, Any] = Field(default_factory=dict)
+    protocol_id: str = "thread_rpg"
+    version: str = "0.1"
+
+
 class ReviewerRegistrationInput(BaseModel):
     project_id: str
     reviewer_id: str
@@ -75,8 +91,13 @@ class VerifyInput(BaseModel):
     diff_ref: str = ""
 
 class ShirakamiHTTPTransport:
-    def __init__(self, api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None, model_adapter: Callable[[str, str], Any] | None = None) -> None:
-        self.api = api or ShirakamiAPI(); self.protocol_registry = dict(protocol_registry or {}); self.api_key = api_key; self.model_adapter = model_adapter; self.reviewer_bundles: dict[str, ReviewerBundle] = {}
+    def __init__(self, api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None, model_adapter: Callable[[str, str], Any] | None = None, thread_rpg_adapter: Any = None) -> None:
+        self.api = api or ShirakamiAPI()
+        self.protocol_registry = dict(protocol_registry or {})
+        self.api_key = api_key
+        self.model_adapter = model_adapter
+        self.thread_rpg_adapter = thread_rpg_adapter
+        self.reviewer_bundles: dict[str, ReviewerBundle] = {}
     def create_app(self) -> FastAPI:
         app = FastAPI(title="Shirakami UI for AI API", version="alpha-0.1"); auth = require_api_key(self.api_key)
         @app.get("/health")
@@ -112,6 +133,82 @@ class ShirakamiHTTPTransport:
                     "reviewer_perspectives_preserved": True,
                 },
             }
+        @app.post("/v1/thread-rpg/execute", dependencies=[Depends(auth)])
+        def execute_thread_rpg_http(payload: ThreadRPGExecuteInput) -> dict[str, Any]:
+            if self.thread_rpg_adapter is None:
+                raise HTTPException(
+                    status_code=503,
+                    detail="ThreadRPG adapter is not configured",
+                )
+            try:
+                result = execute_thread_rpg(
+                    task=payload.task,
+                    perspectives=payload.perspectives,
+                    adapter=self.thread_rpg_adapter,
+                    context=payload.context,
+                    protocol_id=payload.protocol_id,
+                    version=payload.version,
+                )
+            except (TypeError, ValueError) as exc:
+                raise HTTPException(status_code=422, detail=str(exc)) from exc
+            except Exception as exc:
+                raise HTTPException(
+                    status_code=502,
+                    detail=f"ThreadRPG backend execution failed: {type(exc).__name__}",
+                ) from exc
+            evidence_ids = []
+            store = self.api.runtime.store
+
+            phase_results = [
+                (
+                    f"observation:{perspective_id}",
+                    observation,
+                    perspective_id,
+                )
+                for perspective_id, observation
+                in zip(result.perspective_ids, result.observations)
+            ]
+            phase_results.extend([
+                ("conference", result.conference, None),
+                ("matome", result.matome, None),
+            ])
+
+            for phase, phase_result, perspective_id in phase_results:
+                record = EvidenceRecord(
+                    protocol_id=result.protocol_id,
+                    status="observed",
+                    transition_kind=f"thread_rpg.{phase}",
+                    transition_data={
+                        "version": result.version,
+                        "phase": phase,
+                        "perspective_id": perspective_id,
+                        "output": phase_result.output,
+                        "backend": phase_result.backend,
+                        "adapter_evidence": dict(phase_result.evidence),
+                    },
+                    signals=(),
+                    confidence="observed",
+                )
+                store = store.append(record)
+                evidence_ids.append(record.evidence_id)
+
+            self.api.runtime.store = store
+            return {
+                "protocol_id": result.protocol_id,
+                "version": result.version,
+                "evidence_ids": evidence_ids,
+                "perspective_ids": list(result.perspective_ids),
+                "observations": result.observations,
+                "conference": result.conference,
+                "matome": result.matome,
+                "trace": result.trace,
+                "execution_authorized": False,
+                "publish_authorized": False,
+                "merge_authorized": False,
+                "human_gate_required": True,
+                "decision_authority": False,
+            }
+
         @app.post("/v1/observe", dependencies=[Depends(auth)])
         def observe(payload: ObserveInput) -> dict[str, Any]:
             context = ContextSnapshot(protocol_id=payload.context.protocol_id, landscape=payload.context.landscape, metadata=payload.context.metadata)
@@ -251,5 +348,11 @@ class ShirakamiHTTPTransport:
             return result
         return app
 
-def create_app(api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None, model_adapter: Callable[[str, str], Any] | None = None) -> FastAPI:
-    return ShirakamiHTTPTransport(api, protocol_registry, api_key, model_adapter).create_app()
+def create_app(api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None, model_adapter: Callable[[str, str], Any] | None = None, thread_rpg_adapter: Any = None) -> FastAPI:
+    return ShirakamiHTTPTransport(
+        api,
+        protocol_registry,
+        api_key,
+        model_adapter,
+        thread_rpg_adapter,
+    ).create_app()
