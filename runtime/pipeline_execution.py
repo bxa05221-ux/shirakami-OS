@@ -60,6 +60,7 @@ def execute_pipeline_plan(
                     action=step.action,
                     input=request.input,
                     context=plan.context,
+                    previous_outputs=tuple(results),
                 )
             )
         )

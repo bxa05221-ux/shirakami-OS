@@ -62,6 +62,7 @@ class PipelineAdapterRequest:
     action: str
     input: Mapping[str, Any]
     context: Mapping[str, Any]
+    previous_outputs: tuple["PipelineAdapterResult", ...] = ()
 
 
 @dataclass(frozen=True)
