@@ -14,6 +14,7 @@ class ImaginaryTerm:
     term_id: str
     side: str
     question: str
+    required_evidence: tuple[str, ...] = ()
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
 
@@ -47,12 +48,31 @@ class IField:
             raise ValueError(f"duplicate term_id: {term.term_id}")
         self._terms[term.term_id] = term
 
-    def resolve(self, term_id: str, value: Any, evidence_ref: str) -> ResolvedTerm:
-        if not evidence_ref:
-            raise ValueError("evidence_ref is required")
-        term = self._terms.pop(term_id, None)
+    def can_resolve(self, term_id: str, available_evidence: Mapping[str, Any]) -> bool:
+        """Return true only when every declared evidence reference is available."""
+        term = self._terms.get(term_id)
         if term is None:
             raise KeyError(term_id)
+        return all(ref in available_evidence for ref in term.required_evidence)
+
+    def resolve(
+        self,
+        term_id: str,
+        value: Any,
+        evidence_ref: str,
+        available_evidence: Mapping[str, Any] | None = None,
+    ) -> ResolvedTerm:
+        if not evidence_ref:
+            raise ValueError("evidence_ref is required")
+        term = self._terms.get(term_id)
+        if term is None:
+            raise KeyError(term_id)
+        if term.required_evidence:
+            if available_evidence is None:
+                raise ValueError("available_evidence is required")
+            if not self.can_resolve(term_id, available_evidence):
+                raise ValueError("required evidence is not available")
+        self._terms.pop(term_id)
         resolved = ResolvedTerm(term.term_id, term.side, value, evidence_ref)
         self._resolved.append(resolved)
         return resolved
