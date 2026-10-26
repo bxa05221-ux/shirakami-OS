@@ -1,0 +1,20 @@
+name: R0041 Trace Integrity Failure Classification
+
+on:
+  pull_request:
+    paths:
+      - "runtime/**"
+      - "tests/test_r0041_trace_integrity.py"
+      - ".github/workflows/r0041-trace-integrity.yml"
+  workflow_dispatch:
+
+jobs:
+  classify-adversarial-failures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pip pytest
+      - run: python -m pytest tests/test_r0041_trace_integrity.py -q

@@ -4,19 +4,44 @@ on:
   push:
     paths:
       - '.github/workflows/r0044-ci-gate-observation.yml'
+      - 'examples/real_world_trace.py'
+      - 'tests/test_real_world_trace.py'
+      - 'runtime/**'
+      - 'aiwitness/**'
   pull_request:
     paths:
       - '.github/workflows/r0044-ci-gate-observation.yml'
+      - 'examples/real_world_trace.py'
+      - 'tests/test_real_world_trace.py'
+      - 'runtime/**'
+      - 'aiwitness/**'
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install pytest
+        run: python -m pip install pytest
+      - name: Verify real-world trace reconstruction
+        run: python -m pytest tests/test_real_world_trace.py
       - name: Verify deterministic gate input
         run: |
           python - <<'PY'
-          print("R0044 verify: completed")
+          from pathlib import Path
+          required = [
+              Path('examples/real_world_trace.py'),
+              Path('tests/test_real_world_trace.py'),
+              Path('runtime/reconstruction.py'),
+              Path('runtime/aiwitness.py'),
+          ]
+          missing = [str(p) for p in required if not p.exists()]
+          if missing:
+              raise SystemExit(f'R0044 missing required artifacts: {missing}')
+          print('R0044 verify: reconstruction boundary present')
           PY
 
   gate:
