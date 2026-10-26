@@ -1,0 +1,37 @@
+matome:
+  title: "白神 Phase 2・Evidence Reference Boundary"
+  codename: "Observation to Evidence Reference"
+  status: "phase2_contract_frozen_candidate"
+
+  semantic_rule:
+    observation_is_evidence: false
+    evidence_requires_concrete_record: true
+
+  identity:
+    observation_id: "boundary-generated observation identity"
+    evidence_id: "stable identity of concrete EvidenceRecord"
+    handoff_reference: "optional evidence_ids[]"
+
+  flow:
+    - "Observation"
+    - "observation_id"
+    - "Concrete EvidenceRecord"
+    - "evidence_id"
+    - "SemanticHandoff"
+    - "API transport"
+
+  invariants:
+    api_creates_evidence: false
+    handoff_creates_evidence: false
+    empty_evidence_ids_is_valid: true
+    evidence_id_is_authority: false
+    authority_inference: false
+
+  authority_excluded:
+    - "approval"
+    - "human_gate"
+    - "execution_authorization"
+    - "protocol_promotion"
+    - "scope_expansion"
+
+  principle: "Observation can cross the boundary. Evidence can be referenced. Authority remains separate."
