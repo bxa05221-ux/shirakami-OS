@@ -1,0 +1,70 @@
+matome:
+  title: "ApprovalEnvelope Minimum Data Structure"
+  codename: "Approval-Envelope-Min-Schema"
+  version: "0.1"
+  status: "Research Experiment"
+
+  purpose: >
+    ApprovalEnvelopeが人間による意味側の承認を表現するために、
+    最小限必要となる情報を仮定する。
+
+  schema:
+    approval_id:
+      type: "string"
+      role: "この承認判断そのものを識別するID"
+      required: true
+    evidence_id:
+      type: "string"
+      role: "承認対象EvidenceRecordのstable identity"
+      required: true
+    semantic_scope:
+      type: "string"
+      role: "人間が承認した意味上の範囲"
+      required: true
+    decision:
+      type: "enum"
+      values:
+        - "approved"
+        - "rejected"
+        - "pending"
+      role: "人間による判断状態"
+      required: true
+    actor:
+      type: "string"
+      role: "判断主体を識別する参照"
+      required: true
+    decided_at:
+      type: "timestamp"
+      role: "判断が確定した時点"
+      required: true
+    reason:
+      type: "string"
+      role: "判断理由または補足"
+      required: false
+
+  invariants:
+    - "evidence_idはEvidenceRecord.evidence_idを参照する"
+    - "ApprovalEnvelopeはsemantic_scopeを越えて効力を持たない"
+    - "decision=approvedでも、GitHub merge権限を自動付与しない"
+    - "Evidence identityが変更された場合、既存ApprovalEnvelopeを新Evidenceへ再利用しない"
+    - "AIはactorとして自己承認を行わない"
+
+  lifecycle:
+    - "Approval Request"
+    - "pending"
+    - "Human Decision"
+    - "approved / rejected"
+
+  deliberately_unresolved:
+    - "actorの認証方式"
+    - "署名方式"
+    - "approval_idの生成規則"
+    - "semantic_scopeの正式な型"
+    - "失効・再承認の方式"
+    - "GitHub/API/Operationとのadapter仕様"
+
+  verification:
+    method: "schema-only research review"
+    success_condition: >
+      承認対象、Evidence identity、意味範囲、判断主体、判断状態、時点を
+      最小構造として表現でき、実装権限を暗黙に拡張しないこと。
