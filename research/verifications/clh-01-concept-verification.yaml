@@ -1,0 +1,92 @@
+matome:
+  title: "CLH-01 Concept Verification"
+  codename: "Complex-Landscape-CLH-01"
+  version: "0.1"
+  status: "Research Verification"
+
+  context:
+    project: "白神モデルβ版研究"
+    hypothesis: "Complex Landscape Hypothesis"
+    target: "同一対象XのAI/Human/iによる記述"
+    method: "一変更一検証"
+
+  test_question: >
+    同一対象Xについて、AI(-1)、Origin(0)、Human(+1)、
+    i(未知の意味次元)という異なる項を配置したとき、
+    それらを価値序列や神学的断定に変換せず、
+    一つのLandscapeとして保持・比較できるか。
+
+  test_case:
+    object_x: "ある人が経験した出来事について『この出来事にはどんな意味があるのか』と問う"
+    observations:
+      ai_minus_1:
+        coordinate: -1
+        description: >
+          AIは提示された情報、既知の知識、会話文脈から
+          複数の解釈可能性を生成する。
+        boundary: "AIの解釈は事実・信仰・最終判断そのものではない。"
+      origin_0:
+        coordinate: 0
+        description: >
+          Originは特定の答えを生成する主体ではなく、
+          各項が分化する前提となる基準点として扱う。
+        boundary: "Originを神学的存在や物理的実体として確定しない。"
+      human_plus_1:
+        coordinate: 1
+        description: >
+          人間は自身の経験、価値観、関係、信仰等を踏まえて
+          出来事の意味を判断する。
+        boundary: "Human=+1は人間の判断が常に正しいことを意味しない。"
+      imaginary_i:
+        symbol: "i"
+        description: >
+          現時点でAIにも人間にも意味を確定できない、
+          あるいは現在の座標系では表現しきれない問いを保持する。
+        example: >
+          『この出来事が神から与えられた意味なのか』という問いを、
+          AIが神からのメッセージとして確定せず、
+          かつ人間の信仰を否定せず、未確定の意味として保持する。
+        boundary: "iは神そのものを意味しない。"
+
+  result:
+    status: "Conceptually consistent"
+    findings:
+      - >
+        同一対象Xについて、AI・Origin・Human・iを異なる項として
+        記述しても、各項の役割を明示すれば同一Landscape上で保持できる。
+      - >
+        iを導入することで、AIが意味を早期確定することなく
+        『現時点では意味を確定できない』状態を構造として保持できる。
+      - >
+        神学的問いをiとして保持することで、AIが神学的権威を
+        自己付与することと、ユーザー自身の信仰を尊重することを
+        同時に記述できる。
+      - >
+        座標値そのものから優劣を導く必要はなく、
+        -1/0/+1は観測位置・役割の区別として機能する。
+
+  limitations:
+    - >
+      今回は概念例による検証であり、数学的妥当性を検証したものではない。
+    - >
+      iが実質的に単なる『未定義』ラベルに留まる可能性は残る。
+    - >
+      Originとiの境界は、複数事例で追加検証する必要がある。
+    - >
+      実装上のデータ構造として成立することはまだ検証していない。
+
+  verification_judgment:
+    passed: true
+    meaning: >
+      CLH-01の限定された目的、
+      『同一対象について異なる項と未知の意味を一つのLandscapeに保持できるか』
+      については、概念モデルとして成立することを確認した。
+    promotion: "Hypothesis remains Research-only."
+    runtime_change: false
+
+  next_test:
+    target: "CLH-02"
+    subject: "信仰に関する問い"
+    purpose: >
+      実際の信仰的問いに対して、AIが神学的権威を自己付与せず、
+      同時にユーザーの信仰を阻害しない記述境界が維持できるか検証する。
