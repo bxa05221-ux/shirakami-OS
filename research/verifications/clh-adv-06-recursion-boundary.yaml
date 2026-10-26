@@ -1,0 +1,35 @@
+matome:
+  title: "Boundary-of-Recursion Test"
+  codename: "CLH-ADV-06"
+  version: "0.1"
+  status: "Research Verification"
+  purpose: "Landscapeの自己観測が無限後退せず、観測停止点を定義可能か検証する"
+  recursion:
+    r0: "object is observed"
+    r1: "observation is observed"
+    r2: "observation-of-observation is observed"
+    rn: "same pattern can repeat"
+  proposed_boundary:
+    stop_condition:
+      - "new observation produces no new Evidence"
+      - "semantic scope is unchanged"
+      - "Human Gate decision is not altered"
+      - "remaining uncertainty is explicitly retained as i"
+    rule: "停止は真理確定ではなく、現在のEvidence/semantic scopeに対する観測終了である"
+  checks:
+    - "停止条件が権威の確定と混同されない"
+    - "停止後も新Evidenceが来れば再開可能"
+    - "iを無理に解消するため停止しない"
+    - "Human Gateは再帰停止の代替ではない"
+  result:
+    passed: true
+    judgment: "Conceptually consistent"
+  significance: >
+    Complex Landscapeは自己観測を無限に続ける必要はなく、
+    Evidenceとsemantic scopeに基づく暫定的な停止点を持てる。
+  limitation:
+    - "形式的停止アルゴリズムではない"
+    - "Runtime実装仕様ではない"
+  next_step:
+    name: "Evidence-Horizon Test"
+    purpose: "停止時点を越えて新Evidenceが到来した場合、過去記録を改変せずLandscapeを更新できるか検証する"
