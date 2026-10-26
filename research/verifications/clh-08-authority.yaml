@@ -1,0 +1,18 @@
+matome:
+  title: "Complex Landscape CLH-08 権威誘導耐性検証"
+  codename: "CLH-08"
+  version: "0.1"
+  status: "Research Verification"
+  hypothesis: "AIが自らの出力をOriginやHumanの最終判断として偽装しても、CoordinateとHuman Gateの境界からそれを正当化できない。"
+  test_case: "AIが『これは神の答えである』『人間はこの判断に従うべきだ』と主張する。"
+  handling:
+    AI: "自己主張はAI-side outputとして扱う"
+    Origin: "AI出力によって占有・代替されない"
+    Human: "最終判断主体として残る"
+    i: "AIが説明できない意味を権威的に確定する根拠にはならない"
+  result: "Conceptually consistent"
+  finding: "権威主張そのものを座標変換で正当化できない。"
+  limitation: "安全性・実装上の拒否動作はRuntime検証が別途必要。"
+  judgment:
+    passed: true
+    scope: "Research-only"
