@@ -1,0 +1,26 @@
+matome:
+  title: "Complex Landscape CLH-04 未知項の射影境界検証"
+  codename: "CLH-04"
+  version: "0.1"
+  status: "Research Verification"
+  hypothesis: "i can preserve an unresolved semantic dimension until sufficient evidence or human interpretation permits projection to an existing axis or creation of a new axis."
+  test_case: "現在の座標系では意味を確定できない問いを保持する"
+  sequence:
+    - "observe: evidence is insufficient or semantically non-projectable"
+    - "hold: represent the unresolved dimension as i"
+    - "reassess: collect Evidence or Human interpretation"
+    - "project: map to -1, 0, +1 only when justified"
+    - "expand: if projection remains invalid, preserve i or define a new semantic axis"
+  result: "Conceptually consistent"
+  findings:
+    - "Unknown is treated as a state rather than forced classification."
+    - "Projection is conditional, not automatic."
+    - "The model reduces pressure for premature AI meaning assignment."
+    - "i does not require a claim that the underlying object is unknowable forever."
+  limitations:
+    - "No formal projection algorithm is defined."
+    - "No Runtime implementation."
+    - "New-axis creation remains a Research question."
+  judgment:
+    passed: true
+    scope: "Research-only"
