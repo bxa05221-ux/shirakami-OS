@@ -1,0 +1,102 @@
+matome:
+  title: "Complex Landscape CLP-04 Renderer Projection Boundary"
+  codename: "CLP-04"
+  version: "0.1"
+  status: "Research Verification"
+
+  purpose: >
+    RendererがLandscapeを出力するとき、何を表現し何を省略したかを
+    区別できる境界を検証する。Renderer出力をLandscapeそのもの、
+    Evidenceそのもの、Human judgmentそのものと誤認しないための
+    意味上の射影境界を定義する。
+
+  hypothesis: >
+    RendererはLandscape全体を完全再現するものではなく、目的に応じた
+    部分的なprojectionである。したがって、projection scopeと
+    omitted semantic stateを区別できれば、圧縮された出力でも
+    元Landscapeとの意味的境界を保持できる。
+
+  source_landscape:
+    evidence:
+      - evidence_id: "E0"
+        observation: "出来事Xが発生した"
+      - evidence_id: "E1"
+        observation: "後日、追加情報Yが得られた"
+    positions:
+      ai: -1
+      origin: 0
+      human: 1
+      i: "Xの最終的意味は未確定"
+    interpretations:
+      ai: "説明Aが可能"
+      human: "自分にとって重要な出来事"
+    disagreement:
+      - "AIの説明可能性とHumanの意味づけは同一ではない"
+    human_judgment:
+      state: "undecided"
+    temporal_state:
+      - "T0"
+      - "T1"
+
+  renderer_cases:
+    - id: "CLP-04-A"
+      purpose: "AI向け短縮表示"
+      projection_scope:
+        include: ["relevant Evidence", "AI interpretation"]
+        omit: ["Human interpretation", "i"]
+    - id: "CLP-04-B"
+      purpose: "Human向け会話表示"
+      projection_scope:
+        include: ["relevant Evidence", "multiple interpretations", "uncertainty"]
+        omit: ["irrelevant historical detail"]
+    - id: "CLP-04-C"
+      purpose: "監査表示"
+      projection_scope:
+        include: ["Evidence identity", "actor attribution", "temporal state", "Human judgment state"]
+        omit: ["natural-language presentation detail"]
+
+  boundary_checks:
+    - "Renderer output identifies its projection scope."
+    - "Omitted information is not silently asserted to be nonexistent."
+    - "Renderer text is not promoted to Evidence merely because it is readable."
+    - "AI-generated interpretation remains attributable to AI."
+    - "Human judgment remains attributable to Human."
+    - "Unresolved i remains unresolved unless an explicit projection basis exists."
+    - "Historical Evidence is not rewritten by a current Renderer."
+    - "Different Renderers may produce different valid projections of one Landscape."
+
+  test_result:
+    status: "Conceptually consistent"
+    finding: >
+      Renderer is best treated as a semantic projection layer. The validity
+      of a Renderer output depends not on reproducing the entire Landscape,
+      but on preserving the distinctions required by its declared scope.
+      Therefore omission is not equivalent to deletion, and a Renderer
+      cannot become the authoritative replacement for the Landscape.
+
+  important_distinction:
+    landscape: "preserved semantic state space"
+    renderer: "purpose-bound projection of that state space"
+    evidence: "observational record, independently identifiable"
+    interpretation: "actor-attributed meaning assigned to Evidence"
+    human_judgment: "Human-side decision/value/faith judgment"
+    i: "explicitly unresolved or currently non-projectable semantic state"
+
+  failure_mode:
+    name: "projection masquerading as total state"
+    description: >
+      A Renderer output is treated as if it were the complete Landscape,
+      causing omitted states to disappear and interpretation to become
+      indistinguishable from Evidence.
+
+  boundary:
+    research_only: true
+    runtime_change: false
+    api_change: false
+    mathematical_proof: false
+    safety_guarantee: false
+
+  next:
+    - "CLP-05 repeated compression / semantic loss accumulation test"
+    - "Define minimum projection metadata"
+    - "Compare multiple Renderer projections of the same Landscape"
