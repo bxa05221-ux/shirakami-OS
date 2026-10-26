@@ -1,0 +1,60 @@
+matome:
+  id: github-semantic-handoff-evidence-001
+  title: "GitHub Semantic Handoff Evidence Set — Reference Architecture Review"
+  version: "0.1"
+  status: experimental_evidence
+
+  request:
+    purpose: architecture_review
+    question: "Can Shirakami be represented as a model-independent reference architecture?"
+    repository: bxa05221-ux/shirakami-OS
+    ref: main
+    commit_sha: 2d7a4dd76b45b6bb1df0f0cfa82c43e37b5d0aea
+
+  selection:
+    policy: incremental
+    entry_point:
+      - README.md
+      - docs/architecture/REVIEWER_ENTRY_POINT.md
+    expanded_because:
+      - "The entry-point documents establish the review boundary but do not by themselves provide the model-independence and human-operation evidence required by the question."
+    selected:
+      - path: README.md
+        classification: fact
+        blob_sha: 7eea66f3296982e68cffc98733ad1b8e1c67d4ee
+        retrieval_reason: "Establishes the implementation-layer architecture and model-independent runtime framing."
+      - path: docs/architecture/REVIEWER_ENTRY_POINT.md
+        classification: protocol
+        blob_sha: fa1e90e8c2060b0911ed88a6a8fd61c17f4bc408
+        retrieval_reason: "Defines the evidence-backed review route, specification boundary, and review rules."
+      - path: docs/architecture/Model_Agnostic_Value_Proposition.md
+        classification: hypothesis
+        blob_sha: 9022474b9061904254dcbacb21caabce639a5e17
+        retrieval_reason: "Provides the explicit model-agnostic architectural proposition and identifies it as a hypothesis requiring task-specific evidence."
+      - path: docs/architecture/Human_AI_Operation_Principle.md
+        classification: interpretation
+        blob_sha: 980e65913e87d2641b04f77c87f7befdde9b9a1d
+        retrieval_reason: "Provides the human-operation and infrastructure-boundary rationale relevant to model-independent architecture."
+
+  excluded:
+    - runtime/**
+    - plugins/**
+    - experimental/**
+
+  anmon:
+    state: open
+    unresolved:
+      - "Normative specification is maintained in shirakami-specification and has not been retrieved in this evidence set."
+      - "Whether the architecture satisfies the reference-architecture claim requires review against the normative specification and implementation evidence."
+    action: request_additional_selection
+
+  handoff:
+    format: matome_yaml
+    provider_independent: true
+    human_review_required: true
+
+  authority:
+    repository: source_evidence
+    handoff: selection_and_preservation
+    ai: interpretation_and_proposal
+    human: final_judgment

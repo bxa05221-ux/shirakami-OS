@@ -1,0 +1,91 @@
+id: github-semantic-handoff
+name: GitHub Semantic Handoff Protocol
+version: "0.1"
+status: experimental
+kind: semantic_handoff
+
+purpose:
+  - "Select only the repository evidence required for a stated question."
+  - "Preserve source identity and revision before AI interpretation."
+  - "Separate repository retrieval from semantic authority."
+
+principles:
+  - "Repository is a source, not Context itself."
+  - "Selection precedes retrieval."
+  - "Evidence precedes interpretation."
+  - "No silent expansion of retrieval scope."
+  - "Human remains the final authority."
+
+flow:
+  - HumanRequest
+  - SemanticSelection
+  - GitHubRetrieval
+  - EvidencePreservation
+  - AnmonCheck
+  - ProtocolHandoff
+  - AIRuntime
+  - HumanReview
+
+input:
+  required:
+    - purpose
+    - repository
+  optional:
+    - ref
+    - constraints
+    - include
+    - exclude
+
+selection:
+  default_entrypoint:
+    - README.md
+    - docs/architecture/REVIEWER_ENTRY_POINT.md
+  expansion_rules:
+    architecture_review:
+      - docs/architecture/**
+      - spec/**
+    implementation_review:
+      - runtime/**
+      - tests/**
+    protocol_review:
+      - protocols/**
+      - examples/**
+  rule: "Expand only when the question requires evidence beyond the current selection."
+
+retrieval:
+  preferred_revision: commit_sha
+  preserve:
+    - repository
+    - path
+    - ref
+    - commit_sha
+    - content
+    - retrieval_reason
+
+classification:
+  allowed:
+    - fact
+    - interpretation
+    - hypothesis
+    - unresolved
+    - protocol
+  rule: "Never promote interpretation or hypothesis to fact without verification."
+
+anmon:
+  purpose: "Hold unresolved evidence requirements before additional retrieval."
+  insufficient_evidence_action: "request_additional_selection"
+
+handoff:
+  format: matome_yaml
+  provider_independent: true
+
+authority:
+  repository: source_evidence
+  ai: interpretation_and_proposal
+  human: final_judgment
+
+constraints:
+  - "Do not treat repository names as architectural evidence."
+  - "Do not retrieve the entire repository by default."
+  - "Do not silently broaden include scope."
+  - "Do not mutate repository state during retrieval."
