@@ -1,0 +1,110 @@
+registry:
+  id: shirakami-protocol-registry
+  version: "0.1.0"
+  status: draft
+  source_of_truth: matome_yaml
+  principle: >
+    The registry indexes existing Matome YAML protocols. It does not redefine
+    their theory or silently convert their semantics.
+
+layers:
+  core:
+    - id: conversation_turn
+      title: Conversation Turn Protocol
+      source_status: existing
+      runtime_tier: tier_1
+    - id: guide_runtime
+      title: Guide Runtime Protocol
+      source_status: existing
+      runtime_tier: tier_1
+
+  cognition:
+    - id: creative_dialogue_runtime
+      title: Creative Dialogue Runtime
+      source_status: existing
+      runtime_tier: tier_1
+    - id: perspective
+      title: Perspective Protocol
+      source_status: existing
+      runtime_tier: tier_3
+    - id: anmon_layer
+      title: 暗問層
+      source_status: existing
+      runtime_tier: tier_3
+    - id: cognitive_echo_location
+      title: Cognitive Echo Location
+      source_status: existing
+      runtime_tier: tier_3
+    - id: phase_rotation_3d
+      title: Phase Rotation 3D
+      source_status: existing
+      runtime_tier: tier_3
+    - id: pilgrimage_protocol
+      title: Pilgrimage Protocol
+      source_status: existing
+      runtime_tier: tier_3
+
+  workflow:
+    - id: thread_rpg
+      title: Thread RPG Protocol
+      source_status: existing
+      runtime_tier: tier_2
+
+  media:
+    - id: shirakami_radio
+      title: Shirakami Radio Protocol
+      source_status: existing
+      runtime_tier: tier_2
+    - id: manga_runtime
+      title: Manga Runtime / Renderer Protocols
+      source_status: existing
+      runtime_tier: tier_2
+    - id: manga_manual
+      title: Manga User Manual Protocols
+      source_status: existing
+      runtime_tier: tier_2
+
+  metadata:
+    - id: kaorukaze_metadata
+      title: Kaorukaze Metadata
+      source_status: existing
+      runtime_tier: tier_2
+
+  experimental:
+    - id: anmon_layer_reverse_pilgrimage
+      title: 暗問層逆算プロトコル
+      source_status: existing
+      runtime_tier: tier_3
+
+runtime_tiers:
+  tier_1:
+    name: runtime_first
+    purpose: >
+      Protocols that can be validated against the current Runtime without
+      introducing new theory.
+  tier_2:
+    name: adapter_renderer
+    purpose: >
+      Protocols whose execution depends on an existing renderer, media
+      pipeline, or adapter boundary.
+  tier_3:
+    name: cognition_verification
+    purpose: >
+      Protocols requiring observation and verification before being treated
+      as executable Runtime behavior.
+
+lifecycle:
+  - discover
+  - register
+  - validate
+  - load
+  - execute
+  - observe
+  - record_evidence
+
+rules:
+  - registry_entries_must_reference_existing_protocols
+  - registry_does_not_change_protocol_meaning
+  - unverified_protocols_are_not_promoted_to_runtime_contracts
+  - implementation_details_belong_to_design_or_implementation
+  - original_matome_yaml_is_preserved
