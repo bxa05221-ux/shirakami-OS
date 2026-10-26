@@ -1,0 +1,27 @@
+matome:
+  id: R0114-evidence-identity
+  title: "Evidence Identity Boundary"
+  version: "0.1"
+  status: "implementation"
+  purpose:
+    - "既存Evidence fingerprintをEvidence参照境界として明示する"
+    - "新規Evidence意味論やIdentity Managerを導入しない"
+  boundary:
+    from: "EvidenceRecord"
+    through: "evidence_fingerprint"
+    to: "evidence_ref"
+  implementation:
+    - "evidence_id() derives identity from the existing deterministic fingerprint"
+    - "matches_evidence_ref() verifies ownership of an evidence reference"
+  tests:
+    - "same Evidence produces the same identity"
+    - "different Evidence produces different identities"
+    - "valid reference matches"
+    - "unknown reference does not match"
+    - "identity calculation does not mutate Evidence"
+    - "empty reference does not match"
+  exclusions:
+    - "Evidence schema changes"
+    - "timestamps or UUID identity"
+    - "Evidence Manager"
+    - "new domain semantics"
