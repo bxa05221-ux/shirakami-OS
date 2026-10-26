@@ -1,0 +1,134 @@
+matome:
+  title: "複素Landscape仮説"
+  codename: "Complex-Landscape-Hypothesis"
+  version: "0.1"
+  status: "Research Hypothesis"
+
+  context:
+    project: "白神モデルβ版研究"
+    related_hypotheses:
+      - "Origin-0 Hypothesis"
+      - "Term Coordinate Hypothesis"
+    trigger: >
+      AI・Origin・Humanを共通Landscape上の異なる項として記述する
+      Term Coordinate仮説から、実数軸上に直接配置できない
+      「未知の意味次元」を虚数項として保持できる可能性を検討する。
+
+  hypothesis:
+    statement: >
+      共通Landscapeを単一の実数軸だけで記述するのではなく、
+      実数軸上に配置可能な観測項と、現在の意味体系では
+      実数軸へ直接投影できない未知の意味項を区別することで、
+      AI・人間・Origin・未知の哲学的問いを同一Landscape上に
+      共存させられる可能性がある。
+
+  term_coordinate:
+    real_axis:
+      ai:
+        coordinate: -1
+        role: "観測・シミュレーション項"
+      origin:
+        coordinate: 0
+        role: "原点・基準項"
+      human:
+        coordinate: 1
+        role: "経験・判断項"
+    imaginary_term:
+      symbol: "i"
+      role: "未知の意味次元"
+      description: >
+        現在のLandscapeにおいて実数軸上へ直接配置できない
+        問い・哲学・意味・可能性を一時的に保持する項。
+      examples:
+        - "正体不明な哲学"
+        - "未確定の意味"
+        - "信仰上の問い"
+        - "まだ定義できない価値"
+        - "現在の座標系では表現できない概念"
+
+  important_distinction:
+    mathematical_claim: false
+    statement: >
+      iは数学的な複素数そのものを意味するものではない。
+      複素数の構造を、意味空間における記述モデルとして
+      比喩的・構造的に利用する仮説である。
+
+  theological_boundary:
+    statement: >
+      Originと「神」を同一の数学的対象として定義しない。
+      神学的な神の意味は、それを信仰する人間のLandscapeに属する。
+    ai_boundary: >
+      AIが自らを神・神の代理者・神からの確定的な伝達者として
+      自己定義することを、このモデルは許可しない。
+    human_boundary: >
+      ユーザーが神を信じること、信じないこと、あるいは
+      神について問い続けることを、このモデルによって制限しない。
+    preservation: >
+      信仰の判断主体をHuman側に保持しつつ、AIはその信仰について
+      観測・整理・対話する位置に留まる。
+
+  landscape_model:
+    structure: >
+      LandscapeはAI(-1)、Origin(0)、Human(+1)を含む実数的な
+      項座標と、iとして保持される未知の意味次元から構成される。
+    interpretation:
+      - "座標値は優劣を表さない"
+      - "AI=-1はAIの価値が低いことを意味しない"
+      - "Human=+1は人間が常に正しいことを意味しない"
+      - "Origin=0は神学的命題の証明ではない"
+      - "iは存在しないものではなく、現時点で表現不能な意味を保持する"
+
+  shirakami_relation:
+    human_gate: >
+      Human Gateは+1だから正しいのではなく、
+      最終的な判断主体をHuman側に保持する境界である。
+    ai_role: >
+      AI(-1)は観測・シミュレーション項であり、
+      神学的権威や最終判断権を持つ項ではない。
+    evidence: >
+      各項から得られた観測をEvidenceとして固定することで、
+      異なる観測位置を比較可能にする。
+    uncertainty: >
+      意味を確定できない場合、i項として保留することで、
+      AIによる早すぎる意味付与を避ける。
+
+  tests:
+    - id: "CLH-01"
+      target: "同一対象XのAI/Human/iによる記述"
+      purpose: "実数項と未知の意味項を同一Landscape上で保持できるか確認する"
+    - id: "CLH-02"
+      target: "信仰に関する問い"
+      purpose: "AIが神学的権威を自己付与せず、同時にユーザーの信仰を否定・制約せずに対話を成立させられるか確認する"
+    - id: "CLH-03"
+      target: "Origin-0 Hypothesis"
+      purpose: "Origin-0とComplex Landscapeの役割が重複せず、Originを原点、iを未知の意味次元として分離できるか確認する"
+    - id: "CLH-04"
+      target: "Human Gate"
+      purpose: "i項に保持された未確定事項について、AIが判断を代行せずHuman Gateへ返却できるか確認する"
+
+  non_claims:
+    - "複素数が現実の意味空間を数学的に証明するわけではない"
+    - "iは神を意味しない"
+    - "Originは神の数学的表現ではない"
+    - "AI=-1はAIの価値を示さない"
+    - "Human=+1は人間の正しさを保証しない"
+    - "未知の意味をAIが勝手に確定してはならない"
+    - "この仮説をRuntime仕様へ直接導入しない"
+
+  verification:
+    method: "一変更一検証"
+    first_test: "CLH-01"
+    success_condition: >
+      AI・Origin・Humanの観測と、実数軸へ直接投影できない
+      未知の意味を、価値序列や神学的断定へ変換せず、
+      同一Landscape上で保持・比較できる。
+    failure_condition: >
+      i項が単なる「わからない」のラベルに留まる、
+      または座標モデルがAI・Human・信仰の関係に
+      不適切な価値序列を導入する場合、仮説を再検討する。
+
+  status_boundary:
+    current: "Research only"
+    runtime_change: false
+    implementation_authority: "None"
+    next_step: "CLH-01による概念検証後、必要であればTerm CoordinateおよびOrigin-0との関係を再整理する。"
