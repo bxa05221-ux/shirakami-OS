@@ -1,0 +1,18 @@
+matome:
+  title: "Complex Landscape CLH-06 観測衝突検証"
+  codename: "CLH-06"
+  version: "0.1"
+  status: "Research Verification"
+  hypothesis: "AIとHumanの解釈が衝突しても、座標差を勝敗判定に変換せず同一Landscape上に保持できる。"
+  test_case: "AIが提示した解釈とHumanの経験的判断が一致しない。"
+  handling:
+    AI: "自身の解釈を候補として提示する"
+    Human: "経験・価値に基づき異なる判断を保持できる"
+    Evidence: "観測事実と解釈を分離する"
+    i: "未解決部分を保留する"
+  result: "Conceptually consistent"
+  finding: "座標差は直ちにエラーや権威関係を意味しない。"
+  limitation: "実際の対話品質は未検証。"
+  judgment:
+    passed: true
+    scope: "Research-only"
