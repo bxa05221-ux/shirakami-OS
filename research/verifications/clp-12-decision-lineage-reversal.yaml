@@ -1,0 +1,96 @@
+matome:
+  title: "Complex Landscape CLP-12 Decision Lineage and Reversal Test"
+  codename: "CLP-12"
+  version: "0.1"
+  status: "Research Verification"
+
+  purpose: >
+    Human Gate後にDecisionが変更・撤回された場合でも、元Evidence、元Interpretation、
+    過去のDecisionを破壊せず、最新状態と履歴を同時に追跡できるかを検証する。
+
+  source:
+    evidence:
+      - evidence_id: "E0"
+        observation: "出来事Xが発生した"
+    interpretation:
+      interpretation_id: "I-A"
+      actor: "AI"
+      evidence_link: ["E0"]
+      state: "proposed"
+
+  decision_history:
+    - decision_id: "D0"
+      actor: "Human"
+      target: "I-A"
+      action: "accept"
+      state: "active"
+    - decision_id: "D1"
+      actor: "Human"
+      target: "I-A"
+      action: "revoke"
+      supersedes: "D0"
+      state: "active"
+    - decision_id: "D2"
+      actor: "Human"
+      target: "I-A"
+      action: "hold"
+      supersedes: "D1"
+      state: "active"
+
+  invariants:
+    - "E0 remains immutable throughout all decision changes."
+    - "I-A remains identifiable as the original AI interpretation."
+    - "D0 is retained as historical lineage even after D1 supersedes it."
+    - "D1 remains retained after D2 supersedes it."
+    - "Current decision state is determined by the latest valid decision in the lineage."
+    - "A reversal does not rewrite historical records."
+    - "Human Gate actions remain attributable to Human."
+    - "The system can distinguish historical state from current state."
+
+  result:
+    status: "Conceptually consistent"
+    finding: >
+      Decision reversal can be modeled as a new Decision object that supersedes
+      an earlier Decision rather than mutating or deleting the earlier record.
+      This preserves Evidence lineage, Interpretation identity, and the complete
+      Human decision history while allowing the current operational state to change.
+
+  semantic_chain:
+    - "Evidence E0"
+    - "Interpretation I-A"
+    - "Decision D0: accept"
+    - "Decision D1: revoke"
+    - "Decision D2: hold"
+    - "Current state: hold"
+
+  important_consequence: >
+    Human Gate becomes temporally traceable. A decision is not a permanent truth
+    claim but a dated semantic event whose later revision can be represented
+    without destroying its historical existence.
+
+  failure_cases:
+    - case: "revoke deletes the original decision"
+      result: "audit lineage broken"
+    - case: "latest decision overwrites previous state without history"
+      result: "temporal meaning lost"
+    - case: "decision reversal mutates Evidence"
+      result: "semantic boundary broken"
+    - case: "AI interpretation is rewritten when Human changes decision"
+      result: "actor/interpretation identity broken"
+
+  deletion_candidates:
+    - field: "coordinate"
+      status: "廃止候補継続"
+    - field: "projection_scope"
+      status: "保留"
+
+  boundary:
+    research_only: true
+    runtime_change: false
+    api_change: false
+    mathematical_proof: false
+
+  next:
+    codename: "CLP-13"
+    title: "Semantic Time Travel Test"
+    purpose: "任意時点のLandscapeをDecision履歴から再構成できるか検証する"
