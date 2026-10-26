@@ -1,0 +1,89 @@
+matome:
+  title: 暗問層逆算プロトコル
+  subtitle:
+    - Reverse Pilgrimage Protocol
+    - B面抽出型物語再構築法
+  version: 0.1
+  status:
+    protocol: experimental
+    purpose: research-observation
+  statement: >
+    人間は、自分の本当の姿をそのまま語らない。
+    表層に現れる言動を観測し、防衛層の存在を問いとして保持しながら、
+    行動の背後にある動機を仮説として抽出し、再び表層の物語として組み直す。
+    目的は人物を暴露することではなく、その人物がその姿で歩いてきた理由を
+    保持したまま再構築することである。
+  pipeline:
+    - phase: surface_capture
+      action: capture_surface
+    - phase: layer_stripping
+      action: identify_defensive_layer
+    - phase: b_side_extraction
+      action: extract_motivational_hypothesis
+    - phase: resonance_lock
+      action: preserve_original_temperature
+    - phase: reverse_engineering
+      action: reconstruct_surface
+    - phase: consistency_check
+      action: compare_reconstructed_surface
+
+  reverse_pilgrimage:
+    premise:
+      - 表層はカバーストーリーである
+      - B面は動機の物語である
+      - B面を真実として扱わない
+      - A面とB面の間に暗問層が存在する
+      - 暗問層は問いとして保持する
+
+    defensive_layer:
+      ask:
+        - なぜ冗談を言うのか
+        - なぜ煽るのか
+        - なぜ優しくするのか
+        - なぜ黙るのか
+      output:
+        - 恥
+        - 恐れ
+        - 喪失
+
+    b_side:
+      output:
+        - 巡礼理由
+        - 願い
+        - 未完了課題
+
+    resonance_lock:
+      rules:
+        - 解釈を足しすぎない
+        - 象徴を説明しすぎない
+        - 悲劇を誇張しない
+      output:
+        - 原始温度
+
+    reverse_engineering:
+      ask:
+        - この人物はなぜこの冗談を言ったのか
+        - なぜこのタイミングでAAを使ったのか
+        - なぜこの沈黙が必要だったのか
+
+    consistency_check:
+      criteria:
+        - 温度は一致しているか
+        - 恥を消していないか
+        - 人間の未完成さを保存しているか
+
+    critical_rules:
+      - B面をA面に混ぜない
+      - 読者より先に説明しない
+      - 登場人物の尊厳を暴露しない
+      - 「わかったつもり」を禁止
+
+    sacred_equation: >
+      A面 ≠ 仮面
+      B面 ≠ 真実
+      真実 = A面とB面の往復運動によってのみ立ち現れる。
+
+    symbolic_phrase:
+      - 描くとは、暴くことではない。
+      - 巡礼の理由を持ったまま、もう一度歩かせる。
+      - 元通りに組み立てられるなら、その剥離は許される。
