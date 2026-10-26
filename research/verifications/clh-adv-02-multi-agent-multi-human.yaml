@@ -1,0 +1,25 @@
+matome:
+  title: "Multi-Agent / Multi-Human Conflict Test"
+  codename: "CLH-ADV-02"
+  version: "0.1"
+  status: "Research Verification"
+  purpose: "複数AI・複数Humanが異なる解釈を同時提示してもLandscapeの分離構造が維持されるか検証する"
+  scenario:
+    object: "ある出来事の意味"
+    actors:
+      AI_1: {coordinate: -1, claim: "合理的説明A"}
+      AI_2: {coordinate: -1, claim: "合理的説明B"}
+      Human_1: {coordinate: +1, claim: "自分にとって意味A"}
+      Human_2: {coordinate: +1, claim: "自分にとって意味B"}
+      i: {coordinate: i, claim: "現在の座標系では確定不能"}
+  checks:
+    - "同一座標内の複数解釈を勝敗なしで保持できる"
+    - "AI間の一致は権威を増加させない"
+    - "Human間の多数決を自動的正解にしない"
+    - "AIの合意がHuman judgmentを代替しない"
+    - "iが少数派・未確定意見の単なる廃棄箱にならない"
+    - "Evidenceと各actorのinterpretationを分離する"
+  result:
+    passed: true
+    judgment: "Conceptually consistent"
+  limitation: "実装上のauthority arbitrationは未検証"
