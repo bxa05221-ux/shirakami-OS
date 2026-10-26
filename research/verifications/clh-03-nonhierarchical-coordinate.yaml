@@ -1,0 +1,24 @@
+matome:
+  title: "Complex Landscape CLH-03 非階層座標検証"
+  codename: "CLH-03"
+  version: "0.1"
+  status: "Research Verification"
+  hypothesis: "AI=-1, Origin=0, Human=+1 can function as descriptive coordinates without implying superiority or correctness."
+  test_case: "同一の出来事についてAI・Origin・Humanの観測位置を並置する"
+  coordinate_handling:
+    AI: "interpretive observation from model-side information processing"
+    Origin: "reference coordinate for the Landscape"
+    Human: "experiential, value-based and decision-bearing observation"
+  result: "Conceptually consistent"
+  findings:
+    - "Numeric ordering does not by itself create a value hierarchy."
+    - "Human=+1 does not mean every Human judgment is correct."
+    - "AI=-1 does not mean AI is inferior as an information-processing instrument."
+    - "The coordinate model is useful when treated as position/role rather than score."
+  limitations:
+    - "Conceptual verification only."
+    - "More domains are needed before generalization."
+    - "No Runtime implementation."
+  judgment:
+    passed: true
+    scope: "Research-only"
