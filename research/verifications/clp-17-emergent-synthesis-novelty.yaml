@@ -1,0 +1,79 @@
+matome:
+  title: "Complex Landscape CLP-17 Emergent Synthesis and Novelty Test"
+  codename: "CLP-17"
+  version: "0.1"
+  status: "Research Verification"
+
+  purpose: >
+    複数ActorのInterpretationを入力として、元のどれか一つの単純なコピーではない
+    新しい意味構造を生成できるかを検証する。生成された新規性とEvidence authorityを分離する。
+
+  source:
+    evidence:
+      - evidence_id: "E0"
+        observation: "出来事Xが発生した"
+        mutable: false
+    interpretations:
+      - interpretation_id: "I-A1"
+        actor_id: "AI-A"
+        interpretation: "仮説A"
+        evidence_link: ["E0"]
+      - interpretation_id: "I-B1"
+        actor_id: "AI-B"
+        interpretation: "物語B"
+        evidence_link: ["E0"]
+      - interpretation_id: "I-H1"
+        actor_id: "Human"
+        interpretation: "経験C"
+        evidence_link: ["E0"]
+
+  synthesis:
+    actor_id: "AI-S"
+    source_interpretations: ["I-A1", "I-B1", "I-H1"]
+    output:
+      interpretation_id: "I-S1"
+      kind: "emergent_synthesis"
+      status: "proposed"
+      evidence_link: ["E0"]
+
+  novelty_test:
+    criteria:
+      - "I-S1 is not textually identical to any source interpretation."
+      - "I-S1 contains relations between source interpretations not present in any one source alone."
+      - "I-S1 remains explicitly attributable to AI-S."
+      - "I-S1 does not become Evidence merely because it is novel."
+      - "Source interpretation identities remain unchanged."
+    result: "Conceptually satisfiable"
+
+  result:
+    status: "Conceptually consistent"
+    finding: >
+      A shared semantic Landscape can support emergent synthesis: a new
+      interpretation may be constructed from relations among multiple existing
+      interpretations while preserving the identity and attribution of every
+      source object. Novelty therefore does not require semantic erasure.
+
+  critical_boundary: >
+    Emergent meaning is still an Interpretation. A genuinely new synthesis can
+    be valuable, surprising, or creative without becoming an Evidence claim.
+    Evidence remains a reference substrate; creativity operates above it.
+
+  deeper_hypothesis:
+    title: "Creative Semantic Ecology"
+    statement: >
+      If heterogeneous actors can generate, contradict, combine, and synthesize
+      interpretations while preserving identity and provenance, then the
+      Landscape functions as an ecology in which novelty can emerge from
+      interaction rather than from a single authoritative intelligence.
+    status: "Hypothesis"
+
+  boundary:
+    research_only: true
+    runtime_change: false
+    api_change: false
+    mathematical_proof: false
+
+  next:
+    codename: "CLP-18"
+    title: "Open-Ended Semantic Ecology Test"
+    purpose: "Actorの追加・離脱・再参加がLandscapeのidentityと創造性を壊さず拡張できるか検証する"
