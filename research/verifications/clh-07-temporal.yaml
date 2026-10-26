@@ -1,0 +1,18 @@
+matome:
+  title: "Complex Landscape CLH-07 時間変化検証"
+  codename: "CLH-07"
+  version: "0.1"
+  status: "Research Verification"
+  hypothesis: "同一対象の意味が時間とともに変化しても、Landscapeは履歴を保持しながら座標を更新できる。"
+  test_case: "過去にはiだった問いが、新しいEvidenceやHumanの経験によって後に別の座標へ射影される。"
+  sequence:
+    - "t0: unresolved -> i"
+    - "t1: new Evidence appears"
+    - "t2: Human reinterprets the meaning"
+    - "t3: projection may change without rewriting prior Evidence"
+  result: "Conceptually consistent"
+  finding: "意味の更新とEvidenceの改変を分離できる。"
+  limitation: "時間軸を含む正式Schemaは未定義。"
+  judgment:
+    passed: true
+    scope: "Research-only"
