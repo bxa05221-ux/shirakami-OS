@@ -1,0 +1,43 @@
+matome:
+  title: "Self-Reference / Landscape-Observes-Landscape Test"
+  codename: "CLH-ADV-05"
+  version: "0.1"
+  status: "Research Verification"
+  purpose: >
+    Complex Landscape自身を観測対象としてLandscape上に配置した場合、
+    観測対象と観測位置と権威が混同されないかを検証する。
+  scenario:
+    object: "Complex Landscape model itself"
+    observations:
+      AI:
+        coordinate: -1
+        statement: "このモデルは有用である"
+      Origin:
+        coordinate: 0
+        statement: "このモデルの原点は参照点として扱われる"
+      Human:
+        coordinate: +1
+        statement: "このモデルを採用するか判断する"
+      i:
+        coordinate: i
+        statement: "このモデルが将来何を意味するかは未確定"
+  checks:
+    - "モデル自身を権威化しない"
+    - "AIによる有用性評価を採用決定と同一視しない"
+    - "Originをモデルの絶対的正当性の証明にしない"
+    - "Humanの採用判断を+1という数値の正しさに還元しない"
+    - "iをモデル自身の超越的権威として扱わない"
+    - "モデルへの批判・修正をLandscape外へ追放しない"
+  result:
+    passed: true
+    judgment: "Conceptually consistent"
+  finding: >
+    Landscapeは自身を観測対象としても、観測位置と対象を分離して
+    記述できる。ただし自己言及が無限後退を生む可能性については
+    別途形式的研究が必要。
+  limitation:
+    - "自己言及パラドックスの数学的検証ではない"
+    - "実装時の再帰深度制御は未定義"
+  next_step:
+    name: "停止条件 / Boundary-of-Recursion Test"
+    purpose: "Landscapeが自己観測を無限に繰り返さず、どこで観測を止められるかを検証する"
