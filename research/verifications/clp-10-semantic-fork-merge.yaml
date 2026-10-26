@@ -1,0 +1,88 @@
+matome:
+  title: "Complex Landscape CLP-10 Semantic Fork and Merge Test"
+  codename: "CLP-10"
+  version: "0.1"
+  status: "Research Verification"
+
+  purpose: >
+    一つのEvidenceから複数のActor/Rendererが異なる解釈を生成した場合、
+    それらを同一Landscapeへ安全に戻せるかを検証する。
+
+  source:
+    evidence:
+      - evidence_id: "E0"
+        observation: "出来事Xが発生した"
+
+  fork:
+    - interpretation_id: "I-A"
+      actor: "AI"
+      evidence_link: ["E0"]
+      interpretation: "説明Aが可能"
+    - interpretation_id: "I-H"
+      actor: "Human"
+      evidence_link: ["E0"]
+      interpretation: "自分にとって重要"
+    - interpretation_id: "I-R"
+      actor: "Renderer"
+      evidence_link: ["E0"]
+      interpretation: "物語上の転機として表現可能"
+
+  merge_rules:
+    - "Evidence identity E0 is never replaced by an interpretation."
+    - "Each interpretation keeps its own identity."
+    - "Actor attribution is preserved."
+    - "Different interpretations may coexist without being forced into agreement."
+    - "A new synthesis must receive a distinct interpretation identity."
+    - "Human judgment is not inferred from AI or Renderer interpretation."
+    - "Contradictory interpretations are retained as a relation, not silently resolved."
+
+  merge_result:
+    canonical_landscape:
+      evidence_id: "E0"
+      interpretations: ["I-A", "I-H", "I-R"]
+      relation: "multiple interpretations of one Evidence"
+    status: "Conceptually consistent"
+    finding: >
+      Semantic fork can safely return to a shared Landscape when the canonical
+      Evidence identity remains immutable and each interpretation retains an
+      independent identity, actor attribution, and Evidence link. Merge does not
+      mean agreement; it means coexistence within a common semantic substrate.
+
+  critical_observation: >
+    The safe merge operation is not "choose one interpretation". It is "retain
+    the common Evidence and register the interpretations as distinct semantic
+    objects linked to it". A later Human Gate may choose, reject, combine, or
+    leave them unresolved without rewriting the underlying Evidence.
+
+  failure_cases:
+    - case: "interpretation overwrites Evidence"
+      result: "semantic corruption"
+    - case: "AI interpretation becomes Human judgment automatically"
+      result: "Human Gate violation"
+    - case: "two interpretations are merged into one without attribution"
+      result: "loss of semantic identity"
+    - case: "contradiction is silently deleted"
+      result: "loss of uncertainty/disagreement state"
+
+  consequence:
+    - "Landscape behaves more like a semantic graph than a linear answer store."
+    - "Fork is allowed; silent overwrite is not."
+    - "Merge means preserving relations, not forcing consensus."
+    - "Human Gate operates on interpretations while Evidence remains traceable."
+
+  deletion_candidates:
+    - field: "coordinate"
+      status: "廃止候補継続"
+    - field: "projection_scope"
+      status: "保留"
+
+  boundary:
+    research_only: true
+    runtime_change: false
+    api_change: false
+    mathematical_proof: false
+
+  next:
+    codename: "CLP-11"
+    title: "Human Gate Interpretation Selection Test"
+    purpose: "複数解釈をHuman Gateが選択・棄却・保留するとき、Evidence identityを保持できるか検証する"
