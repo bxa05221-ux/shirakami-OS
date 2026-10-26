@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shirakami OS — Landscape Reference</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; line-height: 1.6; }
+    h1 { margin-bottom: 4px; }
+    .muted { color: #666; }
+    textarea { width: 100%; min-height: 110px; box-sizing: border-box; padding: 12px; }
+    button { padding: 10px 16px; margin: 8px 8px 8px 0; cursor: pointer; }
+    pre { background: #f5f5f5; padding: 12px; overflow: auto; border-radius: 6px; }
+    section { margin-top: 28px; }
+  </style>
+</head>
+<body>
+  <h1>Landscape Reference</h1>
+  <p class="muted">A minimal application using Shirakami OS β1.0. No AI is required.</p>
+
+  <section>
+    <h2>Current Landscape</h2>
+    <pre id="landscape">loading...</pre>
+  </section>
+
+  <section>
+    <h2>Record a change</h2>
+    <textarea id="message" placeholder="ここに景色の変化を入力"></textarea>
+    <br>
+    <button id="record">Record change</button>
+    <button id="refresh">Refresh</button>
+  </section>
+
+  <section>
+    <h2>Evidence</h2>
+    <pre id="evidence">loading...</pre>
+  </section>
+
+  <script>
+    const API = "";
+
+    async function request(path, options = {}) {
+      const response = await fetch(API + path, {
+        headers: { "Content-Type": "application/json" },
+        ...options
+      });
+      if (!response.ok) throw new Error(await response.text());
+      return response.json();
+    }
+
+    async function refresh() {
+      const [landscape, evidence] = await Promise.all([
+        request("/v1/landscape/observe", { method: "POST", body: "{}" }),
+        request("/v1/evidence/observe", { method: "POST", body: "{}" })
+      ]);
+      document.getElementById("landscape").textContent = JSON.stringify(landscape.landscape, null, 2);
+      document.getElementById("evidence").textContent = JSON.stringify(evidence.evidence, null, 2);
+    }
+
+    document.getElementById("record").addEventListener("click", async () => {
+      const message = document.getElementById("message").value.trim();
+      if (!message) return;
+      await request("/v1/execute", {
+        method: "POST",
+        body: JSON.stringify({
+          protocol: { matome: { title: "demo.landscape.message", version: "0.1" } },
+          operation: "message",
+          input: { message }
+        })
+      });
+      document.getElementById("message").value = "";
+      await refresh();
+    });
+
+    document.getElementById("refresh").addEventListener("click", refresh);
+    refresh().catch(error => {
+      document.getElementById("landscape").textContent = "APIに接続できません: " + error.message;
+      document.getElementById("evidence").textContent = "APIを起動してから再読み込みしてください。";
+    });
+  </script>
+</body>
+</html>
