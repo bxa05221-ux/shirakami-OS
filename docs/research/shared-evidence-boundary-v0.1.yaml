@@ -1,0 +1,74 @@
+matome:
+  title: "Shared Evidence / Observation-local Evidence Boundary"
+  codename: "Shared Evidence Boundary"
+  version: "0.1"
+  status: "Research Finding"
+
+  project:
+    name: "白神モデルβ版研究"
+    repository: "bxa05221-ux/shirakami-OS"
+
+  purpose: >
+    SemanticHandoff.evidence_ids が、Observation固有Evidenceだけでなく、
+    複数のObservationから参照される共有Evidenceを含み得ることを明示する。
+
+  semantic_rule:
+    statement: >
+      evidence_idsは「そのObservationだけが生成したEvidenceの集合」ではなく、
+      当該SemanticHandoffの意味を支えるEvidenceへの参照集合である。
+
+  evidence_classes:
+    shared:
+      definition: >
+        複数のObservationまたはSemanticHandoffから参照可能なEvidence。
+      identity_rule: "内容が同一ならstable evidence_idを共有する。"
+
+    observation_local:
+      definition: >
+        特定のObservationまたはHandoffに固有の意味を支えるEvidence。
+      identity_rule: "内容が異なれば別のstable evidence_idを持つ。"
+
+  allowed_relationships:
+    - "Observation A → shared Evidence X"
+    - "Observation B → shared Evidence X"
+    - "Observation A → local Evidence A"
+    - "Observation B → local Evidence B"
+
+  prohibited_assumptions:
+    - "同一Observationならevidence_idsが完全一致すると仮定しない"
+    - "異なるObservationならevidence_idsが完全disjointだと仮定しない"
+    - "evidence_idをobservation_idとして扱わない"
+    - "SemanticHandoffがEvidenceを再生成すると解釈しない"
+
+  verification:
+    required:
+      - "同一Evidenceが複数Observationから同一evidence_idで参照可能"
+      - "Observation-local Evidenceは異なるevidence_idを持つ"
+      - "SemanticHandoff.evidence_idsがshared/localの双方を参照可能"
+      - "stable identityはEvidence内容に紐づき、Observation occurrenceには紐づかない"
+
+  test_interpretation:
+    current_ci_observation: >
+      同一入力・contextでevidence_idsが完全一致しないケース、および異なる入力で
+      evidence_idsに共通部分が存在するケースは、shared Evidenceを許容するなら
+      単純なidentity failureとは限らない。テストは「生成したEvidence」ではなく
+      「Handoffが参照するEvidence」を検証する必要がある。
+
+  implementation_rule:
+    owner: "Research → Runtime"
+    rule: >
+      この意味境界を確定するまでRuntimeのEvidence生成ロジックを変更しない。
+      実装変更が必要になった場合は、一変更一検証で行う。
+
+  next_step:
+    priority: "high"
+    action: >
+      この境界を既存SemanticHandoffテストと照合し、テストがshared/localの意味を
+      正しく表現しているかを確認する。必要な場合のみ最小限のテスト変更を行う。
+
+  critical_rule:
+    - "会話を実装上の正本にしない"
+    - "GitHub mainを実装正本とする"
+    - "意味は的目YAMLで固定する"
+    - "未検証の仮説をRuntimeへ埋め込まない"
+    - "一変更一検証"
