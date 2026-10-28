@@ -9,7 +9,10 @@ def echo_protocol(input_data):
     return Transition(kind="api.mvp.async-provider-fixture", data={"output": dict(input_data.input)})
 
 def test_async_http_provider_output_crosses_evidence_trace_and_authority_boundary():
+    calls = []
+
     async def provider(prompt, protocol_id):
+        calls.append((prompt, protocol_id))
         return {"output": f"external:{prompt}", "provider": "async-fixture", "protocol_id": protocol_id}
 
     client = TestClient(create_app(protocol_registry={"fixture.async-provider": echo_protocol}, api_key=API_KEY, async_model_adapter=provider))
@@ -28,7 +31,7 @@ def test_async_http_provider_output_crosses_evidence_trace_and_authority_boundar
     assert observe.status_code == 200, observe.text
     analyze = client.post(
         "/v1/analyze",
-        json={"protocol_id": "fixture.async-provider", "protocol_exists": True},
+        json={"protocol_id": "fixture.async-provider", "protocol_exists": False},
         headers=headers,
     )
     assert analyze.status_code == 200, analyze.text
@@ -52,6 +55,7 @@ def test_async_http_provider_output_crosses_evidence_trace_and_authority_boundar
         },
     }
     blocked = client.post("/v1/execute", json=payload, headers=headers)
+    assert calls == []
     assert blocked.status_code == 409, blocked.text
     assert blocked.json()["detail"] == "Human Gate approval required before execution"
 
@@ -65,6 +69,7 @@ def test_async_http_provider_output_crosses_evidence_trace_and_authority_boundar
     response = client.post("/v1/execute", json=payload, headers=headers)
     assert response.status_code == 200, response.text
     body = response.json()
+    assert calls == [("async external provider", "fixture.async-provider")]
     assert body["model_output"]["output"] == "external:async external provider"
     assert body["model_output"]["provider"] == "async-fixture"
     assert body["execution_authorized"] is False
