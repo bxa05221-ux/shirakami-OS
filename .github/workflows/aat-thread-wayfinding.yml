@@ -27,4 +27,5 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - run: python -m pip install pytest
       - run: python -m pytest -q tests/test_thread_rpg_protocol_boundary.py tests/test_thread_rpg_matome_fixture.py tests/test_aat_thread_wayfinding.py
