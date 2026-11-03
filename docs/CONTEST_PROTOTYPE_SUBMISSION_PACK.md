@@ -14,16 +14,22 @@ Shirakami OS is a model-independent Runtime architecture for preserving observab
 
 The primary demonstration is deterministic and does not require an external AI API key.
 
-From the repository root:
+From a clean checkout, run these commands from the repository root:
 
 ```bash
-python shirakami_os.py
-python examples/evidence_route_demo.py
 python -m pip install pytest pyyaml fastapi pydantic httpx
-python -m pytest runtime tests -q
+python scripts/contest_demo.py
 ```
 
-The repository's fixed GitHub Actions acceptance workflow runs the same three core checks:
+The one-command runner executes these checks in order and stops at the first failure:
+
+1. `python shirakami_os.py` — minimal executable entry point.
+2. `python examples/evidence_route_demo.py` — deterministic Evidence-to-Route demonstration.
+3. `python -m pytest runtime tests -q` — Runtime and regression test suite.
+
+For a step-by-step live presentation, run the three commands above individually after installing dependencies. The runner does not call an external AI provider and does not require an API key.
+
+The repository's fixed GitHub Actions acceptance workflow independently runs the same three core checks:
 - minimal executable entry point;
 - deterministic Evidence-to-Route demonstration;
 - Runtime and test suite.

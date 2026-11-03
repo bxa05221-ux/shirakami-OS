@@ -9,6 +9,7 @@ on:
       - ".github/workflows/contest-prototype-acceptance.yml"
       - "shirakami_os.py"
       - "examples/evidence_route_demo.py"
+      - "scripts/contest_demo.py"
       - "runtime/**"
       - "tests/**"
       - "protocols/**"
@@ -21,6 +22,7 @@ on:
       - ".github/workflows/contest-prototype-acceptance.yml"
       - "shirakami_os.py"
       - "examples/evidence_route_demo.py"
+      - "scripts/contest_demo.py"
       - "runtime/**"
       - "tests/**"
       - "protocols/**"
@@ -48,11 +50,5 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pytest pyyaml fastapi pydantic httpx
 
-      - name: Run minimal executable entry point
-        run: python shirakami_os.py
-
-      - name: Run deterministic Evidence-to-Route demo
-        run: python examples/evidence_route_demo.py
-
-      - name: Run fixed Runtime and test suite
-        run: python -m pytest runtime tests -q
+      - name: Run one-command contest prototype demo and acceptance suite
+        run: python scripts/contest_demo.py
