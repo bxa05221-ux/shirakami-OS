@@ -1,0 +1,77 @@
+matome:
+  title: "Complex Landscape 仮説 v0.2"
+  codename: "Complex-Landscape-Hypothesis-v0.2"
+  version: "0.2"
+  status: "Research Hypothesis"
+  basis:
+    source: "CLH-01 through CLH-08 and CLH-Overview"
+    scope: "Conceptual synthesis only"
+  core_statement: >
+    Complex Landscapeは、AI・Origin・Humanという異なる観測位置と、
+    現在の座標系へ射影できない意味を同一Landscape上に保持するための
+    記述枠である。
+  coordinate_model:
+    real_axis:
+      AI: -1
+      Origin: 0
+      Human: +1
+      interpretation: "position/role, not value ranking"
+    imaginary_term:
+      symbol: "i"
+      meaning: "現在の座標系では未確定または非射影な意味"
+      rule: "unknown is a valid holding state"
+  structural_invariants:
+    - id: "CLH-I01"
+      statement: "座標値は権威・優劣・正誤のスコアではない"
+    - id: "CLH-I02"
+      statement: "AIはOriginまたはHumanの最終判断主体を代替しない"
+    - id: "CLH-I03"
+      statement: "Humanの信仰・価値判断はHuman-sideに保持される"
+    - id: "CLH-I04"
+      statement: "iは未確定意味を強制分類から保護する"
+    - id: "CLH-I05"
+      statement: "Evidenceと意味解釈は分離可能である"
+    - id: "CLH-I06"
+      statement: "観測位置の衝突は勝敗ではなく座標差として保持できる"
+    - id: "CLH-I07"
+      statement: "意味の時間的変化は過去Evidenceの改変なしに記述できる"
+  projection_rule:
+    principle: "iから既存座標への射影は条件付きで行う"
+    prerequisites:
+      - "sufficient Evidence"
+      - "semantic interpretability"
+      - "Human judgment where value or faith is involved"
+    fallback: "射影できない場合はiを保持し、必要なら新しい軸をResearchで定義する"
+  human_gate_boundary:
+    statement: "Human Gateは+1を正解にする仕組みではなく、最終判断権をHuman側に残す境界である"
+  theological_boundary:
+    - "i is not God"
+    - "Origin=0 is not a proof of God"
+    - "AI cannot claim divine authority from the coordinate model"
+    - "the model neither affirms nor denies the user's faith"
+  evidence_boundary:
+    statement: "Evidenceは観測記録であり、意味解釈そのものではない"
+  non_claims:
+    - "mathematical complex-number identity"
+    - "theological proof"
+    - "universal ontology"
+    - "Runtime implementation specification"
+    - "AI safety guarantee by coordinate notation alone"
+  research_implications:
+    - "Landscape can represent disagreement without forcing immediate resolution"
+    - "uncertainty can be represented structurally"
+    - "meaning can evolve without rewriting observation history"
+    - "Human judgment can coexist with AI interpretation without collapsing into AI authority"
+  unresolved:
+    - "iと新規軸の正式境界"
+    - "複数のiの共存・相互作用"
+    - "projection条件の形式化"
+    - "時間軸とEvidence versioningの接続"
+    - "Runtimeへ導入する場合の最小意味境界"
+  verification_status:
+    passed_tests: ["CLH-01","CLH-02","CLH-03","CLH-04","CLH-05","CLH-06","CLH-07","CLH-08"]
+    judgment: "Research-level conceptual consistency"
+    caution: "This is a synthesis of conceptual tests, not a mathematical or implementation proof."
+  next_step:
+    name: "Adversarial Landscape Test"
+    purpose: "複数の座標が同時に権威を主張する状況でも構造的不変条件が維持されるかを検証する"
