@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install test dependencies
-        run: python -m pip install pytest pyyaml fastapi httpx
+        run: python -m pip install pytest pyyaml fastapi httpx cryptography
       - name: Verify AIwitness unit boundary
         run: pytest -q aiwitness/test_witness.py aiwitness/test_store.py aiwitness/test_traceability.py
       - name: Verify runtime provenance chain
@@ -36,3 +36,5 @@ jobs:
         run: pytest -q aiwitness/test_evidence_endpoint.py
       - name: Verify multi-agent reviewer boundary
         run: pytest -q reviewer/test_registry.py reviewer/test_http.py reviewer/test_aiwitness_bridge.py reviewer/test_comparative_trace.py reviewer/test_comparative_aiwitness_integration.py
+      - name: Verify P0 outbound policy gate and encrypted local isolation
+        run: pytest -q runtime/test_openai_policy_gate.py security/test_local_store.py

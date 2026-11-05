@@ -11,6 +11,7 @@ from fastapi.testclient import TestClient
 from api.http import ShirakamiHTTPTransport
 from runtime.api import ShirakamiAPI
 from runtime.prototype import Transition
+from aiwitness.policy_gate import AIwitnessPolicyGate, OutboundPolicy
 
 API_KEY = "local-openai-http-observation-key"
 PROTOCOL_ID = "openai.http.observation"
@@ -27,11 +28,19 @@ async def openai_provider_adapter(prompt: str, protocol_id: str) -> dict[str, An
     model = os.getenv("OPENAI_MODEL", "").strip()
     if not api_key or not model:
         raise RuntimeError("OPENAI_API_KEY and OPENAI_MODEL are required")
+    # This harness is intentionally limited to a fixed non-confidential prompt.
+    # Any missing/disabled policy or altered destination fails before HTTP.
+    gate = AIwitnessPolicyGate(OutboundPolicy(
+        "openai-observation-harness", "1", True,
+        frozenset({("openai", model)}), frozenset({"public"}),
+    ))
+    authorized = gate.authorize({"input": prompt, "data_classification": "public"}, provider="openai", model=model)
+    gate.verify(authorized, provider="openai", model=model)
     async with httpx.AsyncClient(timeout=60.0) as client:
         response = await client.post(
             RESPONSES_URL,
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-            json={"model": model, "input": prompt},
+            json={"model": model, "input": authorized.payload},
         )
         response.raise_for_status()
         payload = response.json()
