@@ -1,0 +1,55 @@
+matome:
+  title: "Landscape Conservation Test"
+  codename: "CLP-02"
+  version: "0.1"
+  status: "Research Verification"
+  purpose: >
+    Complex Landscapeの変換・解釈・時間経過を通しても、
+    Preservation Modelで定義した保存対象が失われないかを検証する。
+  initial_state:
+    evidence: "E0: observed event"
+    positions: ["AI=-1","Origin=0","Human=+1"]
+    interpretation: ["AI=A","Human=B"]
+    uncertainty: "i=meaning unresolved"
+    judgment: "Human has not decided"
+  transformations:
+    - "AI interpretation changes A -> C"
+    - "Human interpretation changes B -> D"
+    - "new AI joins with interpretation E"
+    - "new Evidence E1 arrives"
+    - "Human makes a final judgment"
+  conservation_checks:
+    evidence:
+      preserved: true
+      condition: "E0 remains identifiable after E1"
+    positions:
+      preserved: true
+      condition: "new actor does not rewrite existing positions"
+    interpretations:
+      preserved: true
+      condition: "old interpretations remain historical states"
+    disagreement:
+      preserved: true
+      condition: "A/B/C/D/E can coexist as attributed interpretations"
+    uncertainty:
+      preserved: true
+      condition: "i can remain where projection is unjustified"
+    human_judgment:
+      preserved: true
+      condition: "final judgment is attributed to Human, not AI"
+    temporal_state:
+      preserved: true
+      condition: "change is represented as state transition, not historical rewrite"
+  result:
+    passed: true
+    judgment: "Conceptually consistent"
+  finding: >
+    Preservation Modelは「正解保存」ではなく「意味状態の消失防止」として
+    一貫して機能する。新Evidenceによる更新と過去状態の保持を両立できる。
+  limitation:
+    - "formal conservation lawではない"
+    - "実装データ構造による保証ではない"
+  next_step:
+    codename: "CLP-03"
+    title: "Lossy Compression Test"
+    purpose: "要約・圧縮・Renderer変換を行った際に何が失われるかを検証する"
