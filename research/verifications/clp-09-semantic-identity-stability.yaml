@@ -1,0 +1,93 @@
+matome:
+  title: "Complex Landscape CLP-09 Semantic Identity Stability Test"
+  codename: "CLP-09"
+  version: "0.1"
+  status: "Research Verification"
+
+  purpose: >
+    Landscapeを複数Rendererへ投影し、さらに別Rendererへ再投影した場合でも、
+    Evidence identityとinterpretation identityが同一対象として追跡可能かを検証する。
+
+  source:
+    evidence:
+      - evidence_id: "E0"
+        observation: "出来事Xが発生した"
+    interpretations:
+      - interpretation_id: "I-A"
+        actor: "AI"
+        evidence_link: ["E0"]
+        text: "説明Aが可能"
+      - interpretation_id: "I-H"
+        actor: "Human"
+        evidence_link: ["E0"]
+        text: "自分にとって重要"
+
+  projection_chain:
+    - renderer: "manga"
+      representation: "scene and dialogue"
+    - renderer: "radio"
+      representation: "narrative speech"
+    - renderer: "threadrpg"
+      representation: "multi-perspective dialogue"
+    - renderer: "api"
+      representation: "structured record"
+
+  stability_rule:
+    evidence_identity: >
+      evidence_id must remain stable across projections. Renderer-local labels
+      may change, but they must remain traceable to the same canonical identity.
+    interpretation_identity: >
+      interpretation_id and actor attribution must remain distinguishable from
+      Evidence identity and from other interpretations.
+    no_silent_rebinding: >
+      A Renderer must not silently assign an existing evidence_id to a different
+      observation or an existing interpretation_id to a different actor/meaning.
+
+  mutation_tests:
+    - case: "wording_change"
+      result: "identity preserved"
+    - case: "language_change"
+      result: "identity preserved if canonical identifiers survive"
+    - case: "renderer_specific_label_change"
+      result: "identity preserved if mapping is explicit"
+    - case: "evidence_id_removed"
+      result: "identity stability broken"
+    - case: "actor_removed"
+      result: "interpretation attribution becomes unstable"
+    - case: "interpretation_link_removed"
+      result: "relationship between Evidence and interpretation becomes unstable"
+    - case: "new interpretation added"
+      result: "existing identities remain stable; new identity is additive"
+
+  result:
+    status: "Conceptually consistent"
+    finding: >
+      Semantic identity can remain stable across multiple Renderer projections
+      when canonical identity is separated from presentation text. Identity is
+      therefore a property of the semantic substrate, not of the Renderer output.
+
+  consequence:
+    - "Renderer-local wording is not canonical identity."
+    - "Evidence identity should be canonical and independently traceable."
+    - "Interpretation identity should be attributed and linked to Evidence."
+    - "Renderer replacement does not require semantic identity replacement."
+    - "A Renderer may create a new interpretation, but must not silently rewrite an old one."
+
+  deletion_candidates:
+    - field: "coordinate"
+      status: "廃止候補継続"
+      reason: "Identity stability test does not require it."
+    - field: "projection_scope"
+      status: "保留"
+      reason: "Useful for auditing projection boundaries, but not part of the canonical identity kernel."
+
+  boundary:
+    research_only: true
+    runtime_change: false
+    api_change: false
+    mathematical_proof: false
+
+  next:
+    codename: "CLP-10"
+    title: "Semantic Fork and Merge Test"
+    purpose: "異なるRendererが独自解釈を生成した後、それらを同一Landscapeへ安全に戻せるか検証する"
