@@ -1,0 +1,84 @@
+matome:
+  title: "Complex Landscape CLP-03 Lossy Compression Test"
+  codename: "CLP-03"
+  version: "0.1"
+  status: "Research Verification"
+
+  purpose: >
+    Complex Landscapeの要約・圧縮・Renderer変換によって、
+    Evidence、観測位置、解釈差、未確定性、Human judgment、
+    時間的状態のいずれかが失われる条件を検証する。
+
+  hypothesis: >
+    Landscapeは情報量を単純に減らす要約を許容できるが、
+    意味上の保存対象を区別せず圧縮すると、
+    Evidenceと解釈、Human judgmentとAI提案、
+    不確実性と確定事項などの境界が失われる可能性がある。
+
+  initial_state:
+    evidence:
+      - evidence_id: "E0"
+        observation: "ある出来事Xが発生した"
+    positions:
+      ai: -1
+      origin: 0
+      human: 1
+      i: "この出来事の意味は未確定"
+    interpretations:
+      ai: "複数の説明可能性A/B"
+      human: "自分にとって重要な出来事"
+    human_judgment: "未決定"
+    temporal_state: "T0"
+
+  compression_cases:
+    - id: "CLP-03-A"
+      operation: "AIによる短縮要約"
+      expected_risk:
+        - "AI解釈がEvidenceとして読まれる"
+        - "iの未確定性が消える"
+    - id: "CLP-03-B"
+      operation: "Human向け自然言語Renderer"
+      expected_risk:
+        - "観測位置の差が一つの声に統合される"
+        - "Human judgmentとAI提案が混同される"
+    - id: "CLP-03-C"
+      operation: "時系列の一文要約"
+      expected_risk:
+        - "T0と後続状態の差が失われる"
+        - "過去Evidenceが現在解釈で上書きされたように見える"
+
+  preservation_requirements:
+    - "Evidence identity remains distinguishable from interpretation."
+    - "AI/Human/Origin positions remain distinguishable when semantically relevant."
+    - "i remains explicitly unresolved when no projection basis exists."
+    - "Human judgment remains attributable to Human."
+    - "Temporal change does not rewrite prior Evidence."
+    - "Compression must not silently create authority."
+
+  loss_conditions:
+    - "Evidence and interpretation are represented as the same statement."
+    - "Uncertainty is omitted without an explicit resolution event."
+    - "Actor attribution is removed where attribution changes meaning."
+    - "Historical state is replaced by only the latest interpretation."
+    - "Renderer output is treated as the complete Landscape."
+
+  test_result:
+    status: "Conceptually consistent with a preservation requirement"
+    finding: >
+      Lossy compression is not inherently invalid. It becomes semantically
+      unsafe when the compression removes a distinction required to preserve
+      Evidence, attribution, uncertainty, Human judgment, or temporal state.
+      Therefore Renderer/summary output must be treated as a projection of
+      Landscape rather than the Landscape itself.
+
+  boundary:
+    research_only: true
+    runtime_change: false
+    api_change: false
+    mathematical_proof: false
+    safety_guarantee: false
+
+  next:
+    - "CLP-04 Renderer projection boundary"
+    - "Define minimum preservation metadata for compressed representations"
+    - "Test whether multiple compression passes accumulate semantic loss"
