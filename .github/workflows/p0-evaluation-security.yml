@@ -8,7 +8,9 @@ on:
       - "security/test_evaluator_identity.py"
       - "security/test_local_store.py"
       - "api/http.py"
-      - "api/test_http_evaluation_boundary.py"
+      - "api/evaluation_records.py"
+      - "api/test_evaluation_records.py"
+      - "api/test_http_evaluation_boundary.py api/test_evaluation_records.py"
       - ".github/workflows/p0-evaluation-security.yml"
   workflow_dispatch:
 
