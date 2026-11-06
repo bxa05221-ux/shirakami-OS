@@ -66,3 +66,28 @@ def test_evaluation_reviewer_routes_fail_closed_without_verified_membership(meth
     assert response.json()["detail"] == (
         "evaluation reviewer routes disabled until authenticated project membership is enforced"
     )
+
+@pytest.mark.parametrize("method,path", [
+    ("GET", "/v1/capabilities"),
+    ("POST", "/v1/observe"),
+    ("POST", "/v1/analyze"),
+    ("POST", "/v1/approve"),
+    ("GET", "/v1/executions/fixture"),
+    ("GET", "/v1/traces/fixture"),
+    ("GET", "/v1/witnesses/fixture/history"),
+    ("GET", "/v1/witnesses/fixture"),
+    ("GET", "/v1/traceability/fixture"),
+    ("POST", "/v1/executions/fixture/verify"),
+    ("GET", "/v1/evidence"),
+    ("GET", "/v1/evidence/fixture"),
+])
+def test_evaluation_other_routes_fail_closed(method, path):
+    client = TestClient(create_app(api_key="fixture-key", evaluation_mode=True))
+    response = client.request(method, path, headers={"X-API-Key": "fixture-key"}, json={} if method == "POST" else None)
+    assert response.status_code == 403
+    assert response.json()["detail"] == "evaluation API disabled until authenticated local runtime is available"
+
+
+def test_evaluation_health_stays_available():
+    client = TestClient(create_app(api_key="fixture-key", evaluation_mode=True))
+    assert client.get("/health").status_code == 200
