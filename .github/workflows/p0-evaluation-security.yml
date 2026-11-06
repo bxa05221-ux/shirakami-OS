@@ -23,6 +23,6 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install minimal dependencies
-        run: python -m pip install pytest cryptography
-      - name: Test encrypted evaluation store isolation
-        run: python -m pytest -q security/test_local_store.py
+        run: python -m pip install pytest cryptography fastapi httpx pydantic
+      - name: Test evaluation storage and HTTP deny boundary
+        run: python -m pytest -q security/test_local_store.py api/test_http_evaluation_boundary.py
