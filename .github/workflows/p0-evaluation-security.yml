@@ -5,6 +5,8 @@ on:
     paths:
       - "security/local_store.py"
       - "security/audit_chain.py"
+      - "security/sqlite_journal.py"
+      - "security/test_sqlite_journal.py"
       - "security/test_audit_chain.py"
       - "security/evaluator_identity.py"
       - "security/test_evaluator_identity.py"
@@ -31,4 +33,4 @@ jobs:
       - name: Install minimal dependencies
         run: python -m pip install pytest cryptography fastapi httpx pydantic PyYAML
       - name: Test evaluation storage and HTTP deny boundary
-        run: python -m pytest -q security/test_local_store.py security/test_evaluator_identity.py api/test_http_evaluation_boundary.py api/test_evaluation_records.py security/test_audit_chain.py
+        run: python -m pytest -q security/test_local_store.py security/test_evaluator_identity.py api/test_http_evaluation_boundary.py api/test_evaluation_records.py security/test_audit_chain.py security/test_sqlite_journal.py
