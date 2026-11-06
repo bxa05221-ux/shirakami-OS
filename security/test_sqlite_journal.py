@@ -1,3 +1,4 @@
+from security.audit_chain import LocalAuditChain
 """Synthetic-only atomic persistence and restart tests."""
 import sqlite3
 
@@ -11,7 +12,7 @@ def test_encrypted_record_and_audit_survive_restart(tmp_path):
     head = journal.append_encrypted_record(
         record_id="r1", project_id="p1", owner_id="alice",
         ciphertext=b"encrypted-fixture", key_version="v1",
-        occurred_at="2026-11-06T09:00:00+00:00",
+        occurred_at="2026-11-06T09:00:00+00:00", expected_head=LocalAuditChain.GENESIS,
     )
     reopened = AtomicEvaluationJournal(path)
     assert reopened.load_encrypted_record("r1", "p1", expected_head=head) == (b"encrypted-fixture", "v1")
@@ -26,7 +27,7 @@ def test_duplicate_record_rolls_back_audit_and_record(tmp_path):
                 occurred_at="2026-11-06T09:00:00+00:00")
     head = journal.append_encrypted_record(**args)
     with pytest.raises(sqlite3.IntegrityError):
-        journal.append_encrypted_record(**args)
+        journal.append_encrypted_record(**{**args, "expected_head": head})
     assert journal.verify(expected_head=head)
 
 def test_modified_audit_is_detected_and_blocks_next_write(tmp_path):
@@ -35,7 +36,7 @@ def test_modified_audit_is_detected_and_blocks_next_write(tmp_path):
     head = journal.append_encrypted_record(
         record_id="r1", project_id="p1", owner_id="alice",
         ciphertext=b"encrypted-fixture", key_version="v1",
-        occurred_at="2026-11-06T09:00:00+00:00",
+        occurred_at="2026-11-06T09:00:00+00:00", expected_head=LocalAuditChain.GENESIS,
     )
     with sqlite3.connect(path) as db:
         db.execute("UPDATE audit SET action='altered' WHERE sequence=1")
@@ -45,7 +46,7 @@ def test_modified_audit_is_detected_and_blocks_next_write(tmp_path):
         journal.append_encrypted_record(
             record_id="r2", project_id="p1", owner_id="alice",
             ciphertext=b"encrypted-fixture-2", key_version="v1",
-            occurred_at="2026-11-06T09:01:00+00:00",
+            occurred_at="2026-11-06T09:01:00+00:00", expected_head=head,
         )
     with pytest.raises(PersistenceIntegrityError):
         journal.load_encrypted_record("r2", "p1", expected_head=head)
@@ -56,7 +57,7 @@ def test_ciphertext_tampering_is_detected_before_read(tmp_path):
     head = journal.append_encrypted_record(
         record_id="r1", project_id="p1", owner_id="alice",
         ciphertext=b"encrypted-fixture", key_version="v1",
-        occurred_at="2026-11-06T09:00:00+00:00",
+        occurred_at="2026-11-06T09:00:00+00:00", expected_head=LocalAuditChain.GENESIS,
     )
     with sqlite3.connect(path) as db:
         db.execute("UPDATE records SET ciphertext=? WHERE record_id='r1'", (b"tampered",))
@@ -71,7 +72,7 @@ def test_deleted_record_is_detected(tmp_path):
     head = journal.append_encrypted_record(
         record_id="r1", project_id="p1", owner_id="alice",
         ciphertext=b"encrypted-fixture", key_version="v1",
-        occurred_at="2026-11-06T09:00:00+00:00",
+        occurred_at="2026-11-06T09:00:00+00:00", expected_head=LocalAuditChain.GENESIS,
     )
     with sqlite3.connect(path) as db:
         db.execute("DELETE FROM records WHERE record_id='r1'")
@@ -82,7 +83,7 @@ def test_read_without_independently_trusted_head_fails_closed(tmp_path):
     journal.append_encrypted_record(
         record_id="r1", project_id="p1", owner_id="alice",
         ciphertext=b"encrypted-fixture", key_version="v1",
-        occurred_at="2026-11-06T09:00:00+00:00",
+        occurred_at="2026-11-06T09:00:00+00:00", expected_head=LocalAuditChain.GENESIS,
     )
     from security.sqlite_journal import PersistenceIntegrityError
     with pytest.raises(PersistenceIntegrityError, match="trusted external audit head"):
@@ -94,8 +95,42 @@ def test_key_version_tampering_is_detected(tmp_path):
     head = journal.append_encrypted_record(
         record_id="r1", project_id="p1", owner_id="alice",
         ciphertext=b"encrypted-fixture", key_version="v1",
-        occurred_at="2026-11-06T09:00:00+00:00",
+        occurred_at="2026-11-06T09:00:00+00:00", expected_head=LocalAuditChain.GENESIS,
     )
     with sqlite3.connect(path) as db:
         db.execute("UPDATE records SET key_version='v2' WHERE record_id='r1'")
     assert not journal.verify(expected_head=head)
+
+def test_stale_trusted_head_rejects_new_write(tmp_path):
+    journal = AtomicEvaluationJournal(tmp_path / "journal.sqlite3")
+    head = journal.append_encrypted_record(
+        record_id="r1", project_id="p1", owner_id="alice",
+        ciphertext=b"encrypted-fixture", key_version="v1",
+        occurred_at="2026-11-06T09:00:00+00:00", expected_head=LocalAuditChain.GENESIS,
+    )
+    from security.sqlite_journal import PersistenceIntegrityError
+    with pytest.raises(PersistenceIntegrityError, match="trusted audit head"):
+        journal.append_encrypted_record(
+            record_id="r2", project_id="p1", owner_id="alice",
+            ciphertext=b"encrypted-fixture-2", key_version="v1",
+            occurred_at="2026-11-06T09:01:00+00:00", expected_head=LocalAuditChain.GENESIS,
+        )
+    assert journal.verify(expected_head=head)
+
+def test_modified_ciphertext_blocks_next_write(tmp_path):
+    path = tmp_path / "journal.sqlite3"
+    journal = AtomicEvaluationJournal(path)
+    head = journal.append_encrypted_record(
+        record_id="r1", project_id="p1", owner_id="alice",
+        ciphertext=b"encrypted-fixture", key_version="v1",
+        occurred_at="2026-11-06T09:00:00+00:00", expected_head=LocalAuditChain.GENESIS,
+    )
+    with sqlite3.connect(path) as db:
+        db.execute("UPDATE records SET ciphertext=? WHERE record_id='r1'", (b"tampered",))
+    from security.sqlite_journal import PersistenceIntegrityError
+    with pytest.raises(PersistenceIntegrityError, match="stored records"):
+        journal.append_encrypted_record(
+            record_id="r2", project_id="p1", owner_id="alice",
+            ciphertext=b"encrypted-fixture-2", key_version="v1",
+            occurred_at="2026-11-06T09:01:00+00:00", expected_head=head,
+        )
