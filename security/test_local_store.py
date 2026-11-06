@@ -54,3 +54,20 @@ def test_removed_member_cannot_read_previously_shared_record():
     records.register_project_members("project-a", {"owner"})
     with pytest.raises(AccessDenied):
         records.read("r1", "project-a", "peer")
+
+def test_store_operations_automatically_append_verifiable_audit_chain():
+    from security.audit_chain import LocalAuditChain
+    records = store()
+    records.register_project_members("project-a", {"owner", "peer"})
+    records.put_private("r1", "project-a", "owner", b"synthetic")
+    with pytest.raises(AccessDenied):
+        records.read("r1", "project-a", "peer")
+    records.share_for_consensus("r1", "owner", {"peer"})
+    assert records.read("r1", "project-a", "peer") == b"synthetic"
+    records.revoke_consensus("r1", "owner")
+    events = records.audit_events()
+    chain = records.audit_chain_snapshot()
+    assert [e.action for e in events] == [e.action for e in chain]
+    assert records.verify_audit_chain(expected_head=records.audit_chain_head())
+    assert not LocalAuditChain.verify(chain[:-1], expected_head=records.audit_chain_head())
+    assert "synthetic" not in repr(chain)
