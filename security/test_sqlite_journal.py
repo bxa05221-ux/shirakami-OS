@@ -75,3 +75,26 @@ def test_deleted_record_is_detected(tmp_path):
     with sqlite3.connect(path) as db:
         db.execute("DELETE FROM records WHERE record_id='r1'")
     assert not journal.verify(expected_head=head)
+
+def test_read_without_independently_trusted_head_fails_closed(tmp_path):
+    journal = AtomicEvaluationJournal(tmp_path / "journal.sqlite3")
+    journal.append_encrypted_record(
+        record_id="r1", project_id="p1", owner_id="alice",
+        ciphertext=b"encrypted-fixture", key_version="v1",
+        occurred_at="2026-11-06T09:00:00+00:00",
+    )
+    from security.sqlite_journal import PersistenceIntegrityError
+    with pytest.raises(PersistenceIntegrityError, match="trusted external audit head"):
+        journal.load_encrypted_record("r1", "p1")
+
+def test_key_version_tampering_is_detected(tmp_path):
+    path = tmp_path / "journal.sqlite3"
+    journal = AtomicEvaluationJournal(path)
+    head = journal.append_encrypted_record(
+        record_id="r1", project_id="p1", owner_id="alice",
+        ciphertext=b"encrypted-fixture", key_version="v1",
+        occurred_at="2026-11-06T09:00:00+00:00",
+    )
+    with sqlite3.connect(path) as db:
+        db.execute("UPDATE records SET key_version='v2' WHERE record_id='r1'")
+    assert not journal.verify(expected_head=head)
