@@ -11,7 +11,7 @@ matome:
     final_authority: "Human"
 
   invariant:
-    slogan: "AIが動いても、決定権は動かない。"
+    slogan: "AIが動いても、ユーザーの決定権は動かない。"
     technical: "Execution may be automated. Authority remains human."
 
   freeze_rule:
