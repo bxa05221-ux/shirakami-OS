@@ -57,3 +57,18 @@ def test_cross_project_record_id_cannot_be_shared_or_revoked():
     client.post(p1, json={"record_id": "r1", "content": "synthetic"}, headers=hdr(A))
     assert client.post(p2 + "/r1/share", json={"recipients": ["carol"]}, headers=hdr(C)).status_code == 403
     assert client.post(p2 + "/r1/revoke", headers=hdr(C)).status_code == 403
+
+def test_owner_denial_is_audited_without_disclosing_content():
+    identities = EvaluatorIdentityRegistry()
+    identities.provision(A, "alice", {"p1"})
+    identities.provision(B, "bob", {"p1"})
+    store = EncryptedEvaluationStore(RotatingKeyring({"v1": Fernet.generate_key()}, "v1"))
+    store.register_project_members("p1", {"alice", "bob"})
+    client = TestClient(create_evaluation_records_app(identities, store))
+    url = "/evaluation/projects/p1/records"
+    assert client.post(url, json={"record_id": "r1", "content": "synthetic"}, headers=hdr(A)).status_code == 201
+    response = client.post(url + "/r1/share", json={"recipients": ["alice"]}, headers=hdr(B))
+    assert response.status_code == 403
+    events = store.audit_events()
+    assert any(e.action == "denied" and e.actor_id == "bob" for e in events)
+    assert "synthetic" not in repr(events)
