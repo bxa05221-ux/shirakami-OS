@@ -58,7 +58,7 @@ def create_evaluation_records_app(
         # Bind record to the authenticated project before owner action.
         try:
             store.read(record_id, project_id, principal.evaluator_id)
-            store.share_for_consensus(record_id, principal.evaluator_id, payload.recipients)
+            store.share_for_consensus(record_id, principal.evaluator_id, payload.recipients, project_id=project_id)
         except AccessDenied:
             raise HTTPException(status_code=403, detail="record access denied") from None
         return {"shared": True}
@@ -68,7 +68,7 @@ def create_evaluation_records_app(
         principal = principal_for(project_id, x_evaluator_token)
         try:
             store.read(record_id, project_id, principal.evaluator_id)
-            store.revoke_consensus(record_id, principal.evaluator_id)
+            store.revoke_consensus(record_id, principal.evaluator_id, project_id=project_id)
         except AccessDenied:
             raise HTTPException(status_code=403, detail="record access denied") from None
         return {"revoked": True}
