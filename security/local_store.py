@@ -7,6 +7,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from cryptography.fernet import Fernet, InvalidToken
+from security.audit_chain import LocalAuditChain
 
 class AccessDenied(PermissionError): pass
 class EncryptionError(ValueError): pass
@@ -34,6 +35,7 @@ class EncryptedEvaluationStore:
     def __init__(self, keyring: RotatingKeyring) -> None:
         self._keyring, self._records, self._audit = keyring, {}, []
         self._memberships: dict[str, set[str]] = {}
+        self._audit_chain = LocalAuditChain()
     def register_project_members(self, project_id: str, evaluator_ids: set[str]) -> None:
         """Bootstrap only: caller must be a trusted local administrator, never an HTTP user."""
         if not project_id or not evaluator_ids or any(not item for item in evaluator_ids):
@@ -69,6 +71,10 @@ class EncryptedEvaluationStore:
         self._record(project_id, record_id, actor_id, "read")
         return self._keyring.decrypt(record.key_version, record.ciphertext)
     def audit_events(self) -> tuple[AccessAuditEvent, ...]: return tuple(self._audit)
+    def audit_chain_snapshot(self): return self._audit_chain.snapshot()
+    def audit_chain_head(self) -> str: return self._audit_chain.head_digest
+    def verify_audit_chain(self, expected_head: str | None = None) -> bool:
+        return LocalAuditChain.verify(self._audit_chain.snapshot(), expected_head=expected_head)
     def _require_owner(self, record_id: str, actor_id: str) -> _Record:
         record = self._records.get(record_id)
         if record is None or record.owner_id != actor_id:
@@ -77,3 +83,4 @@ class EncryptedEvaluationStore:
         return record
     def _record(self, project_id: str, record_id: str, actor_id: str, action: str) -> None:
         self._audit.append(AccessAuditEvent(project_id, record_id, actor_id, action, datetime.now(timezone.utc).isoformat()))
+        self._audit_chain.append(project_id, record_id, actor_id, action)
