@@ -14,8 +14,8 @@ def test_encrypted_record_and_audit_survive_restart(tmp_path):
         occurred_at="2026-11-06T09:00:00+00:00",
     )
     reopened = AtomicEvaluationJournal(path)
-    assert reopened.load_encrypted_record("r1", "p1") == (b"encrypted-fixture", "v1")
-    assert reopened.load_encrypted_record("r1", "p2") is None
+    assert reopened.load_encrypted_record("r1", "p1", expected_head=head) == (b"encrypted-fixture", "v1")
+    assert reopened.load_encrypted_record("r1", "p2", expected_head=head) is None
     assert reopened.verify(expected_head=head)
     assert not reopened.verify(expected_head="0" * 64)
 
@@ -47,7 +47,8 @@ def test_modified_audit_is_detected_and_blocks_next_write(tmp_path):
             ciphertext=b"encrypted-fixture-2", key_version="v1",
             occurred_at="2026-11-06T09:01:00+00:00",
         )
-    assert journal.load_encrypted_record("r2", "p1") is None
+    with pytest.raises(PersistenceIntegrityError):
+        journal.load_encrypted_record("r2", "p1", expected_head=head)
 
 def test_ciphertext_tampering_is_detected_before_read(tmp_path):
     path = tmp_path / "journal.sqlite3"
