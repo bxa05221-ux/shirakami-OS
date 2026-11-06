@@ -144,12 +144,16 @@ class ShirakamiHTTPTransport:
             if self.async_model_adapter is not None:
                 return await self.api.execute_async(protocol, payload.protocol_id, payload.input_data, handoff_id=payload.handoff_id, trace_id=payload.trace_id, evidence_ids=tuple(payload.evidence_ids), project=boundary["project"], objective=boundary["objective"], protocol_ids=tuple(boundary["protocol_ids"]), verification_scope=tuple(boundary["verification_scope"]), ai_adapter=self.async_model_adapter)
             return self.api.execute(protocol, payload.protocol_id, payload.input_data, handoff_id=payload.handoff_id, trace_id=payload.trace_id, evidence_ids=tuple(payload.evidence_ids), project=boundary["project"], objective=boundary["objective"], protocol_ids=tuple(boundary["protocol_ids"]), verification_scope=tuple(boundary["verification_scope"]), ai_adapter=self.model_adapter)
-        @app.post("/v1/reviews/register", dependencies=[Depends(auth)])
+        def require_reviewer_isolation() -> None:
+            if self.evaluation_mode:
+                raise HTTPException(status_code=403, detail="evaluation reviewer routes disabled until authenticated project membership is enforced")
+
+        @app.post("/v1/reviews/register", dependencies=[Depends(auth), Depends(require_reviewer_isolation)])
         def register_reviewer_http(payload: ReviewerRegistrationInput) -> dict[str, Any]:
             bundle = self.reviewer_bundles.setdefault(payload.project_id, ReviewerBundle(project_id=payload.project_id))
             return register_reviewer(bundle, payload.model_dump(exclude={"project_id"}))
 
-        @app.post("/v1/reviews/submit", dependencies=[Depends(auth)])
+        @app.post("/v1/reviews/submit", dependencies=[Depends(auth), Depends(require_reviewer_isolation)])
         def submit_reviewer_http(payload: ReviewerSubmissionInput) -> dict[str, Any]:
             bundle = self.reviewer_bundles.get(payload.project_id)
             if bundle is None:
@@ -159,7 +163,7 @@ class ShirakamiHTTPTransport:
             except ValueError as exc:
                 raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-        @app.post("/v1/reviews/blind", dependencies=[Depends(auth)])
+        @app.post("/v1/reviews/blind", dependencies=[Depends(auth), Depends(require_reviewer_isolation)])
         def blind_review_http(payload: dict[str, Any]) -> dict[str, Any]:
             from reviewer.blind_review import ingest_blind_review
             project_id = str(payload.get("project_id", "")).strip()
@@ -172,7 +176,7 @@ class ShirakamiHTTPTransport:
             except ValueError as exc:
                 raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-        @app.post("/v1/reviews/blind/comparative/aiwitness", dependencies=[Depends(auth)])
+        @app.post("/v1/reviews/blind/comparative/aiwitness", dependencies=[Depends(auth), Depends(require_reviewer_isolation)])
         def blind_comparative_aiwitness_http(payload: dict[str, Any]) -> dict[str, Any]:
             from aiwitness.traceability import validate_comparative_traceability
             from reviewer.blind_review import ingest_and_compare_blind_reviews
@@ -187,14 +191,14 @@ class ShirakamiHTTPTransport:
             except ValueError as exc:
                 raise HTTPException(status_code=422, detail=str(exc)) from exc
             return {"valid": True, "aiwitness": context, "traceability": asdict(record)}
-        @app.post("/v1/reviews/comparative", dependencies=[Depends(auth)])
+        @app.post("/v1/reviews/comparative", dependencies=[Depends(auth), Depends(require_reviewer_isolation)])
         def comparative_review_http(payload: ReviewerComparativeInput) -> dict[str, Any]:
             bundle = self.reviewer_bundles.get(payload.project_id)
             if bundle is None:
                 raise HTTPException(status_code=404, detail="unknown reviewer project")
             return as_trace_context(build_comparative_trace(bundle))
 
-        @app.post("/v1/reviews/comparative/aiwitness", dependencies=[Depends(auth)])
+        @app.post("/v1/reviews/comparative/aiwitness", dependencies=[Depends(auth), Depends(require_reviewer_isolation)])
         def comparative_aiwitness_http(payload: ReviewerComparativeInput) -> dict[str, Any]:
             bundle = self.reviewer_bundles.get(payload.project_id)
             if bundle is None:
@@ -209,14 +213,14 @@ class ShirakamiHTTPTransport:
                 raise HTTPException(status_code=409, detail=str(exc)) from exc
             return {"valid": True, "aiwitness": context, "traceability": asdict(record)}
 
-        @app.get("/v1/reviews/comparative/{project_id}", dependencies=[Depends(auth)])
+        @app.get("/v1/reviews/comparative/{project_id}", dependencies=[Depends(auth), Depends(require_reviewer_isolation)])
         def get_comparative_review_http(project_id: str) -> dict[str, Any]:
             bundle = self.reviewer_bundles.get(project_id)
             if bundle is None:
                 raise HTTPException(status_code=404, detail="unknown reviewer project")
             return as_trace_context(build_comparative_trace(bundle))
 
-        @app.get("/v1/reviews/{project_id}", dependencies=[Depends(auth)])
+        @app.get("/v1/reviews/{project_id}", dependencies=[Depends(auth), Depends(require_reviewer_isolation)])
         def get_reviewers_http(project_id: str) -> dict[str, Any]:
             bundle = self.reviewer_bundles.get(project_id)
             if bundle is None:
