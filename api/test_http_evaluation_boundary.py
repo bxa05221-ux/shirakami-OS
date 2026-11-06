@@ -48,3 +48,21 @@ def test_general_mode_retains_adapter_registration():
     adapter = lambda prompt, protocol: "fixture"
     app = create_app(model_adapter=adapter)
     assert app is not None
+
+@pytest.mark.parametrize("method,path", [
+    ("POST", "/v1/reviews/register"),
+    ("POST", "/v1/reviews/submit"),
+    ("POST", "/v1/reviews/blind"),
+    ("POST", "/v1/reviews/blind/comparative/aiwitness"),
+    ("POST", "/v1/reviews/comparative"),
+    ("POST", "/v1/reviews/comparative/aiwitness"),
+    ("GET", "/v1/reviews/comparative/project-a"),
+    ("GET", "/v1/reviews/project-a"),
+])
+def test_evaluation_reviewer_routes_fail_closed_without_verified_membership(method, path):
+    client = TestClient(create_app(api_key="fixture-key", evaluation_mode=True))
+    response = client.request(method, path, headers={"X-API-Key": "fixture-key"}, json={} if method == "POST" else None)
+    assert response.status_code == 403
+    assert response.json()["detail"] == (
+        "evaluation reviewer routes disabled until authenticated project membership is enforced"
+    )
