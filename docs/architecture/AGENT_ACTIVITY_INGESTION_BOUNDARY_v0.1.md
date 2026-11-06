@@ -407,4 +407,4 @@ The central rule of this boundary is:
 
 This preserves the existing Shirakami principle:
 
-> AIが動いても、決定権は動かない。
+> AIが動いても、ユーザーの決定権は動かない。
