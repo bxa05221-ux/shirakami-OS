@@ -28,3 +28,10 @@ def test_chain_detects_reordered_entries():
     chain.append("p1", "r1", "bob", "denied")
     entries = chain.snapshot()
     assert not LocalAuditChain.verify((entries[1], entries[0]), expected_head=chain.head_digest)
+
+def test_chain_detects_timestamp_tampering():
+    chain = LocalAuditChain()
+    chain.append("p1", "r1", "alice", "write", "2026-11-06T09:00:00+00:00")
+    entries = list(chain.snapshot())
+    entries[0] = replace(entries[0], occurred_at="2026-11-06T10:00:00+00:00")
+    assert not LocalAuditChain.verify(tuple(entries), expected_head=chain.head_digest)
