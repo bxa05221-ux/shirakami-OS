@@ -47,7 +47,10 @@ class AtomicEvaluationJournal:
     def append_encrypted_record(
         self, *, record_id: str, project_id: str, owner_id: str,
         ciphertext: bytes, key_version: str, occurred_at: str,
+        expected_head: str,
     ) -> str:
+        if not isinstance(expected_head, str) or len(expected_head) != 64 or any(c not in "0123456789abcdef" for c in expected_head):
+            raise PersistenceIntegrityError("trusted external audit head is required for writes")
         if not all((record_id, project_id, owner_id, ciphertext, key_version, occurred_at)):
             raise ValueError("complete encrypted record and audit metadata required")
         with self._connect() as db:
@@ -60,6 +63,16 @@ class AtomicEvaluationJournal:
                 entry = chain.append(project, record, actor, action, timestamp)
                 if (entry.sequence, entry.previous_digest, entry.digest) != (seq, previous, digest):
                     raise PersistenceIntegrityError("stored audit chain is invalid")
+            if chain.head_digest != expected_head:
+                raise PersistenceIntegrityError("trusted audit head does not match current journal")
+            existing = db.execute("SELECT record_id,project_id,owner_id,ciphertext,key_version FROM records").fetchall()
+            expected_writes = {(rid, project, owner, "write:" + version + ":" + sha256(bytes(cipher)).hexdigest())
+                               for rid, project, owner, cipher, version in existing}
+            chained_writes = {(record, project, actor, action)
+                              for _, project, record, actor, action, _, _, _ in rows
+                              if action.startswith("write:")}
+            if expected_writes != chained_writes:
+                raise PersistenceIntegrityError("stored records do not match audit journal")
             db.execute(
                 "INSERT INTO records(record_id,project_id,owner_id,ciphertext,key_version) VALUES (?,?,?,?,?)",
                 (record_id, project_id, owner_id, ciphertext, key_version),
