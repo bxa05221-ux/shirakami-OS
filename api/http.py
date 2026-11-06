@@ -75,7 +75,10 @@ class VerifyInput(BaseModel):
     diff_ref: str = ""
 
 class ShirakamiHTTPTransport:
-    def __init__(self, api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None, model_adapter: Callable[[str, str], Any] | None = None, async_model_adapter: Callable[[str, str], Any] | None = None) -> None:
+    def __init__(self, api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None, model_adapter: Callable[[str, str], Any] | None = None, async_model_adapter: Callable[[str, str], Any] | None = None, evaluation_mode: bool = False) -> None:
+        if evaluation_mode and (model_adapter is not None or async_model_adapter is not None):
+            raise ValueError("evaluation mode forbids arbitrary model adapters")
+        self.evaluation_mode = evaluation_mode
         self.api = api or ShirakamiAPI(); self.protocol_registry = dict(protocol_registry or {}); self.api_key = api_key; self.model_adapter = model_adapter; self.async_model_adapter = async_model_adapter; self.reviewer_bundles: dict[str, ReviewerBundle] = {}
     def create_app(self) -> FastAPI:
         app = FastAPI(title="Shirakami UI for AI API", version="alpha-0.1"); auth = require_api_key(self.api_key)
@@ -122,6 +125,8 @@ class ShirakamiHTTPTransport:
         def approve(payload: ApproveInput) -> dict[str, Any]: return self.api.approve(approved=payload.approved, reviewer=payload.reviewer, human_authorized=payload.human_authorized)
         @app.post("/v1/execute", dependencies=[Depends(auth)])
         async def execute(payload: ExecuteInput) -> dict[str, Any]:
+            if self.evaluation_mode:
+                raise HTTPException(status_code=403, detail="evaluation execution disabled until audited local runtime is available")
             # Fail closed at the HTTP boundary until explicit Human Gate approval.
             if self.api.runtime.loop.state.value == "HUMAN_REVIEW":
                 raise HTTPException(
@@ -259,5 +264,5 @@ class ShirakamiHTTPTransport:
             return result
         return app
 
-def create_app(api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None, model_adapter: Callable[[str, str], Any] | None = None, async_model_adapter: Callable[[str, str], Any] | None = None) -> FastAPI:
-    return ShirakamiHTTPTransport(api, protocol_registry, api_key, model_adapter, async_model_adapter).create_app()
+def create_app(api: ShirakamiAPI | None = None, protocol_registry: Mapping[str, Callable[[Any], Any]] | None = None, api_key: str | None = None, model_adapter: Callable[[str, str], Any] | None = None, async_model_adapter: Callable[[str, str], Any] | None = None, evaluation_mode: bool = False) -> FastAPI:
+    return ShirakamiHTTPTransport(api, protocol_registry, api_key, model_adapter, async_model_adapter, evaluation_mode=evaluation_mode).create_app()
