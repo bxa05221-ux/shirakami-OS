@@ -88,5 +88,6 @@ class EncryptedEvaluationStore:
             raise AccessDenied("only the owner can share a private record")
         return record
     def _record(self, project_id: str, record_id: str, actor_id: str, action: str) -> None:
-        self._audit.append(AccessAuditEvent(project_id, record_id, actor_id, action, datetime.now(timezone.utc).isoformat()))
-        self._audit_chain.append(project_id, record_id, actor_id, action)
+        occurred_at = datetime.now(timezone.utc).isoformat()
+        self._audit.append(AccessAuditEvent(project_id, record_id, actor_id, action, occurred_at))
+        self._audit_chain.append(project_id, record_id, actor_id, action, occurred_at)
