@@ -68,6 +68,7 @@ def test_store_operations_automatically_append_verifiable_audit_chain():
     events = records.audit_events()
     chain = records.audit_chain_snapshot()
     assert [e.action for e in events] == [e.action for e in chain]
+    assert [e.occurred_at for e in events] == [e.occurred_at for e in chain]
     assert records.verify_audit_chain(expected_head=records.audit_chain_head())
     assert not LocalAuditChain.verify(chain[:-1], expected_head=records.audit_chain_head())
     assert "synthetic" not in repr(chain)
