@@ -33,17 +33,37 @@ class RotatingKeyring:
 class EncryptedEvaluationStore:
     def __init__(self, keyring: RotatingKeyring) -> None:
         self._keyring, self._records, self._audit = keyring, {}, []
+        self._memberships: dict[str, set[str]] = {}
+    def register_project_members(self, project_id: str, evaluator_ids: set[str]) -> None:
+        """Bootstrap only: caller must be a trusted local administrator, never an HTTP user."""
+        if not project_id or not evaluator_ids or any(not item for item in evaluator_ids):
+            raise ValueError("valid project membership is required")
+        self._memberships[project_id] = set(evaluator_ids)
+    def _require_member(self, project_id: str, evaluator_id: str) -> None:
+        if evaluator_id not in self._memberships.get(project_id, set()):
+            raise AccessDenied("evaluator is not a registered member of this project")
     def put_private(self, record_id: str, project_id: str, evaluator_id: str, content: bytes) -> None:
+        self._require_member(project_id, evaluator_id)
+        if record_id in self._records:
+            raise AccessDenied("record id already exists")
         version, ciphertext = self._keyring.encrypt(content)
         self._records[record_id] = _Record(project_id, evaluator_id, frozenset({evaluator_id}), ciphertext, version)
         self._record(project_id, record_id, evaluator_id, "write")
     def share_for_consensus(self, record_id: str, actor_id: str, recipients: set[str]) -> None:
         record = self._require_owner(record_id, actor_id)
+        self._require_member(record.project_id, actor_id)
+        if not recipients or any(member not in self._memberships.get(record.project_id, set()) for member in recipients):
+            raise AccessDenied("consensus recipients must belong to the same project")
         self._records[record_id] = _Record(record.project_id, record.owner_id, frozenset({record.owner_id, *recipients}), record.ciphertext, record.key_version)
         self._record(record.project_id, record_id, actor_id, "share_for_consensus")
+    def revoke_consensus(self, record_id: str, actor_id: str) -> None:
+        record = self._require_owner(record_id, actor_id)
+        self._require_member(record.project_id, actor_id)
+        self._records[record_id] = _Record(record.project_id, record.owner_id, frozenset({record.owner_id}), record.ciphertext, record.key_version)
+        self._record(record.project_id, record_id, actor_id, "revoke_consensus")
     def read(self, record_id: str, project_id: str, actor_id: str) -> bytes:
         record = self._records.get(record_id)
-        if record is None or record.project_id != project_id or actor_id not in record.readers:
+        if record is None or record.project_id != project_id or actor_id not in record.readers or actor_id not in self._memberships.get(project_id, set()):
             self._record(project_id, record_id, actor_id, "denied")
             raise AccessDenied("record is not shared with this evaluator in this project")
         self._record(project_id, record_id, actor_id, "read")
