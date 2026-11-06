@@ -64,7 +64,7 @@ class AtomicEvaluationJournal:
                 "INSERT INTO records(record_id,project_id,owner_id,ciphertext,key_version) VALUES (?,?,?,?,?)",
                 (record_id, project_id, owner_id, ciphertext, key_version),
             )
-            entry = chain.append(project_id, record_id, owner_id, "write:" + sha256(ciphertext).hexdigest(), occurred_at)
+            entry = chain.append(project_id, record_id, owner_id, "write:" + key_version + ":" + sha256(ciphertext).hexdigest(), occurred_at)
             db.execute(
                 "INSERT INTO audit VALUES (?,?,?,?,?,?,?,?)",
                 (entry.sequence, entry.project_id, entry.record_id, entry.actor_id,
@@ -73,6 +73,8 @@ class AtomicEvaluationJournal:
             return entry.digest
 
     def load_encrypted_record(self, record_id: str, project_id: str, *, expected_head: str | None = None) -> tuple[bytes, str] | None:
+        if expected_head is None:
+            raise PersistenceIntegrityError("trusted external audit head is required for reads")
         if not self.verify(expected_head=expected_head):
             raise PersistenceIntegrityError("stored journal integrity verification failed")
         with self._connect() as db:
@@ -95,9 +97,9 @@ class AtomicEvaluationJournal:
             if expected_head is not None and chain.head_digest != expected_head:
                 return False
             # Every stored record must be backed by a matching, chained write event.
-            records = db.execute("SELECT record_id,project_id,owner_id,ciphertext FROM records").fetchall()
-            expected_writes = {(rid, project, owner, "write:" + sha256(bytes(cipher)).hexdigest())
-                               for rid, project, owner, cipher in records}
+            records = db.execute("SELECT record_id,project_id,owner_id,ciphertext,key_version FROM records").fetchall()
+            expected_writes = {(rid, project, owner, "write:" + version + ":" + sha256(bytes(cipher)).hexdigest())
+                               for rid, project, owner, cipher, version in records}
             chained_writes = {(record, project, actor, action)
                               for _, project, record, actor, action, _, _, _ in rows
                               if action.startswith("write:")}
