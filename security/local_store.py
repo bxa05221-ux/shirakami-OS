@@ -71,7 +71,9 @@ class EncryptedEvaluationStore:
     def audit_events(self) -> tuple[AccessAuditEvent, ...]: return tuple(self._audit)
     def _require_owner(self, record_id: str, actor_id: str) -> _Record:
         record = self._records.get(record_id)
-        if record is None or record.owner_id != actor_id: raise AccessDenied("only the owner can share a private record")
+        if record is None or record.owner_id != actor_id:
+            self._record(record.project_id if record is not None else "", record_id, actor_id, "denied_owner_action")
+            raise AccessDenied("only the owner can share a private record")
         return record
     def _record(self, project_id: str, record_id: str, actor_id: str, action: str) -> None:
         self._audit.append(AccessAuditEvent(project_id, record_id, actor_id, action, datetime.now(timezone.utc).isoformat()))
