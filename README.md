@@ -3,7 +3,7 @@
 > **Shirakami OS is not another AI model.**
 > It is a runtime for preserving, observing, and transferring human context across AI systems.
 
-[English](README.md) | [日本語](README.ja.md)
+[English](README.md) | [日本語](README.ja.md) | [Official Website](https://shirakami-project.astutelinen1.chatgpt.site/)
 
 ----
 Version: Prototype v1.1 (PV1.1)  
