@@ -84,7 +84,11 @@ class ShirakamiHTTPTransport:
         app = FastAPI(title="Shirakami UI for AI API", version="alpha-0.1"); auth = require_api_key(self.api_key)
         @app.get("/health")
         def health() -> dict[str, str]: return {"status": "ok"}
-        @app.get("/v1/capabilities", dependencies=[Depends(auth)])
+        def require_evaluation_runtime() -> None:
+            if self.evaluation_mode:
+                raise HTTPException(status_code=403, detail="evaluation API disabled until authenticated local runtime is available")
+
+        @app.get("/v1/capabilities", dependencies=[Depends(auth), Depends(require_evaluation_runtime)])
         def capabilities() -> dict[str, Any]:
             return {
                 "api": {"name": "Shirakami UI for AI API", "version": "alpha-0.1"},
@@ -115,13 +119,13 @@ class ShirakamiHTTPTransport:
                     "reviewer_perspectives_preserved": True,
                 },
             }
-        @app.post("/v1/observe", dependencies=[Depends(auth)])
+        @app.post("/v1/observe", dependencies=[Depends(auth), Depends(require_evaluation_runtime)])
         def observe(payload: ObserveInput) -> dict[str, Any]:
             context = ContextSnapshot(protocol_id=payload.context.protocol_id, landscape=payload.context.landscape, metadata=payload.context.metadata)
             result = self.api.observe(payload.observation, context); result.update({"handoff_id": payload.handoff_id, "trace_id": payload.trace_id, "evidence_ids": list(payload.evidence_ids), "execution_authorized": False, "publish_authorized": False, "merge_authorized": False, "human_gate_required": True}); return result
-        @app.post("/v1/analyze", dependencies=[Depends(auth)])
+        @app.post("/v1/analyze", dependencies=[Depends(auth), Depends(require_evaluation_runtime)])
         def analyze(payload: AnalyzeInput) -> dict[str, Any]: return asdict(self.api.analyze(payload.protocol_id, protocol_exists=payload.protocol_exists, diff_ref=payload.diff_ref))
-        @app.post("/v1/approve", dependencies=[Depends(auth)])
+        @app.post("/v1/approve", dependencies=[Depends(auth), Depends(require_evaluation_runtime)])
         def approve(payload: ApproveInput) -> dict[str, Any]: return self.api.approve(approved=payload.approved, reviewer=payload.reviewer, human_authorized=payload.human_authorized)
         @app.post("/v1/execute", dependencies=[Depends(auth)])
         async def execute(payload: ExecuteInput) -> dict[str, Any]:
@@ -227,24 +231,24 @@ class ShirakamiHTTPTransport:
                 raise HTTPException(status_code=404, detail="unknown reviewer project")
             return get_reviewers(bundle)
 
-        @app.get("/v1/executions/{execution_id}", dependencies=[Depends(auth)])
+        @app.get("/v1/executions/{execution_id}", dependencies=[Depends(auth), Depends(require_evaluation_runtime)])
         def get_execution(execution_id: str) -> dict[str, Any]:
             result = self.api.get_execution(execution_id)
             if result is None: raise HTTPException(status_code=404, detail="unknown execution_id")
             return result
-        @app.get("/v1/traces/{trace_id}", dependencies=[Depends(auth)])
+        @app.get("/v1/traces/{trace_id}", dependencies=[Depends(auth), Depends(require_evaluation_runtime)])
         def get_trace(trace_id: str) -> dict[str, Any]:
             result = self.api.get_trace(trace_id)
             if result is None: raise HTTPException(status_code=404, detail="unknown trace_id")
             return result
-        @app.get("/v1/witnesses/{trace_id}/history", dependencies=[Depends(auth)])
+        @app.get("/v1/witnesses/{trace_id}/history", dependencies=[Depends(auth), Depends(require_evaluation_runtime)])
         def get_witness_history(trace_id: str) -> list[dict[str, Any]]: return self.api.get_witness_history(trace_id)
-        @app.get("/v1/witnesses/{trace_id}", dependencies=[Depends(auth)])
+        @app.get("/v1/witnesses/{trace_id}", dependencies=[Depends(auth), Depends(require_evaluation_runtime)])
         def get_witness(trace_id: str) -> dict[str, Any]:
             result = self.api.get_witness(trace_id)
             if result is None: raise HTTPException(status_code=404, detail="unknown trace_id")
             return result
-        @app.get("/v1/traceability/{trace_id}", dependencies=[Depends(auth)])
+        @app.get("/v1/traceability/{trace_id}", dependencies=[Depends(auth), Depends(require_evaluation_runtime)])
         def get_traceability(trace_id: str) -> dict[str, Any]:
             trace = self.api.get_trace(trace_id); witness = self.api.get_witness(trace_id)
             if trace is None or witness is None: raise HTTPException(status_code=404, detail="unknown trace_id")
@@ -254,14 +258,14 @@ class ShirakamiHTTPTransport:
             try: record = validate_traceability(trace=trace, witness=witness, execution=execution, evidence_ids=trace.get("evidence_ids", []))
             except ValueError as exc: raise HTTPException(status_code=409, detail=str(exc)) from exc
             return {"valid": True, "traceability": asdict(record), "witness_revision": witness["revision"]}
-        @app.post("/v1/executions/{execution_id}/verify", dependencies=[Depends(auth)])
+        @app.post("/v1/executions/{execution_id}/verify", dependencies=[Depends(auth), Depends(require_evaluation_runtime)])
         def verify_execution(execution_id: str, payload: VerifyInput) -> dict[str, Any]:
             result = self.api.verify_execution(execution_id, expected_transition_kind=payload.expected_transition_kind, diff_ref=payload.diff_ref)
             if result is None: raise HTTPException(status_code=404, detail="unknown execution_id")
             return asdict(result)
-        @app.get("/v1/evidence", dependencies=[Depends(auth)])
+        @app.get("/v1/evidence", dependencies=[Depends(auth), Depends(require_evaluation_runtime)])
         def evidence(protocol_id: str | None = None, signal: str | None = None, transition_kind: str | None = None) -> list[dict[str, Any]]: return list(self.api.query_evidence(protocol_id=protocol_id, signal=signal, transition_kind=transition_kind))
-        @app.get("/v1/evidence/{evidence_id}", dependencies=[Depends(auth)])
+        @app.get("/v1/evidence/{evidence_id}", dependencies=[Depends(auth), Depends(require_evaluation_runtime)])
         def evidence_by_id(evidence_id: str) -> dict[str, Any]:
             result = self.api.get_evidence(evidence_id)
             if result is None: raise HTTPException(status_code=404, detail="unknown evidence_id")
