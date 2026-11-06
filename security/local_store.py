@@ -51,15 +51,21 @@ class EncryptedEvaluationStore:
         version, ciphertext = self._keyring.encrypt(content)
         self._records[record_id] = _Record(project_id, evaluator_id, frozenset({evaluator_id}), ciphertext, version)
         self._record(project_id, record_id, evaluator_id, "write")
-    def share_for_consensus(self, record_id: str, actor_id: str, recipients: set[str]) -> None:
+    def share_for_consensus(self, record_id: str, actor_id: str, recipients: set[str], *, project_id: str | None = None) -> None:
         record = self._require_owner(record_id, actor_id)
+        if project_id is not None and record.project_id != project_id:
+            self._record(project_id, record_id, actor_id, "denied_project_mismatch")
+            raise AccessDenied("record does not belong to requested project")
         self._require_member(record.project_id, actor_id)
         if not recipients or any(member not in self._memberships.get(record.project_id, set()) for member in recipients):
             raise AccessDenied("consensus recipients must belong to the same project")
         self._records[record_id] = _Record(record.project_id, record.owner_id, frozenset({record.owner_id, *recipients}), record.ciphertext, record.key_version)
         self._record(record.project_id, record_id, actor_id, "share_for_consensus")
-    def revoke_consensus(self, record_id: str, actor_id: str) -> None:
+    def revoke_consensus(self, record_id: str, actor_id: str, *, project_id: str | None = None) -> None:
         record = self._require_owner(record_id, actor_id)
+        if project_id is not None and record.project_id != project_id:
+            self._record(project_id, record_id, actor_id, "denied_project_mismatch")
+            raise AccessDenied("record does not belong to requested project")
         self._require_member(record.project_id, actor_id)
         self._records[record_id] = _Record(record.project_id, record.owner_id, frozenset({record.owner_id}), record.ciphertext, record.key_version)
         self._record(record.project_id, record_id, actor_id, "revoke_consensus")
