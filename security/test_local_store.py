@@ -71,3 +71,17 @@ def test_store_operations_automatically_append_verifiable_audit_chain():
     assert records.verify_audit_chain(expected_head=records.audit_chain_head())
     assert not LocalAuditChain.verify(chain[:-1], expected_head=records.audit_chain_head())
     assert "synthetic" not in repr(chain)
+
+def test_same_owner_cannot_mutate_record_through_another_project():
+    records = store()
+    records.register_project_members("project-a", {"owner", "peer"})
+    records.register_project_members("project-b", {"owner", "peer"})
+    records.put_private("r1", "project-a", "owner", b"synthetic")
+    with pytest.raises(AccessDenied):
+        records.share_for_consensus("r1", "owner", {"peer"}, project_id="project-b")
+    with pytest.raises(AccessDenied):
+        records.revoke_consensus("r1", "owner", project_id="project-b")
+    with pytest.raises(AccessDenied):
+        records.read("r1", "project-a", "peer")
+    assert [event.action for event in records.audit_events()].count("denied_project_mismatch") == 2
+    assert records.verify_audit_chain(expected_head=records.audit_chain_head())
