@@ -15,7 +15,7 @@ from runtime.real_model_adapter import RealModelAdapter
 
 
 class RadioGenerationControlHandoffTests(unittest.TestCase):
-    def test_real_model_adapter_does_not_forward_control_fields(self):
+    def test_real_model_adapter_preserves_legacy_request_without_control(self):
         captured = []
         adapter = RealModelAdapter(lambda request: captured.append(request) or "fixture")
         output = adapter("今朝は風が冷たいです。", "shirakami-radio-v2.1")
@@ -27,6 +27,57 @@ class RadioGenerationControlHandoffTests(unittest.TestCase):
         self.assertNotIn("generation_control", request.context)
         self.assertNotIn("evaluation", request.context)
         self.assertNotIn("next_turn", request.context)
+
+    def test_pipeline_control_reaches_provider_without_authority_or_mutation(self):
+        registry = ProtocolRegistry()
+        artifact = ProtocolIR(
+            protocol_id="shirakami-radio-v2.1",
+            title="Shirakami Radio",
+            version="2.1",
+            statement="Different views without forced semantic bridging.",
+            pipeline=(
+                {"phase": "listener", "action": "generate_independent_landscape"},
+            ),
+        )
+        registry.register_temporary(artifact.protocol_id, artifact)
+        captured = []
+        adapter = RealModelAdapter(lambda request: captured.append(request) or "fixture")
+        control = {
+            "instructions": {"semantic_bridging": False},
+            "human_authority": "preserved",
+        }
+
+        execution = execute_selected_pipeline(
+            "今朝は風が冷たいです。",
+            registry,
+            artifact.protocol_id,
+            PipelineAdapter(adapter.execute_pipeline, backend_id="model-fixture"),
+            context={"generation_control": control, "broadcast_authorized": False},
+        )
+
+        self.assertEqual(execution.steps[0].output, "fixture")
+        self.assertEqual(len(captured), 1)
+        provider_request = captured[0]
+        self.assertEqual(provider_request.canonical_prompt, "今朝は風が冷たいです。")
+        self.assertEqual(provider_request.context["protocol_id"], artifact.protocol_id)
+        self.assertEqual(
+            provider_request.context["generation_control"],
+            {
+                "instructions": {"semantic_bridging": False},
+                "human_authority": "preserved",
+                "protocol_id": artifact.protocol_id,
+                "protocol_version": "2.1",
+                "phase": "listener",
+                "action": "generate_independent_landscape",
+            },
+        )
+        self.assertEqual(control, {
+            "instructions": {"semantic_bridging": False},
+            "human_authority": "preserved",
+        })
+        self.assertNotIn("execution_authorized", provider_request.context)
+        self.assertNotIn("publish_authorized", provider_request.context)
+        self.assertNotIn("merge_authorized", provider_request.context)
 
     def test_selected_pipeline_carries_step_metadata_to_mock_adapter(self):
         registry = ProtocolRegistry()
