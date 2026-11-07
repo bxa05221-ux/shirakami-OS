@@ -9,6 +9,7 @@ from runtime.protocol_loader import ProtocolLoadError, load_matome
 
 ROOT = Path(__file__).resolve().parents[1]
 THREAD_RPG = ROOT / "protocols" / "thread-rpg-v1.2.1.yaml"
+CONTEXT_CONTRACT = ROOT / "docs" / "protocols" / "ThreadRPG_Conversation_Context_Contract_v0.2.md"
 
 
 def test_thread_rpg_is_present_as_canonical_protocol_artifact():
@@ -26,3 +27,13 @@ def test_thread_rpg_canonical_artifact_does_not_silently_enter_matome_beta01_sub
         load_matome(THREAD_RPG)
 
     assert text.splitlines()[0].strip() == "protocol:"
+
+
+def test_thread_rpg_v02_context_contract_keeps_continuity_out_of_persona():
+    text = CONTEXT_CONTRACT.read_text(encoding="utf-8")
+
+    assert "continuity belongs to the conversation context" in text
+    assert "stable personality" in text
+    assert "mistaken reading, a repeated question, a late" in text
+    assert "MUST NOT state an unprovided inner state" in text
+    assert "user to correct a viewpoint" in text

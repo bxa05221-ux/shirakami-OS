@@ -7,6 +7,11 @@ on:
       - "runtime/aats.py"
       - "runtime/way.py"
       - "runtime/landscape.py"
+      - "protocols/thread-rpg-v1.2.1.yaml"
+      - "docs/protocols/ThreadRPG_Protocol_Generation_Policy_v0.1.md"
+      - "docs/protocols/ThreadRPG_Conversation_Context_Contract_v0.2.md"
+      - "tests/test_thread_rpg_protocol_boundary.py"
+      - "tests/test_thread_rpg_matome_fixture.py"
       - "tests/test_aat_thread_wayfinding.py"
       - ".github/workflows/aat-thread-wayfinding.yml"
   workflow_dispatch:
@@ -22,4 +27,5 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python -m pytest tests/test_aat_thread_wayfinding.py -q
+      - run: python -m pip install pytest
+      - run: python -m pytest -q tests/test_thread_rpg_protocol_boundary.py tests/test_thread_rpg_matome_fixture.py tests/test_aat_thread_wayfinding.py
