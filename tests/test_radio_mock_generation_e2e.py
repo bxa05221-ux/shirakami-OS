@@ -5,6 +5,9 @@ detects only the fixture risks below and makes no quality or broad compliance
 guarantee.  No test invokes a provider, publishes, or mutates Reality.
 """
 
+import json
+from pathlib import Path
+
 from runtime.adapter import PipelineAdapter
 from runtime.guide_thread import (
     build_guide_thread_requests,
@@ -19,6 +22,11 @@ from runtime.protocol_loader import ProtocolIR
 from runtime.protocol_registry import ProtocolRegistry
 from runtime.radio_speech_evaluation import evaluate_radio_speech
 from runtime.real_model_adapter import RealModelAdapter
+
+
+_SAMPLES = json.loads(
+    (Path(__file__).parent / "fixtures" / "radio_speech_samples.json").read_text(encoding="utf-8")
+)
 
 
 def _radio_setup():
@@ -134,3 +142,38 @@ def test_limited_speech_heuristics_leave_distinct_non_advisory_fixture_unflagged
     assert evaluation.duplicate_landscape_pairs == ()
     assert evaluation.personality_restriction_hits == ()
     assert evaluation.semantic_bridge_hits == ()
+
+
+def test_japanese_radio_script_fixture_has_natural_restraint_signals_and_review_notes():
+    sample = _SAMPLES["normal"]
+    evaluation = evaluate_radio_speech(sample["listeners"], sample["personality"])
+
+    assert evaluation.duplicate_landscape_pairs == ()
+    assert evaluation.personality_restriction_hits == ()
+    assert evaluation.semantic_bridge_hits == ()
+    assert evaluation.personality_explanation_hits == ()
+    assert evaluation.performative_emotion_hits == ()
+    assert evaluation.listener_length_violations == ()
+    assert evaluation.personality_duration_violations == ()
+    assert len(_SAMPLES["human_review_checklist"]) == 4
+    assert "not a measurement of actual speaking rate" in evaluation.limitation
+
+
+def test_japanese_radio_script_fixture_flags_known_violation_signals():
+    sample = _SAMPLES["violation"]
+    evaluation = evaluate_radio_speech(sample["listeners"], sample["personality"])
+
+    assert evaluation.duplicate_landscape_pairs == ((0, 1, "rain"), (0, 1, "station"))
+    assert evaluation.listener_length_violations == ((0, 13), (1, 18))
+    assert evaluation.personality_restriction_hits == (sample["personality"][0],)
+    assert evaluation.semantic_bridge_hits == (sample["personality"][0],)
+    assert evaluation.personality_explanation_hits == (sample["personality"][0],)
+    assert evaluation.performative_emotion_hits == (sample["personality"][1],)
+
+
+def test_japanese_radio_script_fixture_accepts_listener_length_boundaries():
+    sample = _SAMPLES["boundary"]
+    evaluation = evaluate_radio_speech(sample["listeners"], sample["personality"])
+
+    assert all(100 <= len(post) <= 250 for post in sample["listeners"])
+    assert evaluation.listener_length_violations == ()
