@@ -7,6 +7,7 @@ import json
 from typing import Any, Callable, Mapping
 from urllib.request import Request, urlopen
 
+from aiwitness.policy_gate import AIwitnessPolicyGate, AuthorizedHandoff, PolicyDenied
 from .backend import BackendResponse
 
 
@@ -21,6 +22,7 @@ class OpenAIBackend:
         model: str = "gpt-5.6-luna",
         endpoint: str = "https://api.openai.com/v1/responses",
         transport: Callable[[Request], bytes] | None = None,
+        policy_gate: AIwitnessPolicyGate | None = None,
     ) -> None:
         if not api_key:
             raise ValueError("api_key is required")
@@ -28,12 +30,17 @@ class OpenAIBackend:
         self._model = model
         self._endpoint = endpoint
         self._transport = transport or self._request
+        self._policy_gate = policy_gate
 
     def execute(self, handoff: Mapping[str, Any]) -> BackendResponse:
+        if self._policy_gate is None:
+            raise PolicyDenied("AIwitness policy gate is required for external provider use")
+        authorized: AuthorizedHandoff = self._policy_gate.authorize(handoff, provider="openai", model=self._model)
+        self._policy_gate.verify(authorized, provider="openai", model=self._model)
         request_id = handoff.get("request_id")
         payload = {
             "model": self._model,
-            "input": handoff.get("input", handoff.get("payload", handoff)),
+            "input": authorized.payload,
         }
         request = Request(
             self._endpoint,
