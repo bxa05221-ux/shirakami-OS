@@ -44,6 +44,40 @@ def test_evaluation_execute_is_denied_before_runtime_or_adapter():
     )
 
 
+def test_evaluation_execute_stays_closed_after_late_async_adapter_injection():
+    """Synthetic-only: late adapter mutation must not reach the external callback."""
+    from api.http import ShirakamiHTTPTransport
+
+    calls = []
+
+    async def forbidden_adapter(prompt, protocol):
+        calls.append((prompt, protocol))
+        raise AssertionError("evaluation data reached arbitrary async adapter")
+
+    transport = ShirakamiHTTPTransport(api_key="fixture-key", evaluation_mode=True)
+    transport.async_model_adapter = forbidden_adapter
+    client = TestClient(transport.create_app())
+    response = client.post(
+        "/v1/execute",
+        headers={"X-API-Key": "fixture-key"},
+        json={
+            "protocol_id": "fixture",
+            "input_data": {"observation": "synthetic-confidential"},
+            "handoff_id": "fixture-handoff",
+            "evidence_ids": [],
+            "boundary_context": {
+                "handoff_id": "fixture-handoff",
+                "project": "evaluation-fixture",
+                "objective": "must not execute",
+                "protocol_ids": ["fixture"],
+                "evidence_ids": [],
+            },
+        },
+    )
+    assert response.status_code == 403
+    assert calls == []
+
+
 def test_general_mode_retains_adapter_registration():
     adapter = lambda prompt, protocol: "fixture"
     app = create_app(model_adapter=adapter)
