@@ -25,7 +25,7 @@ def test_duplicate_record_rolls_back_audit_and_record(tmp_path):
     args = dict(record_id="r1", project_id="p1", owner_id="alice",
                 ciphertext=b"encrypted-fixture", key_version="v1",
                 occurred_at="2026-11-06T09:00:00+00:00")
-    head = journal.append_encrypted_record(**args)
+    head = journal.append_encrypted_record(**args, expected_head=LocalAuditChain.GENESIS)
     with pytest.raises(sqlite3.IntegrityError):
         journal.append_encrypted_record(**{**args, "expected_head": head})
     assert journal.verify(expected_head=head)
