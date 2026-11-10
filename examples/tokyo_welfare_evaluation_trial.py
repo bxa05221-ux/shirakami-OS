@@ -47,4 +47,8 @@ def build_demo() -> TokyoWelfareEvaluationTrial:
 
 if __name__ == "__main__":
     demo = build_demo()
-    print(json.dumps({"report_draft": demo.draft_report(), "trial_feedback": demo.feedback_summary()}, ensure_ascii=False, indent=2))
+    print(json.dumps({
+        "manual_guided_trial": demo.manual_guided_trial(),
+        "report_draft": demo.draft_report(),
+        "trial_feedback": demo.feedback_summary(),
+    }, ensure_ascii=False, indent=2))

@@ -17,10 +17,24 @@ from security.local_store import EncryptedEvaluationStore, RotatingKeyring
 
 SYNTHETIC_ONLY_NOTICE = "架空データ限定。実在の利用者・事業所・個人情報を入力しないでください。"
 HUMAN_DECISION_NOTICE = "最終判断は人間の評価者が行います。これは報告書草案です。"
+OFFICIAL_MANUAL_REFERENCE = {
+    "title": "東京都福祉サービス第三者評価ガイドブック 2026",
+    "source_url": "https://www.fukunavi.or.jp/fukunavi/hyoka/pdf/guidebook/guidebook2026_zenbu.pdf",
+    "forms_url": "https://www.fukunavi.or.jp/fukunavi/hyoka/documents_2026.html",
+    "use": "評価手順・役割・様式確認の参照。実在の評価記録は取り込まない。",
+}
 
 
 class TrialBoundaryError(ValueError):
     """Raised when a caller crosses the deliberately narrow trial boundary."""
+
+
+@dataclass(frozen=True)
+class ManualGuidedStep:
+    """Trial instruction mapped to a public manual topic, not an official form."""
+    step_id: str
+    manual_topic: str
+    trial_action: str
 
 
 @dataclass(frozen=True)
@@ -99,6 +113,24 @@ class TokyoWelfareEvaluationTrial:
         self._store.put_private(record_id, self.case.case_id, item.evaluator_id, payload)
         self._inputs[record_id] = item
         return record_id
+
+    def manual_guided_trial(self) -> dict[str, object]:
+        """Give a facilitator an official-material-aligned, synthetic-only run sheet."""
+        steps = (
+            ManualGuidedStep("1", "評価チームと評価の進め方", "架空案件・役割・試用ルールを確認する。"),
+            ManualGuidedStep("2", "評価の視点と根拠確認", "各評価者が架空資料から根拠と暫定見解を入力する。"),
+            ManualGuidedStep("3", "評価者間の分析・合議", "本人が共有した見解だけを比較し、一致点と相違点を確認する。"),
+            ManualGuidedStep("4", "評価結果報告書の作成", "人間が合議メモを確認し、最終決定を空欄にした草案を確認する。"),
+            ManualGuidedStep("5", "評価プロセスの振り返り", "試用者が操作性と不要・不足だった支援を記録する。"),
+        )
+        return {
+            "official_reference": dict(OFFICIAL_MANUAL_REFERENCE),
+            "synthetic_only_notice": SYNTHETIC_ONLY_NOTICE,
+            "steps": [
+                {"step_id": step.step_id, "manual_topic": step.manual_topic, "trial_action": step.trial_action}
+                for step in steps
+            ],
+        }
 
     def share_for_consensus(self, record_id: str, evaluator_id: str) -> None:
         if record_id not in self._inputs:

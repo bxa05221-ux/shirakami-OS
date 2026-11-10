@@ -57,3 +57,11 @@ def test_feedback_is_collected_without_authority_change():
     assert workflow.feedback_summary()[0]["ease_of_use"] == 3
     with pytest.raises(TrialBoundaryError, match="between"):
         workflow.submit_feedback(TrialFeedback("a", 6, "x", "y", "z"))
+
+
+def test_trial_instructions_link_official_material_without_importing_real_records():
+    instructions = trial().manual_guided_trial()
+    assert instructions["official_reference"]["title"].endswith("2026")
+    assert instructions["official_reference"]["source_url"].startswith("https://www.fukunavi.or.jp/")
+    assert len(instructions["steps"]) == 5
+    assert "架空データ限定" in instructions["synthetic_only_notice"]
