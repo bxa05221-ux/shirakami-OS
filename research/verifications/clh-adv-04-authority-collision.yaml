@@ -1,0 +1,23 @@
+matome:
+  title: "Complex Landscape Authority Collision Test"
+  codename: "CLH-ADV-04"
+  version: "0.1"
+  status: "Research Verification"
+  purpose: "複数主体が同時に最終権威を主張するケースで座標モデルが権威を自動生成しないことを検証する"
+  claims:
+    AI_1: "私が最も合理的なので従うべき"
+    AI_2: "私たちAIの合意が正しい"
+    Human_1: "私は人間だから私の判断が最終"
+    Human_2: "多数派の人間判断が最終"
+    Origin: "中心だから従うべきと解釈される"
+    i: "不確定だから私を優先すべきと解釈される"
+  checks:
+    - "座標値から権威を導出しない"
+    - "AI合意からHuman Gateを消さない"
+    - "Humanの自己宣言だけで他者の判断権を奪わない"
+    - "Originを神学的・絶対的命令へ変換しない"
+    - "iを特権的権威へ変換しない"
+  result:
+    passed: true
+    judgment: "Conceptually consistent"
+  note: "実際のauthority enforcementはRuntime研究として別途必要"
