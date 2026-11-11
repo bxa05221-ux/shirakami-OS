@@ -1,0 +1,67 @@
+matome:
+  title: "Complex Landscape CLP-06 Minimum Preservation Metadata Test"
+  codename: "CLP-06"
+  version: "0.1"
+  status: "Research Verification"
+  purpose: >
+    Projection chainにおいて意味保存に必要な最小metadata候補を検証する。
+  candidate_metadata:
+    - name: "evidence_id"
+      role: "Evidence lineage"
+      preservation: "required"
+    - name: "actor"
+      role: "interpretation/judgment attribution"
+      preservation: "required when attribution changes meaning"
+    - name: "interpretation_link"
+      role: "Evidenceと解釈の境界"
+      preservation: "required"
+    - name: "uncertainty"
+      role: "i / unresolved state"
+      preservation: "required when uncertainty is semantically relevant"
+    - name: "temporal_state"
+      role: "state transition/history"
+      preservation: "required when time changes meaning"
+    - name: "human_judgment"
+      role: "Human-side decision attribution"
+      preservation: "required for decision-support contexts"
+    - name: "projection_scope"
+      role: "Rendererが何を表示/省略したか"
+      preservation: "required for traceable projection"
+    - name: "coordinate"
+      role: "AI / Origin / Human / i positioning"
+      preservation: "conditional; retain when coordinate changes interpretation"
+  candidate_minimum:
+    core:
+      - "evidence_id"
+      - "interpretation_link"
+      - "actor"
+    conditional:
+      - "uncertainty"
+      - "temporal_state"
+      - "human_judgment"
+      - "projection_scope"
+      - "coordinate"
+  deletion_candidates:
+    status: "candidate_only"
+    rule: "削除・廃止はHuman Gateを通すまで実施しない"
+    candidates:
+      - item: "coordinate"
+        reason: "意味に影響しないRendererでは不要な可能性"
+      - item: "temporal_state"
+        reason: "静的表示では不要な可能性。ただし履歴を失う危険あり"
+      - item: "projection_scope"
+        reason: "完全内部Rendererでは省略可能な可能性。ただし再利用時に境界が不明になる"
+  test_result:
+    status: "Conceptually consistent"
+    finding: >
+      一律の固定metadata集合より、Evidence lineage・解釈帰属・境界をcoreとし、
+      不確実性・時間・Human judgment・projection scope・coordinateを用途依存で
+      保持する二層構造が現時点では整合的である。
+  limitation:
+    - "Runtime schemaとして確定していない"
+    - "coordinateの必要条件は追加検証が必要"
+    - "metadata削減によるsemantic lossの実装測定は未実施"
+  next:
+    codename: "CLP-07"
+    title: "Minimum Metadata Ablation Test"
+    purpose: "候補metadataを一つずつ除去し、どの境界が実際に破壊されるかを比較する"
