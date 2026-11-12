@@ -1,4 +1,4 @@
-﻿from runtime.aats import Post, Thread
+from runtime.aats import Post, Thread
 from runtime.threadrpg_v4_landscape import ConversationLandscape, Delta
 
 
@@ -21,7 +21,7 @@ def test_anonymous_observation_is_unverified_by_default():
     assert draft["unverified"] == ["anonymous claim"]
 
 
-def test_explicitly_verified_observation_is_fact_candidate():
+def test_self_declared_verified_observation_is_unverified():
     thread = Thread("verified-boundary")
     thread = thread.with_post(Post("icchi", "statement"))
 
@@ -37,8 +37,8 @@ def test_explicitly_verified_observation_is_fact_candidate():
     )
 
     draft = landscape.to_matome_draft()
-    assert draft["facts"] == ["confirmed observation"]
-    assert draft["unverified"] == []
+    assert draft["facts"] == []
+    assert draft["unverified"] == ["confirmed observation"]
 
 
 def test_unverified_observation_survives_five_turn_layer():

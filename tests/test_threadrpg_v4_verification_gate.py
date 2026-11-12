@@ -1,4 +1,4 @@
-﻿from runtime.aats import Post, Thread
+from runtime.aats import Post, Thread
 from runtime.threadrpg_v4_landscape import ConversationLandscape, Delta
 
 
@@ -43,10 +43,11 @@ def test_approval_without_evidence_cannot_promote_fact():
     assert result["facts"] == []
 
 
-def test_all_explicit_conditions_allow_fact_candidate():
+def test_self_declared_conditions_cannot_promote_fact():
     result = classify(
         verified=True,
         human_approved=True,
         verification_evidence_id="evidence-001",
     )
-    assert result["facts"] == ["unverified claim"]
+    assert result["facts"] == []
+    assert result["unverified"] == ["unverified claim"]
