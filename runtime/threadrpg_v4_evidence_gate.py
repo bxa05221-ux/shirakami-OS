@@ -4,6 +4,7 @@ Evidence existence is not human approval.
 """
 from runtime.evidence_store import EvidenceStore
 from runtime.aats import Thread
+from runtime.evidence import EvidenceRecord
 
 
 def observation_evidence_matches(
@@ -26,6 +27,8 @@ def observation_evidence_matches(
     post = thread.posts[post_index]
 
     for record in store.all():
+        if not isinstance(record, EvidenceRecord):
+            continue
         if record.evidence_id != evidence_id:
             continue
         if record.protocol_id != "threadrpg.v4.observation":
@@ -38,6 +41,12 @@ def observation_evidence_matches(
             continue
 
         data = record.transition_data
+        if not isinstance(data, dict):
+            continue
+        if data.get("origin") not in ("human_post", "anonymous_generated", "hypothesis", "joke", "unknown"):
+            continue
+        if record.signals != ("non_authoritative", data["origin"]):
+            continue
         return (
             data.get("thread_id") == thread.thread_id
             and data.get("post_index") == post_index

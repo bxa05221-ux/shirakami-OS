@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from typing import Literal
 
 from runtime.aats import Thread
+from runtime.evidence_store import EvidenceStore
+from runtime.threadrpg_v4_evidence_gate import observation_evidence_matches
 
 DeltaKind = Literal["observation", "interpretation", "uncertainty", "assumption", "question", "constraint"]
 
@@ -73,6 +75,46 @@ class ConversationLandscape:
         return tuple(
             d for layer in self.layers for d in layer.unresolved
         ) + tuple(d for d in self.pending if d.kind in ("uncertainty", "question"))
+
+    def observed_evidence_draft(
+        self, thread: Thread, store: EvidenceStore
+    ) -> dict[str, list[str]]:
+        """Match raw observations; do not infer human approval or facts."""
+        if not isinstance(thread, Thread):
+            raise TypeError("thread must be Thread")
+        if not isinstance(store, EvidenceStore):
+            raise TypeError("store must be EvidenceStore")
+
+        all_deltas = tuple(
+            d for layer in self.layers for d in layer.deltas
+        ) + self.pending
+
+        matched = []
+        unverified = []
+
+        for delta in all_deltas:
+            if delta.kind != "observation":
+                continue
+            evidence_id = delta.verification_evidence_id
+            indices = delta.source_post_indices
+            evidence_ok = (
+                isinstance(evidence_id, str)
+                and len(indices) == 1
+                and observation_evidence_matches(
+                    store, thread, indices[0], evidence_id
+                )
+                and delta.content == thread.posts[indices[0]].text
+            )
+            if evidence_ok:
+                matched.append(delta.content)
+            else:
+                unverified.append(delta.content)
+
+        return {
+            "evidence_matched": matched,
+            "unverified": unverified,
+            "facts": [],
+        }
 
     def to_matome_draft(self) -> dict[str, list[str]]:
         """Shape-compatible draft; no claim that external Matome API ran."""
