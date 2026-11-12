@@ -51,3 +51,19 @@ def test_invalid_model_output_is_rejected_without_committing_posts():
     with pytest.raises(ValueError):
         run_minimal_flow(original, "相談がある", generator)
     assert original.posts == ()
+@pytest.mark.parametrize("output", [
+    "not json",
+    '{"replies":[]}',
+    '{"replies":[{"text":""}]}',
+    '{"replies":[{"text":"ok","source_post_indices":[99]}]}',
+    '{"replies":[{"text":"ok","batch_reply_indices":[0]}]}',
+    '{"replies":[{"text":"ok"}],"unexpected":true}',
+])
+def test_malformed_provider_replies_do_not_mutate_thread(output):
+    generator = ModelReplyGenerator(
+        lambda prompt, protocol_id: {"output": output}
+    )
+    original = Thread("vip-invalid")
+    with pytest.raises((ValueError, TypeError, KeyError)):
+        run_minimal_flow(original, "相談がある", generator)
+    assert original.posts == ()

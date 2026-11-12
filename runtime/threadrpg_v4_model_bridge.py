@@ -42,6 +42,9 @@ class ModelReplyGenerator:
         if not isinstance(data, dict) or not isinstance(data.get("replies"), list):
             raise ValueError("provider output must contain replies array")
 
+        if set(data) != {"replies"}:
+            raise ValueError("unexpected provider output fields")
+
         replies = tuple(
             AnonymousReply(
                 text=item["text"],
