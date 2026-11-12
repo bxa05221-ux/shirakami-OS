@@ -35,7 +35,7 @@ def test_matome_draft_distinguishes_observation_and_interpretation():
         thread,
         (
             Delta("observation", "reported statement", (0,),
-                  origin="human_post", verified=True),
+                  origin="human_post", verified=True, human_approved=True, verification_evidence_id="test-evidence-001"),
             Delta("interpretation", "possible meaning", (0,)),
             Delta("question", "open question", (0,)),
         ),
