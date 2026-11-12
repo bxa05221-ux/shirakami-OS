@@ -65,6 +65,8 @@ class ShirakamiAPI:
         accepted = self.runtime.approve(approved=approved, reviewer=reviewer)
         return {"accepted": accepted, "state": self.runtime.loop.state.value}
     def execute(self, protocol: Callable[[Any], Transition], protocol_id: str, input_data: Mapping[str, Any] | None = None, *, handoff_id: str | None = None, trace_id: str | None = None, evidence_ids: tuple[str, ...] = (), project: str | None = None, objective: str | None = None, protocol_ids: tuple[str, ...] = (), verification_scope: tuple[Any, ...] = (), ai_adapter: Callable[[str, str], Any] | None = None) -> dict[str, Any]:
+        if self.runtime.loop.state.value != "READY":
+            raise RuntimeError("execution requires READY state before model invocation")
         model_output = None
         if ai_adapter is not None:
             canonical_input = str((input_data or {}).get("text", (input_data or {}).get("input", "")))
@@ -82,6 +84,8 @@ class ShirakamiAPI:
         return {**payload, "execution_id": handle.execution_id, "trace_id": provisional_trace_id}
     async def execute_async(self, protocol: Callable[[Any], Transition], protocol_id: str, input_data: Mapping[str, Any] | None = None, *, handoff_id: str | None = None, trace_id: str | None = None, evidence_ids: tuple[str, ...] = (), project: str | None = None, objective: str | None = None, protocol_ids: tuple[str, ...] = (), verification_scope: tuple[Any, ...] = (), ai_adapter: Callable[[str, str], Awaitable[Any]] | None = None) -> dict[str, Any]:
         """Execute after awaiting an external provider, then use the normal Runtime path."""
+        if self.runtime.loop.state.value != "READY":
+            raise RuntimeError("execution requires READY state before model invocation")
         model_output = None
         if ai_adapter is not None:
             canonical_input = str((input_data or {}).get("text", (input_data or {}).get("input", "")))
