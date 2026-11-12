@@ -17,6 +17,8 @@ class Delta:
     kind: DeltaKind
     content: str
     source_post_indices: tuple[int, ...]
+    origin: str = "unknown"
+    verified: bool = False
 
 
 @dataclass(frozen=True)
@@ -74,7 +76,20 @@ class ConversationLandscape:
         """Shape-compatible draft; no claim that external Matome API ran."""
         all_deltas = tuple(d for layer in self.layers for d in layer.deltas) + self.pending
         return {
-            "facts": [d.content for d in all_deltas if d.kind == "observation"],
-            "interpretations": [d.content for d in all_deltas if d.kind == "interpretation"],
-            "unresolved": [d.content for d in all_deltas if d.kind in ("uncertainty", "question")],
+            "facts": [
+                d.content for d in all_deltas
+                if d.kind == "observation" and d.verified
+            ],
+            "interpretations": [
+                d.content for d in all_deltas
+                if d.kind == "interpretation"
+            ],
+            "unresolved": [
+                d.content for d in all_deltas
+                if d.kind in ("uncertainty", "question")
+            ],
+            "unverified": [
+                d.content for d in all_deltas
+                if d.kind == "observation" and not d.verified
+            ],
         }
