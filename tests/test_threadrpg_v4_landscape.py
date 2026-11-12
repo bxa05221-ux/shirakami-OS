@@ -30,16 +30,21 @@ def test_sixth_turn_stays_pending_and_unresolved_is_retained():
 
 
 def test_matome_draft_distinguishes_observation_and_interpretation():
-    thread = Thread("t").with_post(Post("icchi", "雨"))
-    state = ConversationLandscape().record_generation_turn(thread, (
-        Delta("observation", "雨という発言", (0,)),
-        Delta("interpretation", "悲しいのかもしれない", (0,)),
-        Delta("question", "本当は？", (0,)),
-    ))
+    thread = Thread("t").with_post(Post("icchi", "statement"))
+    state = ConversationLandscape().record_generation_turn(
+        thread,
+        (
+            Delta("observation", "reported statement", (0,),
+                  origin="human_post", verified=True),
+            Delta("interpretation", "possible meaning", (0,)),
+            Delta("question", "open question", (0,)),
+        ),
+    )
     assert state.to_matome_draft() == {
-        "facts": ["雨という発言"],
-        "interpretations": ["悲しいのかもしれない"],
-        "unresolved": ["本当は？"],
+        "facts": ["reported statement"],
+        "interpretations": ["possible meaning"],
+        "unresolved": ["open question"],
+        "unverified": [],
     }
 
 
