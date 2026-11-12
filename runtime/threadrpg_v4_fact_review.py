@@ -41,3 +41,40 @@ def prepare_fact_review(
 def may_promote_to_fact(review: FactReview) -> bool:
     """Fail closed until a trusted reviewer-authentication path exists."""
     return False
+
+def fact_review_matches(
+    review: FactReview,
+    gate_decision: HumanGateDecision,
+    store,
+    thread,
+    post_index: int,
+) -> bool:
+    """Check review provenance without granting fact authority."""
+    from runtime.aats import Thread
+    from runtime.evidence_store import EvidenceStore
+    from runtime.threadrpg_v4_evidence_gate import observation_evidence_matches
+
+    if not isinstance(review, FactReview):
+        return False
+    if not isinstance(gate_decision, HumanGateDecision):
+        return False
+    if not isinstance(store, EvidenceStore) or not isinstance(thread, Thread):
+        return False
+    if not isinstance(post_index, int) or isinstance(post_index, bool):
+        return False
+    if not 0 <= post_index < len(thread.posts):
+        return False
+    if review.decision != gate_decision.decision:
+        return False
+    if review.reviewer_identity != gate_decision.reviewer_identity:
+        return False
+    if gate_decision.candidate_identity != (
+        f"threadrpg.v4:{thread.thread_id}:{post_index}:{review.evidence_id}"
+    ):
+        return False
+    if review.candidate_text != thread.posts[post_index].text:
+        return False
+
+    return observation_evidence_matches(
+        store, thread, post_index, review.evidence_id
+    )
