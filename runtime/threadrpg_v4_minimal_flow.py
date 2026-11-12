@@ -25,6 +25,7 @@ class AnonymousReply:
 
     text: str
     source_post_indices: tuple[int, ...] = ()
+    batch_reply_indices: tuple[int, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -53,6 +54,7 @@ class MinimalFlowResult:
     human_gate_required: bool = True
     reality_mutation_permitted: bool = False
     llm_connected: bool = False
+    resolved_reply_references: tuple[tuple[int, ...], ...] = ()
 
 
 def run_minimal_flow(
@@ -91,16 +93,33 @@ def run_minimal_flow(
         replies=proposal.replies,
         source_posts=source_posts,
         unresolved_questions=unresolved,
+        resolved_reply_references=tuple(
+            reply.source_post_indices + tuple(
+                len(turn.thread.posts) + index
+                for index in reply.batch_reply_indices
+            )
+            for reply in proposal.replies
+        ),
     )
 
 
 def _validate_proposal(thread: Thread, proposal: ReplyProposal) -> None:
     if not 1 <= len(proposal.replies) <= 8:
         raise ValueError("reply batch must contain 1 to 8 replies")
-    for reply in proposal.replies:
+    for position, reply in enumerate(proposal.replies):
         if not isinstance(reply, AnonymousReply) or not reply.text.strip():
             raise ValueError("replies must be non-empty AnonymousReply values")
-        if any(not 0 <= index < len(thread.posts) for index in reply.source_post_indices):
+        if any(
+            not isinstance(index, int) or isinstance(index, bool)
+            or not 0 <= index < len(thread.posts)
+            for index in reply.source_post_indices
+        ):
             raise ValueError("reply provenance must reference an earlier raw post")
+        if any(
+            not isinstance(index, int) or isinstance(index, bool)
+            or not 0 <= index < position
+            for index in reply.batch_reply_indices
+        ):
+            raise ValueError("batch references must point to earlier replies")
     if any(not 0 <= index < len(thread.posts) for index in proposal.unresolved_post_indices):
         raise ValueError("unresolved questions must reference an earlier raw post")
