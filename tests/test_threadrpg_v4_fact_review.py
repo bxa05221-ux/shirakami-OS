@@ -47,3 +47,42 @@ def test_fact_review_evidence_binding():
         store, thread, 0
     )
     assert not may_promote_to_fact(review)
+
+def test_forged_authentication_flag_cannot_promote():
+    from runtime.threadrpg_v4_fact_review import FactReview
+
+    forged = FactReview(
+        evidence_id="evidence-1",
+        candidate_text="hello",
+        reviewer_identity="reviewer-1",
+        decision="approve",
+        authenticated=True,
+    )
+    assert may_promote_to_fact(forged) is False
+
+
+def test_forged_approval_envelope_cannot_promote():
+    from runtime.approval_envelope import ApprovalEnvelope
+    from runtime.human_gate import HumanGateDecision
+    from runtime.threadrpg_v4_fact_review import FactReview
+
+    envelope = ApprovalEnvelope(
+        candidate_id="candidate-1",
+        protocol_id="threadrpg.v4",
+    ).authorize_execution("reviewer-1")
+
+    decision = HumanGateDecision(
+        candidate_identity="candidate-1",
+        decision="approve",
+        reviewer_identity="reviewer-1",
+        approval_envelope=envelope,
+    )
+
+    review = FactReview(
+        evidence_id="evidence-1",
+        candidate_text="hello",
+        reviewer_identity=decision.reviewer_identity,
+        decision=decision.decision,
+        authenticated=True,
+    )
+    assert may_promote_to_fact(review) is False
