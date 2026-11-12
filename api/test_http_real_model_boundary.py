@@ -45,6 +45,31 @@ def test_http_real_model_adapter_crosses_evidence_trace_and_aiwitness():
         },
     }
 
+    headers = {"X-API-Key": API_KEY}
+
+    observed = client.post(
+        "/v1/observe",
+        json={
+            "observation": {"signal": "execute"},
+            "context": {
+                "protocol_id": "fixture.real-model",
+                "landscape": {},
+                "metadata": {},
+            },
+            "handoff_id": "SH-HO-REAL-MODEL-001",
+            "trace_id": "TRACE-REAL-MODEL-001",
+            "evidence_ids": [],
+        },
+        headers=headers,
+    )
+    assert observed.status_code == 200, observed.text
+
+    analyzed = client.post(
+        "/v1/analyze",
+        json={"protocol_id": "fixture.real-model", "protocol_exists": True},
+        headers=headers,
+    )
+    assert analyzed.status_code == 200, analyzed.text
     response = client.post(
         "/v1/execute",
         json=payload,
