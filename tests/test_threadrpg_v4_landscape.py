@@ -41,10 +41,10 @@ def test_matome_draft_distinguishes_observation_and_interpretation():
         ),
     )
     assert state.to_matome_draft() == {
-        "facts": ["reported statement"],
+        "facts": [],
         "interpretations": ["possible meaning"],
         "unresolved": ["open question"],
-        "unverified": [],
+        "unverified": ["reported statement"],
     }
 
 

@@ -81,9 +81,7 @@ class ConversationLandscape:
             "facts": [
                 d.content for d in all_deltas
                 if d.kind == "observation"
-                and d.verified
-                and d.human_approved
-                and bool(d.verification_evidence_id)
+                and False  # Phase 12: no trusted approval resolver yet
             ],
             "interpretations": [
                 d.content for d in all_deltas
@@ -97,9 +95,7 @@ class ConversationLandscape:
                 d.content for d in all_deltas
                 if d.kind == "observation"
                 and not (
-                    d.verified
-                    and d.human_approved
-                    and bool(d.verification_evidence_id)
+                    False  # No verified approval resolver yet
                 )
             ],
         }
