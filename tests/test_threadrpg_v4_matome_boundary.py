@@ -32,7 +32,7 @@ def test_explicitly_verified_observation_is_fact_candidate():
             "confirmed observation",
             (0,),
             origin="human_post",
-            verified=True,
+            verified=True, human_approved=True, verification_evidence_id="test-evidence-001",
         ),),
     )
 

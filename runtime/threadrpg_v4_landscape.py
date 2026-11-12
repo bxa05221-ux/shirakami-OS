@@ -19,6 +19,8 @@ class Delta:
     source_post_indices: tuple[int, ...]
     origin: str = "unknown"
     verified: bool = False
+    verification_evidence_id: str | None = None
+    human_approved: bool = False
 
 
 @dataclass(frozen=True)
@@ -78,7 +80,10 @@ class ConversationLandscape:
         return {
             "facts": [
                 d.content for d in all_deltas
-                if d.kind == "observation" and d.verified
+                if d.kind == "observation"
+                and d.verified
+                and d.human_approved
+                and bool(d.verification_evidence_id)
             ],
             "interpretations": [
                 d.content for d in all_deltas
@@ -90,6 +95,11 @@ class ConversationLandscape:
             ],
             "unverified": [
                 d.content for d in all_deltas
-                if d.kind == "observation" and not d.verified
+                if d.kind == "observation"
+                and not (
+                    d.verified
+                    and d.human_approved
+                    and bool(d.verification_evidence_id)
+                )
             ],
         }
