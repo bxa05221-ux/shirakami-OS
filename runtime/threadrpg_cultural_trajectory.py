@@ -12,6 +12,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
+from runtime.aats import Thread
 from runtime.cultural_trajectory import CulturalTrajectory
 from runtime.oppai_schema import OppaiObservation, normalize
 
@@ -45,6 +46,27 @@ class ThreadRPGCulturalTurn:
         }
         object.__setattr__(self, "revisited_trajectory", self.trajectory.append_relation(relation))
         return deepcopy(relation)
+
+
+def observe_threadrpg_thread(thread: Thread) -> ThreadRPGCulturalTurn:
+    """Read an existing AATS/ThreadRPG thread into detached candidates.
+
+    This is intentionally an observer of the established ThreadRPG lineage:
+    it does not generate posts, alter the supplied ``Thread``, create
+    Evidence, select a RouteMap entry, or cross a Human Gate.  Evidence IDs
+    in the returned candidate remain opaque references only; resolving an
+    external Evidence store is not implemented here.
+    """
+    if not isinstance(thread, Thread):
+        raise TypeError("thread must be an AATS Thread")
+    messages = tuple(
+        {
+            "id": f"{thread.thread_id}:post-{index:03d}",
+            "text": post.text,
+        }
+        for index, post in enumerate(thread.posts, start=1)
+    )
+    return observe_threadrpg_turn(messages)
 
 
 def observe_threadrpg_turn(messages: Sequence[Mapping[str, Any]]) -> ThreadRPGCulturalTurn:
