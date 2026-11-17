@@ -1,0 +1,53 @@
+cultural_trajectory:
+  schema_version: "0.1"
+  objects:
+    - id: "SP-001"
+      type: "spark"
+      text: "AIが間違えるのって、面白くないか？"
+      source_ref: "fixture:thread-001:post-001"
+    - id: "SP-002"
+      type: "spark"
+      text: "間違いをそのまま信じたら危ない"
+      source_ref: "fixture:thread-001:post-002"
+    - id: "SP-003"
+      type: "spark"
+      text: "楽しむことと採用することは別"
+      source_ref: "fixture:thread-001:post-003"
+  relations:
+    - id: "REL-001"
+      from: "SP-001"
+      to: "SP-002"
+      type: "contradicts"
+      assertion:
+        kind: "interpretation"
+        author: "anonymous"
+        verification: "unverified"
+      provenance:
+        source_refs: ["fixture:thread-001:post-001", "fixture:thread-001:post-002"]
+        evidence_ids: ["evidence:observed-posts-001"]
+        witness_ids: []
+      revisits: []
+    - id: "REL-002"
+      from: "SP-001"
+      to: "SP-003"
+      type: "reinterprets"
+      assertion:
+        kind: "interpretation"
+        author: "anonymous"
+        verification: "unverified"
+      provenance:
+        source_refs: ["fixture:thread-001:post-001", "fixture:thread-001:post-003"]
+        evidence_ids: []
+        witness_ids: []
+      revisits: ["REL-001"]
+  trajectories:
+    - id: "TRJ-001"
+      kind: "reconstructed"
+      relation_ids: ["REL-001", "REL-002"]
+      source_refs: ["fixture:thread-001"]
+      verification: "unverified"
+  preservation:
+    append_only: true
+    allow_conflicting_relations: true
+    overwrite_original: false
+    automatic_promotion: false
