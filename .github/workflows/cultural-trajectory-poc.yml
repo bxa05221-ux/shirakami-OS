@@ -1,0 +1,38 @@
+name: Cultural Trajectory PoC Verification
+
+on:
+  push:
+    paths:
+      - 'runtime/cultural_trajectory.py'
+      - 'runtime/threadrpg_cultural_trajectory.py'
+      - 'runtime/cultural_trajectory_review.py'
+      - 'runtime/aats.py'
+      - 'runtime/oppai_schema.py'
+      - 'tests/test_cultural_trajectory.py'
+      - 'tests/test_threadrpg_cultural_trajectory_adapter.py'
+      - 'tests/test_cultural_trajectory_review.py'
+      - '.github/workflows/cultural-trajectory-poc.yml'
+  pull_request:
+    paths:
+      - 'runtime/cultural_trajectory.py'
+      - 'runtime/threadrpg_cultural_trajectory.py'
+      - 'runtime/cultural_trajectory_review.py'
+      - 'runtime/aats.py'
+      - 'runtime/oppai_schema.py'
+      - 'tests/test_cultural_trajectory.py'
+      - 'tests/test_threadrpg_cultural_trajectory_adapter.py'
+      - 'tests/test_cultural_trajectory_review.py'
+      - '.github/workflows/cultural-trajectory-poc.yml'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install pytest pyyaml
+      - name: Verify Cultural Trajectory and read-only review
+        run: python -m pytest -q tests/test_cultural_trajectory.py tests/test_threadrpg_cultural_trajectory_adapter.py tests/test_cultural_trajectory_review.py
