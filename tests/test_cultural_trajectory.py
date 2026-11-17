@@ -41,6 +41,45 @@ def test_conflicting_interpretation_appends_without_rewriting_history():
     assert revised.relations[-1]["revisits"] == ("REL-001",) or revised.relations[-1]["revisits"] == ["REL-001"]
 
 
+def test_nested_input_and_public_snapshots_cannot_mutate_saved_history():
+    source = CulturalTrajectory.from_yaml(FIXTURE).document
+    trajectory = CulturalTrajectory.from_mapping({"cultural_trajectory": source})
+
+    source["relations"][0]["assertion"]["author"] = "changed-input"
+    published_relation = trajectory.relations[0]
+    published_relation["assertion"]["author"] = "changed-public-relation"
+    published_document = trajectory.document
+    published_document["relations"][0]["provenance"]["evidence_ids"].append("evidence:injected")
+    reconstructed = trajectory.reconstruct("TRJ-001")
+    reconstructed[0]["provenance"]["source_refs"].append("fixture:injected")
+
+    saved = trajectory.relations[0]
+    assert saved["assertion"]["author"] == "anonymous"
+    assert saved["provenance"]["evidence_ids"] == ["evidence:observed-posts-001"]
+    assert saved["provenance"]["source_refs"] == ["fixture:thread-001:post-001", "fixture:thread-001:post-002"]
+
+
+def test_append_keeps_both_histories_and_the_relation_argument_immutable():
+    original = CulturalTrajectory.from_yaml(FIXTURE)
+    relation = {
+        "id": "REL-003",
+        "from": "SP-003",  # Cultural trajectories need not be Runtime-continuous paths.
+        "to": "SP-001",
+        "type": "resonates",
+        "assertion": {"kind": "interpretation", "author": "another-anonymous", "verification": "unverified"},
+        "provenance": {"source_refs": ["fixture:thread-001:post-003"], "evidence_ids": ["evidence:001"], "witness_ids": []},
+        "revisits": [],
+    }
+
+    revised = original.append_relation(relation)
+    relation["assertion"]["author"] = "changed-input"
+    revised.relations[-1]["provenance"]["evidence_ids"].append("evidence:injected")
+
+    assert [item["id"] for item in original.relations] == ["REL-001", "REL-002"]
+    assert revised.relations[-1]["assertion"]["author"] == "another-anonymous"
+    assert revised.relations[-1]["provenance"]["evidence_ids"] == ["evidence:001"]
+
+
 def test_invalid_object_reference_and_promoted_interpretation_are_rejected():
     valid = CulturalTrajectory.from_yaml(FIXTURE)
     unknown_object = deepcopy(valid.document)
@@ -59,6 +98,23 @@ def test_invalid_object_reference_and_promoted_interpretation_are_rejected():
     promoted["relations"][0]["assertion"]["verification"] = "verified"
     with pytest.raises(CulturalTrajectoryError, match="must not be promoted"):
         CulturalTrajectory.from_mapping({"cultural_trajectory": promoted})
+
+
+@pytest.mark.parametrize(
+    ("mutate", "message"),
+    [
+        (lambda document: document["objects"].append(deepcopy(document["objects"][0])), "duplicate object id"),
+        (lambda document: document["relations"].append(deepcopy(document["relations"][0])), "duplicate relation id"),
+        (lambda document: document["relations"][0].update({"revisits": ["REL-002"]}), "unknown or future relation"),
+        (lambda document: document["trajectories"][0].update({"relation_ids": ["REL-404"]}), "unknown relation"),
+    ],
+)
+def test_invalid_ids_revisits_and_trajectories_are_rejected(mutate, message):
+    document = CulturalTrajectory.from_yaml(FIXTURE).document
+    mutate(document)
+
+    with pytest.raises(CulturalTrajectoryError, match=message):
+        CulturalTrajectory.from_mapping({"cultural_trajectory": document})
 
 
 def test_oppai_evidence_and_human_gate_stay_separate_from_interpretation():

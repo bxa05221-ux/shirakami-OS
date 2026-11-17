@@ -8,6 +8,7 @@ Gate, and Evidence boundaries remain the owners of those responsibilities.
 
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
@@ -41,7 +42,7 @@ def _string_list(value: object, label: str) -> tuple[str, ...]:
 class CulturalTrajectory:
     """Validated YAML data with append-only relation history operations."""
 
-    document: Mapping[str, Any]
+    _document: Mapping[str, Any]
 
     @classmethod
     def from_yaml(cls, path: str | Path) -> "CulturalTrajectory":
@@ -54,12 +55,14 @@ class CulturalTrajectory:
         root = _mapping(value, "document")
         payload = _mapping(root.get("cultural_trajectory"), "cultural_trajectory")
         cls._validate(payload)
-        # Copy the outer containers so caller mutation cannot alter this view.
-        copied = dict(payload)
-        copied["objects"] = tuple(dict(item) for item in payload["objects"])
-        copied["relations"] = tuple(dict(item) for item in payload["relations"])
-        copied["trajectories"] = tuple(dict(item) for item in payload["trajectories"])
-        return cls(document=copied)
+        # Keep no mutable references to caller-owned nested data.  Public views
+        # below are copies as well, so a caller cannot rewrite saved history.
+        return cls(_document=deepcopy(payload))
+
+    @property
+    def document(self) -> Mapping[str, Any]:
+        """Return a detached public snapshot of this trajectory."""
+        return deepcopy(self._document)
 
     @staticmethod
     def _validate(payload: Mapping[str, Any]) -> None:
@@ -135,26 +138,24 @@ class CulturalTrajectory:
 
     @property
     def relations(self) -> tuple[Mapping[str, Any], ...]:
-        return self.document["relations"]
+        return tuple(deepcopy(self._document["relations"]))
 
     def append_relation(self, relation: Mapping[str, Any]) -> "CulturalTrajectory":
         """Return a new document; the original relation history is untouched."""
-        object_ids = {item["id"] for item in self.document["objects"]}
+        object_ids = {item["id"] for item in self._document["objects"]}
         prior_ids = {item["id"] for item in self.relations}
         self._validate_relation(relation, len(prior_ids), object_ids, prior_ids)
-        replacement = dict(self.document)
-        replacement["relations"] = [dict(item) for item in self.relations] + [dict(relation)]
-        replacement["objects"] = [dict(item) for item in self.document["objects"]]
-        replacement["trajectories"] = [dict(item) for item in self.document["trajectories"]]
+        replacement = deepcopy(self._document)
+        replacement["relations"].append(deepcopy(relation))
         return CulturalTrajectory.from_mapping({"cultural_trajectory": replacement})
 
     def reconstruct(self, trajectory_id: str) -> tuple[Mapping[str, Any], ...]:
         """Return the declared relation sequence without inferring a new path."""
-        trajectory = next((item for item in self.document["trajectories"] if item["id"] == trajectory_id), None)
+        trajectory = next((item for item in self._document["trajectories"] if item["id"] == trajectory_id), None)
         if trajectory is None:
             raise CulturalTrajectoryError(f"unknown trajectory: {trajectory_id}")
         by_id = {item["id"]: item for item in self.relations}
-        return tuple(by_id[relation_id] for relation_id in trajectory["relation_ids"])
+        return tuple(deepcopy(by_id[relation_id]) for relation_id in trajectory["relation_ids"])
 
     def human_gate_candidate(self, relation_id: str) -> dict[str, Any]:
         """Expose an interpretation as non-executable, non-authoritative input to Human Gate."""
