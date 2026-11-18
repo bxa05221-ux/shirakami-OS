@@ -3,6 +3,11 @@ on:
   push:
     branches:
       - codex/cultural-trajectory-readonly-http-poc
+  pull_request:
+    paths:
+      - 'runtime/cultural_trajectory_http_poc.py'
+      - 'tests/test_cultural_trajectory_http_poc.py'
+      - '.github/workflows/cultural-trajectory-http-poc.yml'
   workflow_dispatch:
 jobs:
   verify:
