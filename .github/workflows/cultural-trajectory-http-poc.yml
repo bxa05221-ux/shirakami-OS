@@ -1,0 +1,16 @@
+name: Cultural Trajectory Local HTTP PoC
+on:
+  push:
+    branches:
+      - codex/cultural-trajectory-readonly-http-poc
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pytest pyyaml
+      - run: python -m pytest -q tests/test_cultural_trajectory.py tests/test_threadrpg_cultural_trajectory_adapter.py tests/test_cultural_trajectory_review.py tests/test_cultural_trajectory_http_poc.py
