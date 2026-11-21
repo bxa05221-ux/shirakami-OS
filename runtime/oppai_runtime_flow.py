@@ -13,6 +13,7 @@ from runtime.pipeline import PipelinePlan, build_pipeline_plan
 from runtime.protocol_api import ProtocolRequest, build_protocol_request
 from runtime.protocol_registry import ProtocolRegistry
 from runtime.adapter import PipelineAdapter, PipelineAdapterRequest, PipelineAdapterResult
+from runtime.route_map import RouteMap
 
 
 @dataclass(frozen=True)
@@ -153,6 +154,9 @@ def build_selected_protocol_request(
     registry: ProtocolRegistry,
     selected_protocol: str,
     context: Mapping[str, Any] | None = None,
+    *,
+    route_map: RouteMap | None = None,
+    require_route_map: bool = False,
 ) -> ProtocolRequest:
     """Bridge an explicit OPPAI selection into the canonical ProtocolRequest path.
 
@@ -160,6 +164,13 @@ def build_selected_protocol_request(
     It represents the post-Human-Gate handoff from OPPAI observation to the
     existing ProtocolRegistry/ProtocolRequest boundary.
     """
+    if require_route_map and route_map is None:
+        raise PermissionError("RouteMap is required for this constrained route")
+    if route_map is not None and not route_map.can_transition(selected_protocol):
+        raise PermissionError(
+            f"Protocol transition not permitted: {route_map.current} -> {selected_protocol}"
+        )
+
     prepared = prepare(text, protocol=selected_protocol, context=context)
     return build_protocol_request(
         registry,
@@ -179,6 +190,9 @@ def execute_selected_pipeline(
     selected_protocol: str,
     adapter: PipelineAdapter,
     context: Mapping[str, Any] | None = None,
+    *,
+    route_map: RouteMap | None = None,
+    require_route_map: bool = False,
 ) -> SelectedPipelineExecution:
     """Execute one explicitly selected Protocol through its derived Pipeline.
 
@@ -193,6 +207,8 @@ def execute_selected_pipeline(
         registry,
         selected_protocol,
         context=context,
+        route_map=route_map,
+        require_route_map=require_route_map,
     )
     entry = registry.select_current(request.protocol_id)
     plan = build_pipeline_plan(entry.artifact, context=context)
