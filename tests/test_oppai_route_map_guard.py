@@ -70,4 +70,6 @@ def test_route_recording_does_not_authorize_selection():
         build_selected_protocol_request(
             "test", None, "radio", route_map=_map(), require_route_map=True
         )
-    assert route.can_transition("radio")
+    assert "radio" in route.transitions["thread_rpg"]
+    assert route.current == "radio"
+    assert not route.can_transition("radio")
