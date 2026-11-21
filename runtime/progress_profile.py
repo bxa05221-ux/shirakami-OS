@@ -69,8 +69,10 @@ def resume(profile: ProgressProfile, state: ProgressState, *, signal: str) -> Pr
     _validate(profile, state)
     if state.status != "waiting" or signal != profile.resume_signal:
         raise ProgressError("explicit resume signal required")
-    return ProgressState(profile.profile_id, state.stage, state.index,
-                         "ready")
+    if state.index == len(profile.stages) - 1:
+        return replace(state, status="completed")
+    return ProgressState(profile.profile_id, profile.stages[state.index + 1],
+                         state.index + 1, "ready")
 
 
 def stop(profile: ProgressProfile, state: ProgressState) -> ProgressState:
