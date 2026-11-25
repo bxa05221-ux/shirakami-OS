@@ -11,9 +11,8 @@ body{font:16px/1.6 system-ui,sans-serif;max-width:850px;margin:auto;padding:24px
 <div><label>親密度 <output id="closenessV">50</output>/100</label><input id="closeness" type="range" min="0" max="100" step="5" value="50"><small>距離感・掛け合いを調整する指示</small></div>
 <div><label>言葉遣い <output id="languageV">65</output>/100</label><input id="language" type="range" min="0" max="100" step="5" value="65"><small>0=丁寧／100=砕けたVIP風</small></div>
 </div><label for="bilingual">出力言語</label><select id="bilingual"><option value="ja-en">日本語＋英語対訳</option><option value="ja">日本語のみ</option></select><label for="seed">イッチの投稿</label><textarea id="seed">AIとは、人類の知識ではなく文化を継承・循環させるための記憶基盤である。</textarea></section>
-<section><h2>2. 製品とGitHub Protocol参照</h2><label for="product">製品</label><select id="product"><option value="thread-rpg-v1.2.1">ThreadRPG v1.2.1（正式Protocol）</option></select><p class="help">初回提供製品はThreadRPGです。選択した公開資料の本文を取得して指示文に添えます。OPPAIの資料を参照するだけで、OPPAI Runtime自体を実行するものではありません。</p>
-<div><label><input type="checkbox" id="threadP" checked> ThreadRPG v1.2.1</label><label><input type="checkbox" id="oppaiP" checked> OPPAI Schema v0.1</label><label><input type="checkbox" id="registryP" checked> Registry（暗問層の登録）</label><label><input type="checkbox" id="readmeP" checked> README.ja（Evidence／Landscape）</label></div>
-<button id="fetch">GitHub資料を取得</button><div id="protocolStatus" class="status">未取得</div><p class="help">参照先mainは更新される可能性があります。GitHubが利用できない場合は未取得と表示します。</p></section>
+<section><h2>2. 製品とGitHub Protocol参照</h2><label for="product">製品</label><select id="product"><option value="thread-rpg-v1.2.1">ThreadRPG v1.2.1（正式Protocol）</option></select><p class="help">初回提供製品はThreadRPGです。起動文に添えるのは許可済みの正式Protocolだけです。AIシミュレーションであり、OPPAI Runtimeや非公開資産を実行・配布しません。</p>
+<button id="fetch">正式Protocolを取得</button><div id="protocolStatus" class="status">未取得</div><p class="help">GitHub取得失敗時は本文を添付しません。取得時にはGit blob SHA-1と本文の一致を確認し、参照バージョンを表示します。</p></section>
 <section><h2>3. 各自のAI Chatで実行</h2><p>生成指示をコピーして、普段のAI Chatに貼り付けてください。AI APIキーは不要です。</p>
 <button id="copyPrompt">生成指示をコピー</button><button id="showPrompt" class="alt">指示文を表示</button><pre id="preview" hidden></pre>
 <label for="aiOutput">AI Chatの出力を貼り付け</label><textarea id="aiOutput" placeholder="1 ：名無しさん：...&#10;2 ：名無しさん：..."></textarea><button id="add">レスを登録する</button><div class="status" id="notice" role="status"></div><p class="help">レス番号を各レスの行頭に付けてください。番号が連続しない場合、1回の生成レス数を超えた場合は登録しません。</p></section>
@@ -24,7 +23,7 @@ body{font:16px/1.6 system-ui,sans-serif;max-width:850px;margin:auto;padding:24px
 <script>
 "use strict";
 const q=id=>document.getElementById(id), KEY="idumi-mvp-v03", REPO="bxa05221-ux/shirakami-OS";
-const paths={threadP:"protocols/thread-rpg-v1.2.1.yaml",oppaiP:"docs/specs/OPPAI_Schema_v0.1.md",registryP:"protocols/registry.yaml",readmeP:"README.ja.md"};
+const FORMAL_PROTOCOL={id:"thread-rpg-v1.2.1",path:"protocols/thread-rpg-v1.2.1.yaml",version:"1.2.1"};
 const initial=()=>({threadNo:1,posts:[],carry:"",memo:"",seed:"AIとは、人類の知識ではなく文化を継承・循環させるための記憶基盤である。",members:5,replies:7,closeness:50,language:65,bilingual:"ja-en",refs:[]});
 let state;try{state=Object.assign(initial(),JSON.parse(localStorage.getItem(KEY)||"{}"))}catch{state=initial()}
 if(!Array.isArray(state.posts))state.posts=[];const docs=new Map();
@@ -36,19 +35,20 @@ for(const k of ["members","replies","closeness","language"]){q(k).value=state[k]
 q("bilingual").value=state.bilingual||"ja-en";q("seed").value=state.seed;q("memo").value=state.memo;q("count").textContent=state.posts.length+"/1000（第"+state.threadNo+"スレ）";q("progress").value=state.posts.length;
 q("hint").textContent=state.posts.length>=1000?"1000レス到達。次スレへ。":state.posts.length>=950?"950レス超。次スレの引継ぎを準備できます。":"1000レスは上限です。途中で次スレに進めます。";
 q("add").disabled=state.posts.length>=1000;
-q("thread").replaceChildren();state.posts.forEach(p=>{const d=document.createElement("div");d.className="post";d.textContent=p.no+" ："+p.text;q("thread").append(d)});
+q("thread").replaceChildren();state.posts.forEach(p=>{const d=document.createElement("div");d.className="post";d.textContent=p.no+" ："+(p.kind==="op"?"イッチ：":"名無しさん：")+p.text;q("thread").append(d)});
 q("thread").scrollTop=q("thread").scrollHeight;
-q("protocolStatus").textContent=docs.size?Array.from(docs.values()).map(d=>d.path+" / SHA "+d.sha).join("\n"):"未取得：GitHub資料の本文はまだ確認されていません。";
+q("protocolStatus").textContent=docs.size?Array.from(docs.values()).map(d=>d.path+" / ThreadRPG v"+d.version+" / Git blob SHA-1 "+d.sha+"（本文照合済み）").join("\n"):"未取得：正式Protocolの本文はまだ確認されていません。";
 }
 function selectedProduct(){const product=q("product").value;if(product!=="thread-rpg-v1.2.1")throw Error("選択された製品は利用できません");return "ThreadRPG v1.2.1"}
+function ensureOp(){if(!state.posts.length){const text=state.seed.trim();if(!text)throw Error("イッチの投稿を入力してください");state.posts.push({no:1,kind:"op",text});save();render()}}
 function prompt(){
-update();const limit=Math.min(state.replies,1000-state.posts.length);
+update();ensureOp();const limit=Math.min(state.replies,1000-state.posts.length);
 const past=state.posts.slice(-12).map(p=>p.no+" ："+p.text).join("\n")||"まだ投稿なし";
-const refs=Object.entries(paths).filter(a=>q(a[0]).checked).map(a=>{const d=docs.get(a[0]);return "\n--- "+a[1]+" ---\n"+(d?"GitHub blob SHA: "+d.sha+"\n"+d.content:"未取得。確認できない仕様を補わない。 https://github.com/"+REPO+"/blob/main/"+a[1])}).join("\n");
-return ["【IDUMI β0.3 ユーザー自身のAI Chat試用】","【製品】",selectedProduct(),"【一行Protocol】","問われた事柄への返答を最大7つの意見に集約し、2ちゃんねる形式の群像劇として出力して。","【指定】","スレ民の人数："+state.members+"人","今回の生成レス数："+limit+"レス（各レスの番号を連番で表示）","親密度："+state.closeness+"/100（関係性を調整）","言葉遣い："+state.language+"/100（0は丁寧、100は砕けたVIP風）","出力言語："+(state.bilingual==="ja-en"?"日本語の各レスに英語対訳を付ける":"日本語のみ"),"スレッド番号："+state.threadNo+"、1スレ上限1000レス、次の番号は"+(state.posts.length+1),"【生成ルール】","名無し同士が相互に反応し、安価、ツッコミ、脱線、冗談、異論を交わす。全員がイッチに順番に回答する形式を避ける。無理な結論や総括は作らない。観測・整理はスレッド生成後とし、事前にイッチの原文を意味分類で上書きしない。創造的な誤りは外部の事実として扱わない。","【前スレ引継ぎ】",state.carry||"なし","【このスレ直近12レス】",past,"【メモ】",state.memo||"なし","【イッチの今回の投稿】",state.seed,"【GitHub参照：OPPAIは参照資料であり実行済みを意味しない】",refs,"【出力】","スレッド本文のみ。レス番号を各レスの行頭に置き、今回の指定レス数だけ生成。"].join("\n");
+const d=docs.get(FORMAL_PROTOCOL.id);const refs=d?"\n--- "+d.path+" (ThreadRPG v"+d.version+", Git blob SHA-1 "+d.sha+", verified) ---\n"+d.content:"未取得。確認できない仕様を補わない。 https://github.com/"+REPO+"/blob/main/"+FORMAL_PROTOCOL.path;
+return ["【IDUMI β0.3 ユーザー自身のAI Chat試用】","【製品】",selectedProduct()+" / formal Protocol v"+FORMAL_PROTOCOL.version,"【起動Protocol】","Play ThreadRPG as a Japanese 2channel-style anonymous forum. I am the OP (イッチ); all other posters are unnamed 名無しさん, not assigned characters or experts. They should reply to each other, joke, interrupt, misunderstand, and go off-topic naturally. Number every post continuously."+(state.bilingual==="ja-en"?" Give Japanese-English translations.":" Output Japanese only.")+" Wait for my first topic.","【指定】","AIシミュレーションであり、固定人格・専門家役・権威の代替を作らない。停止・中止を命じられたら直ちに生成を止める。","スレ民の人数："+state.members+"人","今回の生成レス数："+limit+"レス（イッチを含む全投稿の連番）","親密度："+state.closeness+"/100（関係性を調整）","言葉遣い："+state.language+"/100（0は丁寧、100は砕けたVIP風）","出力言語："+(state.bilingual==="ja-en"?"日本語の各レスに英語対訳を付ける":"日本語のみ"),"スレッド番号："+state.threadNo+"、全投稿1000レス上限、次の番号は"+(state.posts.length+1),"【生成ルール】","名無し同士が相互に反応し、安価、ツッコミ、脱線、冗談、異論を交わす。全員がイッチに順番に回答する形式を避ける。強制的な結論や総括は作らない。観測・整理はスレッド生成後とし、事前にイッチの原文を意味分類で上書きしない。創造的な誤りは外部の事実として扱わない。","【前スレ引継ぎ】",state.carry||"なし","【このスレ直近12レス】",past,"【メモ】",state.memo||"なし","【イッチの今回の投稿】",state.seed,"【正式Protocol参照】",refs,"【出力】","スレッド本文のみ。レス番号を各レスの行頭に置き、今回の指定レス数だけ生成。"].join("\n");
 }
 async function fetchDocs(){
-docs.clear();q("protocolStatus").textContent="GitHub照会中…";const pairs=Object.entries(paths).filter(a=>q(a[0]).checked);
+docs.clear();q("protocolStatus").textContent="GitHub照会中…";const pairs=[[FORMAL_PROTOCOL.id,FORMAL_PROTOCOL.path]];
 const failed=[];
 await Promise.all(pairs.map(async a=>{try{
 const path=a[1];const base="https://raw.githubusercontent.com/"+REPO+"/main/"+path;const api="https://api.github.com/repos/"+REPO+"/contents/"+path+"?ref=main";
@@ -56,7 +56,10 @@ const res=await fetch(api,{cache:"no-store",headers:{Accept:"application/vnd.git
 const meta=await res.json();if(!meta.sha||!meta.content||meta.encoding!=="base64")throw Error("file metadata missing");
 const raw=atob(meta.content.replace(/\s/g,""));const bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));const body=new TextDecoder().decode(bytes);
 if(body.length>130000)throw Error("file too large");
-docs.set(a[0],{path,sha:meta.sha,content:body,at:new Date().toISOString()});
+const digest=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-1",new TextEncoder().encode("blob "+bytes.length+"\0"+body)))).map(b=>b.toString(16).padStart(2,"0")).join("");
+if(digest!==meta.sha)throw Error("Git blob SHA-1 mismatch");
+const version=(body.match(/version:\s*([\d.]+)/)||[])[1];if(version!==FORMAL_PROTOCOL.version)throw Error("参照バージョン不一致："+(version||"不明"));
+docs.set(a[0],{path,sha:meta.sha,content:body,version,at:new Date().toISOString()});
 }catch(err){failed.push(a[1]+" : "+err.message)}}));
 state.refs=Array.from(docs.values()).map(d=>({path:d.path,sha:d.sha,at:d.at}));save();render();note(failed.length?"未取得の資料：\n"+failed.join("\n"):"GitHub Protocolを取得しました。");
 }
@@ -66,14 +69,14 @@ for(const l of lines){const m=l.match(/^\s*(\d{1,4})\s*(?:[：:.．)]|\s+)\s*(.*
 if(!out.length)throw Error("番号付きレスがありません");
 if(out.length>state.replies)throw Error("今回の設定レス数を超えています");
 if(state.posts.length+out.length>1000)throw Error("1000レス上限を超えます");
-out.forEach((p,i)=>{if(p.no!==state.posts.length+i+1)throw Error("レス番号が連続していません。期待："+(state.posts.length+i+1));if(!p.text.trim())throw Error("本文が空です")});
+out.forEach((p,i)=>{if(p.no!==state.posts.length+i+1)throw Error("レス番号が連続していません。期待："+(state.posts.length+i+1));if(!p.text.trim())throw Error("本文が空です");p.kind="reply"});
 return out;
 }
 function record(){update();try{const posts=extract(q("aiOutput").value);state.posts.push(...posts);save();render();q("aiOutput").value="";note(posts.length+"レスを記録しました")}catch(err){note("登録できません："+err.message)}}
-function packed(){update();return {matome:{format:"idumi-matome-candidate",version:"0.1",status:"candidate_only",threadNo:state.threadNo,limit:1000,posts:state.posts,carryOver:state.carry,memo:state.memo,seed:state.seed,settings:{members:state.members,replies:state.replies,closeness:state.closeness,language:state.language},protocolRefs:state.refs,observation:"user_pasted_ai_output_unverified",human_gate:"pending",canonical_protocol_update:false}}}
+function packed(){update();return {matome:{format:"idumi-matome-candidate",version:"0.1",status:"candidate_only",threadNo:state.threadNo,limit:1000,posts:state.posts,carryOver:state.carry,memo:state.memo,seed:state.seed,settings:{members:state.members,replies:state.replies,closeness:state.closeness,language:state.language,bilingual:state.bilingual},protocolRefs:state.refs,observation:"user_pasted_ai_output_unverified",human_gate:"pending",canonical_protocol_update:false}}}
 function download(){const data=JSON.stringify(packed(),null,2);const url=URL.createObjectURL(new Blob([data],{type:"application/yaml;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download="idumi-thread-"+state.threadNo+".yaml";a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);note("的目YAML候補を書き出しました")}
 function next(){update();if(!confirm("現在のスレの原文を保存する場合は、先にYAMLを書き出してください。次スレに進みますか？"))return;state.carry="前スレ番号 "+state.threadNo+"\nユーザーメモ "+state.memo+"\n最後の12レス\n"+state.posts.slice(-12).map(p=>p.no+" ："+p.text).join("\n");state.threadNo++;state.posts=[];state.memo="";save();render();note("次スレを作成しました。引継ぎはプロンプトに含まれます")}
-async function upload(file){if(!file)return;try{if(file.size>2000000)throw Error("ファイル容量上限を超えます");const obj=JSON.parse(await file.text()),d=obj.matome;if(!d||d.format!=="idumi-matome-candidate"||!Array.isArray(d.posts)||d.posts.length>1000||!Number.isInteger(d.threadNo)||d.threadNo<1||!d.posts.every((p,i)=>p.no===i+1&&typeof p.text==="string"))throw Error("IDUMI形式ではありません");if(!confirm("現在のブラウザー内データを置き換えますか？"))return;const x=d.settings||{};state=Object.assign(initial(),{threadNo:d.threadNo,posts:d.posts,carry:String(d.carryOver||""),memo:String(d.memo||""),seed:String(d.seed||""),refs:Array.isArray(d.protocolRefs)?d.protocolRefs:[],members:Number(x.members),replies:Number(x.replies),closeness:Number(x.closeness),language:Number(x.language)});if(!(state.members>=1&&state.members<=7&&state.replies>=1&&state.replies<=10&&state.closeness>=0&&state.closeness<=100&&state.language>=0&&state.language<=100))throw Error("設定値が不正です");docs.clear();save();render();note("読み込みました。Protocol本文は再取得してください")}catch(err){note("読み込み失敗："+err.message)}}
+async function upload(file){if(!file)return;try{if(file.size>2000000)throw Error("ファイル容量上限を超えます");const obj=JSON.parse(await file.text()),d=obj.matome,x=d&&d.settings;if(!d||d.format!=="idumi-matome-candidate"||!Array.isArray(d.posts)||d.posts.length>1000||!Number.isInteger(d.threadNo)||d.threadNo<1||!d.posts.every((p,i)=>p.no===i+1&&typeof p.text==="string"&&["op","reply"].includes(p.kind||"reply")))throw Error("IDUMI形式ではありません");if(!d.posts.every((p,i)=>p.no===i+1)||d.posts.filter(p=>p.kind==="op").length>1||(d.posts[0]&&d.posts[0].kind!=="op"))throw Error("投稿の連番またはイッチの区別が不正です");const candidate=Object.assign(initial(),{threadNo:d.threadNo,posts:d.posts.map(p=>({no:p.no,text:p.text,kind:p.kind||"reply"})),carry:String(d.carryOver||""),memo:String(d.memo||""),seed:String(d.seed||""),refs:Array.isArray(d.protocolRefs)?d.protocolRefs:[],members:Number(x.members),replies:Number(x.replies),closeness:Number(x.closeness),language:Number(x.language),bilingual:String(x.bilingual||"ja-en")});if(!(candidate.members>=1&&candidate.members<=7&&candidate.replies>=1&&candidate.replies<=10&&candidate.closeness>=0&&candidate.closeness<=100&&candidate.language>=0&&candidate.language<=100&&["ja","ja-en"].includes(candidate.bilingual)))throw Error("設定値が不正です");if(!confirm("現在のブラウザー内データを置き換えますか？"))return;state=candidate;docs.clear();save();render();note("読み込みました。Protocol本文は再取得してください")}catch(err){note("読み込み失敗："+err.message)}}
 for(const k of ["members","replies","closeness","language"]){q(k).addEventListener("input",()=>{update();q(k+"V").textContent=state[k]})}
 for(const k of ["bilingual","seed","memo"])q(k).addEventListener("change",update);
 q("fetch").onclick=fetchDocs;q("copyPrompt").onclick=async()=>{if(state.posts.length>=1000){note("1000レス上限です");return}try{await navigator.clipboard.writeText(prompt());note("生成指示をコピーしました。各自のAI Chatに貼り付けてください")}catch{q("preview").hidden=false;q("preview").textContent=prompt();note("自動コピーできません。表示した指示文を手動でコピーしてください")}};
