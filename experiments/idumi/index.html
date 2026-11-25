@@ -11,7 +11,7 @@ body{font:16px/1.6 system-ui,sans-serif;max-width:850px;margin:auto;padding:24px
 <div><label>親密度 <output id="closenessV">50</output>/100</label><input id="closeness" type="range" min="0" max="100" step="5" value="50"><small>距離感・掛け合いを調整する指示</small></div>
 <div><label>言葉遣い <output id="languageV">65</output>/100</label><input id="language" type="range" min="0" max="100" step="5" value="65"><small>0=丁寧／100=砕けたVIP風</small></div>
 </div><label for="seed">イッチの投稿</label><textarea id="seed">AIとは、人類の知識ではなく文化を継承・循環させるための記憶基盤である。</textarea></section>
-<section><h2>2. GitHub Protocol参照</h2><p class="help">選択した公開資料の本文を取得して指示文に添えます。OPPAIの資料を参照するだけで、OPPAI Runtime自体を実行するものではありません。</p>
+<section><h2>2. 製品とGitHub Protocol参照</h2><label for="product">製品</label><select id="product"><option value="thread-rpg-v1.2.1">ThreadRPG v1.2.1（正式Protocol）</option></select><p class="help">初回提供製品はThreadRPGです。選択した公開資料の本文を取得して指示文に添えます。OPPAIの資料を参照するだけで、OPPAI Runtime自体を実行するものではありません。</p>
 <div><label><input type="checkbox" id="threadP" checked> ThreadRPG v1.2.1</label><label><input type="checkbox" id="oppaiP" checked> OPPAI Schema v0.1</label><label><input type="checkbox" id="registryP" checked> Registry（暗問層の登録）</label><label><input type="checkbox" id="readmeP" checked> README.ja（Evidence／Landscape）</label></div>
 <button id="fetch">GitHub資料を取得</button><div id="protocolStatus" class="status">未取得</div><p class="help">参照先mainは更新される可能性があります。GitHubが利用できない場合は未取得と表示します。</p></section>
 <section><h2>3. 各自のAI Chatで実行</h2><p>生成指示をコピーして、普段のAI Chatに貼り付けてください。AI APIキーは不要です。</p>
@@ -40,11 +40,12 @@ q("thread").replaceChildren();state.posts.forEach(p=>{const d=document.createEle
 q("thread").scrollTop=q("thread").scrollHeight;
 q("protocolStatus").textContent=docs.size?Array.from(docs.values()).map(d=>d.path+" / SHA "+d.sha).join("\n"):"未取得：GitHub資料の本文はまだ確認されていません。";
 }
+function selectedProduct(){const product=q("product").value;if(product!=="thread-rpg-v1.2.1")throw Error("選択された製品は利用できません");return "ThreadRPG v1.2.1"}
 function prompt(){
 update();const limit=Math.min(state.replies,1000-state.posts.length);
 const past=state.posts.slice(-12).map(p=>p.no+" ："+p.text).join("\n")||"まだ投稿なし";
 const refs=Object.entries(paths).filter(a=>q(a[0]).checked).map(a=>{const d=docs.get(a[0]);return "\n--- "+a[1]+" ---\n"+(d?"GitHub blob SHA: "+d.sha+"\n"+d.content:"未取得。確認できない仕様を補わない。 https://github.com/"+REPO+"/blob/main/"+a[1])}).join("\n");
-return ["【IDUMI β0.3 ユーザー自身のAI Chat試用】","【一行Protocol】","問われた事柄への返答を最大7つの意見に集約し、2ちゃんねる形式の群像劇として出力して。","【指定】","スレ民の人数："+state.members+"人","今回の生成レス数："+limit+"レス（各レスの番号を連番で表示）","親密度："+state.closeness+"/100（関係性を調整）","言葉遣い："+state.language+"/100（0は丁寧、100は砕けたVIP風）","スレッド番号："+state.threadNo+"、1スレ上限1000レス、次の番号は"+(state.posts.length+1),"【生成ルール】","名無し同士が相互に反応し、安価、ツッコミ、脱線、冗談、異論を交わす。全員がイッチに順番に回答する形式を避ける。無理な結論や総括は作らない。観測・整理はスレッド生成後とし、事前にイッチの原文を意味分類で上書きしない。創造的な誤りは外部の事実として扱わない。","【前スレ引継ぎ】",state.carry||"なし","【このスレ直近12レス】",past,"【メモ】",state.memo||"なし","【イッチの今回の投稿】",state.seed,"【GitHub参照：OPPAIは参照資料であり実行済みを意味しない】",refs,"【出力】","スレッド本文のみ。レス番号を各レスの行頭に置き、今回の指定レス数だけ生成。"].join("\n");
+return ["【IDUMI β0.3 ユーザー自身のAI Chat試用】","【製品】",selectedProduct(),"【一行Protocol】","問われた事柄への返答を最大7つの意見に集約し、2ちゃんねる形式の群像劇として出力して。","【指定】","スレ民の人数："+state.members+"人","今回の生成レス数："+limit+"レス（各レスの番号を連番で表示）","親密度："+state.closeness+"/100（関係性を調整）","言葉遣い："+state.language+"/100（0は丁寧、100は砕けたVIP風）","スレッド番号："+state.threadNo+"、1スレ上限1000レス、次の番号は"+(state.posts.length+1),"【生成ルール】","名無し同士が相互に反応し、安価、ツッコミ、脱線、冗談、異論を交わす。全員がイッチに順番に回答する形式を避ける。無理な結論や総括は作らない。観測・整理はスレッド生成後とし、事前にイッチの原文を意味分類で上書きしない。創造的な誤りは外部の事実として扱わない。","【前スレ引継ぎ】",state.carry||"なし","【このスレ直近12レス】",past,"【メモ】",state.memo||"なし","【イッチの今回の投稿】",state.seed,"【GitHub参照：OPPAIは参照資料であり実行済みを意味しない】",refs,"【出力】","スレッド本文のみ。レス番号を各レスの行頭に置き、今回の指定レス数だけ生成。"].join("\n");
 }
 async function fetchDocs(){
 docs.clear();q("protocolStatus").textContent="GitHub照会中…";const pairs=Object.entries(paths).filter(a=>q(a[0]).checked);

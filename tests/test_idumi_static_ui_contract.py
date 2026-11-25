@@ -38,6 +38,17 @@ def test_idumi_required_slider_limits_and_ids():
     assert 'id="aiOutput"' in source
 
 
+def test_initial_product_is_explicitly_selected_and_uses_formal_protocol():
+    source = HTML.read_text(encoding="utf-8")
+    fields = Fields()
+    fields.feed(source)
+    tag, field = fields.fields["product"]
+    assert tag == "select"
+    assert 'value="thread-rpg-v1.2.1"' in source
+    assert 'protocols/thread-rpg-v1.2.1.yaml' in source
+    assert 'function selectedProduct()' in source
+
+
 def test_thread_boundary_and_handoff_contract_statically_present():
     source = HTML.read_text(encoding="utf-8")
     assert 'max="1000"' in source

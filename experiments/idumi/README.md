@@ -4,7 +4,7 @@ Standalone browser-only application: open index.html with a browser, or serve it
 
 ## Primary flow
 
-1. Configure **1–7 anonymous speakers**, **1–10 replies per generation**, closeness and language style.
+1. Select the initial product, **ThreadRPG v1.2.1 (formal Protocol)**, then configure **1–7 anonymous speakers**, **1–10 replies per generation**, closeness and language style. Other products are not offered until their public formal Protocols and product-specific verification are available.
 2. Fetch selected publicly accessible Protocol texts from GitHub's Contents API. The browser captures the blob SHA and attaches fetched text to the generated prompt. If fetch fails, the prompt says **not retrieved**.
 3. Copy the prompt to a user's **own AI Chat**. No model or paid API is called by this app. This is a user-paste process, not a native ChatGPT/Copilot connector.
 4. Paste numbered AI responses into the app to validate sequential numbers and append the output. The **1000-reply cap is per thread, not per generation**.
