@@ -49,6 +49,15 @@ def test_initial_product_is_explicitly_selected_and_uses_formal_protocol():
     assert 'function selectedProduct()' in source
 
 
+def test_bilingual_setting_is_present_and_used_in_prompt():
+    source = HTML.read_text(encoding="utf-8")
+    fields = Fields()
+    fields.feed(source)
+    assert fields.fields["bilingual"][0] == "select"
+    assert 'value="ja-en"' in source
+    assert '日本語の各レスに英語対訳を付ける' in source
+
+
 def test_thread_boundary_and_handoff_contract_statically_present():
     source = HTML.read_text(encoding="utf-8")
     assert 'max="1000"' in source

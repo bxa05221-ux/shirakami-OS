@@ -10,7 +10,7 @@ body{font:16px/1.6 system-ui,sans-serif;max-width:850px;margin:auto;padding:24px
 <div><label>一回の生成レス数 <output id="repliesV">7</output>レス</label><input id="replies" type="range" min="1" max="10" value="7"></div>
 <div><label>親密度 <output id="closenessV">50</output>/100</label><input id="closeness" type="range" min="0" max="100" step="5" value="50"><small>距離感・掛け合いを調整する指示</small></div>
 <div><label>言葉遣い <output id="languageV">65</output>/100</label><input id="language" type="range" min="0" max="100" step="5" value="65"><small>0=丁寧／100=砕けたVIP風</small></div>
-</div><label for="seed">イッチの投稿</label><textarea id="seed">AIとは、人類の知識ではなく文化を継承・循環させるための記憶基盤である。</textarea></section>
+</div><label for="bilingual">出力言語</label><select id="bilingual"><option value="ja-en">日本語＋英語対訳</option><option value="ja">日本語のみ</option></select><label for="seed">イッチの投稿</label><textarea id="seed">AIとは、人類の知識ではなく文化を継承・循環させるための記憶基盤である。</textarea></section>
 <section><h2>2. 製品とGitHub Protocol参照</h2><label for="product">製品</label><select id="product"><option value="thread-rpg-v1.2.1">ThreadRPG v1.2.1（正式Protocol）</option></select><p class="help">初回提供製品はThreadRPGです。選択した公開資料の本文を取得して指示文に添えます。OPPAIの資料を参照するだけで、OPPAI Runtime自体を実行するものではありません。</p>
 <div><label><input type="checkbox" id="threadP" checked> ThreadRPG v1.2.1</label><label><input type="checkbox" id="oppaiP" checked> OPPAI Schema v0.1</label><label><input type="checkbox" id="registryP" checked> Registry（暗問層の登録）</label><label><input type="checkbox" id="readmeP" checked> README.ja（Evidence／Landscape）</label></div>
 <button id="fetch">GitHub資料を取得</button><div id="protocolStatus" class="status">未取得</div><p class="help">参照先mainは更新される可能性があります。GitHubが利用できない場合は未取得と表示します。</p></section>
@@ -25,15 +25,15 @@ body{font:16px/1.6 system-ui,sans-serif;max-width:850px;margin:auto;padding:24px
 "use strict";
 const q=id=>document.getElementById(id), KEY="idumi-mvp-v03", REPO="bxa05221-ux/shirakami-OS";
 const paths={threadP:"protocols/thread-rpg-v1.2.1.yaml",oppaiP:"docs/specs/OPPAI_Schema_v0.1.md",registryP:"protocols/registry.yaml",readmeP:"README.ja.md"};
-const initial=()=>({threadNo:1,posts:[],carry:"",memo:"",seed:"AIとは、人類の知識ではなく文化を継承・循環させるための記憶基盤である。",members:5,replies:7,closeness:50,language:65,refs:[]});
+const initial=()=>({threadNo:1,posts:[],carry:"",memo:"",seed:"AIとは、人類の知識ではなく文化を継承・循環させるための記憶基盤である。",members:5,replies:7,closeness:50,language:65,bilingual:"ja-en",refs:[]});
 let state;try{state=Object.assign(initial(),JSON.parse(localStorage.getItem(KEY)||"{}"))}catch{state=initial()}
 if(!Array.isArray(state.posts))state.posts=[];const docs=new Map();
 function note(s){q("notice").textContent=s}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch{note("ブラウザーに保存できません。ファイルへ書き出してください。")}}
-function update(){for(const k of ["members","replies","closeness","language"])state[k]=Number(q(k).value);state.seed=q("seed").value;state.memo=q("memo").value;save()}
+function update(){for(const k of ["members","replies","closeness","language"])state[k]=Number(q(k).value);state.bilingual=q("bilingual").value;state.seed=q("seed").value;state.memo=q("memo").value;save()}
 function render(){
 for(const k of ["members","replies","closeness","language"]){q(k).value=state[k];q(k+"V").textContent=state[k]}
-q("seed").value=state.seed;q("memo").value=state.memo;q("count").textContent=state.posts.length+"/1000（第"+state.threadNo+"スレ）";q("progress").value=state.posts.length;
+q("bilingual").value=state.bilingual||"ja-en";q("seed").value=state.seed;q("memo").value=state.memo;q("count").textContent=state.posts.length+"/1000（第"+state.threadNo+"スレ）";q("progress").value=state.posts.length;
 q("hint").textContent=state.posts.length>=1000?"1000レス到達。次スレへ。":state.posts.length>=950?"950レス超。次スレの引継ぎを準備できます。":"1000レスは上限です。途中で次スレに進めます。";
 q("add").disabled=state.posts.length>=1000;
 q("thread").replaceChildren();state.posts.forEach(p=>{const d=document.createElement("div");d.className="post";d.textContent=p.no+" ："+p.text;q("thread").append(d)});
@@ -45,7 +45,7 @@ function prompt(){
 update();const limit=Math.min(state.replies,1000-state.posts.length);
 const past=state.posts.slice(-12).map(p=>p.no+" ："+p.text).join("\n")||"まだ投稿なし";
 const refs=Object.entries(paths).filter(a=>q(a[0]).checked).map(a=>{const d=docs.get(a[0]);return "\n--- "+a[1]+" ---\n"+(d?"GitHub blob SHA: "+d.sha+"\n"+d.content:"未取得。確認できない仕様を補わない。 https://github.com/"+REPO+"/blob/main/"+a[1])}).join("\n");
-return ["【IDUMI β0.3 ユーザー自身のAI Chat試用】","【製品】",selectedProduct(),"【一行Protocol】","問われた事柄への返答を最大7つの意見に集約し、2ちゃんねる形式の群像劇として出力して。","【指定】","スレ民の人数："+state.members+"人","今回の生成レス数："+limit+"レス（各レスの番号を連番で表示）","親密度："+state.closeness+"/100（関係性を調整）","言葉遣い："+state.language+"/100（0は丁寧、100は砕けたVIP風）","スレッド番号："+state.threadNo+"、1スレ上限1000レス、次の番号は"+(state.posts.length+1),"【生成ルール】","名無し同士が相互に反応し、安価、ツッコミ、脱線、冗談、異論を交わす。全員がイッチに順番に回答する形式を避ける。無理な結論や総括は作らない。観測・整理はスレッド生成後とし、事前にイッチの原文を意味分類で上書きしない。創造的な誤りは外部の事実として扱わない。","【前スレ引継ぎ】",state.carry||"なし","【このスレ直近12レス】",past,"【メモ】",state.memo||"なし","【イッチの今回の投稿】",state.seed,"【GitHub参照：OPPAIは参照資料であり実行済みを意味しない】",refs,"【出力】","スレッド本文のみ。レス番号を各レスの行頭に置き、今回の指定レス数だけ生成。"].join("\n");
+return ["【IDUMI β0.3 ユーザー自身のAI Chat試用】","【製品】",selectedProduct(),"【一行Protocol】","問われた事柄への返答を最大7つの意見に集約し、2ちゃんねる形式の群像劇として出力して。","【指定】","スレ民の人数："+state.members+"人","今回の生成レス数："+limit+"レス（各レスの番号を連番で表示）","親密度："+state.closeness+"/100（関係性を調整）","言葉遣い："+state.language+"/100（0は丁寧、100は砕けたVIP風）","出力言語："+(state.bilingual==="ja-en"?"日本語の各レスに英語対訳を付ける":"日本語のみ"),"スレッド番号："+state.threadNo+"、1スレ上限1000レス、次の番号は"+(state.posts.length+1),"【生成ルール】","名無し同士が相互に反応し、安価、ツッコミ、脱線、冗談、異論を交わす。全員がイッチに順番に回答する形式を避ける。無理な結論や総括は作らない。観測・整理はスレッド生成後とし、事前にイッチの原文を意味分類で上書きしない。創造的な誤りは外部の事実として扱わない。","【前スレ引継ぎ】",state.carry||"なし","【このスレ直近12レス】",past,"【メモ】",state.memo||"なし","【イッチの今回の投稿】",state.seed,"【GitHub参照：OPPAIは参照資料であり実行済みを意味しない】",refs,"【出力】","スレッド本文のみ。レス番号を各レスの行頭に置き、今回の指定レス数だけ生成。"].join("\n");
 }
 async function fetchDocs(){
 docs.clear();q("protocolStatus").textContent="GitHub照会中…";const pairs=Object.entries(paths).filter(a=>q(a[0]).checked);
@@ -75,7 +75,7 @@ function download(){const data=JSON.stringify(packed(),null,2);const url=URL.cre
 function next(){update();if(!confirm("現在のスレの原文を保存する場合は、先にYAMLを書き出してください。次スレに進みますか？"))return;state.carry="前スレ番号 "+state.threadNo+"\nユーザーメモ "+state.memo+"\n最後の12レス\n"+state.posts.slice(-12).map(p=>p.no+" ："+p.text).join("\n");state.threadNo++;state.posts=[];state.memo="";save();render();note("次スレを作成しました。引継ぎはプロンプトに含まれます")}
 async function upload(file){if(!file)return;try{if(file.size>2000000)throw Error("ファイル容量上限を超えます");const obj=JSON.parse(await file.text()),d=obj.matome;if(!d||d.format!=="idumi-matome-candidate"||!Array.isArray(d.posts)||d.posts.length>1000||!Number.isInteger(d.threadNo)||d.threadNo<1||!d.posts.every((p,i)=>p.no===i+1&&typeof p.text==="string"))throw Error("IDUMI形式ではありません");if(!confirm("現在のブラウザー内データを置き換えますか？"))return;const x=d.settings||{};state=Object.assign(initial(),{threadNo:d.threadNo,posts:d.posts,carry:String(d.carryOver||""),memo:String(d.memo||""),seed:String(d.seed||""),refs:Array.isArray(d.protocolRefs)?d.protocolRefs:[],members:Number(x.members),replies:Number(x.replies),closeness:Number(x.closeness),language:Number(x.language)});if(!(state.members>=1&&state.members<=7&&state.replies>=1&&state.replies<=10&&state.closeness>=0&&state.closeness<=100&&state.language>=0&&state.language<=100))throw Error("設定値が不正です");docs.clear();save();render();note("読み込みました。Protocol本文は再取得してください")}catch(err){note("読み込み失敗："+err.message)}}
 for(const k of ["members","replies","closeness","language"]){q(k).addEventListener("input",()=>{update();q(k+"V").textContent=state[k]})}
-for(const k of ["seed","memo"])q(k).addEventListener("change",update);
+for(const k of ["bilingual","seed","memo"])q(k).addEventListener("change",update);
 q("fetch").onclick=fetchDocs;q("copyPrompt").onclick=async()=>{if(state.posts.length>=1000){note("1000レス上限です");return}try{await navigator.clipboard.writeText(prompt());note("生成指示をコピーしました。各自のAI Chatに貼り付けてください")}catch{q("preview").hidden=false;q("preview").textContent=prompt();note("自動コピーできません。表示した指示文を手動でコピーしてください")}};
 q("showPrompt").onclick=()=>{q("preview").hidden=!q("preview").hidden;if(!q("preview").hidden)q("preview").textContent=prompt()};
 q("add").onclick=record;q("next").onclick=next;q("download").onclick=download;q("upload").onchange=e=>upload(e.target.files[0]);
