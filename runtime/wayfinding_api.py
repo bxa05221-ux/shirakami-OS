@@ -12,6 +12,8 @@ from .aat_thread_wayfinding import run_aats_wayfinding
 from .landscape import LandscapeState
 from .prototype import Transition
 from .threadrpg_queue import ImaginaryTerm, SemanticConnection, ThreadRPGQueue
+from .threadrpg_v4_hanaichimonme_flow import HanaichimonmeSessionStore
+from .threadrpg_v4_minimal_flow import ReplyGenerator
 from .way import SmallStep
 
 
@@ -70,7 +72,7 @@ def _queue_context(payload: Mapping[str, Any]) -> dict[str, Any] | None:
     queue = ThreadRPGQueue()
     queue.add_terms(ImaginaryTerm.from_mapping(item) for item in queue_payload.get("imaginary_terms", []))
     for item in queue_payload.get("resolved_terms", []):
-        queue.resolve_term(str(item["term_id"]), str(item["evidence_id"]))
+        queue.resolve_term(str(item["term_id"]), str(item.get("evidence_id", "")) or None, subject_confirmed=bool(item.get("subject_confirmed", False)))
     if queue_payload.get("reset", False):
         queue.reset()
     context = queue.ingest(
@@ -116,6 +118,27 @@ def execute_wayfinding_request(payload: Mapping[str, Any]) -> dict[str, Any]:
     if queue_context is not None:
         response["thread_rpg_queue"] = queue_context
     return response
+
+
+def execute_hanaichimonme_request(
+    payload: Mapping[str, Any], generator: ReplyGenerator, sessions: HanaichimonmeSessionStore
+) -> dict[str, Any]:
+    """Run the V4 reply path with caller-supplied generation and session state.
+
+    The caller must supply the generator explicitly; this transport boundary
+    does not select a provider or make a paid/network model request itself.
+    """
+    thread_id = str(payload["thread_id"])
+    turn = sessions.get(thread_id).generate(payload.get("input"), generator)
+    return {
+        "thread_id": thread_id,
+        "posts": [asdict(post) for post in turn.thread.posts],
+        "selected_anonymous_speakers": list(turn.plan.participant_ids),
+        "semantic_connections": [asdict(link) for link in turn.semantic_history],
+        "cue_detected": turn.plan.cue_detected,
+        "human_gate_required": turn.human_gate_required,
+        "reality_mutation_permitted": turn.reality_mutation_permitted,
+    }
 
 
 class WayfindingAPIHandler(BaseHTTPRequestHandler):

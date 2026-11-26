@@ -20,10 +20,10 @@ def test_user_wish_requires_evidence_to_leave_active_set_and_schedules_reobserva
     queue = ThreadRPGQueue()
     queue.add_terms([ImaginaryTerm("wish-1", "user", "行きたい")])
 
-    with pytest.raises(ValueError, match="evidence_id"):
-        queue.resolve_term("wish-1", "")
+    with pytest.raises(ValueError, match="subject confirmation"):
+        queue.resolve_term("wish-1")
 
-    queue.resolve_term("wish-1", "EVID-1")
+    queue.resolve_term("wish-1", "EVID-1", subject_confirmed=True)
     context = queue.ingest([], [])
     assert context.unresolved_terms == ()
     assert context.queued_items[-1].kind == "reobserve"

@@ -28,7 +28,7 @@ def test_async_http_provider_output_crosses_evidence_trace_and_authority_boundar
     assert observe.status_code == 200, observe.text
     analyze = client.post(
         "/v1/analyze",
-        json={"protocol_id": "fixture.async-provider", "protocol_exists": True},
+        json={"protocol_id": "fixture.async-provider", "protocol_exists": False},
         headers=headers,
     )
     assert analyze.status_code == 200, analyze.text

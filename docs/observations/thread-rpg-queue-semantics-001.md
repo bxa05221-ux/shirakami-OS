@@ -18,8 +18,9 @@ The request fixes the following implementation constraints:
   retained from that compression;
 - an unresolved wish belongs to the subject; an AI term is a changeable,
   explicitly hypothetical convenience, not a claim of real feeling;
-- a resolved imaginary term needs Evidence; resolution must not rewrite
-  Evidence; when no active terms remain, re-observation is queued;
+- resolving a subject-owned imaginary term requires explicit subject/caller
+  confirmation; optional Evidence may be retained as provenance, and when no
+  active terms remain, re-observation is queued;
 - 3D phase rotation / Eisenhower is represented only as caller-supplied
   origin/centroid context.  No formula, threshold, or priority rule is claimed.
 
@@ -30,7 +31,7 @@ The request fixes the following implementation constraints:
 | Explicit request: queue, not fixed pipeline | Pending work is a queue | `ThreadRPGQueue._items` | optional `thread_rpg_queue` request payload → `_queue_context` | `test_threadrpg_queue.py` |
 | Explicit request: five-turn compression, new links only | No semantic inference and no duplicate growth | `ingest()` truncates to five and adds only caller-declared unseen links | `execute_wayfinding_request()` | queue/API tests |
 | Explicit request: growth history | Preserve acquired semantic connections | `_known_connections` / `growth_history` | response field only | queue test |
-| Explicit request: user wish / AI hypothetical | Evidence-gated resolution; AI does not claim emotion | `ImaginaryTerm`, `resolve_term()` | optional request context | queue test |
+| Explicit request: user wish / AI hypothetical | Subject-confirmed resolution; optional Evidence provenance; AI does not claim emotion | `ImaginaryTerm`, `resolve_term()` | optional request context | queue test |
 | Explicit request: all `i` gone → recurrence | Schedule re-observation, do not force continuation | `QueueItem("reobserve", ...)` | response field only | queue test |
 | Existing vertical slice | Preserve authority and executed path | no changes to `run_aats_wayfinding()` | AATS → Renzan → Kasen → Landscape → Small Step → Evidence → re-observation | existing Wayfinding tests plus API queue test |
 

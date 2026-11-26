@@ -84,12 +84,18 @@ class ThreadRPGQueue:
             if term.term_id not in self._resolution_evidence:
                 self._unresolved[term.term_id] = term
 
-    def resolve_term(self, term_id: str, evidence_id: str) -> None:
-        if not evidence_id:
-            raise ValueError("resolving an imaginary term requires evidence_id")
+    def resolve_term(self, term_id: str, evidence_id: str | None = None, *, subject_confirmed: bool = False) -> None:
+        """Resolve only on an explicit subject/caller confirmation.
+
+        Evidence may be retained when supplied, but is not a newly invented
+        prerequisite for deciding that a subject-owned wish still exists.
+        """
+        if not subject_confirmed:
+            raise ValueError("resolving an imaginary term requires subject confirmation")
         if term_id not in self._unresolved:
             raise ValueError("unknown or already resolved imaginary term")
-        self._resolution_evidence[term_id] = evidence_id
+        if evidence_id:
+            self._resolution_evidence[term_id] = evidence_id
         del self._unresolved[term_id]
         if not self._unresolved:
             self._items.append(QueueItem("reobserve", "all currently active imaginary terms were resolved"))
