@@ -1,0 +1,44 @@
+protocol:
+  id: thread_rpg
+  title: Thread RPG Protocol
+  version: 1.3.0-candidate
+  layer: application
+  status: candidate
+  bootstrap:
+    entry_point: products/thread-rpg-v1.3.0/START.md
+    dependencies:
+      - products/thread-rpg-v1.3.0/START.md
+      - protocols/thread-rpg-v1.3.0.yaml
+    require_same_commit: true
+    fail_closed: true
+  rendering:
+    synthetic_viewpoints: true
+    human_decision_required: true
+    execution_authority: false
+  anmon:
+    contract: preserve_unresolved_questions
+    required_separations:
+      - observation
+      - interpretation
+      - uncertainty
+      - assumption
+      - question
+      - constraint
+      - stop_condition
+      - decision_gate
+    unresolved_question_defaulting: forbidden
+  phase_rotating_matrix:
+    contract: descriptive_candidate_positioning
+    dimensions:
+      - importance
+      - urgency
+      - phase
+    basis_required: true
+    preserve_previous_view_on_rotation: true
+    autonomous_prioritization: false
+  prohibited:
+    - worker
+    - d1
+    - site
+    - deployment
+    - autonomous_execution
