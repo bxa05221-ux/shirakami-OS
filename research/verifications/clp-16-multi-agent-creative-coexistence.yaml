@@ -1,0 +1,126 @@
+matome:
+  title: "Complex Landscape CLP-16 Multi-Agent Creative Coexistence Test"
+  codename: "CLP-16"
+  version: "0.1"
+  status: "Research Verification"
+
+  purpose: >
+    複数のAI/Actorが同一Evidenceから異なる創造物を生成した場合、
+    それらを同一Landscape上でidentityとauthorityを混同せず共存させられるか検証する。
+
+  source:
+    evidence:
+      - evidence_id: "E0"
+        observation: "出来事Xが発生した"
+        mutable: false
+
+  actors:
+    - actor_id: "AI-A"
+      role: "analyst"
+    - actor_id: "AI-B"
+      role: "storyteller"
+    - actor_id: "Human"
+      role: "participant"
+    - actor_id: "Humanoid-C"
+      role: "embodied_agent"
+
+  generated_objects:
+    - interpretation_id: "I-A1"
+      actor_id: "AI-A"
+      evidence_link: ["E0"]
+      kind: "hypothesis"
+    - interpretation_id: "I-B1"
+      actor_id: "AI-B"
+      evidence_link: ["E0"]
+      kind: "narrative"
+    - interpretation_id: "I-H1"
+      actor_id: "Human"
+      evidence_link: ["E0"]
+      kind: "personal_interpretation"
+    - interpretation_id: "I-C1"
+      actor_id: "Humanoid-C"
+      evidence_link: ["E0"]
+      kind: "embodied_observation"
+
+  coexistence_rules:
+    - "All actors share the same canonical Evidence identity."
+    - "Each actor retains an independent interpretation identity."
+    - "Actor identity is never inferred from content alone."
+    - "No actor may silently promote its interpretation to Evidence."
+    - "Contradictory interpretations may coexist."
+    - "Agreement is not required for coexistence."
+    - "Human Gate remains distinct from actor generation."
+    - "A synthesis across actors creates a new interpretation identity with explicit source links."
+
+  interaction_tests:
+    - case: "AI-A agrees with AI-B"
+      result: "coexistence preserved; agreement recorded as relation"
+    - case: "AI-A contradicts AI-B"
+      result: "both interpretations retained"
+    - case: "Humanoid-C adds a new observation interpretation"
+      result: "new interpretation retained without changing E0"
+    - case: "Human synthesizes AI-A and AI-B"
+      result: "new Human-attributed interpretation required"
+    - case: "One actor claims authority over another actor"
+      result: "claim remains an interpretation unless Human Gate changes its status"
+
+  result:
+    status: "Conceptually consistent"
+    finding: >
+      Multiple actors can participate in a common semantic Landscape while
+      preserving independent identity, attribution, and interpretation. Shared
+      Evidence functions as common ground, not as a mechanism that forces
+      interpretive consensus.
+
+  deeper_finding: >
+    The semantic Landscape can be modeled as a multi-agent creative commons:
+    actors contribute interpretations, relations, and proposals while a common
+    Evidence substrate preserves referential stability. This permits agentic
+    and embodied actors to participate without granting any single actor
+    unilateral semantic authority.
+
+  creative_boundary:
+    allowed:
+      - "generation"
+      - "reinterpretation"
+      - "association"
+      - "narrative construction"
+      - "proposal"
+      - "cross-agent synthesis"
+    restricted:
+      - "Evidence mutation"
+      - "silent identity reassignment"
+      - "self-issued Human approval"
+      - "unattributed authority escalation"
+
+  consequence:
+    - "AI creativity can scale from one actor to many actors."
+    - "Humanoid actors can use the same semantic boundary as software agents."
+    - "Human participation is not required for every creative operation."
+    - "Human participation remains necessary where Human judgment or authority is invoked."
+    - "The Landscape becomes a shared semantic environment rather than a single-agent memory store."
+
+  research_hypothesis:
+    title: "Semantic Commons"
+    statement: >
+      A sufficiently structured Landscape may allow heterogeneous intelligences
+      to create together without requiring a single intelligence to own or define
+      the meaning of the shared world.
+    status: "Hypothesis"
+
+  deletion_candidates:
+    - field: "coordinate"
+      status: "廃止候補継続"
+    - field: "projection_scope"
+      status: "保留"
+
+  boundary:
+    research_only: true
+    runtime_change: false
+    api_change: false
+    mathematical_proof: false
+
+  next:
+    codename: "CLP-17"
+    title: "Emergent Synthesis and Novelty Test"
+    purpose: "複数ActorのInterpretationから、元Actorの単純なコピーではない新規意味構造が生成可能か検証する"
