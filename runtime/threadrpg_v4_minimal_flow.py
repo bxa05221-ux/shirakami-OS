@@ -26,6 +26,7 @@ class AnonymousReply:
     text: str
     source_post_indices: tuple[int, ...] = ()
     batch_reply_indices: tuple[int, ...] = ()
+    participant_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -78,7 +79,9 @@ def run_minimal_flow(
     _validate_proposal(turn.thread, proposal)
 
     completed = append_generated_replies(
-        turn.thread, [reply.text for reply in proposal.replies]
+        turn.thread,
+        [reply.text for reply in proposal.replies],
+        [reply.participant_id or "nanashi" for reply in proposal.replies],
     )
     source_posts = tuple(
         SourcePost(index, post.participant_id, post.text, post.aa)
