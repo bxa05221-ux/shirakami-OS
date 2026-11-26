@@ -51,6 +51,14 @@ class VerificationResult:
     uncertainty: str
     observed: Mapping[str, Any] = field(default_factory=dict)
 
+    def as_mapping(self) -> Mapping[str, Any]:
+        """Expose verification without collapsing uncertainty into certainty."""
+        return {
+            "status": self.status,
+            "uncertainty": self.uncertainty,
+            "observed": dict(self.observed),
+        }
+
 
 @dataclass(frozen=True)
 class MismatchEvidence:
