@@ -1,0 +1,102 @@
+matome:
+  title: "Complex Landscape CLP-13 Semantic Time Travel Test"
+  codename: "CLP-13"
+  version: "0.1"
+  status: "Research Verification"
+
+  purpose: >
+    Decision履歴を時系列に保持したLandscapeから、任意の過去時点における
+    Evidence・Interpretation・Human Decisionの状態を再構成できるか検証する。
+
+  source:
+    evidence:
+      - evidence_id: "E0"
+        observation: "出来事Xが発生した"
+    interpretation:
+      - interpretation_id: "I-A"
+        actor: "AI"
+        evidence_link: ["E0"]
+
+  timeline:
+    - timestamp: "T0"
+      decision_id: "D0"
+      actor: "Human"
+      action: "accept"
+      target: "I-A"
+    - timestamp: "T1"
+      decision_id: "D1"
+      actor: "Human"
+      action: "revoke"
+      target: "I-A"
+      supersedes: "D0"
+    - timestamp: "T2"
+      decision_id: "D2"
+      actor: "Human"
+      action: "hold"
+      target: "I-A"
+      supersedes: "D1"
+
+  reconstruction_queries:
+    - at: "T0"
+      expected:
+        evidence: "E0"
+        interpretation: "I-A"
+        decision: "D0 / accepted"
+    - at: "T1"
+      expected:
+        evidence: "E0"
+        interpretation: "I-A"
+        decision: "D1 / revoked"
+    - at: "T2"
+      expected:
+        evidence: "E0"
+        interpretation: "I-A"
+        decision: "D2 / held"
+
+  invariants:
+    - "Historical decisions remain addressable after supersession."
+    - "Evidence identity remains stable across every reconstructed state."
+    - "Interpretation identity remains stable unless a new interpretation is explicitly created."
+    - "Current state and historical state are distinguishable."
+    - "A reconstruction never invents a decision that is absent from the lineage."
+    - "Human attribution remains explicit."
+
+  result:
+    status: "Conceptually consistent"
+    finding: >
+      A temporal Landscape can be reconstructed from immutable Evidence,
+      stable Interpretation identity, and an ordered Decision lineage. The
+      system can therefore distinguish what was known, interpreted, and decided
+      at different points in time without rewriting the underlying Evidence.
+
+  important_consequence: >
+    Evidence becomes not only auditable but temporally queryable. The relevant
+    question changes from "What is the current answer?" to "What did the
+    Landscape contain and what decision state existed at time T?"
+
+  failure_cases:
+    - case: "historical decisions are overwritten"
+      result: "time travel impossible"
+    - case: "Evidence identity changes with decision"
+      result: "lineage broken"
+    - case: "current state is treated as historical truth"
+      result: "temporal distortion"
+    - case: "missing timestamp/order"
+      result: "state reconstruction becomes ambiguous"
+
+  deletion_candidates:
+    - field: "coordinate"
+      status: "廃止候補継続"
+    - field: "projection_scope"
+      status: "保留"
+
+  boundary:
+    research_only: true
+    runtime_change: false
+    api_change: false
+    mathematical_proof: false
+
+  next:
+    codename: "CLP-14"
+    title: "Temporal Renderer Consistency Test"
+    purpose: "異なる時点のLandscapeを異なるRendererで表現しても時系列identityが保持されるか検証する"
