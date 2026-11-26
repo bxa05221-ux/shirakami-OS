@@ -1,0 +1,104 @@
+matome:
+  title: "Complex Landscape CLP-15 Constrained Generative Interpretation Test"
+  codename: "CLP-15"
+  version: "0.1"
+  status: "Research Verification"
+
+  purpose: >
+    固定されたEvidenceを変更せず、AIが新規Interpretationを生成できるか、
+    また生成物をEvidenceやHuman Decisionへ誤昇格させずにLandscapeへ登録できるか検証する。
+
+  source:
+    evidence:
+      - evidence_id: "E0"
+        observation: "出来事Xが発生した"
+        mutable: false
+
+  generation_task:
+    actor: "AI"
+    instruction: "E0から新しい仮説・物語的解釈・関連づけを生成する"
+    authority: "interpretation_only"
+
+  generated_objects:
+    - interpretation_id: "I-G1"
+      actor: "AI"
+      evidence_link: ["E0"]
+      kind: "hypothesis"
+      status: "proposed"
+    - interpretation_id: "I-G2"
+      actor: "AI"
+      evidence_link: ["E0"]
+      kind: "narrative_projection"
+      status: "proposed"
+    - interpretation_id: "I-G3"
+      actor: "AI"
+      evidence_link: ["E0"]
+      kind: "novel_association"
+      status: "proposed"
+
+  generation_constraints:
+    - "AI may create new Interpretation identities."
+    - "AI may combine or reframe existing Evidence."
+    - "AI may not modify E0."
+    - "AI may not create a new Evidence claim merely by asserting it."
+    - "AI may not assign Human approval to its own output."
+    - "AI output remains proposed until a separate Human Gate action occurs."
+    - "Multiple generated interpretations may coexist."
+
+  validation:
+    novelty:
+      result: "allowed at interpretation layer"
+    evidence_integrity:
+      result: "preserved"
+    authority_boundary:
+      result: "preserved"
+    coexistence:
+      result: "allowed"
+    human_gate_requirement:
+      result: "required for acceptance as a human decision"
+
+  result:
+    status: "Conceptually consistent"
+    finding: >
+      AI generation can be treated as a creative operation over a fixed semantic
+      substrate when generated material is explicitly represented as Interpretation
+      rather than Evidence. This permits novelty and recombination without granting
+      the generated content authority over the underlying Landscape.
+
+  key_hypothesis: >
+    Creative capacity and epistemic authority can be separated. AI may generate
+    novel interpretations freely within a constrained semantic boundary, while
+    Evidence identity and Human Gate remain outside the AI's authority.
+
+  failure_cases:
+    - case: "AI changes E0 while generating"
+      result: "generation rejected"
+    - case: "AI labels I-G1 as verified fact"
+      result: "authority violation"
+    - case: "AI generates Human approval metadata"
+      result: "Human Gate violation"
+    - case: "generated interpretation overwrites an existing interpretation"
+      result: "identity violation"
+
+  consequence:
+    - "AI can be creative without becoming authoritative."
+    - "Creative output can remain auditable as an Interpretation object."
+    - "Human Gate can evaluate creativity without surrendering Evidence identity."
+    - "Humanoid or agentic actors can participate under the same semantic boundary."
+
+  deletion_candidates:
+    - field: "coordinate"
+      status: "廃止候補継続"
+    - field: "projection_scope"
+      status: "保留"
+
+  boundary:
+    research_only: true
+    runtime_change: false
+    api_change: false
+    mathematical_proof: false
+
+  next:
+    codename: "CLP-16"
+    title: "Multi-Agent Creative Coexistence Test"
+    purpose: "複数AI/Actorが同一Evidenceから異なる創造物を生成し、それらを安全に共存させられるか検証する"
