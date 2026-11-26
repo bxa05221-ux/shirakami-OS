@@ -11,6 +11,7 @@ from .aats import Participant, Post, Thread
 from .aat_thread_wayfinding import run_aats_wayfinding
 from .landscape import LandscapeState
 from .prototype import Transition
+from .threadrpg_queue import ImaginaryTerm, SemanticConnection, ThreadRPGQueue
 from .way import SmallStep
 
 
@@ -59,8 +60,38 @@ def _evidence_to_dict(evidence: Any) -> dict[str, Any]:
     }
 
 
+def _queue_context(payload: Mapping[str, Any]) -> dict[str, Any] | None:
+    """Build optional descriptive context without changing Wayfinding authority."""
+    queue_payload = payload.get("thread_rpg_queue")
+    if queue_payload is None:
+        return None
+    if not isinstance(queue_payload, Mapping):
+        raise ValueError("thread_rpg_queue must be an object")
+    queue = ThreadRPGQueue()
+    queue.add_terms(ImaginaryTerm.from_mapping(item) for item in queue_payload.get("imaginary_terms", []))
+    for item in queue_payload.get("resolved_terms", []):
+        queue.resolve_term(str(item["term_id"]), str(item["evidence_id"]))
+    if queue_payload.get("reset", False):
+        queue.reset()
+    context = queue.ingest(
+        queue_payload.get("recent_turns", []),
+        (SemanticConnection.from_mapping(item) for item in queue_payload.get("semantic_connections", [])),
+        phase_rotation=queue_payload.get("phase_rotation"),
+    )
+    return {
+        "recent_turns": list(context.recent_turns),
+        "new_semantic_connections": [asdict(item) for item in context.new_connections],
+        "unresolved_imaginary_terms": [asdict(item) for item in context.unresolved_terms],
+        "queued_context_work": [asdict(item) for item in context.queued_items],
+        "growth_history": [asdict(item) for item in context.growth_history],
+        "phase_rotation": context.phase_rotation,
+        "authority": "descriptive_only",
+    }
+
+
 def execute_wayfinding_request(payload: Mapping[str, Any]) -> dict[str, Any]:
     """Execute one transport-level Wayfinding request."""
+    queue_context = _queue_context(payload)
     thread = _thread_from_payload(payload["thread"])
     state = LandscapeState.from_snapshot(payload.get("landscape", {}))
     step_data = payload["small_step"]
@@ -74,7 +105,7 @@ def execute_wayfinding_request(payload: Mapping[str, Any]) -> dict[str, Any]:
     result = run_aats_wayfinding(
         thread, state, _RequestSelector(step), _RequestApplier(transition), _StateObserver()
     )
-    return {
+    response = {
         "viewpoints": [asdict(viewpoint) for viewpoint in result.viewpoints],
         "narrative": result.narrative,
         "before": dict(result.before),
@@ -82,6 +113,9 @@ def execute_wayfinding_request(payload: Mapping[str, Any]) -> dict[str, Any]:
         "evidence": _evidence_to_dict(result.evidence),
         "after": dict(result.after),
     }
+    if queue_context is not None:
+        response["thread_rpg_queue"] = queue_context
+    return response
 
 
 class WayfindingAPIHandler(BaseHTTPRequestHandler):
