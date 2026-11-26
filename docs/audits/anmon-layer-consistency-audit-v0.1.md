@@ -58,3 +58,15 @@ The document clearly states that Anmon is not an execution authority and cannot 
 ## 6. Audit conclusion
 
 Anmon Layer v0.1 is conceptually clear regarding inquiry, uncertainty exposure, and human control. Its principal consistency issue is the unsubstantiated “five-turn observation boundary” claim in repository metadata. The next audit step is to locate or add implementation and test evidence without silently redefining the protocol.
+
+## 7. Follow-up decision
+
+Anmon remains a Protocol/documentation-level inquiry boundary. It does not introduce
+a dedicated Runtime decision engine. The generic Observation → Protocol Candidate →
+structural validation boundary is used to carry explicitly supplied questions,
+assumptions, stop conditions, uncertainty, and the Human Gate requirement without
+granting execution authority. The focused test is
+`tests/test_anmon_handoff_boundary.py`.
+
+The “five-turn observation boundary” remains unverified and is not a Runtime
+requirement until a canonical protocol source defines it with examples and tests.
