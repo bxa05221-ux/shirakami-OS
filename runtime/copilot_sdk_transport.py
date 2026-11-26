@@ -9,16 +9,26 @@ from __future__ import annotations
 import os
 from typing import Any
 
+from aiwitness.policy_gate import AIwitnessPolicyGate, PolicyDenied
 from .provider_transport import ProviderRequest
 
 
 class CopilotSDKProviderTransport:
     """Async provider transport backed by the GitHub Copilot SDK."""
 
-    def __init__(self, model: str = "gpt-5.4") -> None:
+    def __init__(self, model: str = "gpt-5.4", policy_gate: AIwitnessPolicyGate | None = None) -> None:
         self.model = model
+        self._policy_gate = policy_gate
 
     async def __call__(self, request: ProviderRequest) -> Any:
+        if self._policy_gate is None:
+            raise PolicyDenied("AIwitness policy gate is required for external provider use")
+        classification = request.context.get("data_classification", "unknown")
+        authorized = self._policy_gate.authorize(
+            {"input": request.canonical_prompt, "data_classification": classification},
+            provider="github-copilot-sdk", model=self.model,
+        )
+        self._policy_gate.verify(authorized, provider="github-copilot-sdk", model=self.model)
         try:
             from copilot import CopilotClient
         except ImportError as exc:
@@ -46,7 +56,7 @@ class CopilotSDKProviderTransport:
         try:
             session = await client.create_session(model=self.model)
             try:
-                response = await session.send_and_wait(request.canonical_prompt)
+                response = await session.send_and_wait(authorized.payload)
             finally:
                 await session.disconnect()
         finally:

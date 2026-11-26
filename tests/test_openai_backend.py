@@ -3,6 +3,13 @@
 import json
 
 from runtime.openai_backend import OpenAIBackend
+from aiwitness.policy_gate import AIwitnessPolicyGate, OutboundPolicy
+
+
+def _gate():
+    return AIwitnessPolicyGate(
+        OutboundPolicy("test-policy", "1", True, frozenset({("openai", "test-model")}), frozenset({"public"}))
+    )
 
 
 def test_openai_backend_translates_handoff_and_preserves_request_id():
@@ -19,9 +26,10 @@ def test_openai_backend_translates_handoff_and_preserves_request_id():
         model="test-model",
         endpoint="https://example.test/v1/responses",
         transport=fake_transport,
+        policy_gate=_gate(),
     )
     response = backend.execute(
-        {"request_id": "req-001", "input": "hello"}
+        {"request_id": "req-001", "input": "hello", "data_classification": "public"}
     )
 
     assert response.backend_id == "openai-responses:v0.1"
