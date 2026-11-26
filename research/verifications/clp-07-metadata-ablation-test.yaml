@@ -1,0 +1,89 @@
+matome:
+  title: "Complex Landscape CLP-07 Minimum Metadata Ablation Test"
+  codename: "CLP-07"
+  version: "0.1"
+  status: "Research Verification"
+
+  purpose: >
+    CLP-06で候補となった保存メタデータを一項目ずつ除去し、
+    Landscapeの意味境界・追跡可能性・Human Gate境界がどの時点で
+    破壊されるかを比較する。
+
+  baseline:
+    required_candidates:
+      - evidence_id
+      - actor
+      - interpretation_link
+    conditional_candidates:
+      - uncertainty
+      - temporal_state
+      - human_judgment
+      - projection_scope
+      - coordinate
+
+  ablation:
+    - field: evidence_id
+      effect: "Evidenceの個体識別と追跡可能性が失われる"
+      semantic_boundary: "broken"
+      classification: "core"
+    - field: actor
+      effect: "誰の解釈・判断かを区別できなくなる"
+      semantic_boundary: "broken when attribution matters"
+      classification: "core"
+    - field: interpretation_link
+      effect: "解釈とEvidenceの関係が切断される"
+      semantic_boundary: "broken"
+      classification: "core"
+    - field: uncertainty
+      effect: "未確定状態を確定事項として誤読する可能性"
+      semantic_boundary: "context-dependent"
+      classification: "conditional"
+    - field: temporal_state
+      effect: "状態変化と履歴の区別が失われる"
+      semantic_boundary: "context-dependent"
+      classification: "conditional"
+    - field: human_judgment
+      effect: "AI提案とHuman最終判断の区別が失われる"
+      semantic_boundary: "required when decision attribution matters"
+      classification: "conditional-but-critical"
+    - field: projection_scope
+      effect: "Rendererの省略と削除を区別しにくくなる"
+      semantic_boundary: "required for traceable projections"
+      classification: "conditional"
+    - field: coordinate
+      effect: "観測位置の幾何学的表現が失われるが、actor等で代替可能な場合がある"
+      semantic_boundary: "not universally required"
+      classification: "candidate-for-reduction"
+
+  result:
+    status: "Conceptually consistent"
+    finding: >
+      evidence_id、actor、interpretation_linkは、意味状態を再接続するための
+     最小核候補として強く残る。一方、uncertainty、temporal_state、
+      human_judgment、projection_scopeは用途依存だが、特定の意味境界では
+     不可欠となる。coordinateは独立した必須項ではなく、他の帰属情報で
+     代替可能な場合がある。
+
+  deletion_candidates:
+    - field: coordinate
+      status: "廃止候補"
+      reason: "独立項として常時保持する必要性が未確認"
+    - field: projection_scope
+      status: "廃止候補"
+      reason: "Renderer用途に限定すれば条件付きメタデータとして外部化可能"
+
+  rule:
+    deletion_policy: >
+      廃止候補は削除せず候補として記録する。Human Gateによる判断なしに
+     既存意味モデルから除去しない。
+
+  boundary:
+    research_only: true
+    runtime_change: false
+    api_change: false
+    mathematical_proof: false
+
+  next:
+    codename: "CLP-08"
+    title: "Cross-Renderer Reconstruction Test"
+    purpose: "異なるRendererから共通の保存核を再構成できるか検証する"
