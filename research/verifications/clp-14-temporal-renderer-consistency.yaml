@@ -1,0 +1,109 @@
+matome:
+  title: "Complex Landscape CLP-14 Temporal Renderer Consistency Test"
+  codename: "CLP-14"
+  version: "0.1"
+  status: "Research Verification"
+
+  purpose: >
+    異なる時点のLandscapeを異なるRendererへ投影しても、Evidence identity、
+    Interpretation identity、Decision lineage、時点情報が保持されるか検証する。
+
+  source:
+    evidence:
+      - evidence_id: "E0"
+        observation: "出来事Xが発生した"
+    interpretation:
+      - interpretation_id: "I-A"
+        actor: "AI"
+        evidence_link: ["E0"]
+
+  timeline:
+    - timestamp: "T0"
+      decision_id: "D0"
+      action: "accept"
+      target: "I-A"
+    - timestamp: "T1"
+      decision_id: "D1"
+      action: "revoke"
+      target: "I-A"
+      supersedes: "D0"
+    - timestamp: "T2"
+      decision_id: "D2"
+      action: "hold"
+      target: "I-A"
+      supersedes: "D1"
+
+  renderer_projections:
+    - timestamp: "T0"
+      renderer: "manga"
+      expected_identity: "E0 / I-A / D0"
+    - timestamp: "T1"
+      renderer: "radio"
+      expected_identity: "E0 / I-A / D1"
+    - timestamp: "T2"
+      renderer: "threadrpg"
+      expected_identity: "E0 / I-A / D2"
+    - timestamp: "T2"
+      renderer: "api"
+      expected_identity: "E0 / I-A / D2"
+
+  consistency_rules:
+    - "Renderer choice does not create a new Evidence identity merely by changing presentation."
+    - "Renderer choice does not erase historical Decision lineage."
+    - "A past Renderer output must not be interpreted as the current state without a time query."
+    - "A current Renderer must be able to represent a historical state when explicitly requested."
+    - "Interpretation attribution remains stable across Renderer changes."
+    - "Decision state is evaluated relative to the requested timestamp."
+
+  result:
+    status: "Conceptually consistent"
+    finding: >
+      Temporal state and Renderer projection can be treated as independent axes.
+      The same semantic identity can therefore be rendered differently at different
+      times without conflating historical and current meaning.
+
+  important_consequence: >
+    Landscape can be modeled as a time-indexed semantic substrate rather than a
+    single current snapshot. Renderer becomes a view over that substrate, while
+    timestamp selects the semantic state to render.
+
+  emerging_model:
+    axes:
+      - "semantic identity"
+      - "temporal state"
+      - "renderer projection"
+    statement: >
+      A Renderer may vary the representation axis while a temporal query varies
+      the state axis; neither operation should alter canonical semantic identity.
+
+  creative_implication:
+    status: "Research hypothesis"
+    statement: >
+      If semantic identity, temporal state, and renderer projection can be
+      independently manipulated while preserving lineage, an AI system could
+      generate novel projections and novel interpretations without being allowed
+      to silently redefine the underlying Evidence. This suggests a path from
+      generative output toward constrained AI creativity: creation occurs in the
+      interpretation/projection layer, while semantic authority remains outside
+      the generator.
+    boundary:
+      - "Novel interpretation is not equivalent to new Evidence."
+      - "Creative generation does not grant decision authority."
+      - "Human Gate remains available for consequential adoption."
+
+  deletion_candidates:
+    - field: "coordinate"
+      status: "廃止候補継続"
+    - field: "projection_scope"
+      status: "保留"
+
+  boundary:
+    research_only: true
+    runtime_change: false
+    api_change: false
+    mathematical_proof: false
+
+  next:
+    codename: "CLP-15"
+    title: "Constrained Generative Interpretation Test"
+    purpose: "固定EvidenceからAIが新規Interpretationを生成しつつ、Evidence identityとHuman Gate境界を維持できるか検証する"
